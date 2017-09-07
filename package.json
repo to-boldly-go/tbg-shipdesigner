@@ -1,0 +1,15 @@
+{
+    "dependencies": {
+        "argparse": "^1.0.9",
+        "bluebird": "^3.5.0",
+        "papaparse": "^4.3.6",
+        "pretty-data": "^0.40.0"
+    },
+    "scripts": {
+        "run-design": "node run_design.js"
+    },
+    "license": "MIT",
+    "version": "1.0.0",
+    "name": "tbg-shipbuilder",
+    "devDependencies": {}
+}

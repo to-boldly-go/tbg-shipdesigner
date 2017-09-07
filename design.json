@@ -1,0 +1,52 @@
+{
+    "Name": "[C8] Aledeth Kepler",
+    "Principal Frame": "[T1] 900kt Frigate Frame",
+    "Subsystems": [
+        {
+            "Name": "Tactical",
+            "Sub-Frame": "[T1][SR+] Sm Frigate Tactical Suite",
+            "Components": [
+                {
+                    "Name": "Primary Phasers",
+                    "Part": "[T-1][L] Model 68 Phaser Bank",
+                    "Quantity": 2
+                },
+                {
+                    "Name": "Secondary Phasers",
+                    "Part": "No Phasers",
+                    "Quantity": 0
+                },
+                {
+                    "Name": "Torpedo System",
+                    "Part": "No Torp",
+                    "Quantity": 0
+                },
+                {
+                    "Name": "Short-Range Sensors",
+                    "Part": "[T2][H] Mark-VI-Heavy SR Lateral Sensor Array",
+                    "Quantity": 2
+                },
+                {
+                    "Name": "Targeting Computer",
+                    "Part": "No TCU",
+                    "Quantity": 1
+                },
+                {
+                    "Name": "Deflector Shields",
+                    "Part": "[T2][L] Mk-V-E Shield Gens",
+                    "Quantity": 5
+                },
+                {
+                    "Name": "Backup Deflectors",
+                    "Part": "[T2][L] Mk-V-E Shield Gens",
+                    "Quantity": 5
+                },
+                {
+                    "Name": "Impulse Engine Pwr",
+                    "Part": "[T2][M] SDB-09 High-Power Impulse Drive Sys",
+                    "Quantity": 1
+                }
+            ]
+        }
+    ]
+}
