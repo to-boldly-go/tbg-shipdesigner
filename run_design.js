@@ -75,10 +75,14 @@ Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 	.then(([parts, frames, design]) => {
 		let se_DB = new ShipEngine.DB({parts, frames});
 		let se_design = new ShipEngine.Design(se_DB, design);
-		console.log(se_design.raw_stats)
-		console.log(se_design.subsystems.map((ss) => [ss.name, ss.stats]));
-		console.log(se_design.subsystems.map((ss) => {
-			return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.stats.toString()])
-		}));
+		// console.log(se_design.raw_stats)
+		// console.log(se_design.subsystems.map((ss) => [ss.name, ss.stats]));
+		// console.log(se_design.subsystems.map((ss) => {
+		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.stats.toString()])
+		// }));
 		console.log(se_design.weight);
+		console.log(se_design.subsystems.map((ss) => [ss.name, ss.weight, ss.weight_frame, ss.weight_components]));
+		// console.log(se_design.subsystems.map((ss) => {
+		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.weight])
+		// }));
 	});

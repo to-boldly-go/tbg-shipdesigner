@@ -33,54 +33,66 @@ let COMPONENT_MODIFIERS = {
 	"Primary Phasers": {
 		"Effect Qty?": true,
 		"combat": 1,
+		"Cost Mod": 1,
 	},
 	"Secondary Phasers": {
 		"Effect Qty?": true,
 		"combat": 1/4,
+		"Cost Mod": 1/4,
 	},
 	"Torpedo System": {
 		"Effect Qty?": true,
 		"combat": 1,
+		"Cost Mod": 1,
 	},
 	"Short-Range Sensors": {
 		"Effect Qty?": true,
 		"combat": 1/2,
 		"science": 1/2,
+		"Cost Mod": 1,
 	},
 	"Targeting Computer": {
 		"Effect Qty?": true,
 		"combat": 1,
+		"Cost Mod": 1,
 	},
 	"Deflector Shields": {
 		"Effect Qty?": true,
 		"shields": 1,
+		"Cost Mod": 1,
 	},
 	"Backup Deflectors": {
 		"Effect Qty?": true,
 		"shields": 1/5,
+		"Cost Mod": 1/5,
 	},
 	"Impulse Engine Pwr": {
 		"Effect Qty?": true,
 		"combat": 1/4,
 		"defense": 4/5,
+		"Cost Mod": 1,
 	},
 
 	"Long-Range Sensors": {
 		"Effect Qty?": true,
 		"science": 1,
+		"Cost Mod": 1,
 	},
 	"Navigational Sensors": {
 		"Effect Qty?": true,
 		"science": 1,
 		"defense": 1/6,
+		"Cost Mod": 1,
 	},
 	"Survey Sensors": {
 		"Effect Qty?": true,
 		"science": 1,
+		"Cost Mod": 1,
 	},
 	"Science Labs": {
 		"Effect Qty?": true,
 		"science": 1,
+		"Cost Mod": 1,
 	},
 	"Computer Core": {
 		"Effect Qty?": true,
@@ -90,6 +102,7 @@ let COMPONENT_MODIFIERS = {
 		"shields": 1/7,
 		"presence": 1/6,
 		"defense": 1/8,
+		"Cost Mod": 1,
 	},
 	"Operating System": {
 		"Effect Qty?": true,
@@ -97,6 +110,7 @@ let COMPONENT_MODIFIERS = {
 		"science": 1/8,
 		"shields": 1/14,
 		"defense": 1/10,
+		"Cost Mod": 1,
 	},
 	"Secondary Core": {
 		"Effect Qty?": true,
@@ -104,68 +118,81 @@ let COMPONENT_MODIFIERS = {
 		"science": 1/16,
 		"shields": 1/28,
 		"defense": 1/40,
+		"Cost Mod": 1/2,
 	},
 	"Diplomatic Package": {
 		"Effect Qty?": true,
 		"presence": 1,
+		"Cost Mod": 1,
 	},
 	"Recreation Package": {
 		"Effect Qty?": true,
 		"presence": 1,
+		"Cost Mod": 1,
 	},
 	"Sickbay": {
 		"Effect Qty?": true,
 		"science": 1/2,
 		"presence": 1,
+		"Cost Mod": 1,
 	},
 	
 	"Hull System": {
 		"Effect Qty?": true,
 		"hull": 1,
+		"Cost Mod": 1,
+		"Scale Wt?": 1,
 	},
 	
 	"Structural Integrity Fields": {
 		"Effect Qty?": true,
 		"hull": 1,
+		"Cost Mod": 1,
 	},
 	"Navigational Deflector": {
 		"Effect Qty?": false,
 		"science": 1/3,
 		"shields": 1/7,
 		"defense": 1,
+		"Cost Mod": 1,
 	},
 	"Nacelle System": {
 		"Effect Qty?": true,
 		"defense": 1,
+		"Cost Mod": 1,
 	},
 	"Replication Package": {
 		"Effect Qty?": true,
 		"science": 1/10,
 		"presence": 1/4,
 		"defense": 1,
+		"Cost Mod": 1,
 	},
 	"Fuel & Matter Stores": {
 		"Effect Qty?": false,
 		"defense": 1,
+		"Cost Mod": 1,
 	},
 	
 	"Warp Core Type": {
 		"Effect Qty?": true,
-	},
-	"Safety/Performance": {
-		"Effect Qty?": false,
+		"Cost Mod": 1,
 	},
 	"M/AM Injectors": {
 		"Effect Qty?": true,
+		"Cost Mod": 1,
 	},
 	"Coolant Systems": {
 		"Effect Qty?": true,
+		"Cost Mod": 1,
 	},
 	"EPS Manifold System": {
 		"Effect Qty?": false,
+		"Cost Mod": 1,
 	},
 	"Eject System": {
 		"Effect Qty?": false,
+		"Cost Mod": 1,
 	},
 };
 
@@ -286,7 +313,7 @@ class DesignComponent {
 	}
 
 	get cost_mod() {
-		return this.component_modifier['Cost Mod'];
+		return this.component_modifier['Cost Mod'] || 1;
 	};
 
 	// IF(DF31,
@@ -296,7 +323,7 @@ class DesignComponent {
 		if (this.component_modifier['Scale Wt?']) {
 			return this.weight_scale_raw * this.subsystem.design.size;
 		} else {
-			return this.unit_weight;
+			return this.weight_unit_raw;
 		};
 	}
 
@@ -365,7 +392,15 @@ class DesignComponent {
 	// can be formula as long as it doesn't reference any cell on this
 	// row
 	get weight_custom() {
-		// TODO
+		if (this.name === 'Primary Phasers') {
+			return this.setting_phaser_array_weight_multiplier;
+		}
+		if (this.name === 'Secondary Phasers') {
+			return this.setting_phaser_array_weight_multiplier;
+		}
+		if (this.name === 'Torpedo System') {
+			return this.setting_burst_launcher_weight_multiplier;
+		}
 		return 1;
 	};
 
@@ -393,7 +428,6 @@ class DesignComponent {
 			return this.phaser_size_mult * this.setting_phaser_array_combat_multiplier;
 		}
 		if (this.name === 'Secondary Phasers') {
-			// return (0.97 / 2) * this.setting_phaser_array_combat_multiplier;
 			return this.phaser_size_mult * this.setting_phaser_array_combat_multiplier;
 		}
 		if (this.name === 'Torpedo System') {
@@ -406,9 +440,17 @@ class DesignComponent {
 	};
 
 	get phaser_size_mult() {
-		return 1 - (this.subsystem.design.size / 100);
+		return 1 - (this.subsystem.design.size / 100.0);
 	};
 
+	get setting_phaser_array_weight_multiplier() {
+		if (this.subsystem.settings['Phaser Arrays']) {
+			return 1.5;
+		} else {
+			return 1.0;
+		};
+	};
+	
 	get setting_phaser_array_combat_multiplier() {
 		if (this.subsystem.settings['Phaser Arrays']) {
 			return 2.0;
@@ -418,6 +460,14 @@ class DesignComponent {
 	};
 
 	get setting_burst_launcher_combat_multiplier() {
+		if (this.subsystem.settings['Burst Launchers']) {
+			return 1.5;
+		} else {
+			return 1.0;
+		};
+	};
+
+	get setting_burst_launcher_weight_multiplier() {
 		if (this.subsystem.settings['Burst Launchers']) {
 			return 1.5;
 		} else {
@@ -442,7 +492,7 @@ class DesignSubsystem {
 	// scalar
 	get weight() {
 		// =SUM(CK31:CK40)+CK29
-		this.weight_frame + this.weight_components;
+		return this.weight_frame + this.weight_components;
 	};
 
 	// CK29, DM29 if populated, DM29 is weight straight off frames list
@@ -513,14 +563,14 @@ class Design {
 	// O3, CK27
 	// scalar
 	get weight() {
-		return Math.floor(this.weight_raw);
+		return Math.ceil(this.weight_raw);
 	};
 
 	// O2, CK26
 	// scalar
 	get weight_raw() {
 		// =SUM(CK20:CK25)+CK$18
-		this.weight_frame + this.weight_subsystems
+		return this.weight_frame + this.weight_subsystems
 	};
 
 	// CK26
@@ -571,7 +621,7 @@ class Design {
 	// BK26
 	get size() {
 		// BK18 + BK88
-		this.frame_size;// + this.module.size;
+		return this.frame_size;// + this.module.size;
 	};
 
 	// BK18, "Size"
