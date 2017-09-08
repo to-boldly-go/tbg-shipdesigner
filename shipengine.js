@@ -18,6 +18,15 @@ const SUBSYSTEM_NAME_MAP = {
 	"Warp Core": "Core Mod",
 }
 
+const STAT_SHORTNAMES = {
+	'combat': 'C',
+	'science': 'S',
+	'hull': 'H',
+	'shields': 'L',
+	'presence': 'P',
+	'defense': 'D',
+}
+
 // REFACTOR: change the names of these to be less abbreviated
 // (effectiveness instead of effect, for example)
 let COMPONENT_MODIFIERS = {
@@ -186,7 +195,7 @@ class Statline {
 
 	toString() {
 		return '[' + Statline.stats.map((stat) => {
-			return stat[0].toUpperCase() + this[stat].toString();
+			return STAT_SHORTNAMES[stat].toUpperCase() + this[stat].toString();
 		}).join(' ') + ']'
 	};
 
