@@ -1,71 +1,308 @@
-let MODIFIERS = {
+const SIZE_TO_WEIGHT_CAP_MULTIPLIER = 300
+
+const BR_TO_WEIGHT_MULTIPLIER = 10
+
+const BR_COST_ROUND_FRIGATE = 5
+const BR_COST_ROUND_CRUISER = 10
+const BR_COST_ROUND_EXPLORER = 10
+
+const SR_COST_ROUND_FRIGATE = 5
+const SR_COST_ROUND_CRUISER = 5
+const SR_COST_ROUND_EXPLORER = 10
+
+const SUBSYSTEM_NAME_MAP = {
+	"Tactical": "Tac Mod",
+	"Engineering": "Eng. Mod",
+	"Hull": "Hull Mod",
+	"Operations": "Ops Mod",
+	"Warp Core": "Core Mod",
+}
+
+// REFACTOR: change the names of these to be less abbreviated
+// (effectiveness instead of effect, for example)
+let COMPONENT_MODIFIERS = {
 	"Primary Phasers": {
 		"Effect Qty?": true,
-		"C": 1,
+		"combat": 1,
 	},
 	"Secondary Phasers": {
 		"Effect Qty?": true,
-		"C": 1/4,
+		"combat": 1/4,
 	},
 	"Torpedo System": {
 		"Effect Qty?": true,
-		"C": 1,
+		"combat": 1,
 	},
 	"Short-Range Sensors": {
 		"Effect Qty?": true,
-		"C": 1/2,
+		"combat": 1/2,
+		"science": 1/2,
 	},
 	"Targeting Computer": {
 		"Effect Qty?": true,
-		"C": 1,
+		"combat": 1,
 	},
 	"Deflector Shields": {
 		"Effect Qty?": true,
-		"C": 0,
+		"shields": 1,
 	},
 	"Backup Deflectors": {
 		"Effect Qty?": true,
-		"C": 0,
+		"shields": 1/5,
 	},
 	"Impulse Engine Pwr": {
 		"Effect Qty?": true,
-		"C": 1/4,
+		"combat": 1/4,
+		"defense": 4/5,
+	},
+
+	"Long-Range Sensors": {
+		"Effect Qty?": true,
+		"science": 1,
+	},
+	"Navigational Sensors": {
+		"Effect Qty?": true,
+		"science": 1,
+		"defense": 1/6,
+	},
+	"Survey Sensors": {
+		"Effect Qty?": true,
+		"science": 1,
+	},
+	"Science Labs": {
+		"Effect Qty?": true,
+		"science": 1,
+	},
+	"Computer Core": {
+		"Effect Qty?": true,
+		"combat": 1/4,
+		"science": 1/4,
+		"hull": 1/10,
+		"shields": 1/7,
+		"presence": 1/6,
+		"defense": 1/8,
+	},
+	"Operating System": {
+		"Effect Qty?": true,
+		"combat": 1/8,
+		"science": 1/8,
+		"shields": 1/14,
+		"defense": 1/10,
+	},
+	"Secondary Core": {
+		"Effect Qty?": true,
+		"combat": 1/16,
+		"science": 1/16,
+		"shields": 1/28,
+		"defense": 1/40,
+	},
+	"Diplomatic Package": {
+		"Effect Qty?": true,
+		"presence": 1,
+	},
+	"Recreation Package": {
+		"Effect Qty?": true,
+		"presence": 1,
+	},
+	"Sickbay": {
+		"Effect Qty?": true,
+		"science": 1/2,
+		"presence": 1,
+	},
+	
+	"Hull System": {
+		"Effect Qty?": true,
+		"hull": 1,
+	},
+	
+	"Structural Integrity Fields": {
+		"Effect Qty?": true,
+		"hull": 1,
+	},
+	"Navigational Deflector": {
+		"Effect Qty?": false,
+		"science": 1/3,
+		"shields": 1/7,
+		"defense": 1,
+	},
+	"Nacelle System": {
+		"Effect Qty?": true,
+		"defense": 1,
+	},
+	"Replication Package": {
+		"Effect Qty?": true,
+		"science": 1/10,
+		"presence": 1/4,
+		"defense": 1,
+	},
+	"Fuel & Matter Stores": {
+		"Effect Qty?": false,
+		"defense": 1,
+	},
+	
+	"Warp Core Type": {
+		"Effect Qty?": true,
+	},
+	"Safety/Performance": {
+		"Effect Qty?": false,
+	},
+	"M/AM Injectors": {
+		"Effect Qty?": true,
+	},
+	"Coolant Systems": {
+		"Effect Qty?": true,
+	},
+	"EPS Manifold System": {
+		"Effect Qty?": false,
+	},
+	"Eject System": {
+		"Effect Qty?": false,
 	},
 };
 
-class DesignPart {
-	constructor(db, component, name, quantity) {
-		this.db = db;
-		this.name = name;
-		this.quantity = quantity;
-		this.component = component;
+class Statline {
+	static get stats() {
+		return [
+			'combat',
+			'science',
+			'hull',
+			'shields',
+			'presence',
+			'defense',
+		];
+	}
 
-		this.part_def = this.db.find_part(this.name);
-
-		// DK31:DK40, ...
-		this.effect = this.part_def['Effect'];
+	constructor(val) {
+		if ((typeof val) === 'number') {
+			Statline.stats.forEach((stat) => {
+				this[stat] = val;
+			});
+		} else {
+			Statline.stats.forEach((stat) => {
+				this[stat] = val[stat] || 0;
+			});
+		}
 	};
 
-	// CD31
-	get combat() {
+	toString() {
+		return '[' + Statline.stats.map((stat) => {
+			return stat[0].toUpperCase() + this[stat].toString();
+		}).join(' ') + ']'
+	};
+
+	static op_add(a, b) {
+		return a + b;
+	};
+	static op_mult(a, b) {
+		return a * b;
+	};
+
+	add(other) {
+		return this.op(Statline.op_add, other);
+	}
+	mult(other) {
+		return this.op(Statline.op_mult, other);
+	}
+	get floor() {
+		return new Statline(
+			Statline.stats.reduce((acc, stat) => {
+				acc[stat] = Math.floor(this[stat]);
+				return acc;
+			}, {})
+		);
+	}
+
+	op(fun, other) {
+		if ((typeof other) === 'number') {
+			return new Statline(
+				Statline.stats.reduce((acc, stat) => {
+					acc[stat] = fun(this[stat], other);
+					return acc;
+				}, {})
+			);
+		} else {
+			return new Statline(
+				Statline.stats.reduce((acc, stat) => {
+					acc[stat] = fun(this[stat], other[stat]);
+					return acc;
+				}, {})
+			);
+		};
+	};
+};
+
+class DesignComponent {
+	constructor(db, subsystem, design_component_json) {
+		this.db = db;
+		this.name = design_component_json['Name'];
+
+		// parent
+		this.subsystem = subsystem;
+
+		// CY block
+		// statline
+		this.component_modifier = COMPONENT_MODIFIERS[this.name];
+
+		// BK column
+		// scalar
+		this.quantity = design_component_json['Quantity'];
+
+		// BL block
+		// statline
+		this.part_def = this.db.find_part(design_component_json['Part']);
+	};
+
+	// DK column
+	// scalar
+	get raw_effect() {
+		return this.part_def['Effect'];
+	};
+
+	// CE block
+	// statline
+	get stats() {
+		// CD column * CY block * CE$29 row
+		//
+		// effect for this part * frame effect multiplier * the
+		// component's statline modifier
+		return new Statline(this.component_modifier).mult(this.effect * this.subsystem.multiplier);
+	};
+
+	// CD column
+	// scalar
+	get effect() {
 		// =DK31 * IF(CX31,1+3.5*log10(0.7*BK31+0.3),1) * CW31
-		return this.effect * this.raw_combat * this.custom_combat
+		//
+		// raw effect from parts list * quantity multiplier * custom effect
+		return this.raw_effect * this.effect_custom * this.qty_mult;
 	};
 
 	// IF(CX31,
 	// 1 + 3.5 * log10(0.7 * BK31 + 0.3)
 	// ,1)
-	get raw_combat() {
-		if (this.component.effect_qty) {
+	//
+	// scalar
+	get qty_mult() {
+		if (this.uses_effect_qty) {
 			return 1 + (3.5 * Math.log((0.7 * this.quantity) + 0.3) / Math.log(10));
 		} else {
 			return 1;
 		};
 	};
 
-	// CW31
-	get custom_combat () {
-		if (this.component.name === 'Primary Phasers') {
+	// boolean
+	get uses_effect_qty() {
+		return this.component_modifier['Effect Qty?'];
+	};
+
+	// CW column
+	//
+	// scalar
+	// 
+	// comment on sheet: Additional custom multiplier on effect - can
+	// be formula as long as it doesn't reference any cell on this row
+	get effect_custom () {
+		if (this.name === 'Primary Phasers') {
 			// =(1-(BK$26/100)) * IF($D$33,2,1)
 			// BK$26 = BK18 + BK25
 			// BK18 = $CV18 / $AL$6
@@ -75,44 +312,36 @@ class DesignPart {
 			// BK88 = rollbar size? = $CV88 / $AL$6
 			// $CV88 = DL88 = module weight cap? = module weight cap from "Weight Cap" element of module
 			// $D$33 is "phaser arrays Y/N"
+			// return (0.97 / 2) * this.setting_phaser_array_combat_multiplier;
 			return 0.97;
 		}
-		if (this.component.name === 'Secondary Phasers') {
+		if (this.name === 'Secondary Phasers') {
+			// return (0.97 / 2) * this.setting_phaser_array_combat_multiplier;
 			return 0.97;
 		}
-		if (this.component.name === 'Torpedo System') {
+		if (this.name === 'Torpedo System') {
 			// =IF($D$35, 1.5, 1)
 			// $D$35 is burst launchers Y/N
-			return 1.5;
+			return this.setting_burst_launcher_combat_multiplier;
 		}
+		// if nothing else, no change
 		return 1;
 	};
-};
 
-class DesignComponent {
-	constructor(db, subsystem, design_component_json) {
-		this.db = db;
-		this.name = design_component_json['Name'];
-		this.subsystem = subsystem;
-		// CY31:CY40, ...
-		this.modifier = MODIFIERS[this.name] || {};
-
-		this.part = new DesignPart(this.db, this, design_component_json['Part'], design_component_json['Quantity']);
+	get setting_phaser_array_combat_multiplier() {
+		if (this.subsystem.settings['Phaser Arrays']) {
+			return 2.0;
+		} else {
+			return 1.0;
+		};
 	};
 
-	// CE31:CE40, CE46:CE56, ...
-	get combat() {
-		// CD31 * CY31 * CE$29
-		return this.part.combat * this.combat_modifier * this.subsystem.combat_multiplier;
-	};
-
-	get effect_qty() {
-		return this.modifier['Effect Qty?'];
-	};
-
-	// CY31
-	get combat_modifier() {
-		return this.modifier['C'];
+	get setting_burst_launcher_combat_multiplier() {
+		if (this.subsystem.settings['Burst Launchers']) {
+			return 1.5;
+		} else {
+			return 1.0;
+		};
 	};
 };
 
@@ -121,27 +350,32 @@ class DesignSubsystem {
 		this.db = db;
 		this.name = design_subsystem_json['Name'];
 		this.design = design;
+		this.settings = design_subsystem_json['Settings'];
 		this.sub_frame_def = this.db.find_frame(design_subsystem_json['Sub-Frame']);
 		this.components = design_subsystem_json['Components'].map(
 			(comp_json) => new DesignComponent(this.db, this, comp_json)
 		);
 	};
 	
-	// CE20:CE25, CE41, CE57, ...
-	get combat() {
+	// [CE41 row;CE57 row;CE63 row] block
+	get stats() {
 		return this
 			.components
-			.map((comp) => comp.combat)
-			.reduce((sum, value) => sum + value);
+			.map((comp) => comp.stats)
+			.reduce((sum, value) => sum.add(value), new Statline({}));
 	};
 
 	// CE29, CD29, DO29
-	get combat_multiplier() {
+	get multiplier() {
 		// =IF(BI29="",0,DGET('[C8] Frames'!$A:$R,DO$28,{"Type","Name";"="&$AJ29,"="&BI29}))
 		// BI29 is frame name
 		// if no frame, then 0
 		// if frame, then look up "tac mod" field in frames list
-		return this.sub_frame_def['Tac Mod'];
+		if (this.sub_frame_def) {
+			return this.sub_frame_def[SUBSYSTEM_NAME_MAP[this.name]];
+		} else {
+			return 0;
+		};
 	};
 };
 
@@ -156,17 +390,17 @@ class Design {
 		);
 	};
 	
-	// CE27
-	get combat() {
-		return Math.floor(this.raw_combat)
+	// CE27 row
+	get stats() {
+		return this.raw_stats.floor
 	};
 
-	// BL26, CE26
-	get raw_combat() {
+	// BL26, CE26 row
+	get raw_stats() {
 		return this
 			.subsystems
-			.map((ss) => ss.combat)
-			.reduce((sum, value) => sum + value);
+			.map((ss) => ss.stats)
+			.reduce((sum, value) => sum.add(value), new Statline({}));
 	};
 };
 
@@ -188,3 +422,4 @@ class DB {
 
 module.exports.Design = Design;
 module.exports.DB = DB;
+module.exports.Statline = Statline;

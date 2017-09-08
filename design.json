@@ -1,52 +1,195 @@
 {
-    "Name": "[C8] Aledeth Kepler",
-    "Principal Frame": "[T1] 900kt Frigate Frame",
     "Subsystems": [
         {
-            "Name": "Tactical",
-            "Sub-Frame": "[T1][SR+] Sm Frigate Tactical Suite",
             "Components": [
                 {
-                    "Name": "Primary Phasers",
-                    "Part": "[T-1][L] Model 68 Phaser Bank",
-                    "Quantity": 2
+                    "Part": "[T2][L][C+] Type-I Block-A (40E) Warp Core",
+                    "Quantity": 2,
+                    "Name": "Warp Core Type"
                 },
                 {
-                    "Name": "Secondary Phasers",
-                    "Part": "No Phasers",
-                    "Quantity": 0
+                    "Part": "[T2][L][R-C-] Luna-VI High-Efficiency M/AM System",
+                    "Quantity": 2,
+                    "Name": "M/AM Injectors"
                 },
                 {
-                    "Name": "Torpedo System",
-                    "Part": "No Torp",
-                    "Quantity": 0
+                    "Part": "[T2][L] Mk VIII Mod L Yoyodyne Coolant System",
+                    "Quantity": 2,
+                    "Name": "Coolant Systems"
                 },
                 {
-                    "Name": "Short-Range Sensors",
-                    "Part": "[T2][H] Mark-VI-Heavy SR Lateral Sensor Array",
-                    "Quantity": 2
+                    "Part": "[T3][M][R+] VSA-7 Pulse Injection Manifold",
+                    "Quantity": 3,
+                    "Name": "EPS Manifold System"
                 },
                 {
-                    "Name": "Targeting Computer",
-                    "Part": "No TCU",
-                    "Quantity": 1
-                },
-                {
-                    "Name": "Deflector Shields",
-                    "Part": "[T2][L] Mk-V-E Shield Gens",
-                    "Quantity": 5
-                },
-                {
-                    "Name": "Backup Deflectors",
-                    "Part": "[T2][L] Mk-V-E Shield Gens",
-                    "Quantity": 5
-                },
-                {
-                    "Name": "Impulse Engine Pwr",
-                    "Part": "[T2][M] SDB-09 High-Power Impulse Drive Sys",
-                    "Quantity": 1
+                    "Part": "[T2] EngOS Monitoring - Anak-Krueger EM Rails",
+                    "Quantity": 1,
+                    "Name": "Eject System"
                 }
-            ]
+            ],
+            "Settings": {
+                "Safety/Performance": 0
+            },
+            "Sub-Frame": "[T2] Md Frigate Warp Core Suite",
+            "Name": "Warp Core"
+        },
+        {
+            "Components": [
+                {
+                    "Part": "[T2][M] Type-VI SIF",
+                    "Quantity": 2,
+                    "Name": "Structural Integrity Fields"
+                },
+                {
+                    "Part": "[T1][L] Modulated Graviton Beam Deflector Saucer-Only",
+                    "Quantity": 3,
+                    "Name": "Navigational Deflector"
+                },
+                {
+                    "Part": "[T1][L] 2 X Centaur-A Pattern Nacelle",
+                    "Quantity": 1,
+                    "Name": "Nacelle System"
+                },
+                {
+                    "Part": "[T2][M] S-Medical Mk VI Protein Synth",
+                    "Quantity": 1,
+                    "Name": "Replication Package"
+                },
+                {
+                    "Part": "[T2][L] 2310-Light Pattern Deuterium Tanks",
+                    "Quantity": 3,
+                    "Name": "Fuel & Matter Stores"
+                }
+            ],
+            "Settings": {
+            },
+            "Sub-Frame": "[T2][OET-SR-] Md Frigate Engineering Suite",
+            "Name": "Engineering"
+        },
+        {
+            "Components": [
+                {
+                    "Part": "[T2][H] Mark-VII-Heavy LR Sensor Array",
+                    "Quantity": 2,
+                    "Name": "Long-Range Sensors"
+                },
+                {
+                    "Part": "[T2][H] Mark-VII-Heavy Nav Array",
+                    "Quantity": 2,
+                    "Name": "Navigational Sensors"
+                },
+                {
+                    "Part": "No Survey Sensors",
+                    "Quantity": 0,
+                    "Name": "Survey Sensors"
+                },
+                {
+                    "Part": "[T2][H] Spock-C Pattern Lab",
+                    "Quantity": 2,
+                    "Name": "Science Labs"
+                },
+                {
+                    "Part": "[T1][L] Type-III-A Duotronic Core",
+                    "Quantity": 3,
+                    "Name": "Computer Core"
+                },
+                {
+                    "Part": "[T2] Majel 3.1 OS",
+                    "Quantity": 3,
+                    "Name": "Operating System"
+                },
+                {
+                    "Part": "No Core",
+                    "Quantity": 0,
+                    "Name": "Secondary Core"
+                },
+                {
+                    "Part": "[T1][M] Lwaxana '04 General Protocol",
+                    "Quantity": 2,
+                    "Name": "Diplomatic Package"
+                },
+                {
+                    "Part": "No Onboard Recreation",
+                    "Quantity": 0,
+                    "Name": "Recreation Package"
+                },
+                {
+                    "Part": "[T2][H] T'Koren Pattern Large Sickbay",
+                    "Quantity": 4,
+                    "Name": "Sickbay"
+                }
+            ],
+            "Settings": {
+                "Isolinear?": false
+            },
+            "Sub-Frame": "[T2][OE--] Lg Frigate Operations Suite",
+            "Name": "Operations"
+        },
+        {
+            "Components": [
+                {
+                    "Quantity": 1,
+                    "Part": "[T2][L] Lt. Alloy-3 Duranium Hull",
+                    "Name": "Hull System"
+                }
+            ],
+            "Settings": {
+            },
+            "Sub-Frame": "[T2] Sm Frigate Hull Suite",
+            "Name": "Hull"
+        },
+        {
+            "Components": [
+                {
+                    "Quantity": 2,
+                    "Part": "[T-1][L] Model 68 Phaser Bank",
+                    "Name": "Primary Phasers"
+                },
+                {
+                    "Quantity": 0,
+                    "Part": "No Phasers",
+                    "Name": "Secondary Phasers"
+                },
+                {
+                    "Quantity": 0,
+                    "Part": "No Torp",
+                    "Name": "Torpedo System"
+                },
+                {
+                    "Quantity": 2,
+                    "Part": "[T2][H] Mark-VI-Heavy SR Lateral Sensor Array",
+                    "Name": "Short-Range Sensors"
+                },
+                {
+                    "Quantity": 1,
+                    "Part": "No TCU",
+                    "Name": "Targeting Computer"
+                },
+                {
+                    "Quantity": 5,
+                    "Part": "[T2][L] Mk-V-E Shield Gens",
+                    "Name": "Deflector Shields"
+                },
+                {
+                    "Quantity": 5,
+                    "Part": "[T2][L] Mk-V-E Shield Gens",
+                    "Name": "Backup Deflectors"
+                },
+                {
+                    "Quantity": 1,
+                    "Part": "[T2][M] SDB-09 High-Power Impulse Drive Sys",
+                    "Name": "Impulse Engine Pwr"
+                }
+            ],
+            "Settings": {
+                "Burst Launchers": true,
+                "Phaser Arrays": false
+            },
+            "Sub-Frame": "[T1][SR+] Sm Frigate Tactical Suite",
+            "Name": "Tactical"
         }
-    ]
+    ],
+    "Principal Frame": "[T1] 900kt Frigate Frame",
+    "Name": "[C8] Aledeth Kepler"
 }
