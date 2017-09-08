@@ -80,4 +80,5 @@ Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 		console.log(se_design.subsystems.map((ss) => {
 			return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.stats.toString()])
 		}));
+		console.log(se_design.weight);
 	});

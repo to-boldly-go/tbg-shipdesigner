@@ -261,6 +261,60 @@ class DesignComponent {
 		this.part_def = this.db.find_part(design_component_json['Part']);
 	};
 
+	// CK column
+	// scalar
+	get weight() {
+		// =(DL31 + IF(DF31,DM31*BK$26,DN31)*BK31) * DE31 * DG31
+		// DL31 is "Weight O/H", weight overhead, off parts list
+		// DF31 is "Scale Wt?" component configuration
+		// DM31 is "Scale Weight" off parts list
+		// BK$26 is frame size?, BK18+BK25
+		// DN31 is "Unit Weight" off parts list
+		// BK31 is part quantity
+		// DE31 is "Wt Custom" component configuration
+		// DG31 is "Cost Mod" component configuration
+		return this.weight_raw * this.weight_custom * this.cost_mod;
+	};
+
+	// (DL31 + IF(DF31,DM31*BK$26,DN31)*BK31)
+	// scalar
+	//
+	// the weight of the component before component and size modifiers
+	// are applied
+	get weight_raw() {
+		return this.weight_overhead_raw + (this.weight_per_unit * this.quantity);
+	}
+
+	get cost_mod() {
+		return this.component_modifier['Cost Mod'];
+	};
+
+	// IF(DF31,
+	// DM31*BK$26,
+	// DN31)
+	get weight_per_unit() {
+		if (this.component_modifier['Scale Wt?']) {
+			return this.weight_scale_raw * this.subsystem.design.size;
+		} else {
+			return this.unit_weight;
+		};
+	}
+
+	// DL31
+	get weight_overhead_raw() {
+		return this.part_def['Weight O/H'];
+	};
+
+	// DM31
+	get weight_scale_raw() {
+		return this.part_def['Scale Weight'];
+	};
+
+	// DN31
+	get weight_unit_raw() {
+		return this.part_def['Unit Weight'];
+	};
+
 	// DK column
 	// scalar
 	get raw_effect() {
@@ -274,7 +328,7 @@ class DesignComponent {
 		//
 		// effect for this part * frame effect multiplier * the
 		// component's statline modifier
-		return new Statline(this.component_modifier).mult(this.effect * this.subsystem.multiplier);
+		return new Statline(this.component_modifier).mult(this.effect * this.subsystem.stats_multiplier);
 	};
 
 	// CD column
@@ -304,6 +358,17 @@ class DesignComponent {
 		return this.component_modifier['Effect Qty?'];
 	};
 
+	// DE column
+	// scalar
+	//
+	// Additional custom multiplier on weight (and thus also BR/SR) -
+	// can be formula as long as it doesn't reference any cell on this
+	// row
+	get weight_custom() {
+		// TODO
+		return 1;
+	};
+
 	// CW column
 	//
 	// scalar
@@ -314,19 +379,22 @@ class DesignComponent {
 		if (this.name === 'Primary Phasers') {
 			// =(1-(BK$26/100)) * IF($D$33,2,1)
 			// BK$26 = BK18 + BK25
-			// BK18 = $CV18 / $AL$6
-			// $CV18 = weight cap, DL18, equal principal frame MaxSz
-			// $AL$6 = "Size-To-Weight-Cap Multiplier", constant 300
+			// BK18 is design size
+
 			// BK25 = rollbar size?, BK88
 			// BK88 = rollbar size? = $CV88 / $AL$6
 			// $CV88 = DL88 = module weight cap? = module weight cap from "Weight Cap" element of module
 			// $D$33 is "phaser arrays Y/N"
-			// return (0.97 / 2) * this.setting_phaser_array_combat_multiplier;
-			return 0.97;
+
+			// AL6 is size to weight multiplier
+
+			// return (0.97 / 2) * ;
+
+			return this.phaser_size_mult * this.setting_phaser_array_combat_multiplier;
 		}
 		if (this.name === 'Secondary Phasers') {
 			// return (0.97 / 2) * this.setting_phaser_array_combat_multiplier;
-			return 0.97;
+			return this.phaser_size_mult * this.setting_phaser_array_combat_multiplier;
 		}
 		if (this.name === 'Torpedo System') {
 			// =IF($D$35, 1.5, 1)
@@ -335,6 +403,10 @@ class DesignComponent {
 		}
 		// if nothing else, no change
 		return 1;
+	};
+
+	get phaser_size_mult() {
+		return 1 - (this.subsystem.design.size / 100);
 	};
 
 	get setting_phaser_array_combat_multiplier() {
@@ -365,6 +437,32 @@ class DesignSubsystem {
 			(comp_json) => new DesignComponent(this.db, this, comp_json)
 		);
 	};
+
+	// CK20:CK25 column, [CK41, CK57, CK63, ...]
+	// scalar
+	get weight() {
+		// =SUM(CK31:CK40)+CK29
+		this.weight_frame + this.weight_components;
+	};
+
+	// CK29, DM29 if populated, DM29 is weight straight off frames list
+	// scalar
+	get weight_frame() {
+		return this.sub_frame_def['Wt'] || 0;
+	};
+
+	// =SUM(CK31:CK40)
+	// scalar
+	get weight_components() {
+		return this
+			.components
+			.map((comp) => comp.weight)
+			.reduce((sum, value) => sum + value, 0);
+	};
+
+	// get weight_multiplier() {
+	// 	return this.sub_frame_def[''] || 0;
+	// };
 	
 	// [CE41 row;CE57 row;CE63 row] block
 	get stats() {
@@ -375,7 +473,7 @@ class DesignSubsystem {
 	};
 
 	// CE29, CD29, DO29
-	get multiplier() {
+	get stats_multiplier() {
 		// =IF(BI29="",0,DGET('[C8] Frames'!$A:$R,DO$28,{"Type","Name";"="&$AJ29,"="&BI29}))
 		// BI29 is frame name
 		// if no frame, then 0
@@ -401,15 +499,91 @@ class Design {
 	
 	// CE27 row
 	get stats() {
-		return this.raw_stats.floor
+		return this.stats_raw.floor
 	};
 
 	// BL26, CE26 row
-	get raw_stats() {
+	get stats_raw() {
 		return this
 			.subsystems
 			.map((ss) => ss.stats)
 			.reduce((sum, value) => sum.add(value), new Statline({}));
+	};
+
+	// O3, CK27
+	// scalar
+	get weight() {
+		return Math.floor(this.weight_raw);
+	};
+
+	// O2, CK26
+	// scalar
+	get weight_raw() {
+		// =SUM(CK20:CK25)+CK$18
+		this.weight_frame + this.weight_subsystems
+	};
+
+	// CK26
+	get weight_subsystems() {
+		// =SUM(CK20:CK25)
+		// CK20:25 is subsystem weights
+		return this.subsystems
+			.map((ss) => ss.weight)
+			.reduce((sum, value) => sum + value, 0);
+	};
+
+	// CK$18, DM18
+	// part frame weight
+	get weight_frame() {
+		return this.princ_frame_def['Wt'];
+	};
+
+	// P3, CL27
+	get cost_BR() {
+		return Math.floor(this.cost_BR_raw());
+	};
+
+	// P2, CL26
+	get cost_BR_raw() {
+
+	};
+
+	// Q2, CM27
+	get cost_SR() {
+		return Math.floor(this.cost_SR_raw());
+	};
+
+	// Q3, CM26
+	get cost_SR_raw() {
+
+	};
+
+	// R2, CN27
+	get cost_power() {
+		return Math.floor(this.cost_power_raw());
+	};
+
+	// R3, CN26
+	get cost_power_raw() {
+
+	};
+
+	// BK26
+	get size() {
+		// BK18 + BK88
+		this.frame_size;// + this.module.size;
+	};
+
+	// BK18, "Size"
+	get frame_size() {
+		// BK18 = $CV18 / $AL$6
+		// $CV18 = weight cap, DL18, equal principal frame MaxSz
+		// $AL$6 = "Size-To-Weight-Cap Multiplier", constant 300
+		return this.frame_max_size_raw / SIZE_TO_WEIGHT_CAP_MULTIPLIER;
+	};
+
+	get frame_max_size_raw() {
+		return this.princ_frame_def['MaxSz'];
 	};
 };
 
