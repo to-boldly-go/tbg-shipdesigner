@@ -291,7 +291,7 @@ class DesignComponent {
 
 	// CK column
 	// scalar
-	get weight() {
+	get weight_internal() {
 		// =(DL31 + IF(DF31,DM31*BK$26,DN31)*BK31) * DE31 * DG31
 		// DL31 is "Weight O/H", weight overhead, off parts list
 		// DF31 is "Scale Wt?" component configuration
@@ -301,7 +301,35 @@ class DesignComponent {
 		// BK31 is part quantity
 		// DE31 is "Wt Custom" component configuration
 		// DG31 is "Cost Mod" component configuration
-		return this.weight_raw * this.weight_custom * this.cost_mod;
+		switch (this.name) {
+		case 'Nacelle System':
+			// "Nacelle Distribution" line in spreadsheet
+			return this.weight_overhead_raw * this.weight_custom * this.cost_mod;
+		default:
+			return this.weight_raw * this.weight_custom * this.cost_mod;
+		};
+	};
+
+	// CK column
+	// scalar
+	get weight_external() {
+		// =(DL31 + IF(DF31,DM31*BK$26,DN31)*BK31) * DE31 * DG31
+		// DL31 is "Weight O/H", weight overhead, off parts list
+		// DF31 is "Scale Wt?" component configuration
+		// DM31 is "Scale Weight" off parts list
+		// BK$26 is frame size?, BK18+BK25
+		// DN31 is "Unit Weight" off parts list
+		// BK31 is part quantity
+		// DE31 is "Wt Custom" component configuration
+		// DG31 is "Cost Mod" component configuration
+		switch (this.name) {
+		case 'Nacelle System':
+			// "Nacelle System" line in spreadsheet
+			// DN70 * BK70 * DE70 * DG70
+			return this.weight_unit_raw * this.quantity * this.weight_custom * this.cost_mod;
+		default:
+			return 0;
+		};
 	};
 
 	// (DL31 + IF(DF31,DM31*BK$26,DN31)*BK31)
@@ -488,9 +516,16 @@ class DesignSubsystem {
 
 	// CK20:CK25 column, [CK41, CK57, CK63, ...]
 	// scalar
-	get weight() {
+	get weight_external() {
 		// =SUM(CK31:CK40)+CK29
-		return this.weight_frame + this.weight_components;
+		return this.weight_components_external;
+	};
+
+	// CK20:CK25 column, [CK41, CK57, CK63, ...]
+	// scalar
+	get weight_internal() {
+		// =SUM(CK31:CK40)+CK29
+		return this.weight_frame + this.weight_components_internal;
 	};
 
 	// CK29, DM29 if populated, DM29 is weight straight off frames list
@@ -501,10 +536,19 @@ class DesignSubsystem {
 
 	// =SUM(CK31:CK40)
 	// scalar
-	get weight_components() {
+	get weight_components_external() {
 		return this
 			.components
-			.map((comp) => comp.weight)
+			.map((comp) => comp.weight_external)
+			.reduce((sum, value) => sum + value, 0);
+	};
+
+	// =SUM(CK31:CK40)
+	// scalar
+	get weight_components_internal() {
+		return this
+			.components
+			.map((comp) => comp.weight_internal)
 			.reduce((sum, value) => sum + value, 0);
 	};
 
@@ -595,6 +639,7 @@ class Design {
 		this.subsystems = design_json['Subsystems'].map(
 			(ss_json) => new DesignSubsystem(this.db, this, ss_json)
 		);
+		this.module = new Module(db, this, design_json['Module']);
 	};
 	
 	// CE27 row
@@ -620,23 +665,48 @@ class Design {
 
 	// O3, CK27
 	// scalar
-	get weight() {
-		return Math.ceil(this.weight_raw);
+	get weight_total() {
+		return Math.floor(this.weight_raw_total);
 	};
 
 	// O2, CK26
 	// scalar
-	get weight_raw() {
+	get weight_external() {
 		// =SUM(CK20:CK25)+CK$18
-		return this.weight_frame + this.weight_subsystems
+		return this.weight_subsystems_external + this.module.weight_external;
+	};
+
+	// O2, CK26
+	// scalar
+	get weight_internal() {
+		// =SUM(CK20:CK25)+CK$18
+		return this.weight_frame + this.weight_subsystems_internal + this.module.weight_internal;
+	};
+
+	// O2, CK26
+	// scalar
+	get weight_raw_total() {
+		// =SUM(CK20:CK25)+CK$18
+		return this.weight_external + this.weight_internal;
 	};
 
 	// CK26
-	get weight_subsystems() {
+	get weight_subsystems_internal() {
 		// =SUM(CK20:CK25)
-		// CK20:25 is subsystem weights
+		// CK20:24 is subsystem weights
+		// CK25 is module weight
 		return this.subsystems
-			.map((ss) => ss.weight)
+			.map((ss) => ss.weight_internal)
+			.reduce((sum, value) => sum + value, 0);
+	};
+
+	// CK26
+	get weight_subsystems_external() {
+		// =SUM(CK20:CK25)
+		// CK20:24 is subsystem weights
+		// CK25 is module weight
+		return this.subsystems
+			.map((ss) => ss.weight_external)
 			.reduce((sum, value) => sum + value, 0);
 	};
 
@@ -722,3 +792,12 @@ class DB {
 module.exports.Design = Design;
 module.exports.DB = DB;
 module.exports.Statline = Statline;
+
+
+
+// CK71, "nacelle distribution", only has weight, SR+BR cost, and power cost.
+// CK71== DL70 * DE70 * DG70
+// DL70 is "Weight O/H" straight off hte parts list
+// DE70 is Wt Custom
+// DG70 is Cost Mod from component modifiers
+

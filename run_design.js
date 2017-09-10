@@ -88,9 +88,13 @@ Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 		// console.log(se_design.subsystems.map((ss) => {
 		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.stats.toString()])
 		// }));
-		console.log(se_design.weight);
-		console.log(se_design.subsystems.map((ss) => [ss.name, ss.weight, ss.weight_frame, ss.weight_components]));
+		console.log(se_design.weight_internal);
+		console.log(se_design.weight_external);
+		console.log(se_design.weight_raw_total);
+		console.log(se_design.weight_total);
+		console.log(se_design.subsystems.map((ss) => [ss.name, ss.weight_internal, ss.weight_external, ss.weight_frame]));
 		// console.log(se_design.subsystems.map((ss) => {
 		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.weight])
 		// }));
+		console.log(se_design.module.weight_internal, se_design.module.weight_external);
 	});
