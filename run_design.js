@@ -32,6 +32,13 @@ parser.addArgument(
 );
 
 parser.addArgument(
+	['-m', '--modules'],
+	{
+		help: "The CSV for the modules list",
+	}
+);
+
+parser.addArgument(
 	['-d', '--design'],
 	{
 		help: "The JSON for the design itself",
@@ -71,9 +78,10 @@ function parseJSON(data) {
 
 Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 			 readFile(args.frames, 'utf8').then(Papa.parsePromise),
+			 readFile(args.modules, 'utf8').then(Papa.parsePromise),
 			 readFile(args.design, 'utf8').then(parseJSON)])
-	.then(([parts, frames, design]) => {
-		let se_DB = new ShipEngine.DB({parts, frames});
+	.then(([parts, frames, modules, design]) => {
+		let se_DB = new ShipEngine.DB({parts, frames, modules});
 		let se_design = new ShipEngine.Design(se_DB, design);
 		// console.log(se_design.raw_stats)
 		// console.log(se_design.subsystems.map((ss) => [ss.name, ss.stats]));

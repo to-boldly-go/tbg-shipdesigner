@@ -190,6 +190,10 @@
             "Name": "Tactical"
         }
     ],
+    "Module": {
+        "Type": "Miranda Rollbar",
+        "Variant": "Science"
+    },
     "Principal Frame": "[T1] 900kt Frigate Frame",
     "Name": "[C8] Aledeth Kepler"
 }

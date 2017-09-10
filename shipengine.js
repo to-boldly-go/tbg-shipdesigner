@@ -1,3 +1,4 @@
+// AL6, $AL$6
 const SIZE_TO_WEIGHT_CAP_MULTIPLIER = 300
 
 const BR_TO_WEIGHT_MULTIPLIER = 10
@@ -416,9 +417,6 @@ class DesignComponent {
 			// BK$26 = BK18 + BK25
 			// BK18 is design size
 
-			// BK25 = rollbar size?, BK88
-			// BK88 = rollbar size? = $CV88 / $AL$6
-			// $CV88 = DL88 = module weight cap? = module weight cap from "Weight Cap" element of module
 			// $D$33 is "phaser arrays Y/N"
 
 			// AL6 is size to weight multiplier
@@ -536,6 +534,58 @@ class DesignSubsystem {
 	};
 };
 
+class Module {
+	constructor(db, design, design_module_json) {
+		this.db = db;
+		this.design = design;
+		this.module_def = this.db.find_module(design_module_json['Type'], design_module_json['Variant']);
+	};
+
+	// CE88 row, CY88 row
+	// statline
+	get stats() {
+		// pulled straight out of module definition
+		const map = [['combat','C'],
+					 ['science','S'],
+					 ['hull','H'],
+					 ['shields','L'],
+					 ['presence','P'],
+					 ['defense','D']];
+		let stat_block = map.reduce((res, [longname, shortname]) => { res[longname] = this.module_def[shortname]; return res; }, {});
+		return new Statline(stat_block);
+	};
+
+	// CK25, CK88, DM88
+	// scalar
+	// "Weight" value off module definition
+	get weight_total() {
+		return this.weight_internal + this.weight_external;
+	};
+
+	get weight_internal() {
+		return 0;
+	};
+
+	get weight_external() {
+		return this.module_def['Weight'];
+	};
+
+	// BK25, BK88
+	// scalar
+	get size() {
+		// BK25 = rollbar size?, BK88
+		// BK88 = rollbar size? = $CV88 / $AL$6
+		return this.size_raw / SIZE_TO_WEIGHT_CAP_MULTIPLIER;
+	};
+
+	// CV88, DL88
+	// scalar
+	get size_raw() {
+		// $CV88 = DL88 = module weight cap? = module weight cap from "Weight Cap" element of module
+		return this.module_def['Weight Cap'];
+	};
+};
+
 
 class Design {
 	constructor(db, design_json) {
@@ -554,10 +604,18 @@ class Design {
 
 	// BL26, CE26 row
 	get stats_raw() {
+		return this.stats_components + this.stats_module;
+	};
+
+	get stats_components() {
 		return this
 			.subsystems
 			.map((ss) => ss.stats)
 			.reduce((sum, value) => sum.add(value), new Statline({}));
+	};
+
+	get stats_module() {
+		return this.module.stats;
 	};
 
 	// O3, CK27
@@ -621,7 +679,7 @@ class Design {
 	// BK26
 	get size() {
 		// BK18 + BK88
-		return this.frame_size;// + this.module.size;
+		return this.frame_size + this.module.size;
 	};
 
 	// BK18, "Size"
@@ -638,14 +696,22 @@ class Design {
 };
 
 class DB {
-	constructor({parts, frames}) {
+	constructor({parts, frames, modules}) {
 		this.parts = parts;
 		this.frames = frames;
+		this.modules = modules;
+	};
+
+	find_module(type, variant) {
+		return this.modules.data.find(
+			(elem) => (
+				(elem['Type'].trim() === type.trim()) &&
+					(elem['Variant'] === variant.trim()))
+		);
 	};
 
 	find_part(name) {
-		let result = this.parts.data.find((elem) => (elem['Name'].trim() === name.trim()));
-		return result;
+		return this.parts.data.find((elem) => (elem['Name'].trim() === name.trim()));
 	};
 
 	find_frame(name) {
