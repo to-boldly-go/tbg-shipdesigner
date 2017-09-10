@@ -97,4 +97,14 @@ Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.weight])
 		// }));
 		console.log(se_design.module.weight_internal, se_design.module.weight_external);
+		console.log(se_design.cost_BR);
+		console.log(se_design.cost_BR_raw);
+		console.log(se_design.module.cost_BR);
+		console.log(se_design.subsystems.map((ss) => [ss.name, ss.cost_BR]));
+		// console.log(se_design.subsystems.map((ss) => {
+		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.cost_BR])
+		// }));
+		console.log(se_design.cost_BR_round)
+		console.log(se_design.weight_class)
+		console.log(se_design.weight_class_raw)
 	});

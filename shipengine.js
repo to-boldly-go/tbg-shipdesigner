@@ -1,15 +1,27 @@
 // AL6, $AL$6
 const SIZE_TO_WEIGHT_CAP_MULTIPLIER = 300
 
+// AL7
 const BR_TO_WEIGHT_MULTIPLIER = 10
 
-const BR_COST_ROUND_FRIGATE = 5
-const BR_COST_ROUND_CRUISER = 10
-const BR_COST_ROUND_EXPLORER = 10
+const SR_COST_ROUND_MAP = {
+	'Frigate': 5,
+	'Cruiser': 10,
+	'EXplorer': 10,
+};
 
-const SR_COST_ROUND_FRIGATE = 5
-const SR_COST_ROUND_CRUISER = 5
-const SR_COST_ROUND_EXPLORER = 10
+const BR_COST_ROUND_MAP = {
+	'Frigate': 5,
+	'Cruiser': 10,
+	'EXplorer': 10,
+};
+
+// =IF(DK$18 = 1, "Frigate", IF(DK$18 = 2, "Cruiser", "Explorer"))
+const WEIGHT_CLASS_MAP = {
+	1: 'Frigate',
+	2: 'Cruiser',
+	3: 'Explorer',
+};
 
 const SUBSYSTEM_NAME_MAP = {
 	"Tactical": "Tac Mod",
@@ -289,6 +301,12 @@ class DesignComponent {
 		this.part_def = this.db.find_part(design_component_json['Part']);
 	};
 
+	// CL column
+	get cost_BR() {
+		// total weight divided by br to weight mult
+		return (this.weight_internal + this.weight_external) / BR_TO_WEIGHT_MULTIPLIER;
+	};
+
 	// CK column
 	// scalar
 	get weight_internal() {
@@ -514,6 +532,24 @@ class DesignSubsystem {
 		);
 	};
 
+	// sum of component costs plus the frame cost
+	get cost_BR() {
+		return this.cost_BR_components + this.cost_BR_frame;
+	};
+
+	// CL column
+	// CK column / br to weight mult
+	get cost_BR_frame() {
+		return this.weight_frame / BR_TO_WEIGHT_MULTIPLIER;
+	};
+
+	get cost_BR_components() {
+		return this
+			.components
+			.map((comp) => comp.cost_BR)
+			.reduce((sum, value) => sum + value, 0);
+	};
+
 	// CK20:CK25 column, [CK41, CK57, CK63, ...]
 	// scalar
 	get weight_external() {
@@ -583,6 +619,14 @@ class Module {
 		this.db = db;
 		this.design = design;
 		this.module_def = this.db.find_module(design_module_json['Type'], design_module_json['Variant']);
+	};
+
+	// CL25, CL88
+	get cost_BR() {
+		// CK88 / AL7
+		// CK88 is weight
+		// AL7 is the br to weight constant
+		return this.weight_total / BR_TO_WEIGHT_MULTIPLIER;
 	};
 
 	// CE88 row, CY88 row
@@ -718,12 +762,55 @@ class Design {
 
 	// P3, CL27
 	get cost_BR() {
-		return Math.floor(this.cost_BR_raw());
+		// =CEILING(CL26,INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0)))
+		// ceiling(CL16, cost_BR_round)
+		// round raw BR cost to next integer multiple of the rounding interval
+		return Math.ceil(this.cost_BR_raw / this.cost_BR_round) * this.cost_BR_round;
+	};
+
+	get cost_BR_round() {
+		// selects the appropriate interval to round BR to based on the class of the ship
+		// INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0))
+		//
+		// from the list of constants in AL, select the one in the row
+		// that has concat("BR cost round", CD9) in AJ
+		//
+		// CD9 is weight class
+		return BR_COST_ROUND_MAP[this.weight_class];
+	};
+
+	// CD9
+	get weight_class() {
+		// =IF(DK$18 = 1, "Frigate", IF(DK$18 = 2, "Cruiser", "Explorer"))
+		return WEIGHT_CLASS_MAP[this.weight_class_raw];
+	};
+
+	// DK18
+	get weight_class_raw() {
+		// "Weight Class" value off of principal frame definition
+		// integer in [1, 3]
+		return this.princ_frame_def['Weight Class'];
 	};
 
 	// P2, CL26
 	get cost_BR_raw() {
+		// sum(subsystem BR costs) + module cost + frame cost
+		return this.cost_BR_components + this.module.cost_BR + this.cost_BR_frame;
+	};
 
+	get cost_BR_components() {
+		return this.subsystems
+			.map((ss) => ss.cost_BR)
+			.reduce((sum, value) => sum + value, 0);
+	};
+
+	// CL18
+	// scalar
+	get cost_BR_frame() {
+		// CK18 / $AL$7
+		// CK18 = DM18
+		// DM18 is frame "Wt" value
+		return this.weight_frame / BR_TO_WEIGHT_MULTIPLIER;
 	};
 
 	// Q2, CM27
