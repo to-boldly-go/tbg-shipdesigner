@@ -119,10 +119,17 @@ Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 		// }));
 		// console.log(se_design.cost_SR_round)
 
-		console.log(se_design.cost_power);
-		console.log(se_design.cost_power_raw);
-		console.log(se_design.subsystems.map((ss) => [ss.name, ss.design.cost_power]));
+		// console.log(se_design.cost_power);
+		// console.log(se_design.cost_power_raw);
+		// console.log(se_design.subsystems.map((ss) => [ss.name, ss.design.cost_power]));
+		// console.log(se_design.subsystems.map((ss) => {
+		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.cost_power_overhead, comp.cost_power_scale])
+		// }));
+
+		console.log(se_design.power_generation);
+		console.log(se_design.power_generation_raw);
+		console.log(se_design.subsystems.map((ss) => [ss.name, ss.power_generation]));
 		console.log(se_design.subsystems.map((ss) => {
-			return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.cost_power_overhead, comp.cost_power_scale])
+			return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.power_generation])
 		}));
 	});

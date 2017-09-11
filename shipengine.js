@@ -301,6 +301,28 @@ class DesignComponent {
 		this.part_def = this.db.find_part(design_component_json['Part']);
 	};
 
+	get power_generation() {
+		switch (this.name) {
+		case "Warp Core Type":
+			// CD79
+			// CD is effect
+			return this.effect;
+		case "M/AM Injectors":
+			// =1 + (CD81 / 100 * CO$79)
+			// CD is effect
+			// CD$79 is the effect for the "Warp Core Type" component
+			return 1 + (this.effect * this.subsystem.component_warp_core_effect / 100.0)
+		case "Coolant Systems":
+			// =1 + (CD82 / 100 * CO$79)
+			return 1 + (this.effect * this.subsystem.component_warp_core_effect / 100.0)
+		case "EPS Manifold System":
+			// =1 + (CD83 / 100 * CO$79)
+			return 1 + (this.effect * this.subsystem.component_warp_core_effect / 100.0)
+		default:
+			return 0;
+		};
+	};
+
 	// CN column
 	get cost_power() {
 		// =(DP31 + DQ31*BK$26 + DR31*BK31) * DG31
@@ -462,10 +484,18 @@ class DesignComponent {
 	// CD column
 	// scalar
 	get effect() {
-		// =DK31 * IF(CX31,1+3.5*log10(0.7*BK31+0.3),1) * CW31
-		//
-		// raw effect from parts list * quantity multiplier * custom effect
-		return this.raw_effect * this.effect_custom * this.qty_mult;
+		switch (this.subsystem.name) {
+		case 'Warp Core':
+			// =DK79 * IF(CX79,1+3.5*log10(0.7*BK79+0.3),1) * CW79 * CD$77
+			//
+			// raw effect * quantity mult * custom effect * frame effect modifier
+			return this.raw_effect * this.effect_custom * this.qty_mult * this.subsystem.stats_multiplier;
+		default:
+			// =DK31 * IF(CX31,1+3.5*log10(0.7*BK31+0.3),1) * CW31
+			//
+			// raw effect from parts list * quantity multiplier * custom effect
+			return this.raw_effect * this.effect_custom * this.qty_mult;
+		};
 	};
 
 	// IF(CX31,
@@ -584,6 +614,39 @@ class DesignSubsystem {
 		this.components = design_subsystem_json['Components'].map(
 			(comp_json) => new DesignComponent(this.db, this, comp_json)
 		);
+	};
+
+	// CO column
+	// scalar
+	get power_generation() {
+		switch (this.name) {
+		case 'Warp Core':
+			return this.power_generation_components + this.setting_safety_performance;
+		default:
+			return this.power_generation_components;
+		};
+	};
+
+	get power_generation_components() {
+		return this
+			.components
+			.map((comp) => comp.power_generation)
+			.reduce((sum, value) => sum + value, 0);
+	};
+
+	get setting_safety_performance() {
+		// =-BK80 * POWER(2,(ABS(BK80)/2)) / 100 * CO$79
+		// BK80 is D80 is Safety/Performance slider value
+		// CD$79 is warp core effect
+		return -this.settings['Safety/Performance']
+			* this.component_warp_core_effect
+			* Math.pow(2.0, Math.abs(this.settings['Safety/Performance']) / 2.0)
+			/ 100.0;
+	};
+
+	// CD$79
+	get component_warp_core_effect() {
+		return this.components.find((comp) => (comp.name === 'Warp Core Type')).effect;
 	};
 
 	// CN column, 29 etc
@@ -782,6 +845,16 @@ class Design {
 			(ss_json) => new DesignSubsystem(this.db, this, ss_json)
 		);
 		this.module = new Module(db, this, design_json['Module']);
+	};
+
+	get power_generation() {
+		return Math.round(this.power_generation_raw);
+	};
+
+	get power_generation_raw() {
+		return this.subsystems
+			.map((ss) => ss.power_generation)
+			.reduce((sum, value) => sum + value, 0);
 	};
 	
 	// CE27 row
