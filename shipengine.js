@@ -301,6 +301,45 @@ class DesignComponent {
 		this.part_def = this.db.find_part(design_component_json['Part']);
 	};
 
+	// CN column
+	get cost_power() {
+		// =(DP31 + DQ31*BK$26 + DR31*BK31) * DG31
+		// DP is 'Pwr O/H' column off parts sheet
+
+		// DQ is 'Scale Pwr' column off parts sheet
+		// BK$26 is design size
+
+		// DR is 'Unit Power' column off parts sheet
+		// BK is part quantity
+
+		// DG is 'Cost Mod' column off COMPONENT_MODIFIERS
+
+		// the two Nacelle lines look like this:
+		// =(DP70 + DR70*BK70) * DG70
+		// =DQ70 * BK$26 * DG70
+		// these sum together to the same as the normal case, so need
+		// not be special-cased!
+
+		return (this.cost_power_overhead
+				+ this.cost_power_scale * this.subsystem.design.size
+				+ this.cost_power_unit * this.quantity) * this.cost_mod
+	};
+
+	// DP column
+	get cost_power_overhead() {
+		return this.part_def['Pwr O/H'];
+	};
+
+	// DQ
+	get cost_power_scale() {
+		return this.part_def['Scale Pwr'];
+	};
+
+	// DR
+	get cost_power_unit() {
+		return this.part_def['Unit Power'];
+	};
+
 	// CM column
 	get cost_SR() {
 		// =CK31 * DO31 * CM$29
@@ -547,6 +586,18 @@ class DesignSubsystem {
 		);
 	};
 
+	// CN column, 29 etc
+	get cost_power() {
+		return this.cost_power_components;
+	};
+
+	get cost_power_components() {
+		return this
+			.components
+			.map((comp) => comp.cost_power)
+			.reduce((sum, value) => sum + value, 0);
+	};
+
 	// CM column, 29 etc
 	get cost_SR_mult() {
 		// =CM18 * DU29
@@ -657,10 +708,15 @@ class Module {
 		this.module_def = this.db.find_module(design_module_json['Type'], design_module_json['Variant']);
 	};
 
+	// CN25, CN88, DP88, straight from parts list
+	get cost_power() {
+		return this.module_def['Power Cost'];
+	};
+
 	// CM25, CM88, DO88
 	// straight off parts list
 	get cost_SR() {
-		return this.module_def['SR Cost']
+		return this.module_def['SR Cost'];
 	};
 
 	// CL25, CL88
@@ -887,12 +943,19 @@ class Design {
 
 	// R2, CN27
 	get cost_power() {
-		return Math.floor(this.cost_power_raw());
+		// round, not floor or ceil!
+		return Math.round(this.cost_power_raw);
 	};
 
 	// R3, CN26
 	get cost_power_raw() {
+		return this.cost_power_subsystems + this.module.cost_power;
+	};
 
+	get cost_power_subsystems() {
+		return this.subsystems
+			.map((ss) => ss.cost_power)
+			.reduce((sum, value) => sum + value, 0);
 	};
 
 	// BK26

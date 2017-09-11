@@ -110,12 +110,19 @@ Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 		// console.log(se_design.weight_class)
 		// console.log(se_design.weight_class_raw)
 
-		console.log(se_design.cost_SR);
-		console.log(se_design.cost_SR_raw);
-		console.log(se_design.module.cost_SR);
-		console.log(se_design.subsystems.map((ss) => [ss.name, ss.cost_SR_mult_raw, ss.design.cost_SR_frame_mult]));
+		// console.log(se_design.cost_SR);
+		// console.log(se_design.cost_SR_raw);
+		// console.log(se_design.module.cost_SR);
+		// console.log(se_design.subsystems.map((ss) => [ss.name, ss.cost_SR_mult_raw, ss.design.cost_SR_frame_mult]));
+		// console.log(se_design.subsystems.map((ss) => {
+		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.cost_SR, comp.subsystem.cost_SR_mult])
+		// }));
+		// console.log(se_design.cost_SR_round)
+
+		console.log(se_design.cost_power);
+		console.log(se_design.cost_power_raw);
+		console.log(se_design.subsystems.map((ss) => [ss.name, ss.design.cost_power]));
 		console.log(se_design.subsystems.map((ss) => {
-			return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.cost_SR, comp.subsystem.cost_SR_mult])
+			return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.cost_power_overhead, comp.cost_power_scale])
 		}));
-		console.log(se_design.cost_SR_round)
 	});
