@@ -88,23 +88,34 @@ Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 		// console.log(se_design.subsystems.map((ss) => {
 		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.stats.toString()])
 		// }));
-		console.log(se_design.weight_internal);
-		console.log(se_design.weight_external);
-		console.log(se_design.weight_raw_total);
-		console.log(se_design.weight_total);
-		console.log(se_design.subsystems.map((ss) => [ss.name, ss.weight_internal, ss.weight_external, ss.weight_frame]));
+
+		// console.log(se_design.weight_internal);
+		// console.log(se_design.weight_external);
+		// console.log(se_design.weight_raw_total);
+		// console.log(se_design.weight_total);
+		// console.log(se_design.subsystems.map((ss) => [ss.name, ss.weight_internal, ss.weight_external, ss.weight_frame]));
 		// console.log(se_design.subsystems.map((ss) => {
 		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.weight])
 		// }));
-		console.log(se_design.module.weight_internal, se_design.module.weight_external);
-		console.log(se_design.cost_BR);
-		console.log(se_design.cost_BR_raw);
-		console.log(se_design.module.cost_BR);
-		console.log(se_design.subsystems.map((ss) => [ss.name, ss.cost_BR]));
+		// console.log(se_design.module.weight_internal, se_design.module.weight_external);
+
+		// console.log(se_design.cost_BR);
+		// console.log(se_design.cost_BR_raw);
+		// console.log(se_design.module.cost_BR);
+		// console.log(se_design.subsystems.map((ss) => [ss.name, ss.cost_BR]));
 		// console.log(se_design.subsystems.map((ss) => {
 		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.cost_BR])
 		// }));
-		console.log(se_design.cost_BR_round)
-		console.log(se_design.weight_class)
-		console.log(se_design.weight_class_raw)
+		// console.log(se_design.cost_BR_round)
+		// console.log(se_design.weight_class)
+		// console.log(se_design.weight_class_raw)
+
+		console.log(se_design.cost_SR);
+		console.log(se_design.cost_SR_raw);
+		console.log(se_design.module.cost_SR);
+		console.log(se_design.subsystems.map((ss) => [ss.name, ss.cost_SR_mult_raw, ss.design.cost_SR_frame_mult]));
+		console.log(se_design.subsystems.map((ss) => {
+			return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.cost_SR, comp.subsystem.cost_SR_mult])
+		}));
+		console.log(se_design.cost_SR_round)
 	});

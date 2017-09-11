@@ -301,6 +301,21 @@ class DesignComponent {
 		this.part_def = this.db.find_part(design_component_json['Part']);
 	};
 
+	// CM column
+	get cost_SR() {
+		// =CK31 * DO31 * CM$29
+		// CM29 is subsystem frame 'SR Cost x'
+		// CK31 is weight
+		// DO31 is SR Cost x off the part list
+		return (this.weight_internal + this.weight_external) * this.cost_SR_mult * this.subsystem.cost_SR_mult;
+	};
+
+	// DO31
+	get cost_SR_mult() {
+		// SR Cost x off the part list
+		return this.part_def['SR Cost x'];
+	};
+
 	// CL column
 	get cost_BR() {
 		// total weight divided by br to weight mult
@@ -532,6 +547,27 @@ class DesignSubsystem {
 		);
 	};
 
+	// CM column, 29 etc
+	get cost_SR_mult() {
+		// =CM18 * DU29
+		// CM18 is principal frame SR cost
+		// DU29 is 'SR-Mod' straight off part list
+		return this.cost_SR_mult_raw * this.design.cost_SR_frame_mult;
+	};
+
+	get cost_SR_mult_raw() {
+		return this.sub_frame_def['SR-Mod'];
+	};
+
+	// CM column, 20:24, 41 etc
+	get cost_SR() {
+		// straight sum of component costs
+		return this
+			.components
+			.map((comp) => comp.cost_SR)
+			.reduce((sum, value) => sum + value, 0);
+	};
+
 	// sum of component costs plus the frame cost
 	get cost_BR() {
 		return this.cost_BR_components + this.cost_BR_frame;
@@ -619,6 +655,12 @@ class Module {
 		this.db = db;
 		this.design = design;
 		this.module_def = this.db.find_module(design_module_json['Type'], design_module_json['Variant']);
+	};
+
+	// CM25, CM88, DO88
+	// straight off parts list
+	get cost_SR() {
+		return this.module_def['SR Cost']
 	};
 
 	// CL25, CL88
@@ -813,14 +855,34 @@ class Design {
 		return this.weight_frame / BR_TO_WEIGHT_MULTIPLIER;
 	};
 
+	// CM18, DU18
+	get cost_SR_frame_mult() {
+		return this.princ_frame_def['SR-Mod'];
+	};
+
 	// Q2, CM27
 	get cost_SR() {
-		return Math.floor(this.cost_SR_raw());
+		// =CEILING(CL26,INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0)))
+		// ceiling(CL16, cost_BR_round)
+		// round raw BR cost to next integer multiple of the rounding interval
+		return Math.ceil(this.cost_SR_raw / this.cost_SR_round) * this.cost_SR_round;
 	};
 
 	// Q3, CM26
 	get cost_SR_raw() {
+		// sum of subsystems plus module
+		return this.cost_SR_subsystems + this.module.cost_SR;
+	};
 
+	get cost_SR_subsystems() {
+		return this.subsystems
+			.map((ss) => ss.cost_SR)
+			.reduce((sum, value) => sum + value, 0);
+	};
+
+	get cost_SR_round() {
+		// same as BR, basically
+		return BR_COST_ROUND_MAP[this.weight_class];
 	};
 
 	// R2, CN27
