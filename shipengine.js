@@ -1,3 +1,5 @@
+const NamedVector = require('./namedvector').NamedVector
+
 // AL6, $AL$6
 const SIZE_TO_WEIGHT_CAP_MULTIPLIER = 300
 
@@ -29,15 +31,6 @@ const SUBSYSTEM_NAME_MAP = {
 	"Hull": "Hull Mod",
 	"Operations": "Ops Mod",
 	"Warp Core": "Core Mod",
-}
-
-const STAT_SHORTNAMES = {
-	'combat': 'C',
-	'science': 'S',
-	'hull': 'H',
-	'shields': 'L',
-	'presence': 'P',
-	'defense': 'D',
 }
 
 // REFACTOR: change the names of these to be less abbreviated
@@ -209,74 +202,32 @@ let COMPONENT_MODIFIERS = {
 	},
 };
 
-class Statline {
-	static get stats() {
-		return [
-			'combat',
-			'science',
-			'hull',
-			'shields',
-			'presence',
-			'defense',
-		];
-	}
-
-	constructor(val) {
-		if ((typeof val) === 'number') {
-			Statline.stats.forEach((stat) => {
-				this[stat] = val;
-			});
-		} else {
-			Statline.stats.forEach((stat) => {
-				this[stat] = val[stat] || 0;
-			});
-		}
-	};
-
-	toString() {
-		return '[' + Statline.stats.map((stat) => {
-			return STAT_SHORTNAMES[stat].toUpperCase() + this[stat].toString();
-		}).join(' ') + ']'
-	};
-
-	static op_add(a, b) {
-		return a + b;
-	};
-	static op_mult(a, b) {
-		return a * b;
-	};
-
-	add(other) {
-		return this.op(Statline.op_add, other);
-	}
-	mult(other) {
-		return this.op(Statline.op_mult, other);
-	}
-	get floor() {
-		return new Statline(
-			Statline.stats.reduce((acc, stat) => {
-				acc[stat] = Math.floor(this[stat]);
-				return acc;
-			}, {})
-		);
-	}
-
-	op(fun, other) {
-		if ((typeof other) === 'number') {
-			return new Statline(
-				Statline.stats.reduce((acc, stat) => {
-					acc[stat] = fun(this[stat], other);
-					return acc;
-				}, {})
-			);
-		} else {
-			return new Statline(
-				Statline.stats.reduce((acc, stat) => {
-					acc[stat] = fun(this[stat], other[stat]);
-					return acc;
-				}, {})
-			);
+class Crewline extends NamedVector {
+	static get shortnames() {
+		return {
+			'officer': 'O',
+			'enlisted': 'E',
+			'technician': 'T',
 		};
+	};
+	constructor(val) {
+		super(val, Crewline.shortnames);
+	};
+};
+
+class Statline extends NamedVector {
+	static get shortnames() {
+		return {
+			'combat': 'C',
+			'science': 'S',
+			'hull': 'H',
+			'shields': 'L',
+			'presence': 'P',
+			'defense': 'D',
+		};
+	};
+	constructor(val) {
+		super(val, Statline.shortnames);
 	};
 };
 
@@ -864,7 +815,7 @@ class Design {
 
 	// BL26, CE26 row
 	get stats_raw() {
-		return this.stats_components + this.stats_module;
+		return this.stats_components.add(this.stats_module);
 	};
 
 	get stats_components() {
@@ -1077,12 +1028,3 @@ class DB {
 module.exports.Design = Design;
 module.exports.DB = DB;
 module.exports.Statline = Statline;
-
-
-
-// CK71, "nacelle distribution", only has weight, SR+BR cost, and power cost.
-// CK71== DL70 * DE70 * DG70
-// DL70 is "Weight O/H" straight off hte parts list
-// DE70 is Wt Custom
-// DG70 is Cost Mod from component modifiers
-

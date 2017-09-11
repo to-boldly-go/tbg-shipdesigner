@@ -83,8 +83,10 @@ Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 	.then(([parts, frames, modules, design]) => {
 		let se_DB = new ShipEngine.DB({parts, frames, modules});
 		let se_design = new ShipEngine.Design(se_DB, design);
-		// console.log(se_design.raw_stats)
-		// console.log(se_design.subsystems.map((ss) => [ss.name, ss.stats]));
+
+		console.log(se_design.stats)
+		console.log(se_design.stats_raw)
+		console.log(se_design.subsystems.map((ss) => [ss.name, ss.stats]));
 		// console.log(se_design.subsystems.map((ss) => {
 		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.stats.toString()])
 		// }));
@@ -126,10 +128,10 @@ Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.cost_power_overhead, comp.cost_power_scale])
 		// }));
 
-		console.log(se_design.power_generation);
-		console.log(se_design.power_generation_raw);
-		console.log(se_design.subsystems.map((ss) => [ss.name, ss.power_generation]));
-		console.log(se_design.subsystems.map((ss) => {
-			return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.power_generation])
-		}));
+		// console.log(se_design.power_generation);
+		// console.log(se_design.power_generation_raw);
+		// console.log(se_design.subsystems.map((ss) => [ss.name, ss.power_generation]));
+		// console.log(se_design.subsystems.map((ss) => {
+		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.power_generation])
+		// }));
 	});
