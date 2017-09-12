@@ -84,9 +84,9 @@ Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 		let se_DB = new ShipEngine.DB({parts, frames, modules});
 		let se_design = new ShipEngine.Design(se_DB, design);
 
-		console.log(se_design.stats)
-		console.log(se_design.stats_raw)
-		console.log(se_design.subsystems.map((ss) => [ss.name, ss.stats]));
+		// console.log(se_design.stats)
+		// console.log(se_design.stats_raw)
+		// console.log(se_design.subsystems.map((ss) => [ss.name, ss.stats]));
 		// console.log(se_design.subsystems.map((ss) => {
 		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.stats.toString()])
 		// }));
@@ -134,4 +134,24 @@ Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 		// console.log(se_design.subsystems.map((ss) => {
 		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.power_generation])
 		// }));
+
+		// console.log(se_design.subsystems.map((ss) => {
+		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name,
+		// 										comp.cost_crew.toString(),
+		// 										// comp.cost_crew_raw.toString(),
+		// 										// comp.subsystem.cost_crew_frame_mult.toString(),
+		// 										// comp.subsystem.design.cost_crew_frame_mult.toString(),
+		// 										// comp.crew_mod.toString(),
+		// 										// comp.cost_crew_quantity_mod,
+		// 										// comp.subsystem.design.cost_crew_size_mod,
+		// 									   ])
+		// }));
+
+		console.log(se_design.cost_crew.toString());
+		console.log(se_design.cost_crew_raw.toString());
+		console.log(se_design.subsystems.map((ss) => [ss.name, ss.cost_crew.toString()]));
+		// console.log(se_design.subsystems.map((ss) => {
+		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.cost_crew.toString()])
+		// }));
+
 	});

@@ -3,7 +3,7 @@ class NamedVector {
 	constructor(val, shortnames) {
 		this.shortnames = shortnames;
 		if ((typeof val) === 'number') {
-			this.constructor.names.forEach((name) => {
+			this.names.forEach((name) => {
 				this[name] = val;
 			});
 		} else {
@@ -19,7 +19,7 @@ class NamedVector {
 
 	toString() {
 		return '[' + this.names.map((name) => {
-			return this.constructor.shortnames[name].toUpperCase() + this[name].toString();
+			return this.shortnames[name].toUpperCase() + this[name].toString();
 		}).join(' ') + ']'
 	};
 	static op_add(a, b) {
@@ -28,6 +28,9 @@ class NamedVector {
 	static op_mult(a, b) {
 		return a * b;
 	};
+	static op_div(a, b) {
+		return a / b;
+	};
 
 	add(other) {
 		return this.op(NamedVector.op_add, other);
@@ -35,14 +38,24 @@ class NamedVector {
 	mult(other) {
 		return this.op(NamedVector.op_mult, other);
 	}
+	div(other) {
+		return this.op(NamedVector.op_div, other);
+	}
 	get floor() {
+		return this.apply(Math.floor);
+	}
+	get ceil() {
+		return this.apply(Math.ceil);
+	}
+
+	apply(fun) {
 		return new this.constructor(
 			this.names.reduce((acc, name) => {
-				acc[name] = Math.floor(this[name]);
+				acc[name] = fun(this[name]);
 				return acc;
 			}, {})
 		);
-	}
+	};
 
 	op(fun, other) {
 		if ((typeof other) === 'number') {

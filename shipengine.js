@@ -40,65 +40,77 @@ let COMPONENT_MODIFIERS = {
 		"Effect Qty?": true,
 		"combat": 1,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Secondary Phasers": {
 		"Effect Qty?": true,
 		"combat": 1/4,
 		"Cost Mod": 1/4,
+		"Crew Mod": 1,
 	},
 	"Torpedo System": {
 		"Effect Qty?": true,
 		"combat": 1,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Short-Range Sensors": {
 		"Effect Qty?": true,
 		"combat": 1/2,
 		"science": 1/2,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Targeting Computer": {
 		"Effect Qty?": true,
 		"combat": 1,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Deflector Shields": {
 		"Effect Qty?": true,
 		"shields": 1,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Backup Deflectors": {
 		"Effect Qty?": true,
 		"shields": 1/5,
 		"Cost Mod": 1/5,
+		"Crew Mod": 1/5,
 	},
 	"Impulse Engine Pwr": {
 		"Effect Qty?": true,
 		"combat": 1/4,
 		"defense": 4/5,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 
 	"Long-Range Sensors": {
 		"Effect Qty?": true,
 		"science": 1,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Navigational Sensors": {
 		"Effect Qty?": true,
 		"science": 1,
 		"defense": 1/6,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Survey Sensors": {
 		"Effect Qty?": true,
 		"science": 1,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Science Labs": {
 		"Effect Qty?": true,
 		"science": 1,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Computer Core": {
 		"Effect Qty?": true,
@@ -109,6 +121,7 @@ let COMPONENT_MODIFIERS = {
 		"presence": 1/6,
 		"defense": 1/8,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Operating System": {
 		"Effect Qty?": true,
@@ -117,6 +130,7 @@ let COMPONENT_MODIFIERS = {
 		"shields": 1/14,
 		"defense": 1/10,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Secondary Core": {
 		"Effect Qty?": true,
@@ -125,22 +139,26 @@ let COMPONENT_MODIFIERS = {
 		"shields": 1/28,
 		"defense": 1/40,
 		"Cost Mod": 1/2,
+		"Crew Mod": 1/4,
 	},
 	"Diplomatic Package": {
 		"Effect Qty?": true,
 		"presence": 1,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Recreation Package": {
 		"Effect Qty?": true,
 		"presence": 1,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Sickbay": {
 		"Effect Qty?": true,
 		"science": 1/2,
 		"presence": 1,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	
 	"Hull System": {
@@ -148,12 +166,14 @@ let COMPONENT_MODIFIERS = {
 		"hull": 1,
 		"Cost Mod": 1,
 		"Scale Wt?": 1,
+		"Crew Mod": 1,
 	},
 	
 	"Structural Integrity Fields": {
 		"Effect Qty?": true,
 		"hull": 1,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Navigational Deflector": {
 		"Effect Qty?": false,
@@ -161,11 +181,13 @@ let COMPONENT_MODIFIERS = {
 		"shields": 1/7,
 		"defense": 1,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Nacelle System": {
 		"Effect Qty?": true,
 		"defense": 1,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Replication Package": {
 		"Effect Qty?": true,
@@ -173,32 +195,39 @@ let COMPONENT_MODIFIERS = {
 		"presence": 1/4,
 		"defense": 1,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Fuel & Matter Stores": {
 		"Effect Qty?": false,
 		"defense": 1,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	
 	"Warp Core Type": {
 		"Effect Qty?": true,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"M/AM Injectors": {
 		"Effect Qty?": true,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Coolant Systems": {
 		"Effect Qty?": true,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"EPS Manifold System": {
 		"Effect Qty?": false,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 	"Eject System": {
 		"Effect Qty?": false,
 		"Cost Mod": 1,
+		"Crew Mod": 1,
 	},
 };
 
@@ -250,6 +279,53 @@ class DesignComponent {
 		// BL block
 		// statline
 		this.part_def = this.db.find_part(design_component_json['Part']);
+	};
+
+	// CP-CR block
+	// crewline
+	get cost_crew() {
+		// =DS31 * IF(VALUE($BK31)=0,1,(1+(LOG($BK31))*2)) * ($BK$26^0.7 / 2) * CP$29 * $DH31
+		//
+		// DS31 is officer cost off sheet
+		// $BK31 is quantity
+		//
+		// $BK$26 is design size
+		//
+		// CP$29 is subsystem officer multiplier
+		// $DH31 is component crew modifier
+		return [
+			this.cost_crew_raw,
+			this.subsystem.cost_crew_frame_mult,
+			this.crew_mod,
+
+			this.cost_crew_quantity_mod,
+			this.subsystem.design.cost_crew_size_mod,
+		].reduce((sum, value) => sum.mult(value), new Crewline(1));
+		return 
+	};
+
+	// IF(VALUE($BK31)=0,
+	// 1,
+	// (1+(LOG($BK31))*2))
+	// crewline
+	get cost_crew_quantity_mod() {
+		if (this.quantity) {
+			return 1 + (2 * Math.log(this.quantity) / Math.log(10));
+		} else {
+			return 1;
+		};
+	};
+
+	get cost_crew_raw() {
+		const map = [['officer','O'],
+					 ['enlisted','E'],
+					 ['technician','T']];
+		let crew_block = map.reduce((res, [longname, shortname]) => { res[longname] = this.part_def[shortname]; return res; }, {});
+		return new Crewline(crew_block);
+	};
+
+	get crew_mod() {
+		return new Crewline(this.component_modifier['Crew Mod'] || 1);
 	};
 
 	get power_generation() {
@@ -567,6 +643,35 @@ class DesignSubsystem {
 		);
 	};
 
+	// DS31-DSU31 row
+	// crewline
+	get cost_crew_frame_mult() {
+		// CP$18 * DR29
+		// CP$18 is DR18 is design principal frame 'O-Mod' off parts list
+		// DR29 is subframe 'O-Mod' off parts list
+		return this.cost_crew_frame_mult_raw.mult(this.design.cost_crew_frame_mult);
+	};
+
+	// DR29 is subframe 'O-Mod' off parts list
+	// crewline
+	get cost_crew_frame_mult_raw() {
+		const map = [['officer','O-Mod'],
+					 ['enlisted','E-Mod'],
+					 ['technician','T-Mod']];
+		let crew_block = map.reduce((res, [longname, shortname]) => { res[longname] = this.sub_frame_def[shortname]; return res; }, {});
+		return new Crewline(crew_block);
+	};
+
+	// CP, CQ, CR block
+	// crewline
+	get cost_crew() {
+		// straight sum of components
+		return this
+			.components
+			.map((comp) => comp.cost_crew)
+			.reduce((sum, value) => sum.add(value), new Crewline({}));
+	};
+
 	// CO column
 	// scalar
 	get power_generation() {
@@ -722,6 +827,17 @@ class Module {
 		this.module_def = this.db.find_module(design_module_json['Type'], design_module_json['Variant']);
 	};
 
+	// CP-CR 88, DS-DU88
+	// crewline
+	get cost_crew() {
+		// straight off parts list
+		const map = [['officer','O'],
+					 ['enlisted','E'],
+					 ['technician','T']];
+		let stat_block = map.reduce((res, [longname, shortname]) => { res[longname] = this.module_def[shortname]; return res; }, {});
+		return new Crewline(stat_block);
+	};
+
 	// CN25, CN88, DP88, straight from parts list
 	get cost_power() {
 		return this.module_def['Power Cost'];
@@ -796,6 +912,45 @@ class Design {
 			(ss_json) => new DesignSubsystem(this.db, this, ss_json)
 		);
 		this.module = new Module(db, this, design_json['Module']);
+	};
+
+	// ($BK$26^0.7 / 2)
+	// crewline
+	get cost_crew_size_mod() {
+		// BK26 is design size
+		return Math.pow(this.size, 0.7) / 2;
+		// return 1/2;
+	};
+
+	// CP$18 is DR18 is design principal frame 'O-Mod' off parts list
+	// crewline
+	get cost_crew_frame_mult() {
+		const map = [['officer','O-Mod'],
+					 ['enlisted','E-Mod'],
+					 ['technician','T-Mod']];
+		let crew_block = map.reduce((res, [longname, shortname]) => { res[longname] = this.princ_frame_def[shortname]; return res; }, {});
+		return new Crewline(crew_block);
+	};
+
+	// T,U,V 3; CP,CQ,CR 27
+	// crewline
+	get cost_crew() {
+		// ceiling of CP,CQ,CR 26
+		return this.cost_crew_raw.ceil;
+	};
+
+	// T,U,V 2
+	// crewline
+	get cost_crew_raw() {
+		// CP,CQ,CR 26
+		// sum of subsystem crew costs plus module crew cost
+		return this.cost_crew_subsystems.add(this.module.cost_crew);
+	};
+
+	get cost_crew_subsystems() {
+		return this.subsystems
+			.map((ss) => ss.cost_crew)
+			.reduce((sum, value) => sum.add(value), new Crewline({}));
 	};
 
 	get power_generation() {
@@ -1028,3 +1183,4 @@ class DB {
 module.exports.Design = Design;
 module.exports.DB = DB;
 module.exports.Statline = Statline;
+module.exports.Crewline = Crewline;
