@@ -147,11 +147,22 @@ Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 		// 									   ])
 		// }));
 
-		console.log(se_design.cost_crew.toString());
-		console.log(se_design.cost_crew_raw.toString());
-		console.log(se_design.subsystems.map((ss) => [ss.name, ss.cost_crew.toString()]));
+		// console.log(se_design.cost_crew.toString());
+		// console.log(se_design.cost_crew_raw.toString());
+		// console.log(se_design.subsystems.map((ss) => [ss.name, ss.cost_crew.toString()]));
 		// console.log(se_design.subsystems.map((ss) => {
 		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.cost_crew.toString()])
 		// }));
+
+
+		console.log(se_design.build_time);
+		console.log(se_design.build_time_raw);
+		console.log(se_design.evasion);
+		// console.log(se_design.subsystems.map((ss) => [ss.name, ss.evasion]));
+		// console.log(se_design.subsystems.map((ss) => {
+		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.evasion])
+		// }));
+		console.log(se_design.warp_core_breach);
+		console.log(se_design.subsystems.map((ss) => [ss.name, ss.warp_core_breach]));
 
 	});

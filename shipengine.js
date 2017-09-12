@@ -281,6 +281,28 @@ class DesignComponent {
 		this.part_def = this.db.find_part(design_component_json['Part']);
 	};
 
+	get evasion() {
+		if (this.name === 'Impulse Engine Pwr') {
+			// (1+((CJ$40/DD$40*10)/100))
+			//
+			// that's the effect with the component modifer divided
+			// out and some junk to convert it to a probability
+			//
+			const evasion_effect = this.effect * this.subsystem.stats_multiplier;
+			return 1 + (evasion_effect / 10);
+		} else {
+			return false;
+		};
+	};
+
+	get warp_core_breach() {
+		if (this.name === 'Eject System') {
+			return this.part_def['Reliability'];
+		} else {
+			return false;
+		};
+	};
+
 	// CP-CR block
 	// crewline
 	get cost_crew() {
@@ -643,6 +665,35 @@ class DesignSubsystem {
 		);
 	};
 
+	get warp_core_breach() {
+		return this.components
+			.map((comp) => comp.warp_core_breach)
+			.filter((val) => (val !== false))
+			.reduce((sum, value) => 1 - ((1 - sum) * (1 - value)), 0);
+	};
+
+	get evasion() {
+		// CJ40 is D value for Impulse Engine Pwr
+		// DD40 D mod for Impulse Engine Pwr
+		return this.components
+			.map((comp) => comp.evasion)
+			.filter((val) => (val !== false))
+			.reduce((sum, value) => 1 - ((1 - sum) * (1 - value)), 0);
+	};
+
+	// CT column, subsystems
+	get build_time() {
+		// =SUM(CT31:CT40)+CT29
+		//
+		// but the component values are all blank - no way for them to
+		// be filled, and parts don't have build times - so this is
+		// just CT29
+		//
+		// CT29 is DN29 is the build time value straight off the
+		// frames list
+		return eval(this.sub_frame_def['Build Time']);
+	};
+
 	// DS31-DSU31 row
 	// crewline
 	get cost_crew_frame_mult() {
@@ -827,6 +878,12 @@ class Module {
 		this.module_def = this.db.find_module(design_module_json['Type'], design_module_json['Variant']);
 	};
 
+	// CT88, DN88
+	get build_time() {
+		// straight off modules list
+		return eval(this.module_def['Build Time']);
+	};
+
 	// CP-CR 88, DS-DU88
 	// crewline
 	get cost_crew() {
@@ -912,6 +969,65 @@ class Design {
 			(ss_json) => new DesignSubsystem(this.db, this, ss_json)
 		);
 		this.module = new Module(db, this, design_json['Module']);
+	};
+
+	// CT27, CT26
+	get build_time() {
+		return Math.ceil(this.build_time_raw * 4) / 4;
+	};
+
+	// CT26
+	get build_time_raw() {
+		// =SUM(CT20:CT25)+CT$18
+		return this.build_time_frame + this.build_time_subsystems + this.module.build_time;
+	};
+
+	// CT18, DN18
+	get build_time_frame() {
+		// "Build Time" off frames list
+		return eval(this.princ_frame_def['Build Time']);
+	};
+
+	// sum of CT column on subsystems
+	get build_time_subsystems() {
+		return this.subsystems
+			.map((ss) => ss.build_time)
+			.reduce((sum, value) => sum + value, 0);
+	};
+
+	// CD11
+	get evasion() {
+		// =(MAX(0, 30 - (BK$26*3)) / 100) * (1+((CJ$40/DD$40*10)/100))
+		// BK26 is size
+		// CJ40 is D value for Impulse Engine Pwr
+		// DD40 D mod for Impulse Engine Pwr
+		return this.evasion_size_mult * this.evasion_subsystems;
+	};
+
+	get evasion_size_mult() {
+		// =(MAX(0, 30 - (BK$26*3)) / 100)
+		// for ease of programming: probability of all failing
+		return Math.max(0, 30 - (this.size * 3)) / 100;
+	};
+
+	get evasion_subsystems() {
+		return this.subsystems
+			.map((ss) => ss.evasion)
+			.filter((wcb) => wcb)
+			.reduce((sum, value) => 1 - ((1 - sum) * (1 - value)), 0);
+	};
+
+	// CD13, DV84
+	get warp_core_breach() {
+		return this.warp_core_breach_subsystems;
+	};
+
+	get warp_core_breach_subsystems() {
+		// for ease of programming: probability of all failing
+		return this.subsystems
+			.map((ss) => ss.warp_core_breach)
+			.filter((wcb) => wcb)
+			.reduce((sum, value) => 1 - ((1 - sum) * (1 - value)), 0);
 	};
 
 	// ($BK$26^0.7 / 2)
