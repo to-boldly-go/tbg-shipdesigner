@@ -155,14 +155,20 @@ Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 		// }));
 
 
-		console.log(se_design.build_time);
-		console.log(se_design.build_time_raw);
-		console.log(se_design.evasion);
+		// console.log(se_design.build_time);
+		// console.log(se_design.build_time_raw);
+		// console.log(se_design.evasion);
 		// console.log(se_design.subsystems.map((ss) => [ss.name, ss.evasion]));
 		// console.log(se_design.subsystems.map((ss) => {
 		// 	return ss.components.map((comp) => [comp.name, comp.part_def.Name, comp.evasion])
 		// }));
-		console.log(se_design.warp_core_breach);
-		console.log(se_design.subsystems.map((ss) => [ss.name, ss.warp_core_breach]));
+		// console.log(se_design.warp_core_breach);
+		// console.log(se_design.subsystems.map((ss) => [ss.name, ss.warp_core_breach]));
 
+		// console.log(se_design.frame_max_size_raw);
+		// console.log(se_design.module.size);
+		// console.log(se_design.subsystems.map((ss) => [ss.name, ss.weight_cap]));
+
+		console.log(se_design.pretty_summary)
+		console.log(se_design.pretty_sdb_info)
 	});

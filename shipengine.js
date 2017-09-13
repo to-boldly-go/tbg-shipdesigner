@@ -1,3 +1,4 @@
+const util = require('util')
 const NamedVector = require('./namedvector').NamedVector
 
 // AL6, $AL$6
@@ -5,6 +6,14 @@ const SIZE_TO_WEIGHT_CAP_MULTIPLIER = 300
 
 // AL7
 const BR_TO_WEIGHT_MULTIPLIER = 10
+
+const SUBSYSTEM_SORT_ORDER = {
+	"Tactical": 1,
+	"Operations": 2,
+	"Hull": 3,
+	"Engineering": 4,
+	"Warp Core": 5,
+};
 
 const SR_COST_ROUND_MAP = {
 	'Frigate': 5,
@@ -665,6 +674,29 @@ class DesignSubsystem {
 		);
 	};
 
+	// CV20, CV41
+	get weight_cap() {
+		// sum of CV31-40 plus CV29
+		return this.weight_cap_components + this.weight_cap_frame;
+	};
+
+	// CV column
+	get weight_cap_components() {
+		// these can't be filled in the C8 sheet
+		return 0;
+	};
+
+	// CV29
+	get weight_cap_frame() {
+		// =(DL29/100) * CV$18
+		return this.max_size_frame * this.design.frame_max_size_raw / 100;
+	};
+
+	get max_size_frame() {
+		// "MaxSz" off frame def
+		return this.sub_frame_def['MaxSz'];
+	};
+
 	get warp_core_breach() {
 		return this.components
 			.map((comp) => comp.warp_core_breach)
@@ -967,13 +999,13 @@ class Design {
 		this.princ_frame_def = this.db.find_frame(design_json['Principal Frame']);
 		this.subsystems = design_json['Subsystems'].map(
 			(ss_json) => new DesignSubsystem(this.db, this, ss_json)
-		);
+		).sort((ssa, ssb) => SUBSYSTEM_SORT_ORDER[ssa.name] > SUBSYSTEM_SORT_ORDER[ssb.name]);
 		this.module = new Module(db, this, design_json['Module']);
 	};
 
 	// CT27, CT26
 	get build_time() {
-		return Math.ceil(this.build_time_raw * 4) / 4;
+		return Math.ceil(this.build_time_raw * 12) / 12;
 	};
 
 	// CT26
@@ -995,8 +1027,12 @@ class Design {
 			.reduce((sum, value) => sum + value, 0);
 	};
 
-	// CD11
 	get evasion() {
+		return Math.round(this.evasion_raw * 1e4) / 1e4;
+	};
+
+	// CD11
+	get evasion_raw() {
 		// =(MAX(0, 30 - (BK$26*3)) / 100) * (1+((CJ$40/DD$40*10)/100))
 		// BK26 is size
 		// CJ40 is D value for Impulse Engine Pwr
@@ -1103,7 +1139,7 @@ class Design {
 	// O3, CK27
 	// scalar
 	get weight_total() {
-		return Math.floor(this.weight_raw_total);
+		return Math.floor(this.weight_total_raw);
 	};
 
 	// O2, CK26
@@ -1122,7 +1158,7 @@ class Design {
 
 	// O2, CK26
 	// scalar
-	get weight_raw_total() {
+	get weight_total_raw() {
 		// =SUM(CK20:CK25)+CK$18
 		return this.weight_external + this.weight_internal;
 	};
@@ -1267,8 +1303,40 @@ class Design {
 		return this.frame_max_size_raw / SIZE_TO_WEIGHT_CAP_MULTIPLIER;
 	};
 
+	// CV18, DL18
 	get frame_max_size_raw() {
+		// 'MaxSz' item off principal frame definition
 		return this.princ_frame_def['MaxSz'];
+	};
+
+	get pretty_summary() {
+		const ID = 'Class: ' + this.name;
+		const statline =
+			  this.stats.toString() + ' - '
+			  + this.cost_BR.toString() + 'br ' + this.cost_SR.toString() + 'sr ' + ' - '
+			  + this.weight_total.toString() + 'kt ' + '[' + this.build_time.toFixed(2) + ']yr' + ' - '
+			  + this.cost_crew.toString();
+		const miscstats =
+			  'Evasion Chance: ' + (this.evasion * 100).toFixed(2) + "%\t"
+			  + 'Warp Core Breach Chance: ' + (this.warp_core_breach * 100).toFixed(2) + '%';
+		return [ID, statline, miscstats].join("\n");
+	};
+
+	get pretty_sdb_info() {
+		const statline =
+			  this.stats_raw.toFixed(2) + ' - '
+			  + '[' + this.cost_BR_raw.toFixed(2) + ']br [' + this.cost_SR_raw.toFixed(2) + ']sr ' + ' - '
+			  + '[' + this.weight_total_raw.toFixed(2) + ']kt ' + '[' + this.build_time.toFixed(2) + ']yr' + ' - '
+			  + this.cost_crew_raw.toFixed(2);
+		const buildinfo =
+			  'Power[' + this.cost_power_raw.toFixed(2) + '/' + this.power_generation_raw.toFixed(2) + '] - '
+			  + 'Internal[' + this.weight_internal.toFixed(1) + '/' + this.frame_max_size_raw + '] '
+			  + this.subsystems.map((ss) => ss.name + '[' + ss.weight_internal.toFixed(1) + '/' + ss.weight_cap.toFixed(0) + ']').join(' ')
+
+		return [statline, buildinfo].join("\n");
+	};
+
+	get pretty_dump() {
 	};
 };
 

@@ -17,10 +17,16 @@ class NamedVector {
 		return Object.keys(this.shortnames);
 	};
 
+	toFixed(n) {
+		return this.names.map((name) => {
+			return this.shortnames[name].toUpperCase() + '[' + this[name].toFixed(n) + ']';
+		}).join(' ')
+	};
+
 	toString() {
-		return '[' + this.names.map((name) => {
+		return this.names.map((name) => {
 			return this.shortnames[name].toUpperCase() + this[name].toString();
-		}).join(' ') + ']'
+		}).join(' ')
 	};
 	static op_add(a, b) {
 		return a + b;
