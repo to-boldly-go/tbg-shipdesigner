@@ -74,8 +74,8 @@ const COMPONENT_MAPPING = [
 			{name: "Impulse Engine Pwr", row: 39},
 		],
 		settings: [
-			{name: "Phaser Array?", row: 32},
-			{name: "Burst Launcher?", row: 34},
+			{name: "Phaser Arrays", row: 32},
+			{name: "Burst Launchers", row: 34},
 		],
 	},
 ];
