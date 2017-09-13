@@ -6,7 +6,8 @@
         "pretty-data": "^0.40.0"
     },
     "scripts": {
-        "run-design": "node run_design.js"
+        "run-design": "node run_design.js --parts parts_C8.csv  --frames frames_C8.csv --modules modules_C8.csv",
+        "test-against": "node validate_engine.js --parts parts_C8.csv  --frames frames_C8.csv --modules modules_C8.csv"
     },
     "license": "MIT",
     "version": "1.0.0",
