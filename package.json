@@ -6,11 +6,24 @@
         "pretty-data": "^0.40.0"
     },
     "scripts": {
-        "run-design": "node run_design.js --parts parts_C8.csv  --frames frames_C8.csv --modules modules_C8.csv",
-        "test-against": "node validate_engine.js --parts parts_C8.csv  --frames frames_C8.csv --modules modules_C8.csv"
+        "load-ship": "node scripts/load-ship.js --parts dist/parts_C8.csv  --frames dist/frames_C8.csv --modules dist/modules_C8.csv",
+        "import-ship": "node scripts/import-ship.js --parts dist/parts_C8.csv  --frames dist/frames_C8.csv --modules dist/modules_C8.csv",
+        "webpack": "webpack",
+        "watch": "webpack --progress --watch",
+        "start": "webpack-dev-server"
     },
     "license": "MIT",
     "version": "1.0.0",
     "name": "tbg-shipbuilder",
-    "devDependencies": {}
+    "devDependencies": {
+        "babel-core": "^6.26.0",
+        "babel-loader": "^7.1.2",
+        "babel-plugin-syntax-object-rest-spread": "^6.13.0",
+        "babel-plugin-transform-es2015-destructuring": "^6.23.0",
+        "babel-plugin-transform-object-rest-spread": "^6.26.0",
+        "babel-preset-env": "^1.6.0",
+        "csv-loader": "^2.1.1",
+        "webpack": "^3.5.6",
+        "webpack-dev-server": "^2.8.1"
+    }
 }

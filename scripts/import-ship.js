@@ -9,8 +9,8 @@ const Promise = require('bluebird');
 
 Promise.longStackTraces();
 
-const ShipEngine = require('./shipengine');
-const ShipImporter = require('./importer');
+const ShipEngine = require('../lib/shipengine');
+const ShipImporter = require('../lib/shipimporter');
 
 let parser = new ArgumentParser({
 	version: '0.0.1',
@@ -82,7 +82,11 @@ Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 			 readFile(args.modules, 'utf8').then(Papa.parsePromise),
 			 readFile(args.designcsv, 'utf8')])
 	.then(([parts, frames, modules, design]) => {
-		let se_DB = new ShipEngine.DB({parts, frames, modules});
+		let se_DB = new ShipEngine.DB({
+			parts: parts.data,
+			frames: frames.data,
+			modules: modules.data,
+		});
 		let se_json = ShipImporter.import_design(design);
 		let se_design = new ShipEngine.Design(se_DB, se_json);
 
