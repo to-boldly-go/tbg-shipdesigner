@@ -25,8 +25,20 @@ const config = {
 				},
 			},
 			{
+				test: /\.vue$/,
+				use: [
+					'vue-loader',
+				],
+			},
+			{
+				test: /\.raw\./,
+				use: [
+					'raw-loader',
+				],
+			},
+			{
 				test: /\.csv$/,
-				exclude: /(node_modules|bower_components)/,
+				exclude: /(node_modules|bower_components|\.raw\.)/,
 				loader: 'csv-loader',
 				options: {
 					dynamicTyping: true,
