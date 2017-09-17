@@ -17,12 +17,9 @@ export default {
 	name: 'DesignSummary',
 	props: {
 		se_db: Object,
-		design_json: Object,
+		se_design: Object,
 	},
 	computed: {
-		se_design () {
-			return new ShipEngine.Design(this.se_db, this.design_json);
-		},
 	},
 	methods: {
 	},
@@ -37,9 +34,7 @@ export default {
 	width: 100%;
 	margin: 0px;
 	box-sizing: border-box;
-	min-height: 50px;
-	position: fixed;
-	left: 0px;
-	top: 0px;
+	left: 5px;
+	top: 5px;
 }
 </style>
