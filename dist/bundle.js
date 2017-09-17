@@ -308,6 +308,40 @@ const SUBSYSTEM_NAME_MAP = {
 	}
 };
 
+// AI, AJ, AK block
+// GL column onward
+const COMPONENT_PART_CLASSIFICATIONS = {
+	"Primary Phasers": "Phasers",
+	"Secondary Phasers": "Phasers",
+	"Torpedo System": "Torpedoes",
+	"Short-Range Sensors": "Short-Range Sensors",
+	"Targeting Computer": "Targeting Computers",
+	"Deflector Shields": "Deflector Shields",
+	"Backup Deflectors": "Deflector Shields",
+	"Impulse Engine Pwr": "Impulse Engine Power",
+	"Long-Range Sensors": "Long-Range Sensors",
+	"Navigational Sensors": "Navigational Sensors",
+	"Survey Sensors": "Survey Sensors",
+	"Science Labs": "Science Labs",
+	"Computer Core": "Computer Cores",
+	"Operating System": "Operating System",
+	"Secondary Core": "Computer Cores",
+	"Diplomatic Package": "Diplomatic Packages",
+	"Recreation Package": "Recreation Packages",
+	"Sickbay": "Sickbays",
+	"Hull System": "Hull System",
+	"Structural Integrity Fields": "Structural Integrity Fields",
+	"Navigational Deflector": "Navigational Deflectors",
+	"Nacelle System": "Nacelles",
+	"Replication Package": "Replication Packages",
+	"Fuel & Matter Stores": "Fuel & Matter Stores",
+	"Warp Core Type": "Warp Core Types",
+	"M/AM Injectors": "Matter/Anti-Matter Injectors",
+	"Coolant Systems": "Coolant Systems",
+	"EPS Manifold System": "EPS Manifold System",
+	"Eject System": "Eject System"
+};
+
 class Crewline extends NamedVector {
 	static get shortnames() {
 		return {
@@ -358,6 +392,10 @@ class DesignComponent {
 		// BL block
 		// statline
 		this.part_def = this.db.find_part(this.json['Part']);
+	}
+
+	get valid_parts() {
+		return this.db.find_parts(COMPONENT_PART_CLASSIFICATIONS[this.name]);
 	}
 
 	get evasion() {
@@ -734,6 +772,10 @@ class DesignSubsystem {
 		this.components = this.json['Components'].map(comp_json => new DesignComponent(this.db, this, comp_json));
 	}
 
+	get valid_frames() {
+		return this.db.find_frames(this.name);
+	}
+
 	// CV20, CV41
 	get weight_cap() {
 		// sum of CV31-40 plus CV29
@@ -938,6 +980,10 @@ class Module {
 		this.module_def = this.db.find_module(this.json['Type'], this.json['Variant']);
 	}
 
+	get valid_modules() {
+		return this.db.find_modules(this.module_def['Type']);
+	}
+
 	// CT88, DN88
 	get build_time() {
 		// straight off modules list
@@ -1024,6 +1070,10 @@ class Design {
 		this.princ_frame_def = this.db.find_frame(this.json['Principal Frame']);
 		this.subsystems = this.json['Subsystems'].map(ss_json => new DesignSubsystem(this.db, this, ss_json)).sort((ssa, ssb) => SUBSYSTEM_SORT_ORDER[ssa.name] > SUBSYSTEM_SORT_ORDER[ssb.name]);
 		this.module = new Module(db, this, this.json['Module']);
+	}
+
+	get valid_frames() {
+		return this.db.find_frames('Frame');
 	}
 
 	// CT27, CT26
@@ -1355,6 +1405,14 @@ class DB {
 
 	find_frames(type) {
 		return this.frames.filter(elem => elem['Type'].trim() === type.trim());
+	}
+
+	find_parts(type) {
+		return this.parts.filter(elem => elem['Type'].trim() === type.trim());
+	}
+
+	find_modules(type) {
+		return this.modules.filter(elem => elem['Type'].trim() === type.trim());
 	}
 };
 
@@ -18503,7 +18561,7 @@ exports = module.exports = __webpack_require__(1)(true);
 
 
 // module
-exports.push([module.i, "\n.principal-frame {\n\tbackground-color: #29e;\n\tborder: 2px solid #07a;\n\twidth: 100%;\n\tmargin: 0px;\n\tbox-sizing: border-box;\n\tleft: 5px;\n\ttop: 5px;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/principal-frame.vue?7caa7e2e"],"names":[],"mappings":";AAiDA;CACA,uBAAA;CACA,uBAAA;CACA,YAAA;CACA,YAAA;CACA,uBAAA;CACA,UAAA;CACA,SAAA;CACA","file":"principal-frame.vue","sourcesContent":["<template>\n  <div class=\"principal-frame\">\n\t<input v-model=\"ship_name\" placeholder=\"Ship Name\">\n\n\t<select v-model=\"principal_frame\">\n\t  <option v-for=\"princ_frame_value in this.principal_frame_values\">{{princ_frame_value['Name']}}</option>\n\t</select>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nexport default {\n\tname: 'PrincipalFrame',\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tprincipal_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.se_design.json['Principal Frame'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_design.json['Principal Frame'] = value;\n\t\t\t},\n\t\t},\n\t\tprincipal_frame_values() {\n\t\t\treturn this.se_db.find_frames('Frame');\n\t\t},\n\t\tship_name: {\n\t\t\tget () {\n\t\t\t\treturn this.se_design.json['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_design.json['Name'] = value;\n\t\t\t}\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.principal-frame {\n\tbackground-color: #29e;\n\tborder: 2px solid #07a;\n\twidth: 100%;\n\tmargin: 0px;\n\tbox-sizing: border-box;\n\tleft: 5px;\n\ttop: 5px;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.principal-frame {\n\tbackground-color: #29e;\n\tborder: 2px solid #07a;\n\twidth: 100%;\n\tmargin: 0px;\n\tbox-sizing: border-box;\n\tleft: 5px;\n\ttop: 5px;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/principal-frame.vue?782f2534"],"names":[],"mappings":";AA8CA;CACA,uBAAA;CACA,uBAAA;CACA,YAAA;CACA,YAAA;CACA,uBAAA;CACA,UAAA;CACA,SAAA;CACA","file":"principal-frame.vue","sourcesContent":["<template>\n  <div class=\"principal-frame\">\n\t<input v-model=\"ship_name\" placeholder=\"Ship Name\">\n\n\t<select v-model=\"principal_frame\">\n\t  <option v-for=\"princ_frame_value in se_design.valid_frames\">{{princ_frame_value['Name']}}</option>\n\t</select>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nexport default {\n\tname: 'PrincipalFrame',\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tprincipal_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.se_design.json['Principal Frame'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_design.json['Principal Frame'] = value;\n\t\t\t},\n\t\t},\n\t\tship_name: {\n\t\t\tget () {\n\t\t\t\treturn this.se_design.json['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_design.json['Name'] = value;\n\t\t\t}\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.principal-frame {\n\tbackground-color: #29e;\n\tborder: 2px solid #07a;\n\twidth: 100%;\n\tmargin: 0px;\n\tbox-sizing: border-box;\n\tleft: 5px;\n\ttop: 5px;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -18544,9 +18602,6 @@ exports.push([module.i, "\n.principal-frame {\n\tbackground-color: #29e;\n\tbord
 			set(value) {
 				this.se_design.json['Principal Frame'] = value;
 			}
-		},
-		principal_frame_values() {
-			return this.se_db.find_frames('Frame');
 		},
 		ship_name: {
 			get() {
@@ -18605,7 +18660,7 @@ var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._sel
         _vm.principal_frame = $event.target.multiple ? $$selectedVal : $$selectedVal[0]
       }
     }
-  }, _vm._l((this.principal_frame_values), function(princ_frame_value) {
+  }, _vm._l((_vm.se_design.valid_frames), function(princ_frame_value) {
     return _c('option', [_vm._v(_vm._s(princ_frame_value['Name']))])
   }))])
 }
@@ -18708,7 +18763,7 @@ exports = module.exports = __webpack_require__(1)(true);
 
 
 // module
-exports.push([module.i, "\n.subsystem {\n\tbackground-color: #29e;\n\tborder: 2px solid #07a;\n\twidth: 100%;\n\tmargin: 0px;\n\tbox-sizing: border-box;\n\tleft: 5px;\n\ttop: 5px;\n}\n.headline {\n\tdisplay: flex;\n\tjustify-content: flex-start;\n}\n.name-span {\n}\n.stats-span {\n}\n.spacer-span {\n\tflex-grow: 1;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/subsystem.vue?ec00ded2"],"names":[],"mappings":";AA+CA;CACA,uBAAA;CACA,uBAAA;CACA,YAAA;CACA,YAAA;CACA,uBAAA;CACA,UAAA;CACA,SAAA;CACA;AAEA;CACA,cAAA;CACA,4BAAA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA,aAAA;CACA","file":"subsystem.vue","sourcesContent":["<template>\n  <div class=\"subsystem\">\n\t<div class=\"headline\">\n\t  <div class=\"name-span\">{{this.se_subsystem.name}}</div>\n\t  <div class=\"spacer-span\"></div>\n\t  <div class=\"stats-span\">\n\t\t<Statline :stats=this.se_subsystem.stats></Statline>\n\t  </div>\n\t</div>\n\t<div class=\"components-div\">\n\t  <div v-for=\"se_component in se_components\">\n\t\t{{se_component.name}}: {{se_component.quantity}}x {{se_component.json['Part']}} {{se_component.stats.toFixed(2)}}\n\t  </div>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport Statline from './statline.vue';\nimport ComponentDiv from './component.vue';\n\nexport default {\n\tname: 'Subsystem',\n\tcomponents: {\n\t\tStatline,\n\t\tComponentDiv,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.subsystem {\n\tbackground-color: #29e;\n\tborder: 2px solid #07a;\n\twidth: 100%;\n\tmargin: 0px;\n\tbox-sizing: border-box;\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.headline {\n\tdisplay: flex;\n\tjustify-content: flex-start;\n}\n\n.name-span {\n}\n\n.stats-span {\n}\n\n.spacer-span {\n\tflex-grow: 1;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.subsystem {\n\tbackground-color: #29e;\n\tborder: 2px solid #07a;\n\twidth: 100%;\n\tmargin: 0px;\n\tbox-sizing: border-box;\n\tleft: 5px;\n\ttop: 5px;\n}\n.headline {\n\tdisplay: flex;\n\tjustify-content: flex-start;\n}\n.name-span {\n}\n.stats-span {\n}\n.spacer-span {\n\tflex-grow: 1;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/subsystem.vue?492da66c"],"names":[],"mappings":";AA0DA;CACA,uBAAA;CACA,uBAAA;CACA,YAAA;CACA,YAAA;CACA,uBAAA;CACA,UAAA;CACA,SAAA;CACA;AAEA;CACA,cAAA;CACA,4BAAA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA,aAAA;CACA","file":"subsystem.vue","sourcesContent":["<template>\n  <div class=\"subsystem\">\n\t<div class=\"headline\">\n\t  <div class=\"name-span\">{{se_subsystem.name}}</div>\n\t  <select v-model=\"sub_frame\">\n\t\t<option v-for=\"sub_frame_value in se_subsystem.valid_frames\">{{sub_frame_value['Name']}}</option>\n\t  </select>\n\t  <div class=\"spacer-span\"></div>\n\t  <div class=\"stats-span\">\n\t\t<Statline :stats=se_subsystem.stats></Statline>\n\t  </div>\n\t</div>\n\t<div class=\"components-div\">\n\t  <div v-for=\"se_component in se_components\">\n\t\t<ComponentDiv :se_db=\"se_db\" :se_component=\"se_component\"></ComponentDiv>\n\t  </div>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport Statline from './statline.vue';\nimport ComponentDiv from './component.vue';\n\nexport default {\n\tname: 'Subsystem',\n\tcomponents: {\n\t\tStatline,\n\t\tComponentDiv,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tsub_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.se_subsystem.json['Sub-Frame'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_subsystem.json['Sub-Frame'] = value;\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.subsystem {\n\tbackground-color: #29e;\n\tborder: 2px solid #07a;\n\twidth: 100%;\n\tmargin: 0px;\n\tbox-sizing: border-box;\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.headline {\n\tdisplay: flex;\n\tjustify-content: flex-start;\n}\n\n.name-span {\n}\n\n.stats-span {\n}\n\n.spacer-span {\n\tflex-grow: 1;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -18722,6 +18777,9 @@ exports.push([module.i, "\n.subsystem {\n\tbackground-color: #29e;\n\tborder: 2p
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_vue__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__component_vue__ = __webpack_require__(50);
+//
+//
+//
 //
 //
 //
@@ -18760,6 +18818,14 @@ exports.push([module.i, "\n.subsystem {\n\tbackground-color: #29e;\n\tborder: 2p
 	computed: {
 		se_components() {
 			return this.se_subsystem.components;
+		},
+		sub_frame: {
+			get() {
+				return this.se_subsystem.json['Sub-Frame'];
+			},
+			set(value) {
+				this.se_subsystem.json['Sub-Frame'] = value;
+			}
 		}
 	},
 	methods: {}
@@ -18945,7 +19011,7 @@ exports = module.exports = __webpack_require__(1)(true);
 
 
 // module
-exports.push([module.i, "\n.subsystem {\n\tbackground-color: #29e;\n\tborder: 2px solid #07a;\n\twidth: 100%;\n\tmargin: 0px;\n\tbox-sizing: border-box;\n\tleft: 5px;\n\ttop: 5px;\n}\n.headline {\n\tdisplay: flex;\n\tjustify-content: flex-start;\n}\n.name-span {\n}\n.stats-span {\n}\n.spacer-span {\n\tflex-grow: 1;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/component.vue?e3d29ca6"],"names":[],"mappings":";AAmDA;CACA,uBAAA;CACA,uBAAA;CACA,YAAA;CACA,YAAA;CACA,uBAAA;CACA,UAAA;CACA,SAAA;CACA;AAEA;CACA,cAAA;CACA,4BAAA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA,aAAA;CACA","file":"component.vue","sourcesContent":["<template>\n  <div class=\"component-div\">\n\t<div class=\"name-span\">{{this.se_component.name}}</div>\n\t<div class=\"part-span\">{{this.se_component.part_def['Name']}}</div>\n\t<div class=\"count-span\">{{this.se_component.quantity}}</div>\n\t<div class=\"spacer-span\"></div>\n\t<div class=\"stats-span\">\n\t  <Statline :stats=this.se_component.stats></Statline>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\n// TODO: function properly in the case of multiple components with the\n// same name\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport Statline from './statline.vue';\n\nexport default {\n\tname: 'ComponentDiv',\n\tcomponents: {\n\t\tStatline,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tdesign_info: Object,\n\t\tsubsystem_name: String,\n\t\tcomponent_name: String,\n\t},\n\tcomputed: {\n\t\tse_design () {\n\t\t\treturn new ShipEngine.Design(this.se_db, this.design_info.data);\n\t\t},\n\t\tse_subsystem() {\n\t\t\treturn this.se_design.subsystems.find((ss) => ss.name === this.subsystem_name);\n\t\t},\n\t\tset_component() {\n\t\t\treturn this.se_subsystem.find((comp) => comp.name === this.component_name);\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.subsystem {\n\tbackground-color: #29e;\n\tborder: 2px solid #07a;\n\twidth: 100%;\n\tmargin: 0px;\n\tbox-sizing: border-box;\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.headline {\n\tdisplay: flex;\n\tjustify-content: flex-start;\n}\n\n.name-span {\n}\n\n.stats-span {\n}\n\n.spacer-span {\n\tflex-grow: 1;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.component-div {\n\tbackground-color: #07c;\n\tborder: 2px solid #07a;\n\twidth: 100%;\n\tmargin: 0px;\n\tbox-sizing: border-box;\n\tleft: 5px;\n\ttop: 5px;\n\n\tdisplay: flex;\n\tjustify-content: flex-start;\n}\n.name-span {\n}\n.stats-span {\n}\n.part-span {\n}\n.quantity-input {\n\twidth: 30px;\n}\n.spacer-span {\n\tflex-grow: 1;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/component.vue?0f27379e"],"names":[],"mappings":";AA0DA;CACA,uBAAA;CACA,uBAAA;CACA,YAAA;CACA,YAAA;CACA,uBAAA;CACA,UAAA;CACA,SAAA;;CAEA,cAAA;CACA,4BAAA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,aAAA;CACA","file":"component.vue","sourcesContent":["<template>\n  <div class=\"component-div\">\n\t<div class=\"name-span\">{{se_component.name}}</div>\n\t<input class=\"quantity-input\" type=\"number\" v-model=\"quantity\">\n\t<select v-model=\"part\">\n\t  <option v-for=\"part_value in se_component.valid_parts\">{{part_value['Name']}}</option>\n\t</select>\n\t<div class=\"spacer-span\"></div>\n\t<div class=\"stats-span\">\n\t  <Statline :stats=stats></Statline>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport Statline from './statline.vue';\n\nexport default {\n\tname: 'ComponentDiv',\n\tcomponents: {\n\t\tStatline,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_component: Object,\n\t},\n\tcomputed: {\n\t\tquantity: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.quantity;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_component.json['Quantity'] = value;\n\t\t\t},\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_component.stats;\n\t\t},\n\t\tpart: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.json['Part'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_component.json['Part'] = value;\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.component-div {\n\tbackground-color: #07c;\n\tborder: 2px solid #07a;\n\twidth: 100%;\n\tmargin: 0px;\n\tbox-sizing: border-box;\n\tleft: 5px;\n\ttop: 5px;\n\n\tdisplay: flex;\n\tjustify-content: flex-start;\n}\n\n.name-span {\n}\n\n.stats-span {\n}\n\n.part-span {\n}\n\n.quantity-input {\n\twidth: 30px;\n}\n\n.spacer-span {\n\tflex-grow: 1;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -18971,10 +19037,9 @@ exports.push([module.i, "\n.subsystem {\n\tbackground-color: #29e;\n\tborder: 2p
 //
 //
 //
+//
+//
 
-
-// TODO: function properly in the case of multiple components with the
-// same name
 
 
 
@@ -18987,19 +19052,27 @@ exports.push([module.i, "\n.subsystem {\n\tbackground-color: #29e;\n\tborder: 2p
 	},
 	props: {
 		se_db: Object,
-		design_info: Object,
-		subsystem_name: String,
-		component_name: String
+		se_component: Object
 	},
 	computed: {
-		se_design() {
-			return new __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default.a.Design(this.se_db, this.design_info.data);
+		quantity: {
+			get() {
+				return this.se_component.quantity;
+			},
+			set(value) {
+				this.se_component.json['Quantity'] = value;
+			}
 		},
-		se_subsystem() {
-			return this.se_design.subsystems.find(ss => ss.name === this.subsystem_name);
+		stats() {
+			return this.se_component.stats;
 		},
-		set_component() {
-			return this.se_subsystem.find(comp => comp.name === this.component_name);
+		part: {
+			get() {
+				return this.se_component.json['Part'];
+			},
+			set(value) {
+				this.se_component.json['Part'] = value;
+			}
 		}
 	},
 	methods: {}
@@ -19015,17 +19088,53 @@ var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._sel
     staticClass: "component-div"
   }, [_c('div', {
     staticClass: "name-span"
-  }, [_vm._v(_vm._s(this.se_component.name))]), _vm._v(" "), _c('div', {
-    staticClass: "part-span"
-  }, [_vm._v(_vm._s(this.se_component.part_def['Name']))]), _vm._v(" "), _c('div', {
-    staticClass: "count-span"
-  }, [_vm._v(_vm._s(this.se_component.quantity))]), _vm._v(" "), _c('div', {
+  }, [_vm._v(_vm._s(_vm.se_component.name))]), _vm._v(" "), _c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.quantity),
+      expression: "quantity"
+    }],
+    staticClass: "quantity-input",
+    attrs: {
+      "type": "number"
+    },
+    domProps: {
+      "value": (_vm.quantity)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.quantity = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('select', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.part),
+      expression: "part"
+    }],
+    on: {
+      "change": function($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function(o) {
+          return o.selected
+        }).map(function(o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val
+        });
+        _vm.part = $event.target.multiple ? $$selectedVal : $$selectedVal[0]
+      }
+    }
+  }, _vm._l((_vm.se_component.valid_parts), function(part_value) {
+    return _c('option', [_vm._v(_vm._s(part_value['Name']))])
+  })), _vm._v(" "), _c('div', {
     staticClass: "spacer-span"
   }), _vm._v(" "), _c('div', {
     staticClass: "stats-span"
   }, [_c('Statline', {
     attrs: {
-      "stats": this.se_component.stats
+      "stats": _vm.stats
     }
   })], 1)])
 }
@@ -19052,18 +19161,43 @@ var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._sel
     staticClass: "headline"
   }, [_c('div', {
     staticClass: "name-span"
-  }, [_vm._v(_vm._s(this.se_subsystem.name))]), _vm._v(" "), _c('div', {
+  }, [_vm._v(_vm._s(_vm.se_subsystem.name))]), _vm._v(" "), _c('select', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.sub_frame),
+      expression: "sub_frame"
+    }],
+    on: {
+      "change": function($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function(o) {
+          return o.selected
+        }).map(function(o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val
+        });
+        _vm.sub_frame = $event.target.multiple ? $$selectedVal : $$selectedVal[0]
+      }
+    }
+  }, _vm._l((_vm.se_subsystem.valid_frames), function(sub_frame_value) {
+    return _c('option', [_vm._v(_vm._s(sub_frame_value['Name']))])
+  })), _vm._v(" "), _c('div', {
     staticClass: "spacer-span"
   }), _vm._v(" "), _c('div', {
     staticClass: "stats-span"
   }, [_c('Statline', {
     attrs: {
-      "stats": this.se_subsystem.stats
+      "stats": _vm.se_subsystem.stats
     }
   })], 1)]), _vm._v(" "), _c('div', {
     staticClass: "components-div"
   }, _vm._l((_vm.se_components), function(se_component) {
-    return _c('div', [_vm._v("\n\t\t" + _vm._s(se_component.name) + ": " + _vm._s(se_component.quantity) + "x " + _vm._s(se_component.json['Part']) + " " + _vm._s(se_component.stats.toFixed(2)) + "\n\t  ")])
+    return _c('div', [_c('ComponentDiv', {
+      attrs: {
+        "se_db": _vm.se_db,
+        "se_component": se_component
+      }
+    })], 1)
   }))])
 }
 var staticRenderFns = []
