@@ -1,15 +1,18 @@
 <template>
   <div class="subsystem">
 	<div class="headline">
-	  <div class="name-span">{{this.se_subsystem.name}}</div>
+	  <div class="name-span">{{se_subsystem.name}}</div>
+	  <select v-model="sub_frame">
+		<option v-for="sub_frame_value in se_subsystem.valid_frames">{{sub_frame_value['Name']}}</option>
+	  </select>
 	  <div class="spacer-span"></div>
 	  <div class="stats-span">
-		<Statline :stats=this.se_subsystem.stats></Statline>
+		<Statline :stats=se_subsystem.stats></Statline>
 	  </div>
 	</div>
 	<div class="components-div">
 	  <div v-for="se_component in se_components">
-		{{se_component.name}}: {{se_component.quantity}}x {{se_component.json['Part']}} {{se_component.stats.toFixed(2)}}
+		<ComponentDiv :se_db="se_db" :se_component="se_component"></ComponentDiv>
 	  </div>
 	</div>
   </div>
@@ -36,6 +39,14 @@ export default {
 	computed: {
 		se_components () {
 			return this.se_subsystem.components;
+		},
+		sub_frame: {
+			get () {
+				return this.se_subsystem.json['Sub-Frame'];
+			},
+			set (value) {
+				this.se_subsystem.json['Sub-Frame'] = value;
+			},
 		},
 	},
 	methods: {

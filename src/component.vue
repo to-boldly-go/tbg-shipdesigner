@@ -1,20 +1,19 @@
 <template>
   <div class="component-div">
-	<div class="name-span">{{this.se_component.name}}</div>
-	<div class="part-span">{{this.se_component.part_def['Name']}}</div>
-	<div class="count-span">{{this.se_component.quantity}}</div>
+	<div class="name-span">{{se_component.name}}</div>
+	<input class="quantity-input" type="number" v-model="quantity">
+	<select v-model="part">
+	  <option v-for="part_value in se_component.valid_parts">{{part_value['Name']}}</option>
+	</select>
 	<div class="spacer-span"></div>
 	<div class="stats-span">
-	  <Statline :stats=this.se_component.stats></Statline>
+	  <Statline :stats=stats></Statline>
 	</div>
   </div>
 </template>
 
 
 <script>
-
-// TODO: function properly in the case of multiple components with the
-// same name
 
 import ShipEngine from '../lib/shipengine.js';
 
@@ -27,19 +26,27 @@ export default {
 	},
 	props: {
 		se_db: Object,
-		design_info: Object,
-		subsystem_name: String,
-		component_name: String,
+		se_component: Object,
 	},
 	computed: {
-		se_design () {
-			return new ShipEngine.Design(this.se_db, this.design_info.data);
+		quantity: {
+			get () {
+				return this.se_component.quantity;
+			},
+			set (value) {
+				this.se_component.json['Quantity'] = value;
+			},
 		},
-		se_subsystem() {
-			return this.se_design.subsystems.find((ss) => ss.name === this.subsystem_name);
+		stats() {
+			return this.se_component.stats;
 		},
-		set_component() {
-			return this.se_subsystem.find((comp) => comp.name === this.component_name);
+		part: {
+			get () {
+				return this.se_component.json['Part'];
+			},
+			set (value) {
+				this.se_component.json['Part'] = value;
+			},
 		},
 	},
 	methods: {
@@ -49,17 +56,15 @@ export default {
 
 
 <style>
-.subsystem {
-	background-color: #29e;
+.component-div {
+	background-color: #07c;
 	border: 2px solid #07a;
 	width: 100%;
 	margin: 0px;
 	box-sizing: border-box;
 	left: 5px;
 	top: 5px;
-}
 
-.headline {
 	display: flex;
 	justify-content: flex-start;
 }
@@ -68,6 +73,13 @@ export default {
 }
 
 .stats-span {
+}
+
+.part-span {
+}
+
+.quantity-input {
+	width: 30px;
 }
 
 .spacer-span {

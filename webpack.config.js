@@ -12,8 +12,8 @@ const config = {
 	devServer: {
 		contentBase: path.join(__dirname, "dist"),
 		port: 8001,
-		// host: '0.0.0.0',
-		// disableHostCheck: true,
+		host: '0.0.0.0',
+		disableHostCheck: true,
 	},
 	module: {
 		rules: [
