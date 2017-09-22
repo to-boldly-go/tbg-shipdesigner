@@ -31,10 +31,10 @@ export default {
 <style>
 .design-import-export {
 	background-color: #29d;
-	border: 2px solid #07a;
+
 	width: 100%;
 	margin: 0px;
-	box-sizing: border-box;
+
 	left: 5px;
 	top: 5px;
 }

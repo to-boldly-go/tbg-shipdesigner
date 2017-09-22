@@ -19,8 +19,6 @@ export default {
 		se_db: Object,
 		se_design: Object,
 	},
-	computed: {
-	},
 	methods: {
 	},
 }
@@ -30,10 +28,10 @@ export default {
 <style>
 .design-summary {
 	background-color: #29e;
-	border: 2px solid #07a;
+
 	width: 100%;
 	margin: 0px;
-	box-sizing: border-box;
+
 	left: 5px;
 	top: 5px;
 }

@@ -1,8 +1,14 @@
 <template>
-  <div>
-	<DesignSummary :se_db="se_db" :se_design="se_design"></DesignSummary>
-	<Design :se_db="se_db" :se_design="se_design"></Design>
-	<DesignImportExport :design_info="design_info"></DesignImportExport>
+  <div class="root">
+	<div class="header">
+	  <DesignSummary :se_db="se_db" :se_design="se_design"></DesignSummary>
+	</div>
+	<div class="design">
+	  <Design :se_db="se_db" :se_design="se_design"></Design>
+	</div>
+	<div class="footer">
+	  <DesignImportExport :design_info="design_info"></DesignImportExport>
+	</div>
   </div>
 </template>
 
@@ -52,5 +58,30 @@ export default {
 
 
 <style>
+
+.root {
+	width: 100%;
+	height: 100%;
+
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+}
+
+.header {
+	flex: 0 0 auto;
+	border-bottom: 2px solid;
+}
+
+.design {
+	flex: 1 1 auto;
+	position: relative;/* need this to position inner content */
+	overflow-y: auto;
+}
+
+.footer {
+	flex: 0 0 auto;
+	border-top: 2px solid;
+}
 
 </style>

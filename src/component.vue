@@ -1,15 +1,27 @@
 <template>
-  <div class="component-div">
-	<div class="name-span">{{se_component.name}}</div>
-	<input class="quantity-input" type="number" v-model="quantity">
-	<select v-model="part" class="part-select">
+  <tr class="component-tr">
+	<td class="name-cell">{{se_component.name}}</td>
+	<td class="quantity-cell"><input class="quantity-input" type="number" v-model="quantity"></td>
+	<td class="part-cell"><select v-model="part" class="part-select">
 	  <option v-for="part_value in se_component.valid_parts">{{part_value['Name']}}</option>
-	</select>
-	<div class="post-part-spacer"></div>
-	<div class="stats-span">
-	  <Statline :stats=stats></Statline>
-	</div>
-  </div>
+	</select></td>
+
+	<template v-for="name in stats.names">
+	  <StatlineCell :stats="stats" :name="name"></StatlineCell>
+	</template>
+
+	<td class="weight-cell">{{se_component.weight_internal.toFixed(2)}}</td>
+	<td class="br-cell">{{se_component.cost_BR.toFixed(2)}}</td>
+	<td class="sr-cell">{{se_component.cost_SR.toFixed(2)}}</td>
+	<td class="power-gen-cell">{{se_component.power_generation.toFixed(2)}}</td>
+	<td class="power-cost-cell">{{se_component.cost_power.toFixed(2)}}</td>
+
+	<template v-for="name in crew.names">
+	  <StatlineCell :stats="crew" :name="name"></StatlineCell>
+	</template>
+
+	<td class="build-time-cell"></td>
+  </tr>
 </template>
 
 
@@ -17,12 +29,12 @@
 
 import ShipEngine from '../lib/shipengine.js';
 
-import Statline from './statline.vue';
+import StatlineCell from './statline-cell.vue';
 
 export default {
-	name: 'ComponentDiv',
+	name: 'ComponentTr',
 	components: {
-		Statline,
+		StatlineCell,
 	},
 	props: {
 		se_db: Object,
@@ -37,8 +49,11 @@ export default {
 				this.se_component.quantity = value;
 			},
 		},
-		stats() {
+		stats () {
 			return this.se_component.stats;
+		},
+		crew() {
+			return this.se_component.cost_crew;
 		},
 		part: {
 			get () {
@@ -56,37 +71,25 @@ export default {
 
 
 <style>
-.component-div {
-	background-color: #07c;
-	border: 2px solid #07a;
+.component-tr {
 	width: 100%;
 	margin: 0px;
-	box-sizing: border-box;
-	left: 5px;
-	top: 5px;
-
-	display: flex;
-	flex-flow: row nowrap;
 }
 
-.name-span {
-	flex: 3 0 0;
+.name-cell {
 }
 
-.stats-span {
-	flex: 5 1 0;
+.quantity-cell {
+}
+
+.part-cell {
 }
 
 .part-select {
-	flex: 5 1 0;
+	width: 100%;
 }
 
 .quantity-input {
 	width: 30px;
-	flex: 0 0 auto;
-}
-
-.post-part-spacer {
-	flex: 1 1 0;
 }
 </style>
