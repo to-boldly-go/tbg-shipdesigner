@@ -1,5 +1,8 @@
 'use strict';
 
+import Vue from 'vue';
+import App from './app.vue';
+
 import design_json from '../dist/design.json';
 import canon_parts from '../dist/parts_C8.csv';
 import canon_modules from '../dist/modules_C8.csv';
@@ -17,18 +20,7 @@ const se_db = new ShipEngine.DB({
 	modules: canon_modules,
 });
 
-console.log(design_json);
-console.log(canon_parts);
-console.log(canon_modules);
-
 let se_design = new ShipEngine.Design(se_db, design_json);
-console.log(se_design.pretty_summary);
-console.log(se_design.pretty_sdb_info);
-
-
-
-import Vue from 'vue';
-import App from './app.vue';
 
 // create a root instance
 new Vue({

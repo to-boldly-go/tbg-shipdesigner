@@ -10,7 +10,8 @@
         "import-ship": "node scripts/import-ship.js --parts dist/parts_C8.csv  --frames dist/frames_C8.csv --modules dist/modules_C8.csv",
         "webpack": "webpack",
         "watch": "webpack --progress --watch",
-        "start": "webpack-dev-server"
+        "start": "webpack-dev-server",
+        "deploy-gh-pages": "git subtree push --prefix dist origin gh-pages"
     },
     "license": "MIT",
     "version": "1.0.0",
@@ -24,6 +25,7 @@
         "babel-preset-env": "^1.6.0",
         "css-loader": "^0.28.7",
         "csv-loader": "^2.1.1",
+        "deep-equal": "^1.0.1",
         "raw-loader": "^0.5.1",
         "vue": "^2.4.3",
         "vue-loader": "^13.0.4",

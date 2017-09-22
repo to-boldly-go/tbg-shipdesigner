@@ -2,10 +2,11 @@
   <div class="subsystem">
 	<div class="headline">
 	  <div class="name-span">{{se_subsystem.name}}</div>
-	  <select v-model="sub_frame">
+	  <div class="pre-sub-frame-spacer"></div>
+	  <select v-model="sub_frame" class="sub-frame-select">
 		<option v-for="sub_frame_value in se_subsystem.valid_frames">{{sub_frame_value['Name']}}</option>
 	  </select>
-	  <div class="spacer-span"></div>
+	  <div class="post-sub-frame-spacer"></div>
 	  <div class="stats-span">
 		<Statline :stats=se_subsystem.stats></Statline>
 	  </div>
@@ -42,10 +43,10 @@ export default {
 		},
 		sub_frame: {
 			get () {
-				return this.se_subsystem.json['Sub-Frame'];
+				return this.se_subsystem.sub_frame;
 			},
 			set (value) {
-				this.se_subsystem.json['Sub-Frame'] = value;
+				this.se_subsystem.sub_frame = value;
 			},
 		},
 	},
@@ -68,16 +69,27 @@ export default {
 
 .headline {
 	display: flex;
-	justify-content: flex-start;
+	flex-flow: row nowrap;
 }
 
 .name-span {
+	flex: 3 0 0;
 }
 
 .stats-span {
+	flex: 5 1 0;
 }
 
-.spacer-span {
-	flex-grow: 1;
+.sub-frame-select {
+	flex: 5 1 0;
+}
+
+.pre-sub-frame-spacer {
+	width: 30px;
+	flex: 0 0 auto;
+}
+
+.post-sub-frame-spacer {
+	flex: 1 1 0;
 }
 </style>

@@ -2,10 +2,10 @@
   <div class="component-div">
 	<div class="name-span">{{se_component.name}}</div>
 	<input class="quantity-input" type="number" v-model="quantity">
-	<select v-model="part">
+	<select v-model="part" class="part-select">
 	  <option v-for="part_value in se_component.valid_parts">{{part_value['Name']}}</option>
 	</select>
-	<div class="spacer-span"></div>
+	<div class="post-part-spacer"></div>
 	<div class="stats-span">
 	  <Statline :stats=stats></Statline>
 	</div>
@@ -34,7 +34,7 @@ export default {
 				return this.se_component.quantity;
 			},
 			set (value) {
-				this.se_component.json['Quantity'] = value;
+				this.se_component.quantity = value;
 			},
 		},
 		stats() {
@@ -42,10 +42,10 @@ export default {
 		},
 		part: {
 			get () {
-				return this.se_component.json['Part'];
+				return this.se_component.part;
 			},
 			set (value) {
-				this.se_component.json['Part'] = value;
+				this.se_component.part = value;
 			},
 		},
 	},
@@ -66,23 +66,27 @@ export default {
 	top: 5px;
 
 	display: flex;
-	justify-content: flex-start;
+	flex-flow: row nowrap;
 }
 
 .name-span {
+	flex: 3 0 0;
 }
 
 .stats-span {
+	flex: 5 1 0;
 }
 
-.part-span {
+.part-select {
+	flex: 5 1 0;
 }
 
 .quantity-input {
 	width: 30px;
+	flex: 0 0 auto;
 }
 
-.spacer-span {
-	flex-grow: 1;
+.post-part-spacer {
+	flex: 1 1 0;
 }
 </style>
