@@ -28,9 +28,9 @@
                     "Name": "Eject System"
                 }
             ],
-            "Settings": {
-                "Safety/Performance": 0
-            },
+            "Settings": [
+				{ "Name": "Safety/Performance", "Value": 0 }
+            ],
             "Sub-Frame": "[T2] Md Frigate Warp Core Suite",
             "Name": "Warp Core"
         },
@@ -62,8 +62,8 @@
                     "Name": "Fuel & Matter Stores"
                 }
             ],
-            "Settings": {
-            },
+            "Settings": [
+            ],
             "Sub-Frame": "[T2][OET-SR-] Md Frigate Engineering Suite",
             "Name": "Engineering"
         },
@@ -120,9 +120,9 @@
                     "Name": "Sickbay"
                 }
             ],
-            "Settings": {
-                "Isolinear?": false
-            },
+            "Settings": [
+                { "Name": "Isolinear?", "Value": false }
+            ],
             "Sub-Frame": "[T2][OE--] Lg Frigate Operations Suite",
             "Name": "Operations"
         },
@@ -134,8 +134,8 @@
                     "Name": "Hull System"
                 }
             ],
-            "Settings": {
-            },
+            "Settings": [
+            ],
             "Sub-Frame": "[T2] Sm Frigate Hull Suite",
             "Name": "Hull"
         },
@@ -182,10 +182,10 @@
                     "Name": "Impulse Engine Pwr"
                 }
             ],
-            "Settings": {
-                "Burst Launchers": true,
-                "Phaser Arrays": false
-            },
+            "Settings": [
+                { "Name": "Burst Launchers", "Value": true },
+                { "Name": "Phaser Arrays", "Value": false }
+            ],
             "Sub-Frame": "[T1][SR+] Sm Frigate Tactical Suite",
             "Name": "Tactical"
         }
