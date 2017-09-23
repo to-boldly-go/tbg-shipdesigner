@@ -1,8 +1,9 @@
 <template>
 
   <tr class="subsystem-frame">
-	<td class="name-cell" colspan="2">{{se_subsystem.name}}</td>
-	<td class="part-cell"><select v-model="sub_frame" class="part-select">
+	<td class="name-column" colspan="2">{{se_subsystem.name}}</td>
+
+	<td class="part-column"><select v-model="sub_frame" class="part-column-select">
 		<option v-for="sub_frame_value in se_subsystem.valid_frames">{{sub_frame_value['Name']}}</option>
 	</select></td>
 
@@ -10,19 +11,19 @@
 	  <td>{{stats_multiplier_pretty}}</td>
 	</template>
 
-	<td class="weight-cell">{{se_subsystem.weight_cap.toFixed(2)}}</td>
-	<td></td>
+	<td class="weight-internal-column" colspan="2">{{se_subsystem.weight_cap.toFixed(2)}}</td>
 
-	<td class="br-cell">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>
-	<td class="sr-cell">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>
-	<td class="power-gen-cell"></td>
-	<td class="power-cost-cell"></td>
+	<td class="br-column">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>
+	<td class="sr-column">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>
+
+	<td class="power-gen-column"></td>
+	<td class="power-cost-column"></td>
 
 	<template v-for="name in crew.names">
 	  <StatlineCell :stats="crew_mult_pretty" :name="name" :ispretty="false"></StatlineCell>
 	</template>
 
-	<td class="build-time-cell">{{se_subsystem.build_time.toFixed(2)}}</td>
+	<td class="build-time-column">{{se_subsystem.build_time.toFixed(2)}}</td>
   </tr>
 
 
@@ -84,13 +85,8 @@ export default {
 	border-color: black;
 }
 
-.name-cell {
-}
+</style>
 
-.part-cell {
-}
 
-.part-select {
-	width: 100%;
-}
+<style scoped>
 </style>

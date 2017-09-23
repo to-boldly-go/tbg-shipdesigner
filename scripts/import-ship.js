@@ -90,8 +90,8 @@ Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
 		let se_json = ShipImporter.import_design(design);
 		let se_design = new ShipEngine.Design(se_DB, se_json);
 
-		fs.writeFileSync('output.json', JSON.stringify(se_json));
+		console.log(JSON.stringify(se_json));
 
-		console.log(se_design.pretty_summary)
-		console.log(se_design.pretty_sdb_info)
+		// console.log(se_design.pretty_summary)
+		// console.log(se_design.pretty_sdb_info)
 	});

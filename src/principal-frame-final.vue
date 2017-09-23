@@ -1,26 +1,26 @@
 <template>
   <tr class="principal-frame-final">
-	<td class="design-name-cell">{{ship_name}}</td>
+	<td class="name-column" colspan="2">{{ship_name}}</td>
 
-	<td></td>
-	<td>{{principal_frame}}</td>
+	<td class="part-column">{{principal_frame}}</td>
 
 	<template v-for="name in stats.names">
 	  <StatlineCell :stats="stats" :name="name" :fixed="0"></StatlineCell>
 	</template>
 	
-	<td class="weight-cell" colspan="2">{{se_design.weight_total}}</td>
+	<td class="weight-internal-column" colspan="2">{{se_design.weight_total}}</td>
 
-	<td class="br-cell">{{se_design.cost_BR}}</td>
-	<td class="sr-cell">{{se_design.cost_SR}}</td>
-	<td class="power-gen-cell">{{se_design.power_generation}}</td>
-	<td class="power-cost-cell">{{se_design.cost_power}}</td>
+	<td class="br-column">{{se_design.cost_BR}}</td>
+	<td class="sr-column">{{se_design.cost_SR}}</td>
+
+	<td class="power-gen-column">{{se_design.power_generation}}</td>
+	<td class="power-cost-column">{{se_design.cost_power}}</td>
 
 	<template v-for="name in crew.names">
 	  <StatlineCell :stats="crew" :name="name" :fixed="0"></StatlineCell>
 	</template>
 
-	<td class="build-time-cell"></td>
+	<td class="build-time-column">{{build_time}}</td>
   </tr>
 </template>
 
@@ -50,6 +50,9 @@ export default {
 		crew () {
 			return this.se_design.cost_crew;
 		},
+		build_time () {
+			return this.se_design.build_time;
+		},
 		ship_name () {
 			return this.se_design.json['Name'];
 		},
@@ -60,7 +63,7 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
 .principal-frame-final {
 	background: #111;
 	color: #fff;
@@ -75,9 +78,5 @@ export default {
 	/* position: relative; */
 	/* left: 2px; */
 	/* top: 2px; */
-}
-
-.frame-select {
-	width: 100%;
 }
 </style>

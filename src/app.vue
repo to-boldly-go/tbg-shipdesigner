@@ -18,8 +18,7 @@
 import ShipEngine from '../lib/shipengine.js';
 import ShipImporter from '../lib/shipimporter';
 
-import design_json_init from '../dist/design.json';
-import design_csv_init from '../dist/swb_kepler_recreations.raw.csv';
+import design_json_init from '../dist/swb_kepler_recreation.json';
 import canon_parts from '../dist/parts_C8.csv';
 import canon_modules from '../dist/modules_C8.csv';
 import canon_frames from '../dist/frames_C8.csv';

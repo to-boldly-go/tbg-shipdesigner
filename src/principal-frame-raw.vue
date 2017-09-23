@@ -1,9 +1,8 @@
 <template>
   <tr class="principal-frame-raw">
-	<td><input v-model="ship_name" placeholder="Ship Name"></td>
+	<td class="name-column" colspan="2"><input v-model="ship_name" placeholder="Ship Name" class="name-column-input"></td>
 
-	<td></td>
-	<td><select v-model="principal_frame" class="frame-select">
+	<td class="part-column"><select v-model="principal_frame" class="part-column-select">
 	  <option v-for="princ_frame_value in se_design.valid_frames">{{princ_frame_value['Name']}}</option>
 	</select></td>
 
@@ -11,19 +10,20 @@
 	  <StatlineCell :stats="stats_raw" :name="name"></StatlineCell>
 	</template>
 	
-	<td class="weight-cell">{{se_design.weight_internal.toFixed(2)}}</td>
-	<td class="weight-cell">{{se_design.weight_external.toFixed(2)}}</td>
+	<td class="weight-internal-column">{{se_design.weight_internal.toFixed(2)}}</td>
+	<td class="weight-external-column">{{se_design.weight_external.toFixed(2)}}</td>
 
-	<td class="br-cell">{{se_design.cost_BR_raw.toFixed(2)}}</td>
-	<td class="sr-cell">{{se_design.cost_SR_raw.toFixed(2)}}</td>
-	<td class="power-gen-cell">{{se_design.power_generation_raw.toFixed(2)}}</td>
-	<td class="power-cost-cell">{{se_design.cost_power_raw.toFixed(2)}}</td>
+	<td class="br-column">{{se_design.cost_BR_raw.toFixed(2)}}</td>
+	<td class="sr-column">{{se_design.cost_SR_raw.toFixed(2)}}</td>
+
+	<td class="power-gen-column">{{se_design.power_generation_raw.toFixed(2)}}</td>
+	<td class="power-cost-column">{{se_design.cost_power_raw.toFixed(2)}}</td>
 
 	<template v-for="name in crew_raw.names">
 	  <StatlineCell :stats="crew_raw" :name="name"></StatlineCell>
 	</template>
 
-	<td class="build-time-cell"></td>
+	<td class="build-time-column">{{se_design.build_time_frame.toFixed(2)}}</td>
   </tr>
 </template>
 
@@ -74,6 +74,9 @@ export default {
 
 
 <style>
+</style>
+
+<style scoped>
 .principal-frame-raw {
 	background: #111;
 	color: #fff;
@@ -84,9 +87,5 @@ export default {
 	/* position: relative; */
 	/* left: 2px; */
 	/* top: 2px; */
-}
-
-.frame-select {
-	width: 100%;
 }
 </style>

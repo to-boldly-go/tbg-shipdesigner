@@ -85,7 +85,48 @@ export default {
 
 	left: 5px;
 	top: 5px;
+}
 
+.name-column {
+}
+
+.part-column {
+}
+
+.part-column-select {
+	width: 100%;
+}
+
+.quantity-column {
+	width: 30px;
+}
+
+.quantity-column-input {
+	width: 100%;
+}
+
+.stat-column {
+}
+
+.weight-internal-column {
+}
+
+.weight-external-column {
+}
+
+.br-column {
+}
+
+.sr-column {
+}
+
+.power-gen-column {
+}
+
+.power-cost-column {
+}
+
+.build-time-column {
 }
 
 .design-table-head {

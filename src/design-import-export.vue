@@ -28,7 +28,7 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
 .design-import-export {
 	background-color: #999;
 

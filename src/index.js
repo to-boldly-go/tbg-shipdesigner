@@ -14,13 +14,13 @@ import ShipImporter from '../lib/shipimporter';
 
 Promise.longStackTraces();
 
-const se_db = new ShipEngine.DB({
-	parts: canon_parts,
-	frames: canon_frames,
-	modules: canon_modules,
-});
+// const se_db = new ShipEngine.DB({
+// 	parts: canon_parts,
+// 	frames: canon_frames,
+// 	modules: canon_modules,
+// });
 
-let se_design = new ShipEngine.Design(se_db, design_json);
+// let se_design = new ShipEngine.Design(se_db, design_json);
 
 // create a root instance
 new Vue({

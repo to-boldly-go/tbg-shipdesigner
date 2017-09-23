@@ -70,6 +70,19 @@
         {
             "Components": [
                 {
+                    "Part": "[T2][L] Lt. Alloy-3 Duranium Hull",
+                    "Quantity": 1,
+                    "Name": "Hull System"
+                }
+            ],
+            "Settings": {
+            },
+            "Sub-Frame": "[T2] Sm Frigate Hull Suite",
+            "Name": "Hull"
+        },
+        {
+            "Components": [
+                {
                     "Part": "[T2][H] Mark-VII-Heavy LR Sensor Array",
                     "Quantity": 2,
                     "Name": "Long-Range Sensors"
@@ -110,13 +123,13 @@
                     "Name": "Diplomatic Package"
                 },
                 {
-                    "Part": "No Onboard Recreation",
-                    "Quantity": 0,
+                    "Part": "[T-1][M] 2260s Rec Space",
+                    "Quantity": 1,
                     "Name": "Recreation Package"
                 },
                 {
                     "Part": "[T2][H] T'Koren Pattern Large Sickbay",
-                    "Quantity": 4,
+                    "Quantity": 3,
                     "Name": "Sickbay"
                 }
             ],
@@ -129,56 +142,43 @@
         {
             "Components": [
                 {
-                    "Quantity": 1,
-                    "Part": "[T2][L] Lt. Alloy-3 Duranium Hull",
-                    "Name": "Hull System"
-                }
-            ],
-            "Settings": {
-            },
-            "Sub-Frame": "[T2] Sm Frigate Hull Suite",
-            "Name": "Hull"
-        },
-        {
-            "Components": [
-                {
-                    "Quantity": 2,
                     "Part": "[T-1][L] Model 68 Phaser Bank",
+                    "Quantity": 2,
                     "Name": "Primary Phasers"
                 },
                 {
-                    "Quantity": 0,
                     "Part": "No Phasers",
+                    "Quantity": 0,
                     "Name": "Secondary Phasers"
                 },
                 {
-                    "Quantity": 0,
                     "Part": "No Torp",
+                    "Quantity": 0,
                     "Name": "Torpedo System"
                 },
                 {
-                    "Quantity": 2,
                     "Part": "[T2][H] Mark-VI-Heavy SR Lateral Sensor Array",
+                    "Quantity": 2,
                     "Name": "Short-Range Sensors"
                 },
                 {
-                    "Quantity": 1,
                     "Part": "No TCU",
+                    "Quantity": 1,
                     "Name": "Targeting Computer"
                 },
                 {
-                    "Quantity": 5,
                     "Part": "[T2][L] Mk-V-E Shield Gens",
+                    "Quantity": 5,
                     "Name": "Deflector Shields"
                 },
                 {
-                    "Quantity": 5,
                     "Part": "[T2][L] Mk-V-E Shield Gens",
+                    "Quantity": 5,
                     "Name": "Backup Deflectors"
                 },
                 {
-                    "Quantity": 1,
                     "Part": "[T2][M] SDB-09 High-Power Impulse Drive Sys",
+                    "Quantity": 1,
                     "Name": "Impulse Engine Pwr"
                 }
             ],
@@ -191,9 +191,9 @@
         }
     ],
     "Module": {
-        "Type": "Miranda Rollbar",
-        "Variant": "Science"
+        "Type": "No Module",
+        "Variant": "-"
     },
     "Principal Frame": "[T1] 900kt Frigate Frame",
-    "Name": "[C8] Aledeth Kepler"
+    "Name": "SWB Cheapish Kepler"
 }

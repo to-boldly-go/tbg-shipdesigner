@@ -1,5 +1,5 @@
 <template>
-  <td class="statline-cell">{{pretty}}</td>
+  <td class="stat-column">{{pretty}}</td>
 </template>
 
 
@@ -41,9 +41,8 @@ export default {
 }
 </script>
 
-
 <style>
-.statline-cell {
-	border-style: none;
-}
+</style>
+
+<style scoped>
 </style>
