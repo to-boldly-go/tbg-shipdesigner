@@ -1,5 +1,5 @@
 <template>
-  <tr class="component-tr" v-bind:class="{ hasloaderror: !loaded }">
+  <tr class="component-tr" v-bind:class="{ hasloaderror: !isloaded }">
 	<td class="name-column" @click="log_parts">{{se_component.name}}</td>
 	<td class="quantity-column"><input class="quantity-column-input" type="number" v-model="quantity"></td>
 
@@ -33,24 +33,11 @@
 
 import ShipEngine from '../lib/shipengine.js';
 
+import {
+	pretty,
+} from './ui-functions.js'
+
 import StatlineCell from './statline-cell.vue';
-
-function pretty(self, f, n) {
-	let val = f();
-	if (Math.abs(val) > 0) {
-		return val.toFixed(2);
-	} else {
-		return n || '';
-	}
-};
-
-function loaded(self, f, n) {
-	if (self.loaded) {
-		return f();
-	} else {
-		return n || '';
-	};
-};
 
 export default {
 	name: 'ComponentTr',
@@ -63,24 +50,24 @@ export default {
 	},
 	computed: {
 		power_gen () {
-			return pretty(this, () => loaded(this, () => this.se_component.power_generation, 0));
+			return pretty(this.isloaded ? this.se_component.power_generation : 0);
 		},
 		power_cost () {
-			return pretty(this, () => loaded(this, () => this.se_component.cost_power, 0));
+			return pretty(this.isloaded ? this.se_component.cost_power : 0);
 		},
 		cost_sr () {
-			return pretty(this, () => loaded(this, () => this.se_component.cost_SR, 0));
+			return pretty(this.isloaded ? this.se_component.cost_SR : 0);
 		},
 		cost_br () {
-			return pretty(this, () => loaded(this, () => this.se_component.cost_BR, 0));
+			return pretty(this.isloaded ? this.se_component.cost_BR : 0);
 		},
 		weight_internal () {
-			return pretty(this, () => loaded(this, () => this.se_component.weight_internal, 0));
+			return pretty(this.isloaded ? this.se_component.weight_internal : 0);
 		},
 		weight_external () {
-			return pretty(this, () => loaded(this, () => this.se_component.weight_external, 0));
+			return pretty(this.isloaded ? this.se_component.weight_external : 0);
 		},
-		loaded () {
+		isloaded () {
 			return (!!this.se_component.part_def)
 		},
 		valid_parts () {
@@ -95,10 +82,10 @@ export default {
 			},
 		},
 		stats () {
-			return loaded(this, () => this.se_component.stats, new ShipEngine.Statline(0));
+			return this.isloaded ? this.se_component.stats : new ShipEngine.Statline(0);
 		},
 		crew() {
-			return loaded(this, () => this.se_component.cost_crew, new ShipEngine.Crewline(0));
+			return this.isloaded ? this.se_component.cost_crew : new ShipEngine.Crewline(0);
 		},
 		part: {
 			get () {
