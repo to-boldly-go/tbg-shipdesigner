@@ -30,7 +30,7 @@ export default {
 
 <style>
 .design-import-export {
-	background-color: #29d;
+	background-color: #999;
 
 	width: 100%;
 	margin: 0px;
