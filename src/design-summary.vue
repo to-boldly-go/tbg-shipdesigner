@@ -1,6 +1,6 @@
 <template>
   <div class="design-summary">
-	<div>{{se_design.pretty_miscstats}}</div>
+	<div>{{se_design.name}} | {{se_design.pretty_miscstats}}</div>
 	<div>{{se_design.stats_raw.toFixed(2)}} | [{{se_design.cost_BR_raw.toFixed(2)}}]br [{{se_design.cost_SR_raw.toFixed(2)}}]sr | {{se_design.cost_crew_raw.toFixed(2)}}</div>
 	<div>{{se_design.pretty_buildinfo}}</div>
   </div>

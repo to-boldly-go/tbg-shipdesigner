@@ -30,6 +30,7 @@
 		<template v-for="se_subsystem in se_subsystems">
 		  <SubsystemFrame :se_db="se_db" :se_subsystem="se_subsystem"></SubsystemFrame>
 		  <SubsystemSummary :se_db="se_db" :se_subsystem="se_subsystem"></SubsystemSummary>
+		  <SubsystemSettings :se_db="se_db" :se_subsystem="se_subsystem"></SubsystemSettings>
 
 		  <template v-for="se_component in se_subsystem.components">
 			<ComponentTr :se_db="se_db" :se_component="se_component"></ComponentTr>
@@ -51,6 +52,7 @@ import PrincipalFrameRaw from './principal-frame-raw.vue';
 import PrincipalFrameFinal from './principal-frame-final.vue';
 import SubsystemSummary from './subsystem-summary.vue';
 import SubsystemFrame from './subsystem-frame.vue';
+import SubsystemSettings from './subsystem-settings.vue';
 import ComponentTr from './component.vue';
 import ModuleTr from './module.vue';
 
@@ -61,6 +63,7 @@ export default {
 		PrincipalFrameFinal,
 		SubsystemSummary,
 		SubsystemFrame,
+		SubsystemSettings,
 		ComponentTr,
 		ModuleTr,
 	},

@@ -1,0 +1,83 @@
+<template>
+  <span class="setting-cell">
+	<span class="setting-name">{{setting_name}}</span>
+
+	<input
+	  v-if="typeof(setting_value) === 'number'"
+	  class="setting-input-number"
+	  type="number"
+	  v-model="setting_value">
+
+	<input
+	  v-if="typeof(setting_value) === 'boolean'"
+	  class="setting-input-bool"
+	  type="checkbox"
+	  v-model="setting_value">
+  </span>
+</template>
+
+<script>
+
+import ShipEngine from '../lib/shipengine.js';
+
+export default {
+	name: 'SettingCell',
+	components: {
+	},
+	props: {
+		setting: Object,
+	},
+	computed: {
+		setting_name: {
+			get () {
+				return this.setting['Name'];
+			},
+			set (value) {
+				this.setting['Name'] = value;
+			},
+		},
+		setting_type () {
+			return typeof(this.setting_value);
+		},
+		setting_value: {
+			get () {
+				return this.setting['Value'];
+			},
+			set (value) {
+				switch (this.setting_type) {
+				case 'number':
+					this.setting['Value'] = parseInt(value);
+					break;
+				case 'boolean':
+					this.setting['Value'] = value;
+					break;
+				};
+			},
+		}
+	},
+}
+
+</script>
+
+<style>
+  
+</style>
+
+<style scoped>
+
+.setting-cell {
+	flex: 1 1 0;
+	margin-right: 13px;
+}
+
+.setting-input-number {
+	width: 30px;
+}
+
+.setting-input-bool {
+}
+
+.setting-name {
+}
+
+</style>

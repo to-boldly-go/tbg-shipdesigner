@@ -84,10 +84,6 @@ export default {
 <style>
 .subsystem-frame {
 	background: #ccc;
-
-	border-style: double none none;
-	border-width: 2px;
-	border-color: black;
 }
 
 </style>

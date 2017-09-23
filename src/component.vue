@@ -114,4 +114,7 @@ export default {
 .hasloaderror {
 	background: #faa;
 }
+
+.quantity-column {
+}
 </style>
