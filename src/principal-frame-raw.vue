@@ -23,7 +23,7 @@
 	  <StatlineCell :stats="crew_raw" :name="name"></StatlineCell>
 	</template>
 
-	<td class="build-time-column">{{se_design.build_time_frame.toFixed(2)}}</td>
+	<td class="build-time-column">{{build_time_frame}}</td>
   </tr>
 </template>
 
@@ -33,6 +33,8 @@
 import ShipEngine from '../lib/shipengine.js';
 
 import StatlineCell from './statline-cell.vue';
+
+import { frac } from './ui-functions.js';
 
 export default {
 	name: 'PrincipalFrameRaw',
@@ -57,6 +59,9 @@ export default {
 		},
 		crew_raw () {
 			return this.se_design.cost_crew_raw;
+		},
+		build_time_frame () {
+			return frac(this.se_design.build_time_frame, 12);
 		},
 		ship_name: {
 			get () {

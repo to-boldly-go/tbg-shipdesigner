@@ -31,6 +31,8 @@ import ShipEngine from '../lib/shipengine.js';
 
 import StatlineCell from './statline-cell.vue';
 
+import { frac } from './ui-functions.js';
+
 export default {
 	name: 'PrincipalFrame',
 	components: {
@@ -51,7 +53,7 @@ export default {
 			return this.se_design.cost_crew;
 		},
 		build_time () {
-			return this.se_design.build_time;
+			return frac(this.se_design.build_time, 12, true);
 		},
 		ship_name () {
 			return this.se_design.json['Name'];

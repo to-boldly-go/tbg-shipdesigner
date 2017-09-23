@@ -23,7 +23,7 @@
 	  <StatlineCell :stats="crew_mult_pretty" :name="name" :ispretty="false"></StatlineCell>
 	</template>
 
-	<td class="build-time-column">{{se_subsystem.build_time.toFixed(2)}}</td>
+	<td class="build-time-column">{{build_time}}</td>
   </tr>
 
 
@@ -35,6 +35,8 @@
 import ShipEngine from '../lib/shipengine.js';
 
 import StatlineCell from './statline-cell.vue';
+
+import { frac } from './ui-functions.js';
 
 export default {
 	name: 'SubsystemFrame',
@@ -60,6 +62,9 @@ export default {
 		},
 		crew_mult_pretty() {
 			return this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');
+		},
+		build_time () {
+			return frac(this.se_subsystem.build_time, 12);
 		},
 		sub_frame: {
 			get () {
