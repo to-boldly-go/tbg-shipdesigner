@@ -23,6 +23,7 @@
         "babel-plugin-transform-es2015-destructuring": "^6.23.0",
         "babel-plugin-transform-object-rest-spread": "^6.26.0",
         "babel-preset-env": "^1.6.0",
+        "clipboard": "^1.7.1",
         "css-loader": "^0.28.7",
         "csv-loader": "^2.1.1",
         "deep-equal": "^1.0.1",
