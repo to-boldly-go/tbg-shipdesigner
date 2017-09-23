@@ -35,6 +35,8 @@
 			<ComponentTr :se_db="se_db" :se_component="se_component"></ComponentTr>
 		  </template>
 		</template>
+
+		<ModuleTr :se_db="se_db" :se_module="se_design.module"></ModuleTr>
 	  </tbody>
 	</table>
   </div>
@@ -50,6 +52,7 @@ import PrincipalFrameFinal from './principal-frame-final.vue';
 import SubsystemSummary from './subsystem-summary.vue';
 import SubsystemFrame from './subsystem-frame.vue';
 import ComponentTr from './component.vue';
+import ModuleTr from './module.vue';
 
 export default {
 	name: 'Design',
@@ -59,6 +62,7 @@ export default {
 		SubsystemSummary,
 		SubsystemFrame,
 		ComponentTr,
+		ModuleTr,
 	},
 	props: {
 		se_db: Object,

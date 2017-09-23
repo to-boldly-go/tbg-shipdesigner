@@ -1,6 +1,6 @@
 <template>
   <tr class="component-tr" v-bind:class="{ hasloaderror: !isloaded }">
-	<td class="name-column" @click="log_parts">{{se_component.name}}</td>
+	<td class="name-column">{{se_component.name}}</td>
 	<td class="quantity-column"><input class="quantity-column-input" type="number" v-model="quantity"></td>
 
 	<td class="part-column"><select v-model="part" class="part-column-select">
@@ -97,12 +97,6 @@ export default {
 		},
 	},
 	methods: {
-		log_parts() {
-			console.log('"' + this.part + '"');
-			console.log(this.valid_parts.map((part) => part['Name']))
-			console.log(this.se_db.find_part(this.part));
-			this.part = this.part;
-		},
 	},
 }
 </script>
