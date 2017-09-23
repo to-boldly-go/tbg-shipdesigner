@@ -44,7 +44,10 @@ export default {
 	computed: {
 		design_json_string: {
 			get () {
-				this.design_info.data['Blueprint Date'] = new Date().toISOString();
+				let timestamp = new Date().toISOString();
+				timestamp.seconds = 0;
+				timestamp.milliseconds = 0;
+				this.design_info.data['Blueprint Date'] = timestamp;
 				return JSON.stringify(this.design_info.data);
 			},
 			set (value) {
