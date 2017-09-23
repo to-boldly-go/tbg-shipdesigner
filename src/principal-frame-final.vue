@@ -76,9 +76,39 @@ export default {
 	margin: 0px;
 
 	text-align: center;
-
-	/* position: relative; */
-	/* left: 2px; */
-	/* top: 2px; */
 }
+
+/* override global value for this one */
+.build-time-column {
+	text-align: center;
+}
+
+.stat-column {
+	text-align: center;
+}
+
+.weight-internal-column {
+	text-align: center;
+}
+
+.weight-external-column {
+	text-align: center;
+}
+
+.br-column {
+	text-align: center;
+}
+
+.sr-column {
+	text-align: center;
+}
+
+.power-gen-column {
+	text-align: center;
+}
+
+.power-cost-column {
+	text-align: center;
+}
+
 </style>

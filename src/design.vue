@@ -106,27 +106,35 @@ export default {
 }
 
 .stat-column {
+	text-align: right;
 }
 
 .weight-internal-column {
+	text-align: right;
 }
 
 .weight-external-column {
+	text-align: right;
 }
 
 .br-column {
+	text-align: right;
 }
 
 .sr-column {
+	text-align: right;
 }
 
 .power-gen-column {
+	text-align: right;
 }
 
 .power-cost-column {
+	text-align: right;
 }
 
 .build-time-column {
+	text-align: right;
 }
 
 .design-table-head {
