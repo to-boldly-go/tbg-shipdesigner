@@ -17,8 +17,8 @@
 	<td class="br-column">{{cost_br}}</td>
 	<td class="sr-column">{{cost_sr}}</td>
 
-	<td class="power-gen-column">{{power_gen}}</td>
 	<td class="power-cost-column">{{power_cost}}</td>
+	<td class="power-gen-column">{{power_gen}}</td>
 
 	<template v-for="name in crew.names">
 	  <StatlineCell :stats="crew" :name="name"></StatlineCell>

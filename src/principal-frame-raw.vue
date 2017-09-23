@@ -16,8 +16,8 @@
 	<td class="br-column">{{se_design.cost_BR_raw.toFixed(2)}}</td>
 	<td class="sr-column">{{se_design.cost_SR_raw.toFixed(2)}}</td>
 
-	<td class="power-gen-column">{{se_design.power_generation_raw.toFixed(2)}}</td>
 	<td class="power-cost-column">{{se_design.cost_power_raw.toFixed(2)}}</td>
+	<td class="power-gen-column">{{se_design.power_generation_raw.toFixed(2)}}</td>
 
 	<template v-for="name in crew_raw.names">
 	  <StatlineCell :stats="crew_raw" :name="name"></StatlineCell>

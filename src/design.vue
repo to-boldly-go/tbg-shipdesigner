@@ -16,8 +16,8 @@
 		  <th>Ext)</th>
 		  <th>BR</th>
 		  <th>SR</th>
-		  <th>Pwr Gen</th>
 		  <th>Pwr Cost</th>
+		  <th>Pwr Gen</th>
 		  <th>O</th>
 		  <th>E</th>
 		  <th>T</th>

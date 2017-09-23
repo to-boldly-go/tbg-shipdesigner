@@ -14,8 +14,9 @@
 
 	<td class="br-column">{{se_subsystem.cost_BR.toFixed(2)}}</td>
 	<td class="sr-column">{{se_subsystem.cost_SR.toFixed(2)}}</td>
-	<td class="power-gen-column">{{se_subsystem.power_generation.toFixed(2)}}</td>
+
 	<td class="power-cost-column">{{se_subsystem.cost_power.toFixed(2)}}</td>
+	<td class="power-gen-column">{{se_subsystem.power_generation.toFixed(2)}}</td>
 
 	<template v-for="name in crew.names">
 	  <StatlineCell :stats="crew" :name="name"></StatlineCell>
@@ -23,7 +24,6 @@
 
 	<td class="build-cost-column"></td>
   </tr>
-
 
 </template>
 

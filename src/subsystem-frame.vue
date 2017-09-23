@@ -16,8 +16,8 @@
 	<td class="br-column">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>
 	<td class="sr-column">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>
 
-	<td class="power-gen-column"></td>
 	<td class="power-cost-column"></td>
+	<td class="power-gen-column"></td>
 
 	<template v-for="name in crew.names">
 	  <StatlineCell :stats="crew_mult_pretty" :name="name" :ispretty="false"></StatlineCell>

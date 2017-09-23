@@ -13,8 +13,8 @@
 	<td class="br-column">{{se_design.cost_BR}}</td>
 	<td class="sr-column">{{se_design.cost_SR}}</td>
 
-	<td class="power-gen-column">{{se_design.power_generation}}</td>
 	<td class="power-cost-column">{{se_design.cost_power}}</td>
+	<td class="power-gen-column">{{se_design.power_generation}}</td>
 
 	<template v-for="name in crew.names">
 	  <StatlineCell :stats="crew" :name="name" :fixed="0"></StatlineCell>
