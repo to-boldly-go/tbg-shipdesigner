@@ -7,6 +7,7 @@
 		v-if="quantity_configurable"
 		class="quantity-column-select"
 		v-model="quantity"
+		v-on:wheel="quantity_select_wheel_event"
 		v-bind:class="{ hasquantityerror: has_quantity_error }">
 
 		<option v-if="!valid_quantities.includes(quantity)">{{quantity}}</option>
@@ -16,7 +17,9 @@
 	</td>
 
 	<td class="part-column">
-	  <select v-model="part" class="part-column-select">
+	  <select
+		v-model="part"
+		class="part-column-select">
 		<option v-for="part_value in valid_parts">{{part_value['Name']}}</option>
 	  </select>
 	</td>
@@ -133,6 +136,35 @@ export default {
 		},
 	},
 	methods: {
+		is_quantity_valid (hypothesis) {
+			return this
+				.valid_quantities
+				.map((elem) => (elem === hypothesis))
+				.reduce((acc, elem) => acc || elem);
+		},
+		increment_quantity () {
+			let hypothesis = this.quantity + 1;
+			if (this.is_quantity_valid(hypothesis)) {
+				this.quantity = hypothesis;
+			};
+		},
+		decrement_quantity () {
+			let hypothesis = this.quantity - 1;
+			if (this.is_quantity_valid(hypothesis)) {
+				this.quantity = hypothesis;
+			};
+		},
+
+		quantity_select_wheel_event (ev) {
+			if (ev.deltaY > 0) {
+				this.decrement_quantity();
+			} else if (ev.deltaY < 0) {
+				this.increment_quantity();
+			};
+			if (ev.preventDefault)
+				ev.preventDefault();
+			ev.returnValue = false;
+		},
 	},
 }
 </script>

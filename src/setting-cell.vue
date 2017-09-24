@@ -2,11 +2,13 @@
   <span class="setting-cell">
 	<span class="setting-name">{{setting_name}}</span>
 
-	<input
+	<select
 	  v-if="typeof(setting_value) === 'number'"
 	  class="setting-input-number"
 	  type="number"
 	  v-model="setting_value">
+	  <option v-for="num in valid_numbers">{{num}}</option>
+	</select>
 
 	<input
 	  v-if="typeof(setting_value) === 'boolean'"
@@ -28,6 +30,9 @@ export default {
 		setting: Object,
 	},
 	computed: {
+		valid_numbers () {
+			return [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];
+		},
 		setting_name: {
 			get () {
 				return this.setting['Name'];
@@ -71,7 +76,7 @@ export default {
 }
 
 .setting-input-number {
-	width: 30px;
+	width: 60px;
 }
 
 .setting-input-bool {
