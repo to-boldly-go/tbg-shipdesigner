@@ -2,6 +2,7 @@
     "dependencies": {
         "argparse": "^1.0.9",
         "bluebird": "^3.5.0",
+        "lodash": "^4.17.4",
         "papaparse": "^4.3.6",
         "pretty-data": "^0.40.0"
     },
