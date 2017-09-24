@@ -1,6 +1,6 @@
 <template>
   <tr class="principal-frame-raw">
-	<td class="name-column" colspan="2"><input v-model="ship_name" placeholder="Ship Name" class="name-column-input"></td>
+	<td class="name-column" colspan="2">Size: {{frame_size.toFixed(2)}}</td>
 
 	<td class="part-column"><select v-model="principal_frame" class="part-column-select">
 	  <option v-for="princ_frame_value in se_design.valid_frames">{{princ_frame_value['Name']}}</option>
@@ -63,13 +63,8 @@ export default {
 		build_time_frame () {
 			return frac(this.se_design.build_time_frame, 12);
 		},
-		ship_name: {
-			get () {
-				return this.se_design.json['Name'];
-			},
-			set (value) {
-				this.se_design.json['Name'] = value;
-			}
+		frame_size () {
+			return this.se_design.frame_size;
 		},
 	},
 	methods: {
@@ -92,5 +87,9 @@ export default {
 	/* position: relative; */
 	/* left: 2px; */
 	/* top: 2px; */
+}
+
+.name-column {
+	text-align: right;
 }
 </style>

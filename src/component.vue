@@ -1,11 +1,25 @@
 <template>
   <tr class="component-tr" v-bind:class="{ hasloaderror: !isloaded }">
 	<td class="name-column">{{se_component.name}}</td>
-	<td class="quantity-column"><input class="quantity-column-input" type="number" v-model="quantity"></td>
 
-	<td class="part-column"><select v-model="part" class="part-column-select">
-	  <option v-for="part_value in valid_parts">{{part_value['Name']}}</option>
-	</select></td>
+	<td class="quantity-column" v-bind:class="{ hasquantityerror: has_quantity_error }">
+	  <select
+		v-if="quantity_configurable"
+		class="quantity-column-select"
+		v-model="quantity"
+		v-bind:class="{ hasquantityerror: has_quantity_error }">
+
+		<option v-if="!valid_quantities.includes(quantity)">{{quantity}}</option>
+		<option v-for="valid_quantity in valid_quantities">{{valid_quantity}}</option>
+	  </select>
+	  <span v-if="!quantity_configurable">{{quantity_pretty}}</span>
+	</td>
+
+	<td class="part-column">
+	  <select v-model="part" class="part-column-select">
+		<option v-for="part_value in valid_parts">{{part_value['Name']}}</option>
+	  </select>
+	</td>
 
 	<template v-for="name in stats.names">
 	  <StatlineCell :stats="stats" :name="name"></StatlineCell>
@@ -49,6 +63,9 @@ export default {
 		se_component: Object,
 	},
 	computed: {
+		has_quantity_error () {
+			return this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));
+		},
 		power_gen () {
 			return pretty(this.isloaded ? this.se_component.power_generation : 0);
 		},
@@ -73,6 +90,16 @@ export default {
 		valid_parts () {
 			return this.se_component.valid_parts;
 		},
+		quantity_configurable () {
+			return this.se_component.is_quantity_configurable;
+		},
+		quantity_pretty () {
+			if (this.quantity === Math.round(this.quantity)) {
+				return this.quantity;
+			} else {
+				return this.quantity.toFixed(2);
+			};
+		},
 		quantity: {
 			get () {
 				return this.se_component.quantity;
@@ -80,6 +107,9 @@ export default {
 			set (value) {
 				this.se_component.quantity = value;
 			},
+		},
+		valid_quantities () {
+			return this.se_component.valid_quantities;
 		},
 		stats () {
 			return this.isloaded ? this.se_component.stats : new ShipEngine.Statline(0);
@@ -93,6 +123,12 @@ export default {
 			},
 			set (value) {
 				this.se_component.part = value;
+				if (!this.quantity && !this.se_component.is_no_part) {
+					this.quantity = 1;
+				};
+				if (this.se_component.is_no_part) {
+					this.quantity = 0;
+				};
 			},
 		},
 	},
@@ -112,6 +148,10 @@ export default {
 }
 
 .hasloaderror {
+	background: #faa;
+}
+
+.hasquantityerror {
 	background: #faa;
 }
 

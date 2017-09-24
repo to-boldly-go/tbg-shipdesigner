@@ -1,6 +1,8 @@
 <template>
   <tr class="principal-frame-final">
-	<td class="name-column" colspan="2">{{ship_name}}</td>
+	<td class="name-column" colspan="2">
+	  <input v-model="ship_name" placeholder="Ship Name" class="name-column-input">
+	</td>
 
 	<td class="part-column">{{principal_frame}}</td>
 
@@ -55,8 +57,13 @@ export default {
 		build_time () {
 			return frac(this.se_design.build_time, 12, true);
 		},
-		ship_name () {
-			return this.se_design.json['Name'];
+		ship_name: {
+			get () {
+				return this.se_design.json['Name'];
+			},
+			set (value) {
+				this.se_design.json['Name'] = value;
+			}
 		},
 	},
 	methods: {
@@ -75,6 +82,15 @@ export default {
 	width: 100%;
 	margin: 0px;
 
+	text-align: center;
+}
+
+.name-column-input {
+	color: white;
+	background: black;
+	font-weight: bold;
+	width: 100%;
+	border-style: none;
 	text-align: center;
 }
 
