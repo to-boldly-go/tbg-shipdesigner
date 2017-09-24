@@ -5197,7 +5197,7 @@ class DesignComponent {
 	}
 
 	get valid_parts() {
-		return this.db.find_parts(COMPONENT_PART_CLASSIFICATIONS[this.name]);
+		return this.db.find_parts(COMPONENT_PART_CLASSIFICATIONS[this.name]).filter(part => !part['Name'].match(/^x/));
 	}
 
 	get evasion() {
@@ -5587,7 +5587,7 @@ class DesignSubsystem {
 	}
 
 	get valid_frames() {
-		return this.db.find_frames(this.name);
+		return this.db.find_frames(this.name).filter(frame => !frame['Name'].match(/^x/));
 	}
 
 	// CV20, CV41
@@ -27345,14 +27345,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 __WEBPACK_IMPORTED_MODULE_6_bluebird___default.a.longStackTraces();
-
-// const se_db = new ShipEngine.DB({
-// 	parts: canon_parts,
-// 	frames: canon_frames,
-// 	modules: canon_modules,
-// });
-
-// let se_design = new ShipEngine.Design(se_db, design_json);
 
 // create a root instance
 new __WEBPACK_IMPORTED_MODULE_0_vue__["a" /* default */]({
@@ -74766,7 +74758,7 @@ exports = module.exports = __webpack_require__(10)(true);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"setting-cell.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"setting-cell.vue","sourceRoot":""}]);
 
 // exports
 
@@ -74806,7 +74798,7 @@ exports = module.exports = __webpack_require__(10)(true);
 
 
 // module
-exports.push([module.i, "\n.setting-cell[data-v-1ad72548] {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n.setting-input-number[data-v-1ad72548] {\n\twidth: 30px;\n}\n.setting-input-bool[data-v-1ad72548] {\n}\n.setting-name[data-v-1ad72548] {\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/setting-cell.vue?25111ffa"],"names":[],"mappings":";AAmEA;CACA,YAAA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA;AAEA;CACA","file":"setting-cell.vue","sourcesContent":["<template>\n  <span class=\"setting-cell\">\n\t<span class=\"setting-name\">{{setting_name}}</span>\n\n\t<input\n\t  v-if=\"typeof(setting_value) === 'number'\"\n\t  class=\"setting-input-number\"\n\t  type=\"number\"\n\t  v-model=\"setting_value\">\n\n\t<input\n\t  v-if=\"typeof(setting_value) === 'boolean'\"\n\t  class=\"setting-input-bool\"\n\t  type=\"checkbox\"\n\t  v-model=\"setting_value\">\n  </span>\n</template>\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nexport default {\n\tname: 'SettingCell',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tsetting: Object,\n\t},\n\tcomputed: {\n\t\tsetting_name: {\n\t\t\tget () {\n\t\t\t\treturn this.setting['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.setting['Name'] = value;\n\t\t\t},\n\t\t},\n\t\tsetting_type () {\n\t\t\treturn typeof(this.setting_value);\n\t\t},\n\t\tsetting_value: {\n\t\t\tget () {\n\t\t\t\treturn this.setting['Value'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tswitch (this.setting_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\tthis.setting['Value'] = parseInt(value);\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'boolean':\n\t\t\t\t\tthis.setting['Value'] = value;\n\t\t\t\t\tbreak;\n\t\t\t\t};\n\t\t\t},\n\t\t}\n\t},\n}\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-cell {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n\n.setting-input-number {\n\twidth: 30px;\n}\n\n.setting-input-bool {\n}\n\n.setting-name {\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.setting-cell[data-v-1ad72548] {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n.setting-input-number[data-v-1ad72548] {\n\twidth: 60px;\n}\n.setting-input-bool[data-v-1ad72548] {\n}\n.setting-name[data-v-1ad72548] {\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/setting-cell.vue?6504e512"],"names":[],"mappings":";AAwEA;CACA,YAAA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA;AAEA;CACA","file":"setting-cell.vue","sourcesContent":["<template>\n  <span class=\"setting-cell\">\n\t<span class=\"setting-name\">{{setting_name}}</span>\n\n\t<select\n\t  v-if=\"typeof(setting_value) === 'number'\"\n\t  class=\"setting-input-number\"\n\t  type=\"number\"\n\t  v-model=\"setting_value\">\n\t  <option v-for=\"num in valid_numbers\">{{num}}</option>\n\t</select>\n\n\t<input\n\t  v-if=\"typeof(setting_value) === 'boolean'\"\n\t  class=\"setting-input-bool\"\n\t  type=\"checkbox\"\n\t  v-model=\"setting_value\">\n  </span>\n</template>\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nexport default {\n\tname: 'SettingCell',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tsetting: Object,\n\t},\n\tcomputed: {\n\t\tvalid_numbers () {\n\t\t\treturn [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];\n\t\t},\n\t\tsetting_name: {\n\t\t\tget () {\n\t\t\t\treturn this.setting['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.setting['Name'] = value;\n\t\t\t},\n\t\t},\n\t\tsetting_type () {\n\t\t\treturn typeof(this.setting_value);\n\t\t},\n\t\tsetting_value: {\n\t\t\tget () {\n\t\t\t\treturn this.setting['Value'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tswitch (this.setting_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\tthis.setting['Value'] = parseInt(value);\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'boolean':\n\t\t\t\t\tthis.setting['Value'] = value;\n\t\t\t\t\tbreak;\n\t\t\t\t};\n\t\t\t},\n\t\t}\n\t},\n}\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-cell {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n\n.setting-input-number {\n\twidth: 60px;\n}\n\n.setting-input-bool {\n}\n\n.setting-name {\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -74836,6 +74828,8 @@ exports.push([module.i, "\n.setting-cell[data-v-1ad72548] {\n\tflex: 1 1 0;\n\tm
 //
 //
 //
+//
+//
 
 
 
@@ -74847,6 +74841,9 @@ exports.push([module.i, "\n.setting-cell[data-v-1ad72548] {\n\tflex: 1 1 0;\n\tm
 		setting: Object
 	},
 	computed: {
+		valid_numbers() {
+			return [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];
+		},
 		setting_name: {
 			get() {
 				return this.setting['Name'];
@@ -74886,7 +74883,7 @@ var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._sel
     staticClass: "setting-cell"
   }, [_c('span', {
     staticClass: "setting-name"
-  }, [_vm._v(_vm._s(_vm.setting_name))]), _vm._v(" "), (typeof(_vm.setting_value) === 'number') ? _c('input', {
+  }, [_vm._v(_vm._s(_vm.setting_name))]), _vm._v(" "), (typeof(_vm.setting_value) === 'number') ? _c('select', {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -74897,16 +74894,20 @@ var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._sel
     attrs: {
       "type": "number"
     },
-    domProps: {
-      "value": (_vm.setting_value)
-    },
     on: {
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.setting_value = $event.target.value
+      "change": function($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function(o) {
+          return o.selected
+        }).map(function(o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val
+        });
+        _vm.setting_value = $event.target.multiple ? $$selectedVal : $$selectedVal[0]
       }
     }
-  }) : _vm._e(), _vm._v(" "), (typeof(_vm.setting_value) === 'boolean') ? _c('input', {
+  }, _vm._l((_vm.valid_numbers), function(num) {
+    return _c('option', [_vm._v(_vm._s(num))])
+  })) : _vm._e(), _vm._v(" "), (typeof(_vm.setting_value) === 'boolean') ? _c('input', {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -75073,7 +75074,7 @@ exports = module.exports = __webpack_require__(10)(true);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"component.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"component.vue","sourceRoot":""}]);
 
 // exports
 
@@ -75113,7 +75114,7 @@ exports = module.exports = __webpack_require__(10)(true);
 
 
 // module
-exports.push([module.i, "\n.component-tr[data-v-702f1bb0] {\n\twidth: 100%;\n\tmargin: 0px;\n}\n.hasloaderror[data-v-702f1bb0] {\n\tbackground: #faa;\n}\n.hasquantityerror[data-v-702f1bb0] {\n\tbackground: #faa;\n}\n.quantity-column[data-v-702f1bb0] {\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/component.vue?1386cf14"],"names":[],"mappings":";AAgJA;CACA,YAAA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA","file":"component.vue","sourcesContent":["<template>\n  <tr class=\"component-tr\" v-bind:class=\"{ hasloaderror: !isloaded }\">\n\t<td class=\"name-column\">{{se_component.name}}</td>\n\n\t<td class=\"quantity-column\" v-bind:class=\"{ hasquantityerror: has_quantity_error }\">\n\t  <select\n\t\tv-if=\"quantity_configurable\"\n\t\tclass=\"quantity-column-select\"\n\t\tv-model=\"quantity\"\n\t\tv-bind:class=\"{ hasquantityerror: has_quantity_error }\">\n\n\t\t<option v-if=\"!valid_quantities.includes(quantity)\">{{quantity}}</option>\n\t\t<option v-for=\"valid_quantity in valid_quantities\">{{valid_quantity}}</option>\n\t  </select>\n\t  <span v-if=\"!quantity_configurable\">{{quantity_pretty}}</span>\n\t</td>\n\n\t<td class=\"part-column\">\n\t  <select v-model=\"part\" class=\"part-column-select\">\n\t\t<option v-for=\"part_value in valid_parts\">{{part_value['Name']}}</option>\n\t  </select>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t<td class=\"br-column\">{{cost_br}}</td>\n\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\"></td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport {\n\tpretty,\n} from './ui-functions.js'\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ComponentTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_component: Object,\n\t},\n\tcomputed: {\n\t\thas_quantity_error () {\n\t\t\treturn this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));\n\t\t},\n\t\tpower_gen () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.power_generation : 0);\n\t\t},\n\t\tpower_cost () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_power : 0);\n\t\t},\n\t\tcost_sr () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_SR : 0);\n\t\t},\n\t\tcost_br () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_BR : 0);\n\t\t},\n\t\tweight_internal () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.weight_internal : 0);\n\t\t},\n\t\tweight_external () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.weight_external : 0);\n\t\t},\n\t\tisloaded () {\n\t\t\treturn (!!this.se_component.part_def)\n\t\t},\n\t\tvalid_parts () {\n\t\t\treturn this.se_component.valid_parts;\n\t\t},\n\t\tquantity_configurable () {\n\t\t\treturn this.se_component.is_quantity_configurable;\n\t\t},\n\t\tquantity_pretty () {\n\t\t\tif (this.quantity === Math.round(this.quantity)) {\n\t\t\t\treturn this.quantity;\n\t\t\t} else {\n\t\t\t\treturn this.quantity.toFixed(2);\n\t\t\t};\n\t\t},\n\t\tquantity: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.quantity;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_component.quantity = value;\n\t\t\t},\n\t\t},\n\t\tvalid_quantities () {\n\t\t\treturn this.se_component.valid_quantities;\n\t\t},\n\t\tstats () {\n\t\t\treturn this.isloaded ? this.se_component.stats : new ShipEngine.Statline(0);\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.isloaded ? this.se_component.cost_crew : new ShipEngine.Crewline(0);\n\t\t},\n\t\tpart: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.part;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_component.part = value;\n\t\t\t\tif (!this.quantity && !this.se_component.is_no_part) {\n\t\t\t\t\tthis.quantity = 1;\n\t\t\t\t};\n\t\t\t\tif (this.se_component.is_no_part) {\n\t\t\t\t\tthis.quantity = 0;\n\t\t\t\t};\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.component-tr {\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n.hasloaderror {\n\tbackground: #faa;\n}\n\n.hasquantityerror {\n\tbackground: #faa;\n}\n\n.quantity-column {\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.component-tr[data-v-702f1bb0] {\n\twidth: 100%;\n\tmargin: 0px;\n}\n.hasloaderror[data-v-702f1bb0] {\n\tbackground: #faa;\n}\n.hasquantityerror[data-v-702f1bb0] {\n\tbackground: #faa;\n}\n.quantity-column[data-v-702f1bb0] {\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/component.vue?8e1d4ad8"],"names":[],"mappings":";AAgLA;CACA,YAAA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA","file":"component.vue","sourcesContent":["<template>\n  <tr class=\"component-tr\" v-bind:class=\"{ hasloaderror: !isloaded }\">\n\t<td class=\"name-column\">{{se_component.name}}</td>\n\n\t<td class=\"quantity-column\" v-bind:class=\"{ hasquantityerror: has_quantity_error }\">\n\t  <select\n\t\tv-if=\"quantity_configurable\"\n\t\tclass=\"quantity-column-select\"\n\t\tv-model=\"quantity\"\n\t\tv-on:wheel=\"quantity_select_wheel_event\"\n\t\tv-bind:class=\"{ hasquantityerror: has_quantity_error }\">\n\n\t\t<option v-if=\"!valid_quantities.includes(quantity)\">{{quantity}}</option>\n\t\t<option v-for=\"valid_quantity in valid_quantities\">{{valid_quantity}}</option>\n\t  </select>\n\t  <span v-if=\"!quantity_configurable\">{{quantity_pretty}}</span>\n\t</td>\n\n\t<td class=\"part-column\">\n\t  <select\n\t\tv-model=\"part\"\n\t\tclass=\"part-column-select\">\n\t\t<option v-for=\"part_value in valid_parts\">{{part_value['Name']}}</option>\n\t  </select>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t<td class=\"br-column\">{{cost_br}}</td>\n\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\"></td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport {\n\tpretty,\n} from './ui-functions.js'\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ComponentTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_component: Object,\n\t},\n\tcomputed: {\n\t\thas_quantity_error () {\n\t\t\treturn this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));\n\t\t},\n\t\tpower_gen () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.power_generation : 0);\n\t\t},\n\t\tpower_cost () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_power : 0);\n\t\t},\n\t\tcost_sr () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_SR : 0);\n\t\t},\n\t\tcost_br () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_BR : 0);\n\t\t},\n\t\tweight_internal () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.weight_internal : 0);\n\t\t},\n\t\tweight_external () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.weight_external : 0);\n\t\t},\n\t\tisloaded () {\n\t\t\treturn (!!this.se_component.part_def)\n\t\t},\n\t\tvalid_parts () {\n\t\t\treturn this.se_component.valid_parts;\n\t\t},\n\t\tquantity_configurable () {\n\t\t\treturn this.se_component.is_quantity_configurable;\n\t\t},\n\t\tquantity_pretty () {\n\t\t\tif (this.quantity === Math.round(this.quantity)) {\n\t\t\t\treturn this.quantity;\n\t\t\t} else {\n\t\t\t\treturn this.quantity.toFixed(2);\n\t\t\t};\n\t\t},\n\t\tquantity: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.quantity;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_component.quantity = value;\n\t\t\t},\n\t\t},\n\t\tvalid_quantities () {\n\t\t\treturn this.se_component.valid_quantities;\n\t\t},\n\t\tstats () {\n\t\t\treturn this.isloaded ? this.se_component.stats : new ShipEngine.Statline(0);\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.isloaded ? this.se_component.cost_crew : new ShipEngine.Crewline(0);\n\t\t},\n\t\tpart: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.part;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_component.part = value;\n\t\t\t\tif (!this.quantity && !this.se_component.is_no_part) {\n\t\t\t\t\tthis.quantity = 1;\n\t\t\t\t};\n\t\t\t\tif (this.se_component.is_no_part) {\n\t\t\t\t\tthis.quantity = 0;\n\t\t\t\t};\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tis_quantity_valid (hypothesis) {\n\t\t\treturn this\n\t\t\t\t.valid_quantities\n\t\t\t\t.map((elem) => (elem === hypothesis))\n\t\t\t\t.reduce((acc, elem) => acc || elem);\n\t\t},\n\t\tincrement_quantity () {\n\t\t\tlet hypothesis = this.quantity + 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t};\n\t\t},\n\t\tdecrement_quantity () {\n\t\t\tlet hypothesis = this.quantity - 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t};\n\t\t},\n\n\t\tquantity_select_wheel_event (ev) {\n\t\t\tif (ev.deltaY > 0) {\n\t\t\t\tthis.decrement_quantity();\n\t\t\t} else if (ev.deltaY < 0) {\n\t\t\t\tthis.increment_quantity();\n\t\t\t};\n\t\t\tif (ev.preventDefault)\n\t\t\t\tev.preventDefault();\n\t\t\tev.returnValue = false;\n\t\t},\n\t},\n}\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.component-tr {\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n.hasloaderror {\n\tbackground: #faa;\n}\n\n.hasquantityerror {\n\tbackground: #faa;\n}\n\n.quantity-column {\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -75127,6 +75128,9 @@ exports.push([module.i, "\n.component-tr[data-v-702f1bb0] {\n\twidth: 100%;\n\tm
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ui_functions_js__ = __webpack_require__(64);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__statline_cell_vue__ = __webpack_require__(54);
+//
+//
+//
 //
 //
 //
@@ -75259,7 +75263,33 @@ exports.push([module.i, "\n.component-tr[data-v-702f1bb0] {\n\twidth: 100%;\n\tm
 			}
 		}
 	},
-	methods: {}
+	methods: {
+		is_quantity_valid(hypothesis) {
+			return this.valid_quantities.map(elem => elem === hypothesis).reduce((acc, elem) => acc || elem);
+		},
+		increment_quantity() {
+			let hypothesis = this.quantity + 1;
+			if (this.is_quantity_valid(hypothesis)) {
+				this.quantity = hypothesis;
+			};
+		},
+		decrement_quantity() {
+			let hypothesis = this.quantity - 1;
+			if (this.is_quantity_valid(hypothesis)) {
+				this.quantity = hypothesis;
+			};
+		},
+
+		quantity_select_wheel_event(ev) {
+			if (ev.deltaY > 0) {
+				this.decrement_quantity();
+			} else if (ev.deltaY < 0) {
+				this.increment_quantity();
+			};
+			if (ev.preventDefault) ev.preventDefault();
+			ev.returnValue = false;
+		}
+	}
 });
 
 /***/ }),
@@ -75292,6 +75322,7 @@ var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._sel
       hasquantityerror: _vm.has_quantity_error
     },
     on: {
+      "wheel": _vm.quantity_select_wheel_event,
       "change": function($event) {
         var $$selectedVal = Array.prototype.filter.call($event.target.options, function(o) {
           return o.selected
