@@ -30,7 +30,7 @@
 	  <StatlineCell :stats="crew" :name="name"></StatlineCell>
 	</template>
 
-	<td class="build-time-column"></td>
+	<td class="build-time-column">{{build_time}}</td>
   </tr>
 </template>
 
@@ -41,6 +41,7 @@ import ShipEngine from '../lib/shipengine.js';
 
 import {
 	pretty,
+	frac,
 } from './ui-functions.js'
 
 import StatlineCell from './statline-cell.vue';
@@ -55,6 +56,9 @@ export default {
 		se_module: Object,
 	},
 	computed: {
+		build_time () {
+			return this.isloaded ? frac(this.se_module.build_time, 12) || '' : '';
+		},
 		power_gen () {
 			return pretty(this.isloaded ? this.se_module.power_generation : 0);
 		},
