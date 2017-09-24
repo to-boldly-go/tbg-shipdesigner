@@ -5137,7 +5137,7 @@ class DesignComponent {
 				return {
 					is_configurable: () => false,
 					get: () => {
-						return this.subsystem.design.size;
+						return this.subsystem.design.size_round;
 					}
 				};
 				break;
@@ -5188,7 +5188,7 @@ class DesignComponent {
 								return [...Array(sif_max_count + 1).keys()];
 								break;
 							default:
-								return [0, 1, 2, 3, 4, 5];
+								return [...Array(26).keys()];
 						};
 					}
 				};
