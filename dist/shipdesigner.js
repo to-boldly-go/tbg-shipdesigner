@@ -99746,7 +99746,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.design-import-export[data-v-8a85d0ac] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/design-import-export.vue?73f43693"],"names":[],"mappings":";AAmJA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n  <div class=\"design-import-export\">\n    <input id=\"design-import-export-blueprint-string\" v-model=\"design_json_string\">\n    <input type=\"button\"\n\t\t   class=\"clipboard-copy-button\"\n\t\t   data-clipboard-target=\"#design-import-export-blueprint-string\"\n\t\t   value=\"Copy\"></input>\n\n    <select v-model=\"selected_save_bp\">\n      <option v-for=\"blueprint in local_saves\">\n\t\t{{blueprint_save_name(blueprint)}}\n      </option>\n    </select>\n\n    <input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"></input>\n    <input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"></input>\n\n    <input type=\"button\" @click=\"local_saves_save_design\" value=\"Save current design\"></input>\n    <input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"></input>\n\n    <span class=\"design-import-export-status-message\">{{ status_message }}</span>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\nimport localforage from 'localforage';\nimport Clipboard from 'clipboard';\n\nnew Clipboard('.clipboard-copy-button');\n\nconst STATUS_DEFAULT_DURATION = 2000;\n\nexport default {\n    name: 'DesignImportExport',\n    components: {\n    },\n    data () {\n\t\treturn {\n\t\t\t// local_saves is a straight array of blueprint objects,\n\t\t\t// exactly the same as the design_info.data object.\n\t\t\tlocal_saves: [],\n\t\t\t// the currently selected element of the local_saves\n\t\t\t// array. *not* the same as design_info.data! this is so\n\t\t\t// the user can work with the list of locally saved\n\t\t\t// blueprints without clobbering their current work.\n\t\t\t// TODO: Consider binding to the actual blueprint\n\t\t\tselected_save: null,\n\n\t\t\tstatus_message: \"\",\n\n\t\t\tstatus_message_timeout_id: null,\n\t\t};\n    },\n    props: {\n\t\tdesign_info: Object,\n    },\n    computed: {\n\t\tselected_save_bp: {\n\t\t\tget () {\n\t\t\t\treturn this.blueprint_save_name(this.selected_save);\n\t\t\t},\n\t\t\tset () {\n\t\t\t\tthis.selected_save = _.chain(this.local_saves).find(bp => {\n\t\t\t\t\treturn _.isEqual(comparison_slice(bp), comparison_slice(this.selected_save));\n\t\t\t\t}).value();\n\t\t\t},\n\t\t},\n\t\tdesign_json_string: {\n\t\t\tget () {\n\t\t\t\tlet timestamp = new Date();\n\t\t\t\t// timestamp.setSeconds(0);\n\t\t\t\ttimestamp.setMilliseconds(0);\n\t\t\t\tthis.design_info.data['Blueprint Date'] = timestamp.toISOString();\n\t\t\t\treturn JSON.stringify(this.design_info.data);\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.design_info.data = JSON.parse(value);\n\t\t\t},\n\t\t},\n    },\n    mounted () {\n\t\tthis.local_saves_load_from_local_storage();\n    },\n    methods: {\n\t\tblueprint_save_name (bp) {\n\t\t\treturn bp['Name'] + ' @' + bp['Blueprint Date'];\n\t\t},\n\t\tlocal_saves_delete_selected () {\n\t\t\tconst comparison_slice = _.partial(_.pick, _, ['Name', 'Blueprint Date']);\n\t\t\t// Remove the selected blueprint from local_saves\n\t\t\tthis.local_saves = _.chain(this.local_saves).filter(bp => {\n\t\t\t\treturn _.isEqual(comparison_slice(bp), comparison_slice(this.selected_save));\n\t\t\t}).value();\n\t\t\tthis.selected_save = null;\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t},\n\t\tlocal_saves_load_selected () {\n\t\t\tthis.design_info.data = this.selected_save;\n\t\t},\n\t\tlocal_saves_save_design () {\n\t\t\t// TODO: add the user's current blueprint to local_saves\n\t\t\tthis.local_saves.push(_.clone(this.design_info.data));\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t},\n\n\t\tlocal_saves_load_from_local_storage () {\n\t\t\t// TODO: implement this\n\t\t\tlocalforage.getItem('local_saves').then(\n\t\t\t\tvalue => {\n\t\t\t\t\tif (value === null) {\n\t\t\t\t\t\tthis.local_saves = [];\n\t\t\t\t\t\tthis.display_status_message(\"No Blueprints to load\");\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthis.local_saves = value;\n\t\t\t\t\t\tthis.display_status_message(\"Blueprints loaded.\");\n\t\t\t\t\t};\n\t\t\t\t}\n\t\t\t)\n\t\t},\n\t\tlocal_saves_save_to_local_storage () {\n\t\t\t// TODO: implement this\n\t\t\tlocalforage.setItem('local_saves', this.local_saves).then(\n\t\t\t\tvalue => {\n\t\t\t\t\tthis.display_status_message(\"Blueprints saved.\");\n\t\t\t\t}\n\t\t\t)\n\t\t},\n\n\t\tdisplay_status_message (status) {\n\t\t\tclearTimeout(this.status_message_timeout_id)\n\t\t\t// TODO: Add fade in/out\n\t\t\tthis.status_message = status;\n\t\t},\n\n\t\tclear_status_message () {\n\t\t\t// TODO: implement\n\t\t}\n\t\t\n    },\n}\n</script>\n\n\n<style scoped>\n.design-import-export {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.design-import-export[data-v-8a85d0ac] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/design-import-export.vue?67ab7aaa"],"names":[],"mappings":";AAiIA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n  <div class=\"design-import-export\">\n    <input id=\"design-import-export-blueprint-string\" v-model=\"design_json_string\">\n    <input type=\"button\"\n\t   class=\"clipboard-copy-button\"\n\t   data-clipboard-target=\"#design-import-export-blueprint-string\"\n\t   value=\"Copy\"></input>\n\n    <select v-model=\"selected_save\">\n      <option v-for=\"blueprint in local_saves\">\n\t{{blueprint['Name']}} @{{blueprint['Blueprint Date']}}\n      </option>\n    </select>\n\n    <input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"></input>\n    <input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"></input>\n\n    <input type=\"button\" @click=\"local_saves_save_design\" value=\"Save current design\"></input>\n    <input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"></input>\n\n    <span class=\"design-import-export-status-message\">{{ status_message }}</span>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash'\nimport localforage from 'localforage'\nimport Clipboard from 'clipboard';\n\nnew Clipboard('.clipboard-copy-button');\n\nconst STATUS_DEFAULT_DURATION = 2000;\n\nexport default {\n    name: 'DesignImportExport',\n    components: {\n    },\n    data () {\n\treturn {\n\t    // local_saves is a straight array of blueprint objects,\n\t    // exactly the same as the design_info.data object.\n\t    local_saves: [],\n\t    // the currently selected element of the local_saves\n\t    // array. *not* the same as design_info.data! this is so\n\t    // the user can work with the list of locally saved\n\t    // blueprints without clobbering their current work.\n\t    // TODO: Consider binding to the actual blueprint\n\t    selected_save: null,\n\n\t    status_message: \"\",\n\n\t    status_message_timeout_id: null,\n\t};\n    },\n    props: {\n\tdesign_info: Object,\n    },\n    computed: {\n\tdesign_json_string: {\n\t    get () {\n\t\tlet timestamp = new Date();\n\t\t// timestamp.setSeconds(0);\n\t\ttimestamp.setMilliseconds(0);\n\t\tthis.design_info.data['Blueprint Date'] = timestamp.toISOString();\n\t\treturn JSON.stringify(this.design_info.data);\n\t    },\n\t    set (value) {\n\t\tthis.design_info.data = JSON.parse(value);\n\t    },\n\t},\n    },\n    mounted () {\n\tthis.local_saves_load_from_local_storage();\n    },\n    methods: {\n\tlocal_saves_delete_selected () {\n\t    // Remove the selected blueprint from local_saves\n\t    _.remove(this.local_saves, e => {\n\t\tlet tmp = this.selected_save.split(\" @\");\n\t\treturn e['Name'] === tmp[0] && e['Blueprint Date'] === tmp[1];\n\t    });\n\t    this.selected_save = null;\n\t    this.local_saves_save_to_local_storage();\n\t},\n\tlocal_saves_load_selected () {\n\t    this.design_info.data = this.selected_save;\n\t},\n\tlocal_saves_save_design () {\n\t    // TODO: add the user's current blueprint to local_saves\n\t    this.local_saves.push(_.clone(this.design_info.data));\n\t    this.local_saves_save_to_local_storage();\n\t},\n\n\tlocal_saves_load_from_local_storage () {\n\t    // TODO: implement this\n\t    localforage.getItem('local_saves').then(\n\t\tvalue => {\n\t\t    this.local_saves = value;\n\t\t    this.display_status_message(\"Blueprints loaded.\")\n\t\t}\n\t    )\n\t},\n\tlocal_saves_save_to_local_storage () {\n\t    // TODO: implement this\n\t    localforage.setItem('local_saves', this.local_saves).then(\n\t\tvalue => {\n\t\t    this.display_status_message(\"Blueprints saved.\");\n\t\t}\n\t    )\n\t},\n\n\tdisplay_status_message (status) {\n\t    clearTimeout(this.status_message_timeout_id)\n\t    // TODO: Add fade in/out\n\t    this.status_message = status;\n\t},\n\n\tclear_status_message () {\n\t    // TODO: implement\n\t}\n\t\n    },\n}\n</script>\n\n\n<style scoped>\n.design-import-export {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -99821,16 +99821,6 @@ const STATUS_DEFAULT_DURATION = 2000;
 		design_info: Object
 	},
 	computed: {
-		selected_save_bp: {
-			get() {
-				return this.blueprint_save_name(this.selected_save);
-			},
-			set() {
-				this.selected_save = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.chain(this.local_saves).find(bp => {
-					return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEqual(comparison_slice(bp), comparison_slice(this.selected_save));
-				}).value();
-			}
-		},
 		design_json_string: {
 			get() {
 				let timestamp = new Date();
@@ -99848,15 +99838,12 @@ const STATUS_DEFAULT_DURATION = 2000;
 		this.local_saves_load_from_local_storage();
 	},
 	methods: {
-		blueprint_save_name(bp) {
-			return bp['Name'] + ' @' + bp['Blueprint Date'];
-		},
 		local_saves_delete_selected() {
-			const comparison_slice = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.partial(__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.pick, __WEBPACK_IMPORTED_MODULE_0_lodash___default.a, ['Name', 'Blueprint Date']);
 			// Remove the selected blueprint from local_saves
-			this.local_saves = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.chain(this.local_saves).filter(bp => {
-				return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEqual(comparison_slice(bp), comparison_slice(this.selected_save));
-			}).value();
+			__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.remove(this.local_saves, e => {
+				let tmp = this.selected_save.split(" @");
+				return e['Name'] === tmp[0] && e['Blueprint Date'] === tmp[1];
+			});
 			this.selected_save = null;
 			this.local_saves_save_to_local_storage();
 		},
@@ -99872,13 +99859,8 @@ const STATUS_DEFAULT_DURATION = 2000;
 		local_saves_load_from_local_storage() {
 			// TODO: implement this
 			__WEBPACK_IMPORTED_MODULE_1_localforage___default.a.getItem('local_saves').then(value => {
-				if (value === null) {
-					this.local_saves = [];
-					this.display_status_message("No Blueprints to load");
-				} else {
-					this.local_saves = value;
-					this.display_status_message("Blueprints loaded.");
-				};
+				this.local_saves = value;
+				this.display_status_message("Blueprints loaded.");
 			});
 		},
 		local_saves_save_to_local_storage() {
@@ -102258,8 +102240,8 @@ var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._sel
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: (_vm.selected_save_bp),
-      expression: "selected_save_bp"
+      value: (_vm.selected_save),
+      expression: "selected_save"
     }],
     on: {
       "change": function($event) {
@@ -102269,11 +102251,11 @@ var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._sel
           var val = "_value" in o ? o._value : o.value;
           return val
         });
-        _vm.selected_save_bp = $event.target.multiple ? $$selectedVal : $$selectedVal[0]
+        _vm.selected_save = $event.target.multiple ? $$selectedVal : $$selectedVal[0]
       }
     }
   }, _vm._l((_vm.local_saves), function(blueprint) {
-    return _c('option', [_vm._v("\n\t\t" + _vm._s(_vm.blueprint_save_name(blueprint)) + "\n      ")])
+    return _c('option', [_vm._v("\n\t" + _vm._s(blueprint['Name']) + " @" + _vm._s(blueprint['Blueprint Date']) + "\n      ")])
   })), _vm._v(" "), _c('input', {
     attrs: {
       "type": "button",

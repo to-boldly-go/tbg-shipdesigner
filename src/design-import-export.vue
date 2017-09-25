@@ -26,7 +26,7 @@
 <script>
 
 import _ from 'lodash'
-import localforage from 'localForage'
+import localforage from 'localforage'
 import Clipboard from 'clipboard';
 
 new Clipboard('.clipboard-copy-button');
