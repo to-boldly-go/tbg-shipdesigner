@@ -1,7 +1,7 @@
 'use strict';
 
 import Vue from 'vue';
-import App from './app.vue';
+import ShipDesigner from './shipdesigner.vue';
 
 import design_json from '../dist/design.json';
 import canon_parts from '../dist/parts_C8.csv';
@@ -17,5 +17,5 @@ Promise.longStackTraces();
 // create a root instance
 new Vue({
 	el: '#app',
- 	render: h => h(App),
+ 	render: h => h(ShipDesigner),
 });

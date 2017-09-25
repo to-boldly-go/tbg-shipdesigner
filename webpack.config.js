@@ -2,11 +2,12 @@ const path = require('path');
 
 const config = {
 	entry: {
-		'main': './src/index.js',
+		'shipdesigner': './src/shipdesigner.js',
+		'partbuilder': './src/partbuilder.js',
 	},
 	output: {
 		path: path.resolve(__dirname, 'dist'),
-		filename: 'bundle.js',
+		filename: '[name].js',
 	},
 	devtool: 'cheap-module-source-map',
 	devServer: {
