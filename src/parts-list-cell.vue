@@ -99,9 +99,19 @@ export default {
 	},
 	methods: {
 		on_keydown(ev) {
-			if (ev.key === 'Enter') {
-				this.$refs.input.blur();
+			switch (ev.key){
+			case 'Enter':
+				// leave focus and let the app save changes
+				this.commit_edit();
+				break;
+			case 'Escape':
+				this.abort_edit();
+				break;
 			};
+		},
+		abort_edit () {
+			this.temp_value = this.value;
+			this.is_editing = false;
 		},
 		edit_cell (ev) {
 			this.is_editing = true;
