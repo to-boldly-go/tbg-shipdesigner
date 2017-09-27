@@ -1,6 +1,6 @@
 <template>
   <tr class="part">
-	<PartsListCell v-for="field in fields" :key="field.name" :part="part" :field="field"></PartsListCell>
+	<PartsListCell v-on:partupdate="partupdate()" v-for="field in fields" :key="field.name" :part="part" :field="field"></PartsListCell>
 	<td class="delete-cell"><input type="button" class="delete-button" value="X" @click="delete_this_part"></td>
   </tr>
 </template>
@@ -33,6 +33,9 @@ export default {
 		},
 	},
 	methods: {
+		partupdate () {
+			this.$emit('partupdate');
+		},
 		delete_this_part () {
 			const idx = this.partslist.findIndex((part) => part['Name'] === this.part['Name']);
 			console.log(idx);

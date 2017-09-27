@@ -4,7 +4,7 @@
 	  <PartsListHeader :partslist="partslist_info.data" :schema="schema" :display="display"></PartsListHeader>
 	</div>
 	<div class="editor">
-	  <PartsListEditor :partslist="partslist_info.data" :schema="schema" :display="display"></PartsListEditor>
+	  <PartsListEditor v-on:partupdate="save_parts_to_storage()" :partslist="partslist_info.data" :schema="schema" :display="display"></PartsListEditor>
 	</div>
 	<div class="footer">
 	  <PartsListFooter :partslist_info="partslist_info"></PartsListFooter>
@@ -176,6 +176,8 @@ const SCHEMA = [
 	},
 ];
 
+const PARTS_KEY = 'working_parts_list';
+
 export default {
 	name: 'app',
 	components: {
@@ -190,7 +192,26 @@ export default {
 			display: { types: [_(canon_parts).minBy((part) => part['Type Sort'])['Type']] },
 		};
 	},
+	mounted () {
+		this.load_parts_from_storage();
+	},
+	updated () {
+		this.save_parts_to_storage();
+	},
 	computed: {
+	},
+	methods: {
+		load_parts_from_storage () {
+			const saved_parts = localStorage.getItem(PARTS_KEY);
+			if (saved_parts) {
+				this.partslist_info.data = JSON.parse(saved_parts);
+			} else {
+				localStorage.setItem(PARTS_KEY, JSON.stringify(this.partslist_info.data));
+			};
+		},
+		save_parts_to_storage () {
+			localStorage.setItem(PARTS_KEY, JSON.stringify(this.partslist_info.data));
+		},
 	},
 };
 

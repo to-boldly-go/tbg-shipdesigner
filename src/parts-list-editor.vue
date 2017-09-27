@@ -9,7 +9,7 @@
 	  <th class="column-header delete-column"></th>
 	</thead>
 	<tbody>
-	  <PartsListPart v-for="part in displayed_parts" key="part.name" :partslist="partslist" :part="part" :schema="schema"></PartsListPart>
+	  <PartsListPart v-on:partupdate="partupdate()" v-for="part in displayed_parts" key="part.name" :partslist="partslist" :part="part" :schema="schema"></PartsListPart>
 	</tbody>
   </table>
   <input type="button" value="Add new part" @click="add_new_part" class="new-part-button">
@@ -65,6 +65,9 @@ export default {
 		},
 	},
 	methods: {
+		partupdate () {
+			this.$emit('partupdate');
+		},
 		add_new_part () {
 			let new_part = _.chain(this.fields)
 				.map((field) => [field.name, null])

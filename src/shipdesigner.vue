@@ -27,6 +27,10 @@ import DesignSummary from './design-summary.vue';
 import Design from './design.vue';
 import DesignImportExport from './design-import-export.vue';
 
+const PARTS_KEY = 'working_parts_list';
+const MODULES_KEY = 'working_modules_list';
+const FRAMES_KEY = 'working_frames_list';
+
 const se_db = new ShipEngine.DB({
 	parts: canon_parts,
 	frames: canon_frames,
@@ -42,13 +46,40 @@ export default {
 	},
 	data () {
 		return {
-			design_info: { data: design_json_init },
-			se_db: se_db,
+			design_info: {
+				data: design_json_init,
+			},
+			parts_info: {
+				parts: canon_parts,
+				modules: canon_modules,
+				frames: canon_frames,
+			},
 		};
+	},
+	mounted () {
+		this.load_parts_from_storage();
+		window.addEventListener('storage', function(ev) {
+			if (ev.key === PARTS_KEY) {
+				this.load_parts_from_storage();
+			};
+		}.bind(this));
 	},
 	computed: {
 		se_design () {
-			return new ShipEngine.Design(se_db, this.design_info.data);
+			return new ShipEngine.Design(this.se_db, this.design_info.data);
+		},
+		se_db () {
+			return new ShipEngine.DB(this.parts_info);
+		},
+	},
+	methods: {
+		load_parts_from_storage () {
+			const saved_parts = localStorage.getItem(PARTS_KEY);
+			if (saved_parts) {
+				this.parts_info.parts = JSON.parse(saved_parts);
+			} else {
+				localStorage.setItem(PARTS_KEY, JSON.stringify(this.parts_info.parts));
+			};
 		},
 	},
 };

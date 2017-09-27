@@ -87,7 +87,11 @@ export default {
     },
     mounted () {
 		this.local_saves_load_from_local_storage();
-		window.addEventListener('storage', this.local_saves_load_from_local_storage);
+		window.addEventListener('storage', function(ev) {
+			if (ev.key === LOCAL_SAVES_KEY) {
+				this.local_saves_load_from_local_storage;
+			};
+		});
     },
     methods: {
 		blueprint_save_name (bp) {

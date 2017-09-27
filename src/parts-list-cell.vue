@@ -78,6 +78,7 @@ export default {
 					this.value_string = value;
 					break;
 				};
+				this.partupdate();
 			},
 		},
 		value_number: {
@@ -98,6 +99,9 @@ export default {
 		},
 	},
 	methods: {
+		partupdate () {
+			this.$emit('partupdate');
+		},
 		on_keydown(ev) {
 			switch (ev.key){
 			case 'Enter':
