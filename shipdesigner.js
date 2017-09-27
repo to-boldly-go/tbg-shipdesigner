@@ -4444,7 +4444,7 @@ function factory (type, config, load, typed) {
   var addScalar = load(__webpack_require__(22));
   var latex = __webpack_require__(4);
   
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm04 = load(__webpack_require__(79));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm13 = load(__webpack_require__(8));
@@ -4740,7 +4740,7 @@ function factory (type, config, load, typed) {
   var addScalar = load(__webpack_require__(22));
   var unaryMinus = load(__webpack_require__(41));
 
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm03 = load(__webpack_require__(17));
   var algorithm05 = load(__webpack_require__(66));
   var algorithm10 = load(__webpack_require__(40));
@@ -5369,7 +5369,7 @@ exports.factory = factory;
 
 exports.array = __webpack_require__(2);
 exports['boolean'] = __webpack_require__(193);
-exports['function'] = __webpack_require__(35);
+exports['function'] = __webpack_require__(36);
 exports.number = __webpack_require__(3);
 exports.object = __webpack_require__(5);
 exports.string = __webpack_require__(9);
@@ -6476,378 +6476,6 @@ exports.factory = factory;
 
 /***/ }),
 /* 35 */
-/***/ (function(module, exports) {
-
-// function utils
-
-/*
- * Memoize a given function by caching the computed result.
- * The cache of a memoized function can be cleared by deleting the `cache`
- * property of the function.
- *
- * @param {function} fn                     The function to be memoized.
- *                                          Must be a pure function.
- * @param {function(args: Array)} [hasher]  A custom hash builder.
- *                                          Is JSON.stringify by default.
- * @return {function}                       Returns the memoized function
- */
-exports.memoize = function(fn, hasher) {
-  return function memoize() {
-    if (typeof memoize.cache !== 'object') {
-      memoize.cache = {};
-    }
-
-    var args = [];
-    for (var i = 0; i < arguments.length; i++) {
-      args[i] = arguments[i];
-    }
-
-    var hash = hasher ? hasher(args) : JSON.stringify(args);
-    if (!(hash in memoize.cache)) {
-      return memoize.cache[hash] = fn.apply(fn, args);
-    }
-    return memoize.cache[hash];
-  };
-};
-
-/**
- * Find the maximum number of arguments expected by a typed function.
- * @param {function} fn   A typed function
- * @return {number} Returns the maximum number of expected arguments.
- *                  Returns -1 when no signatures where found on the function.
- */
-exports.maxArgumentCount = function (fn) {
-  return Object.keys(fn.signatures || {})
-      .reduce(function (args, signature) {
-        var count = (signature.match(/,/g) || []).length + 1;
-        return Math.max(args, count);
-      }, -1);
-};
-
-/**
- * Call a typed function with the
- * @param {function} fn   A function or typed function
- * @return {number} Returns the maximum number of expected arguments.
- *                  Returns -1 when no signatures where found on the function.
- */
-exports.callWithRightArgumentCount = function (fn, args, argCount) {
-  return Object.keys(fn.signatures || {})
-      .reduce(function (args, signature) {
-        var count = (signature.match(/,/g) || []).length + 1;
-        return Math.max(args, count);
-      }, -1);
-};
-
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var DimensionError = __webpack_require__(10);
-
-function factory (type, config, load, typed) {
-
-  var DenseMatrix = type.DenseMatrix;
-
-  /**
-   * Iterates over SparseMatrix nonzero items and invokes the callback function f(Dij, Sij). 
-   * Callback function invoked NNZ times (number of nonzero items in SparseMatrix).
-   *
-   *
-   *          ┌  f(Dij, Sij)  ; S(i,j) !== 0
-   * C(i,j) = ┤
-   *          └  Dij          ; otherwise
-   *
-   *
-   * @param {Matrix}   denseMatrix       The DenseMatrix instance (D)
-   * @param {Matrix}   sparseMatrix      The SparseMatrix instance (S)
-   * @param {Function} callback          The f(Dij,Sij) operation to invoke, where Dij = DenseMatrix(i,j) and Sij = SparseMatrix(i,j)
-   * @param {boolean}  inverse           A true value indicates callback should be invoked f(Sij,Dij)
-   *
-   * @return {Matrix}                    DenseMatrix (C)
-   *
-   * see https://github.com/josdejong/mathjs/pull/346#issuecomment-97477571
-   */
-  var algorithm01 = function (denseMatrix, sparseMatrix, callback, inverse) {
-    // dense matrix arrays
-    var adata = denseMatrix._data;
-    var asize = denseMatrix._size;
-    var adt = denseMatrix._datatype;
-    // sparse matrix arrays
-    var bvalues = sparseMatrix._values;
-    var bindex = sparseMatrix._index;
-    var bptr = sparseMatrix._ptr;
-    var bsize = sparseMatrix._size;
-    var bdt = sparseMatrix._datatype;
-
-    // validate dimensions
-    if (asize.length !== bsize.length)
-      throw new DimensionError(asize.length, bsize.length);
-
-    // check rows & columns
-    if (asize[0] !== bsize[0] || asize[1] !== bsize[1])
-      throw new RangeError('Dimension mismatch. Matrix A (' + asize + ') must match Matrix B (' + bsize + ')');
-
-    // sparse matrix cannot be a Pattern matrix
-    if (!bvalues)
-      throw new Error('Cannot perform operation on Dense Matrix and Pattern Sparse Matrix');
-
-    // rows & columns
-    var rows = asize[0];
-    var columns = asize[1];
-
-    // process data types
-    var dt = typeof adt === 'string' && adt === bdt ? adt : undefined;
-    // callback function
-    var cf = dt ? typed.find(callback, [dt, dt]) : callback;
-
-    // vars
-    var i, j;
-    
-    // result (DenseMatrix)
-    var cdata = [];
-    // initialize c
-    for (i = 0; i < rows; i++)
-      cdata[i] = [];      
-    
-    // workspace
-    var x = [];
-    // marks indicating we have a value in x for a given column
-    var w = [];
-
-    // loop columns in b
-    for (j = 0; j < columns; j++) {
-      // column mark
-      var mark = j + 1;
-      // values in column j
-      for (var k0 = bptr[j], k1 = bptr[j + 1], k = k0; k < k1; k++) {
-        // row
-        i = bindex[k];
-        // update workspace
-        x[i] = inverse ? cf(bvalues[k], adata[i][j]) : cf(adata[i][j], bvalues[k]);
-        // mark i as updated
-        w[i] = mark;
-      }
-      // loop rows
-      for (i = 0; i < rows; i++) {
-        // check row is in workspace
-        if (w[i] === mark) {
-          // c[i][j] was already calculated
-          cdata[i][j] = x[i];
-        }
-        else {
-          // item does not exist in S
-          cdata[i][j] = adata[i][j];
-        }
-      }
-    }
-
-    // return dense matrix
-    return new DenseMatrix({
-      data: cdata,
-      size: [rows, columns],
-      datatype: dt
-    });
-  };
-  
-  return algorithm01;
-}
-
-exports.name = 'algorithm01';
-exports.factory = factory;
-
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var nearlyEqual = __webpack_require__(3).nearlyEqual;
-var bigNearlyEqual = __webpack_require__(39);
-
-function factory (type, config, load, typed) {
-  
-  var matrix = load(__webpack_require__(0));
-
-  var algorithm03 = load(__webpack_require__(17));
-  var algorithm07 = load(__webpack_require__(28));
-  var algorithm12 = load(__webpack_require__(18));
-  var algorithm13 = load(__webpack_require__(8));
-  var algorithm14 = load(__webpack_require__(6));
-
-  var latex = __webpack_require__(4);
-
-  /**
-   * Test whether value x is larger than y.
-   *
-   * The function returns true when x is larger than y and the relative
-   * difference between x and y is larger than the configured epsilon. The
-   * function cannot be used to compare values smaller than approximately 2.22e-16.
-   *
-   * For matrices, the function is evaluated element wise.
-   *
-   * Syntax:
-   *
-   *    math.larger(x, y)
-   *
-   * Examples:
-   *
-   *    math.larger(2, 3);             // returns false
-   *    math.larger(5, 2 + 2);         // returns true
-   *
-   *    var a = math.unit('5 cm');
-   *    var b = math.unit('2 inch');
-   *    math.larger(a, b);             // returns false
-   *
-   * See also:
-   *
-   *    equal, unequal, smaller, smallerEq, largerEq, compare
-   *
-   * @param  {number | BigNumber | Fraction | boolean | Unit | string | Array | Matrix} x First value to compare
-   * @param  {number | BigNumber | Fraction | boolean | Unit | string | Array | Matrix} y Second value to compare
-   * @return {boolean | Array | Matrix} Returns true when the x is larger than y, else returns false
-   */
-  var larger = typed('larger', {
-
-    'boolean, boolean': function (x, y) {
-      return x > y;
-    },
-
-    'number, number': function (x, y) {
-      return x > y && !nearlyEqual(x, y, config.epsilon);
-    },
-
-    'BigNumber, BigNumber': function (x, y) {
-      return x.gt(y) && !bigNearlyEqual(x, y, config.epsilon);
-    },
-
-    'Fraction, Fraction': function (x, y) {
-      return x.compare(y) === 1;
-    },
-
-    'Complex, Complex': function () {
-      throw new TypeError('No ordering relation is defined for complex numbers');
-    },
-
-    'Unit, Unit': function (x, y) {
-      if (!x.equalBase(y)) {
-        throw new Error('Cannot compare units with different base');
-      }
-      return larger(x.value, y.value);
-    },
-
-    'string, string': function (x, y) {
-      return x > y;
-    },
-
-    'Matrix, Matrix': function (x, y) {
-      // result
-      var c;
-
-      // process matrix storage
-      switch (x.storage()) {
-        case 'sparse':
-          switch (y.storage()) {
-            case 'sparse':
-              // sparse + sparse
-              c = algorithm07(x, y, larger);
-              break;
-            default:
-              // sparse + dense
-              c = algorithm03(y, x, larger, true);
-              break;
-          }
-          break;
-        default:
-          switch (y.storage()) {
-            case 'sparse':
-              // dense + sparse
-              c = algorithm03(x, y, larger, false);
-              break;
-            default:
-              // dense + dense
-              c = algorithm13(x, y, larger);
-              break;
-          }
-          break;
-      }
-      return c;
-    },
-
-    'Array, Array': function (x, y) {
-      // use matrix implementation
-      return larger(matrix(x), matrix(y)).valueOf();
-    },
-
-    'Array, Matrix': function (x, y) {
-      // use matrix implementation
-      return larger(matrix(x), y);
-    },
-
-    'Matrix, Array': function (x, y) {
-      // use matrix implementation
-      return larger(x, matrix(y));
-    },
-
-    'Matrix, any': function (x, y) {
-      // result
-      var c;
-      // check storage format
-      switch (x.storage()) {
-        case 'sparse':
-          c = algorithm12(x, y, larger, false);
-          break;
-        default:
-          c = algorithm14(x, y, larger, false);
-          break;
-      }
-      return c;
-    },
-
-    'any, Matrix': function (x, y) {
-      // result
-      var c;
-      // check storage format
-      switch (y.storage()) {
-        case 'sparse':
-          c = algorithm12(y, x, larger, true);
-          break;
-        default:
-          c = algorithm14(y, x, larger, true);
-          break;
-      }
-      return c;
-    },
-
-    'Array, any': function (x, y) {
-      // use matrix implementation
-      return algorithm14(matrix(x), y, larger, false).valueOf();
-    },
-
-    'any, Array': function (x, y) {
-      // use matrix implementation
-      return algorithm14(matrix(y), x, larger, true).valueOf();
-    }
-  });
-
-  larger.toTex = {
-    2: '\\left(${args[0]}' + latex.operators['larger'] + '${args[1]}\\right)'
-  };
-
-  return larger;
-}
-
-exports.name = 'larger';
-exports.factory = factory;
-
-
-/***/ }),
-/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const util = __webpack_require__(98);
@@ -8345,6 +7973,378 @@ module.exports.Design = Design;
 module.exports.DB = DB;
 module.exports.Statline = Statline;
 module.exports.Crewline = Crewline;
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports) {
+
+// function utils
+
+/*
+ * Memoize a given function by caching the computed result.
+ * The cache of a memoized function can be cleared by deleting the `cache`
+ * property of the function.
+ *
+ * @param {function} fn                     The function to be memoized.
+ *                                          Must be a pure function.
+ * @param {function(args: Array)} [hasher]  A custom hash builder.
+ *                                          Is JSON.stringify by default.
+ * @return {function}                       Returns the memoized function
+ */
+exports.memoize = function(fn, hasher) {
+  return function memoize() {
+    if (typeof memoize.cache !== 'object') {
+      memoize.cache = {};
+    }
+
+    var args = [];
+    for (var i = 0; i < arguments.length; i++) {
+      args[i] = arguments[i];
+    }
+
+    var hash = hasher ? hasher(args) : JSON.stringify(args);
+    if (!(hash in memoize.cache)) {
+      return memoize.cache[hash] = fn.apply(fn, args);
+    }
+    return memoize.cache[hash];
+  };
+};
+
+/**
+ * Find the maximum number of arguments expected by a typed function.
+ * @param {function} fn   A typed function
+ * @return {number} Returns the maximum number of expected arguments.
+ *                  Returns -1 when no signatures where found on the function.
+ */
+exports.maxArgumentCount = function (fn) {
+  return Object.keys(fn.signatures || {})
+      .reduce(function (args, signature) {
+        var count = (signature.match(/,/g) || []).length + 1;
+        return Math.max(args, count);
+      }, -1);
+};
+
+/**
+ * Call a typed function with the
+ * @param {function} fn   A function or typed function
+ * @return {number} Returns the maximum number of expected arguments.
+ *                  Returns -1 when no signatures where found on the function.
+ */
+exports.callWithRightArgumentCount = function (fn, args, argCount) {
+  return Object.keys(fn.signatures || {})
+      .reduce(function (args, signature) {
+        var count = (signature.match(/,/g) || []).length + 1;
+        return Math.max(args, count);
+      }, -1);
+};
+
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var DimensionError = __webpack_require__(10);
+
+function factory (type, config, load, typed) {
+
+  var DenseMatrix = type.DenseMatrix;
+
+  /**
+   * Iterates over SparseMatrix nonzero items and invokes the callback function f(Dij, Sij). 
+   * Callback function invoked NNZ times (number of nonzero items in SparseMatrix).
+   *
+   *
+   *          ┌  f(Dij, Sij)  ; S(i,j) !== 0
+   * C(i,j) = ┤
+   *          └  Dij          ; otherwise
+   *
+   *
+   * @param {Matrix}   denseMatrix       The DenseMatrix instance (D)
+   * @param {Matrix}   sparseMatrix      The SparseMatrix instance (S)
+   * @param {Function} callback          The f(Dij,Sij) operation to invoke, where Dij = DenseMatrix(i,j) and Sij = SparseMatrix(i,j)
+   * @param {boolean}  inverse           A true value indicates callback should be invoked f(Sij,Dij)
+   *
+   * @return {Matrix}                    DenseMatrix (C)
+   *
+   * see https://github.com/josdejong/mathjs/pull/346#issuecomment-97477571
+   */
+  var algorithm01 = function (denseMatrix, sparseMatrix, callback, inverse) {
+    // dense matrix arrays
+    var adata = denseMatrix._data;
+    var asize = denseMatrix._size;
+    var adt = denseMatrix._datatype;
+    // sparse matrix arrays
+    var bvalues = sparseMatrix._values;
+    var bindex = sparseMatrix._index;
+    var bptr = sparseMatrix._ptr;
+    var bsize = sparseMatrix._size;
+    var bdt = sparseMatrix._datatype;
+
+    // validate dimensions
+    if (asize.length !== bsize.length)
+      throw new DimensionError(asize.length, bsize.length);
+
+    // check rows & columns
+    if (asize[0] !== bsize[0] || asize[1] !== bsize[1])
+      throw new RangeError('Dimension mismatch. Matrix A (' + asize + ') must match Matrix B (' + bsize + ')');
+
+    // sparse matrix cannot be a Pattern matrix
+    if (!bvalues)
+      throw new Error('Cannot perform operation on Dense Matrix and Pattern Sparse Matrix');
+
+    // rows & columns
+    var rows = asize[0];
+    var columns = asize[1];
+
+    // process data types
+    var dt = typeof adt === 'string' && adt === bdt ? adt : undefined;
+    // callback function
+    var cf = dt ? typed.find(callback, [dt, dt]) : callback;
+
+    // vars
+    var i, j;
+    
+    // result (DenseMatrix)
+    var cdata = [];
+    // initialize c
+    for (i = 0; i < rows; i++)
+      cdata[i] = [];      
+    
+    // workspace
+    var x = [];
+    // marks indicating we have a value in x for a given column
+    var w = [];
+
+    // loop columns in b
+    for (j = 0; j < columns; j++) {
+      // column mark
+      var mark = j + 1;
+      // values in column j
+      for (var k0 = bptr[j], k1 = bptr[j + 1], k = k0; k < k1; k++) {
+        // row
+        i = bindex[k];
+        // update workspace
+        x[i] = inverse ? cf(bvalues[k], adata[i][j]) : cf(adata[i][j], bvalues[k]);
+        // mark i as updated
+        w[i] = mark;
+      }
+      // loop rows
+      for (i = 0; i < rows; i++) {
+        // check row is in workspace
+        if (w[i] === mark) {
+          // c[i][j] was already calculated
+          cdata[i][j] = x[i];
+        }
+        else {
+          // item does not exist in S
+          cdata[i][j] = adata[i][j];
+        }
+      }
+    }
+
+    // return dense matrix
+    return new DenseMatrix({
+      data: cdata,
+      size: [rows, columns],
+      datatype: dt
+    });
+  };
+  
+  return algorithm01;
+}
+
+exports.name = 'algorithm01';
+exports.factory = factory;
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var nearlyEqual = __webpack_require__(3).nearlyEqual;
+var bigNearlyEqual = __webpack_require__(39);
+
+function factory (type, config, load, typed) {
+  
+  var matrix = load(__webpack_require__(0));
+
+  var algorithm03 = load(__webpack_require__(17));
+  var algorithm07 = load(__webpack_require__(28));
+  var algorithm12 = load(__webpack_require__(18));
+  var algorithm13 = load(__webpack_require__(8));
+  var algorithm14 = load(__webpack_require__(6));
+
+  var latex = __webpack_require__(4);
+
+  /**
+   * Test whether value x is larger than y.
+   *
+   * The function returns true when x is larger than y and the relative
+   * difference between x and y is larger than the configured epsilon. The
+   * function cannot be used to compare values smaller than approximately 2.22e-16.
+   *
+   * For matrices, the function is evaluated element wise.
+   *
+   * Syntax:
+   *
+   *    math.larger(x, y)
+   *
+   * Examples:
+   *
+   *    math.larger(2, 3);             // returns false
+   *    math.larger(5, 2 + 2);         // returns true
+   *
+   *    var a = math.unit('5 cm');
+   *    var b = math.unit('2 inch');
+   *    math.larger(a, b);             // returns false
+   *
+   * See also:
+   *
+   *    equal, unequal, smaller, smallerEq, largerEq, compare
+   *
+   * @param  {number | BigNumber | Fraction | boolean | Unit | string | Array | Matrix} x First value to compare
+   * @param  {number | BigNumber | Fraction | boolean | Unit | string | Array | Matrix} y Second value to compare
+   * @return {boolean | Array | Matrix} Returns true when the x is larger than y, else returns false
+   */
+  var larger = typed('larger', {
+
+    'boolean, boolean': function (x, y) {
+      return x > y;
+    },
+
+    'number, number': function (x, y) {
+      return x > y && !nearlyEqual(x, y, config.epsilon);
+    },
+
+    'BigNumber, BigNumber': function (x, y) {
+      return x.gt(y) && !bigNearlyEqual(x, y, config.epsilon);
+    },
+
+    'Fraction, Fraction': function (x, y) {
+      return x.compare(y) === 1;
+    },
+
+    'Complex, Complex': function () {
+      throw new TypeError('No ordering relation is defined for complex numbers');
+    },
+
+    'Unit, Unit': function (x, y) {
+      if (!x.equalBase(y)) {
+        throw new Error('Cannot compare units with different base');
+      }
+      return larger(x.value, y.value);
+    },
+
+    'string, string': function (x, y) {
+      return x > y;
+    },
+
+    'Matrix, Matrix': function (x, y) {
+      // result
+      var c;
+
+      // process matrix storage
+      switch (x.storage()) {
+        case 'sparse':
+          switch (y.storage()) {
+            case 'sparse':
+              // sparse + sparse
+              c = algorithm07(x, y, larger);
+              break;
+            default:
+              // sparse + dense
+              c = algorithm03(y, x, larger, true);
+              break;
+          }
+          break;
+        default:
+          switch (y.storage()) {
+            case 'sparse':
+              // dense + sparse
+              c = algorithm03(x, y, larger, false);
+              break;
+            default:
+              // dense + dense
+              c = algorithm13(x, y, larger);
+              break;
+          }
+          break;
+      }
+      return c;
+    },
+
+    'Array, Array': function (x, y) {
+      // use matrix implementation
+      return larger(matrix(x), matrix(y)).valueOf();
+    },
+
+    'Array, Matrix': function (x, y) {
+      // use matrix implementation
+      return larger(matrix(x), y);
+    },
+
+    'Matrix, Array': function (x, y) {
+      // use matrix implementation
+      return larger(x, matrix(y));
+    },
+
+    'Matrix, any': function (x, y) {
+      // result
+      var c;
+      // check storage format
+      switch (x.storage()) {
+        case 'sparse':
+          c = algorithm12(x, y, larger, false);
+          break;
+        default:
+          c = algorithm14(x, y, larger, false);
+          break;
+      }
+      return c;
+    },
+
+    'any, Matrix': function (x, y) {
+      // result
+      var c;
+      // check storage format
+      switch (y.storage()) {
+        case 'sparse':
+          c = algorithm12(y, x, larger, true);
+          break;
+        default:
+          c = algorithm14(y, x, larger, true);
+          break;
+      }
+      return c;
+    },
+
+    'Array, any': function (x, y) {
+      // use matrix implementation
+      return algorithm14(matrix(x), y, larger, false).valueOf();
+    },
+
+    'any, Array': function (x, y) {
+      // use matrix implementation
+      return algorithm14(matrix(y), x, larger, true).valueOf();
+    }
+  });
+
+  larger.toTex = {
+    2: '\\left(${args[0]}' + latex.operators['larger'] + '${args[1]}\\right)'
+  };
+
+  return larger;
+}
+
+exports.name = 'larger';
+exports.factory = factory;
+
 
 /***/ }),
 /* 39 */
@@ -36733,7 +36733,7 @@ exports.factory = factory;
 /* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var memoize = __webpack_require__(35).memoize;
+var memoize = __webpack_require__(36).memoize;
 
 /**
  * Calculate BigNumber e
@@ -39140,7 +39140,7 @@ var reduce = __webpack_require__(71);
 var containsCollections = __webpack_require__(72);
 
 function factory (type, config, load, typed) {
-  var larger = load(__webpack_require__(37));
+  var larger = load(__webpack_require__(38));
 
   /**
    * Compute the maximum value of a matrix or a  list with values.
@@ -41365,7 +41365,7 @@ function factory (type, config, load, typed) {
   var divideScalar = load(__webpack_require__(21));
   var multiplyScalar = load(__webpack_require__(25));
   var subtract = load(__webpack_require__(23));
-  var larger = load(__webpack_require__(37));
+  var larger = load(__webpack_require__(38));
   var equalScalar = load(__webpack_require__(11));
   var unaryMinus = load(__webpack_require__(41));
   
@@ -43083,7 +43083,7 @@ function factory (type, config, load, typed) {
   var combinations = load(__webpack_require__(76));
   var isNegative = load(__webpack_require__(62));
   var isInteger = load(__webpack_require__(53));
-  var larger = load(__webpack_require__(37));
+  var larger = load(__webpack_require__(38));
 
   /**
    * The Stirling numbers of the second kind, counts the number of ways to partition
@@ -43428,7 +43428,7 @@ exports.factory = factory;
 "use strict";
 
 
-var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
 
 function factory (type, config, load, typed) {
   /**
@@ -44340,7 +44340,7 @@ const util = __webpack_require__(98);
 const NamedVector = __webpack_require__(99).NamedVector;
 
 const Papa = __webpack_require__(567);
-const ShipEngine = __webpack_require__(38);
+const ShipEngine = __webpack_require__(35);
 
 const COMPONENT_MAPPING = [{
 	name: "Warp Core",
@@ -63799,7 +63799,7 @@ exports.factory = factory;
 function factory (type, config, load, typed) {
   
   var smaller = load(__webpack_require__(49));
-  var larger = load(__webpack_require__(37));
+  var larger = load(__webpack_require__(38));
   
   var oneOverLogPhi = 1.0 / Math.log((1.0 + Math.sqrt(5.0)) / 2.0);
   
@@ -73245,7 +73245,7 @@ exports.factory = factory;
 
 var filter = __webpack_require__(2).filter;
 var filterRegExp = __webpack_require__(2).filterRegExp;
-var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
 
 /**
  * Attach a transform function to math.filter
@@ -73340,7 +73340,7 @@ exports.factory = factory;
 "use strict";
 
 
-var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
 var forEach = __webpack_require__(2).forEach;
 
 /**
@@ -73477,7 +73477,7 @@ exports.factory = factory;
 "use strict";
 
 
-var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
 var map = __webpack_require__(2).map;
 
 /**
@@ -76691,7 +76691,7 @@ function factory (type, config, load) {
   var divideScalar = load(__webpack_require__(21));
   var multiply = load(__webpack_require__(12));
   
-  var larger = load(__webpack_require__(37));
+  var larger = load(__webpack_require__(38));
   var largerEq = load(__webpack_require__(137));
   
   var cs_spsolve = load(__webpack_require__(438));
@@ -78139,7 +78139,7 @@ function factory (type, config, load, typed) {
 
   var matrix = load(__webpack_require__(0));
 
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm04 = load(__webpack_require__(79));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm13 = load(__webpack_require__(8));
@@ -79006,7 +79006,7 @@ function factory (type, config, load, typed) {
   var sqrt        = load(__webpack_require__(61));
   var multiply    = load(__webpack_require__(12));
   var equalScalar = load(__webpack_require__(11));
-  var larger      = load(__webpack_require__(37));
+  var larger      = load(__webpack_require__(38));
   var smaller     = load(__webpack_require__(49));
   var matrix      = load(__webpack_require__(0));
   var trace       = load(__webpack_require__(145));
@@ -79224,7 +79224,7 @@ function factory (type, config, load, typed) {
 
   var matrix = load(__webpack_require__(0));
 
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm02 = load(__webpack_require__(26));
   var algorithm06 = load(__webpack_require__(74));
   var algorithm11 = load(__webpack_require__(19));
@@ -80137,7 +80137,7 @@ function factory (type, config, load, typed) {
 
   var matrix = load(__webpack_require__(0));
 
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm04 = load(__webpack_require__(79));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm13 = load(__webpack_require__(8));
@@ -80576,7 +80576,7 @@ function factory (type, config, load, typed) {
   var equalScalar = load(__webpack_require__(11));
   var zeros = load(__webpack_require__(42));
 
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm02 = load(__webpack_require__(26));
   var algorithm08 = load(__webpack_require__(93));
   var algorithm10 = load(__webpack_require__(40));
@@ -80792,7 +80792,7 @@ function factory (type, config, load, typed) {
   var equalScalar = load(__webpack_require__(11));
   var zeros = load(__webpack_require__(42));
 
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm02 = load(__webpack_require__(26));
   var algorithm08 = load(__webpack_require__(93));
   var algorithm10 = load(__webpack_require__(40));
@@ -81013,7 +81013,7 @@ function factory (type, config, load, typed) {
   var equalScalar = load(__webpack_require__(11));
   var zeros = load(__webpack_require__(42));
 
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm02 = load(__webpack_require__(26));
   var algorithm08 = load(__webpack_require__(93));
   var algorithm10 = load(__webpack_require__(40));
@@ -81250,7 +81250,7 @@ function factory (type, config, load, typed) {
   var add = load(__webpack_require__(22));
   var isPositive = load(__webpack_require__(60));
   var isInteger = load(__webpack_require__(53));
-  var larger = load(__webpack_require__(37));
+  var larger = load(__webpack_require__(38));
 
   /**
    * The composition counts of n into k parts.
@@ -82959,7 +82959,7 @@ exports.factory = factory;
 
 var filter = __webpack_require__(2).filter;
 var filterRegExp = __webpack_require__(2).filterRegExp;
-var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
 
 function factory (type, config, load, typed) {
   var matrix = load(__webpack_require__(0));
@@ -83100,7 +83100,7 @@ exports.factory = factory;
 "use strict";
 
 
-var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
 var forEach = __webpack_require__(2).forEach;
 
 function factory (type, config, load, typed) {
@@ -84430,7 +84430,7 @@ module.exports = [
   __webpack_require__(34),
   __webpack_require__(514),
   __webpack_require__(33),
-  __webpack_require__(37),
+  __webpack_require__(38),
   __webpack_require__(137),
   __webpack_require__(49),
   __webpack_require__(515),
@@ -96576,7 +96576,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_bluebird__ = __webpack_require__(578);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__lib_shipengine__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__lib_shipengine__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__lib_shipengine___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7__lib_shipengine__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__lib_shipimporter__ = __webpack_require__(162);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__lib_shipimporter___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8__lib_shipimporter__);
@@ -96608,7 +96608,7 @@ new __WEBPACK_IMPORTED_MODULE_0_vue__["a" /* default */]({
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__ = __webpack_require__(585);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5ae9c078_hasScoped_false_node_modules_vue_loader_lib_selector_type_template_index_0_shipdesigner_vue__ = __webpack_require__(661);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5ae9c078_hasScoped_false_node_modules_vue_loader_lib_selector_type_template_index_0_shipdesigner_vue__ = __webpack_require__(660);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
@@ -96690,7 +96690,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n}\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/shipdesigner.vue?0c0d0e56"],"names":[],"mappings":";AA4DA;CACA,YAAA;CACA,aAAA;;CAEA,cAAA;CACA,uBAAA;CACA,kBAAA;CACA;AAEA;CACA,eAAA;CACA,yBAAA;CACA;AAEA;CACA,eAAA;CACA,mBAAA,yCAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,sBAAA;CACA","file":"shipdesigner.vue","sourcesContent":["<template>\n  <div class=\"root\">\n\t<div class=\"header\">\n\t  <DesignSummary :se_db=\"se_db\" :se_design=\"se_design\"></DesignSummary>\n\t</div>\n\t<div class=\"design\">\n\t  <Design :se_db=\"se_db\" :se_design=\"se_design\"></Design>\n\t</div>\n\t<div class=\"footer\">\n\t  <DesignImportExport :design_info=\"design_info\"></DesignImportExport>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\nimport ShipImporter from '../lib/shipimporter';\n\nimport design_json_init from '../dist/swb_kepler_recreation.json';\nimport canon_parts from '../dist/parts_C8.csv';\nimport canon_modules from '../dist/modules_C8.csv';\nimport canon_frames from '../dist/frames_C8.csv';\n\nimport DesignSummary from './design-summary.vue';\nimport Design from './design.vue';\nimport DesignImportExport from './design-import-export.vue';\n\nconst se_db = new ShipEngine.DB({\n\tparts: canon_parts,\n\tframes: canon_frames,\n\tmodules: canon_modules,\n});\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tDesignSummary,\n\t\tDesign,\n\t\tDesignImportExport,\n\t},\n\tdata () {\n\t\treturn {\n\t\t\tdesign_info: { data: design_json_init },\n\t\t\tse_db: se_db,\n\t\t};\n\t},\n\tcomputed: {\n\t\tse_design () {\n\t\t\treturn new ShipEngine.Design(se_db, this.design_info.data);\n\t\t},\n\t},\n};\n\n</script>\n\n\n<style>\n\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n}\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/shipdesigner.vue?188be2d0"],"names":[],"mappings":";AA4DA;CACA,YAAA;CACA,aAAA;;CAEA,cAAA;CACA,uBAAA;CACA,kBAAA;CACA;AAEA;CACA,eAAA;CACA,yBAAA;CACA;AAEA;CACA,eAAA;CACA,mBAAA,yCAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,sBAAA;CACA","file":"shipdesigner.vue","sourcesContent":["<template>\n  <div class=\"root\">\n\t<div class=\"header\">\n\t  <DesignSummary :se_db=\"se_db\" :se_design=\"se_design\"></DesignSummary>\n\t</div>\n\t<div class=\"design\">\n\t  <Design :se_db=\"se_db\" :se_design=\"se_design\"></Design>\n\t</div>\n\t<div class=\"footer\">\n\t  <DesignImportExport :se_db=\"se_db\" :design_info=\"design_info\"></DesignImportExport>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\nimport ShipImporter from '../lib/shipimporter';\n\nimport design_json_init from '../dist/swb_kepler_recreation.json';\nimport canon_parts from '../dist/parts_C8.csv';\nimport canon_modules from '../dist/modules_C8.csv';\nimport canon_frames from '../dist/frames_C8.csv';\n\nimport DesignSummary from './design-summary.vue';\nimport Design from './design.vue';\nimport DesignImportExport from './design-import-export.vue';\n\nconst se_db = new ShipEngine.DB({\n\tparts: canon_parts,\n\tframes: canon_frames,\n\tmodules: canon_modules,\n});\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tDesignSummary,\n\t\tDesign,\n\t\tDesignImportExport,\n\t},\n\tdata () {\n\t\treturn {\n\t\t\tdesign_info: { data: design_json_init },\n\t\t\tse_db: se_db,\n\t\t};\n\t},\n\tcomputed: {\n\t\tse_design () {\n\t\t\treturn new ShipEngine.Design(se_db, this.design_info.data);\n\t\t},\n\t},\n};\n\n</script>\n\n\n<style>\n\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -96700,7 +96700,7 @@ exports.push([module.i, "\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_shipimporter__ = __webpack_require__(162);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_shipimporter___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__lib_shipimporter__);
@@ -96864,7 +96864,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.design-summary[data-v-12e2d818] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/design-summary.vue?1cfe06ee"],"names":[],"mappings":";AA0BA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA","file":"design-summary.vue","sourcesContent":["<template>\n  <div class=\"design-summary\">\n\t<div>{{se_design.name}} | {{se_design.pretty_miscstats}}</div>\n\t<div>{{se_design.stats_raw.toFixed(2)}} | [{{se_design.cost_BR_raw.toFixed(2)}}]br [{{se_design.cost_SR_raw.toFixed(2)}}]sr | {{se_design.cost_crew_raw.toFixed(2)}}</div>\n\t<div>{{se_design.pretty_buildinfo}}</div>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nexport default {\n\tname: 'DesignSummary',\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.design-summary {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.design-summary[data-v-12e2d818] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/design-summary.vue?11495418"],"names":[],"mappings":";AA0BA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA","file":"design-summary.vue","sourcesContent":["<template>\n  <div class=\"design-summary\">\n\t<div>{{se_design.name}} | {{se_design.pretty_miscstats}}</div>\n\t<div>{{se_design.stats_raw.toFixed(2)}} | [{{se_design.cost_BR_raw.toFixed(2)}}]br [{{se_design.cost_SR_raw.toFixed(2)}}]sr | {{se_design.cost_crew_raw.toFixed(2)}}</div>\n\t<div>{{se_design.pretty_buildinfo}}</div>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nexport default {\n\tname: 'DesignSummary',\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.design-summary {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -96874,7 +96874,7 @@ exports.push([module.i, "\n.design-summary[data-v-12e2d818] {\n\tbackground-colo
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
 //
 //
@@ -96903,10 +96903,33 @@ exports.push([module.i, "\n.design-summary[data-v-12e2d818] {\n\tbackground-colo
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "design-summary"
-  }, [_c('div', [_vm._v(_vm._s(_vm.se_design.name) + " | " + _vm._s(_vm.se_design.pretty_miscstats))]), _vm._v(" "), _c('div', [_vm._v(_vm._s(_vm.se_design.stats_raw.toFixed(2)) + " | [" + _vm._s(_vm.se_design.cost_BR_raw.toFixed(2)) + "]br [" + _vm._s(_vm.se_design.cost_SR_raw.toFixed(2)) + "]sr | " + _vm._s(_vm.se_design.cost_crew_raw.toFixed(2)))]), _vm._v(" "), _c('div', [_vm._v(_vm._s(_vm.se_design.pretty_buildinfo))])])
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "design-summary" }, [
+    _c("div", [
+      _vm._v(
+        _vm._s(_vm.se_design.name) +
+          " | " +
+          _vm._s(_vm.se_design.pretty_miscstats)
+      )
+    ]),
+    _vm._v(" "),
+    _c("div", [
+      _vm._v(
+        _vm._s(_vm.se_design.stats_raw.toFixed(2)) +
+          " | [" +
+          _vm._s(_vm.se_design.cost_BR_raw.toFixed(2)) +
+          "]br [" +
+          _vm._s(_vm.se_design.cost_SR_raw.toFixed(2)) +
+          "]sr | " +
+          _vm._s(_vm.se_design.cost_crew_raw.toFixed(2))
+      )
+    ]),
+    _vm._v(" "),
+    _c("div", [_vm._v(_vm._s(_vm.se_design.pretty_buildinfo))])
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -97007,7 +97030,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n    /* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.name-column {\n}\n.part-column {\n}\n.part-column-select {\n\twidth: 100%;\n}\n.quantity-column {\n\twidth: 30px;\n}\n.quantity-column-input {\n\twidth: 100%;\n}\n.stat-column {\n\ttext-align: right;\n}\n.weight-internal-column {\n\ttext-align: right;\n}\n.weight-external-column {\n\ttext-align: right;\n}\n.br-column {\n\ttext-align: right;\n}\n.sr-column {\n\ttext-align: right;\n}\n.power-gen-column {\n\ttext-align: right;\n}\n.power-cost-column {\n\ttext-align: right;\n}\n.build-time-column {\n\ttext-align: right;\n}\n.design-table-head {\n}\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/design.vue?6b94da2c"],"names":[],"mappings":";AAqFA;CACA,mBAAA;;CAEA,YAAA;CACA,YAAA;IACA,mBAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA;AAEA;CACA,qBAAA;CACA,yBAAA;CACA;AAGA;IACA,qBAAA;IACA,qBAAA;IACA,kBAAA;IACA,mBAAA;CACA","file":"design.vue","sourcesContent":["<template>\n  <div class=\"design-table\">\n\t<table>\n\t  <thead class=\"design-table-head\">\n\t\t<tr class=\"design-table-head-tr\">\n\t\t  <th></th>\t<!-- name -->\n\t\t  <th></th>\t<!-- quantity -->\n\t\t  <th></th>\t<!-- part -->\n\t\t  <th>C</th>\n\t\t  <th>S</th>\n\t\t  <th>H</th>\n\t\t  <th>L</th>\n\t\t  <th>P</th>\n\t\t  <th>D</th>\n\t\t  <th>Wt (Int</th>\n\t\t  <th>Ext)</th>\n\t\t  <th>BR</th>\n\t\t  <th>SR</th>\n\t\t  <th>Pwr Cost</th>\n\t\t  <th>Pwr Gen</th>\n\t\t  <th>O</th>\n\t\t  <th>E</th>\n\t\t  <th>T</th>\n\t\t  <th>Build Time</th>\n\t\t</tr>\n\t  </thead>\n\t  <tbody class=\"design-table-body\">\n\t\t<PrincipalFrameFinal :se_db=\"se_db\" :se_design=\"se_design\"></PrincipalFrameFinal>\n\t\t<PrincipalFrameRaw :se_db=\"se_db\" :se_design=\"se_design\"></PrincipalFrameRaw>\n\t\t<template v-for=\"se_subsystem in se_subsystems\">\n\t\t  <SubsystemFrame :se_db=\"se_db\" :se_subsystem=\"se_subsystem\"></SubsystemFrame>\n\t\t  <SubsystemSummary :se_db=\"se_db\" :se_subsystem=\"se_subsystem\"></SubsystemSummary>\n\t\t  <SubsystemSettings :se_db=\"se_db\" :se_subsystem=\"se_subsystem\"></SubsystemSettings>\n\n\t\t  <template v-for=\"se_component in se_subsystem.components\">\n\t\t\t<ComponentTr :se_db=\"se_db\" :se_component=\"se_component\"></ComponentTr>\n\t\t  </template>\n\t\t</template>\n\n\t\t<ModuleTr :se_db=\"se_db\" :se_module=\"se_design.module\"></ModuleTr>\n\t  </tbody>\n\t</table>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport PrincipalFrameRaw from './principal-frame-raw.vue';\nimport PrincipalFrameFinal from './principal-frame-final.vue';\nimport SubsystemSummary from './subsystem-summary.vue';\nimport SubsystemFrame from './subsystem-frame.vue';\nimport SubsystemSettings from './subsystem-settings.vue';\nimport ComponentTr from './component.vue';\nimport ModuleTr from './module.vue';\n\nexport default {\n\tname: 'Design',\n\tcomponents: {\n\t\tPrincipalFrameRaw,\n\t\tPrincipalFrameFinal,\n\t\tSubsystemSummary,\n\t\tSubsystemFrame,\n\t\tSubsystemSettings,\n\t\tComponentTr,\n\t\tModuleTr,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tse_subsystems () {\n\t\t\treturn this.se_design.subsystems;\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n    /* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.name-column {\n}\n\n.part-column {\n}\n\n.part-column-select {\n\twidth: 100%;\n}\n\n.quantity-column {\n\twidth: 30px;\n}\n\n.quantity-column-input {\n\twidth: 100%;\n}\n\n.stat-column {\n\ttext-align: right;\n}\n\n.weight-internal-column {\n\ttext-align: right;\n}\n\n.weight-external-column {\n\ttext-align: right;\n}\n\n.br-column {\n\ttext-align: right;\n}\n\n.sr-column {\n\ttext-align: right;\n}\n\n.power-gen-column {\n\ttext-align: right;\n}\n\n.power-cost-column {\n\ttext-align: right;\n}\n\n.build-time-column {\n\ttext-align: right;\n}\n\n.design-table-head {\n}\n\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n\n\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n    /* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.name-column {\n}\n.part-column {\n}\n.part-column-select {\n\twidth: 100%;\n}\n.quantity-column {\n\twidth: 30px;\n}\n.quantity-column-input {\n\twidth: 100%;\n}\n.stat-column {\n\ttext-align: right;\n}\n.weight-internal-column {\n\ttext-align: right;\n}\n.weight-external-column {\n\ttext-align: right;\n}\n.br-column {\n\ttext-align: right;\n}\n.sr-column {\n\ttext-align: right;\n}\n.power-gen-column {\n\ttext-align: right;\n}\n.power-cost-column {\n\ttext-align: right;\n}\n.build-time-column {\n\ttext-align: right;\n}\n.design-table-head {\n}\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/design.vue?1db8bf3e"],"names":[],"mappings":";AAqFA;CACA,mBAAA;;CAEA,YAAA;CACA,YAAA;IACA,mBAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA;AAEA;CACA,qBAAA;CACA,yBAAA;CACA;AAGA;IACA,qBAAA;IACA,qBAAA;IACA,kBAAA;IACA,mBAAA;CACA","file":"design.vue","sourcesContent":["<template>\n  <div class=\"design-table\">\n\t<table>\n\t  <thead class=\"design-table-head\">\n\t\t<tr class=\"design-table-head-tr\">\n\t\t  <th></th>\t<!-- name -->\n\t\t  <th></th>\t<!-- quantity -->\n\t\t  <th></th>\t<!-- part -->\n\t\t  <th>C</th>\n\t\t  <th>S</th>\n\t\t  <th>H</th>\n\t\t  <th>L</th>\n\t\t  <th>P</th>\n\t\t  <th>D</th>\n\t\t  <th>Wt (Int</th>\n\t\t  <th>Ext)</th>\n\t\t  <th>BR</th>\n\t\t  <th>SR</th>\n\t\t  <th>Pwr Cost</th>\n\t\t  <th>Pwr Gen</th>\n\t\t  <th>O</th>\n\t\t  <th>E</th>\n\t\t  <th>T</th>\n\t\t  <th>Build Time</th>\n\t\t</tr>\n\t  </thead>\n\t  <tbody class=\"design-table-body\">\n\t\t<PrincipalFrameFinal :se_db=\"se_db\" :se_design=\"se_design\"></PrincipalFrameFinal>\n\t\t<PrincipalFrameRaw :se_db=\"se_db\" :se_design=\"se_design\"></PrincipalFrameRaw>\n\t\t<template v-for=\"se_subsystem in se_subsystems\">\n\t\t  <SubsystemFrame :se_db=\"se_db\" :se_subsystem=\"se_subsystem\"></SubsystemFrame>\n\t\t  <SubsystemSummary :se_db=\"se_db\" :se_subsystem=\"se_subsystem\"></SubsystemSummary>\n\t\t  <SubsystemSettings :se_db=\"se_db\" :se_subsystem=\"se_subsystem\"></SubsystemSettings>\n\n\t\t  <template v-for=\"se_component in se_subsystem.components\">\n\t\t\t<ComponentTr :se_db=\"se_db\" :se_component=\"se_component\"></ComponentTr>\n\t\t  </template>\n\t\t</template>\n\n\t\t<ModuleTr :se_db=\"se_db\" :se_module=\"se_design.module\"></ModuleTr>\n\t  </tbody>\n\t</table>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport PrincipalFrameRaw from './principal-frame-raw.vue';\nimport PrincipalFrameFinal from './principal-frame-final.vue';\nimport SubsystemSummary from './subsystem-summary.vue';\nimport SubsystemFrame from './subsystem-frame.vue';\nimport SubsystemSettings from './subsystem-settings.vue';\nimport ComponentTr from './component.vue';\nimport ModuleTr from './module.vue';\n\nexport default {\n\tname: 'Design',\n\tcomponents: {\n\t\tPrincipalFrameRaw,\n\t\tPrincipalFrameFinal,\n\t\tSubsystemSummary,\n\t\tSubsystemFrame,\n\t\tSubsystemSettings,\n\t\tComponentTr,\n\t\tModuleTr,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tse_subsystems () {\n\t\t\treturn this.se_design.subsystems;\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n    /* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.name-column {\n}\n\n.part-column {\n}\n\n.part-column-select {\n\twidth: 100%;\n}\n\n.quantity-column {\n\twidth: 30px;\n}\n\n.quantity-column-input {\n\twidth: 100%;\n}\n\n.stat-column {\n\ttext-align: right;\n}\n\n.weight-internal-column {\n\ttext-align: right;\n}\n\n.weight-external-column {\n\ttext-align: right;\n}\n\n.br-column {\n\ttext-align: right;\n}\n\n.sr-column {\n\ttext-align: right;\n}\n\n.power-gen-column {\n\ttext-align: right;\n}\n\n.power-cost-column {\n\ttext-align: right;\n}\n\n.build-time-column {\n\ttext-align: right;\n}\n\n.design-table-head {\n}\n\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n\n\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -97017,7 +97040,7 @@ exports.push([module.i, "\n.design-table {\n\tborder-style: none;\n\n\twidth: 10
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__principal_frame_raw_vue__ = __webpack_require__(596);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__principal_frame_final_vue__ = __webpack_require__(609);
@@ -97236,7 +97259,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.principal-frame-raw[data-v-d00ca848] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n.name-column[data-v-d00ca848] {\n\ttext-align: right;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/principal-frame-raw.vue?e6776864"],"names":[],"mappings":";AA+EA;CACA,iBAAA;CACA,YAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,yBAAA;CACA,gBAAA;CACA,eAAA;CACA;AAEA;CACA,kBAAA;CACA","file":"principal-frame-raw.vue","sourcesContent":["<template>\n  <tr class=\"principal-frame-raw\">\n\t<td class=\"name-column\" colspan=\"2\">Size: {{frame_size.toFixed(2)}}</td>\n\n\t<td class=\"part-column\"><select v-model=\"principal_frame\" class=\"part-column-select\">\n\t  <option v-for=\"princ_frame_value in se_design.valid_frames\">{{princ_frame_value['Name']}}</option>\n\t</select></td>\n\n\t<template v-for=\"name in stats_raw.names\">\n\t  <StatlineCell :stats=\"stats_raw\" :name=\"name\"></StatlineCell>\n\t</template>\n\t\n\t<td class=\"weight-internal-column\">{{se_design.weight_internal.toFixed(2)}}</td>\n\t<td class=\"weight-external-column\">{{se_design.weight_external.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_design.cost_BR_raw.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_design.cost_SR_raw.toFixed(2)}}</td>\n\n\t<td class=\"power-cost-column\">{{se_design.cost_power_raw.toFixed(2)}}</td>\n\t<td class=\"power-gen-column\">{{se_design.power_generation_raw.toFixed(2)}}</td>\n\n\t<template v-for=\"name in crew_raw.names\">\n\t  <StatlineCell :stats=\"crew_raw\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time_frame}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrameRaw',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tprincipal_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.se_design.json['Principal Frame'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_design.json['Principal Frame'] = value;\n\t\t\t},\n\t\t},\n\t\tstats_raw () {\n\t\t\treturn this.se_design.stats_raw;\n\t\t},\n\t\tcrew_raw () {\n\t\t\treturn this.se_design.cost_crew_raw;\n\t\t},\n\t\tbuild_time_frame () {\n\t\t\treturn frac(this.se_design.build_time_frame, 12);\n\t\t},\n\t\tframe_size () {\n\t\t\treturn this.se_design.frame_size;\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n</style>\n\n<style scoped>\n.principal-frame-raw {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n\n.name-column {\n\ttext-align: right;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.principal-frame-raw[data-v-d00ca848] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n.name-column[data-v-d00ca848] {\n\ttext-align: right;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/principal-frame-raw.vue?73c75443"],"names":[],"mappings":";AA+EA;CACA,iBAAA;CACA,YAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,yBAAA;CACA,gBAAA;CACA,eAAA;CACA;AAEA;CACA,kBAAA;CACA","file":"principal-frame-raw.vue","sourcesContent":["<template>\n  <tr class=\"principal-frame-raw\">\n\t<td class=\"name-column\" colspan=\"2\">Size: {{frame_size.toFixed(2)}}</td>\n\n\t<td class=\"part-column\"><select v-model=\"principal_frame\" class=\"part-column-select\">\n\t  <option v-for=\"princ_frame_value in se_design.valid_frames\">{{princ_frame_value['Name']}}</option>\n\t</select></td>\n\n\t<template v-for=\"name in stats_raw.names\">\n\t  <StatlineCell :stats=\"stats_raw\" :name=\"name\"></StatlineCell>\n\t</template>\n\t\n\t<td class=\"weight-internal-column\">{{se_design.weight_internal.toFixed(2)}}</td>\n\t<td class=\"weight-external-column\">{{se_design.weight_external.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_design.cost_BR_raw.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_design.cost_SR_raw.toFixed(2)}}</td>\n\n\t<td class=\"power-cost-column\">{{se_design.cost_power_raw.toFixed(2)}}</td>\n\t<td class=\"power-gen-column\">{{se_design.power_generation_raw.toFixed(2)}}</td>\n\n\t<template v-for=\"name in crew_raw.names\">\n\t  <StatlineCell :stats=\"crew_raw\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time_frame}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrameRaw',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tprincipal_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.se_design.json['Principal Frame'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_design.json['Principal Frame'] = value;\n\t\t\t},\n\t\t},\n\t\tstats_raw () {\n\t\t\treturn this.se_design.stats_raw;\n\t\t},\n\t\tcrew_raw () {\n\t\t\treturn this.se_design.cost_crew_raw;\n\t\t},\n\t\tbuild_time_frame () {\n\t\t\treturn frac(this.se_design.build_time_frame, 12);\n\t\t},\n\t\tframe_size () {\n\t\t\treturn this.se_design.frame_size;\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n</style>\n\n<style scoped>\n.principal-frame-raw {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n\n.name-column {\n\ttext-align: right;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -97246,7 +97269,7 @@ exports.push([module.i, "\n.principal-frame-raw[data-v-d00ca848] {\n\tbackground
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(96);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_functions_js__ = __webpack_require__(161);
@@ -97457,10 +97480,11 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('td', {
-    staticClass: "stat-column"
-  }, [_vm._v(_vm._s(_vm.pretty))])
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("td", { staticClass: "stat-column" }, [_vm._v(_vm._s(_vm.pretty))])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -97478,66 +97502,95 @@ if (false) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('tr', {
-    staticClass: "principal-frame-raw"
-  }, [_c('td', {
-    staticClass: "name-column",
-    attrs: {
-      "colspan": "2"
-    }
-  }, [_vm._v("Size: " + _vm._s(_vm.frame_size.toFixed(2)))]), _vm._v(" "), _c('td', {
-    staticClass: "part-column"
-  }, [_c('select', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.principal_frame),
-      expression: "principal_frame"
-    }],
-    staticClass: "part-column-select",
-    on: {
-      "change": function($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function(o) {
-          return o.selected
-        }).map(function(o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val
-        });
-        _vm.principal_frame = $event.target.multiple ? $$selectedVal : $$selectedVal[0]
-      }
-    }
-  }, _vm._l((_vm.se_design.valid_frames), function(princ_frame_value) {
-    return _c('option', [_vm._v(_vm._s(princ_frame_value['Name']))])
-  }))]), _vm._v(" "), _vm._l((_vm.stats_raw.names), function(name) {
-    return [_c('StatlineCell', {
-      attrs: {
-        "stats": _vm.stats_raw,
-        "name": name
-      }
-    })]
-  }), _vm._v(" "), _c('td', {
-    staticClass: "weight-internal-column"
-  }, [_vm._v(_vm._s(_vm.se_design.weight_internal.toFixed(2)))]), _vm._v(" "), _c('td', {
-    staticClass: "weight-external-column"
-  }, [_vm._v(_vm._s(_vm.se_design.weight_external.toFixed(2)))]), _vm._v(" "), _c('td', {
-    staticClass: "br-column"
-  }, [_vm._v(_vm._s(_vm.se_design.cost_BR_raw.toFixed(2)))]), _vm._v(" "), _c('td', {
-    staticClass: "sr-column"
-  }, [_vm._v(_vm._s(_vm.se_design.cost_SR_raw.toFixed(2)))]), _vm._v(" "), _c('td', {
-    staticClass: "power-cost-column"
-  }, [_vm._v(_vm._s(_vm.se_design.cost_power_raw.toFixed(2)))]), _vm._v(" "), _c('td', {
-    staticClass: "power-gen-column"
-  }, [_vm._v(_vm._s(_vm.se_design.power_generation_raw.toFixed(2)))]), _vm._v(" "), _vm._l((_vm.crew_raw.names), function(name) {
-    return [_c('StatlineCell', {
-      attrs: {
-        "stats": _vm.crew_raw,
-        "name": name
-      }
-    })]
-  }), _vm._v(" "), _c('td', {
-    staticClass: "build-time-column"
-  }, [_vm._v(_vm._s(_vm.build_time_frame))])], 2)
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "tr",
+    { staticClass: "principal-frame-raw" },
+    [
+      _c("td", { staticClass: "name-column", attrs: { colspan: "2" } }, [
+        _vm._v("Size: " + _vm._s(_vm.frame_size.toFixed(2)))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "part-column" }, [
+        _c(
+          "select",
+          {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.principal_frame,
+                expression: "principal_frame"
+              }
+            ],
+            staticClass: "part-column-select",
+            on: {
+              change: function($event) {
+                var $$selectedVal = Array.prototype.filter
+                  .call($event.target.options, function(o) {
+                    return o.selected
+                  })
+                  .map(function(o) {
+                    var val = "_value" in o ? o._value : o.value
+                    return val
+                  })
+                _vm.principal_frame = $event.target.multiple
+                  ? $$selectedVal
+                  : $$selectedVal[0]
+              }
+            }
+          },
+          _vm._l(_vm.se_design.valid_frames, function(princ_frame_value) {
+            return _c("option", [_vm._v(_vm._s(princ_frame_value["Name"]))])
+          })
+        )
+      ]),
+      _vm._v(" "),
+      _vm._l(_vm.stats_raw.names, function(name) {
+        return [
+          _c("StatlineCell", { attrs: { stats: _vm.stats_raw, name: name } })
+        ]
+      }),
+      _vm._v(" "),
+      _c("td", { staticClass: "weight-internal-column" }, [
+        _vm._v(_vm._s(_vm.se_design.weight_internal.toFixed(2)))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "weight-external-column" }, [
+        _vm._v(_vm._s(_vm.se_design.weight_external.toFixed(2)))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "br-column" }, [
+        _vm._v(_vm._s(_vm.se_design.cost_BR_raw.toFixed(2)))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "sr-column" }, [
+        _vm._v(_vm._s(_vm.se_design.cost_SR_raw.toFixed(2)))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "power-cost-column" }, [
+        _vm._v(_vm._s(_vm.se_design.cost_power_raw.toFixed(2)))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "power-gen-column" }, [
+        _vm._v(_vm._s(_vm.se_design.power_generation_raw.toFixed(2)))
+      ]),
+      _vm._v(" "),
+      _vm._l(_vm.crew_raw.names, function(name) {
+        return [
+          _c("StatlineCell", { attrs: { stats: _vm.crew_raw, name: name } })
+        ]
+      }),
+      _vm._v(" "),
+      _c("td", { staticClass: "build-time-column" }, [
+        _vm._v(_vm._s(_vm.build_time_frame))
+      ])
+    ],
+    2
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -97638,7 +97691,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.principal-frame-final[data-v-4654872a] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n.name-column-input[data-v-4654872a] {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.build-time-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.stat-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.br-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.sr-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-4654872a] {\n\ttext-align: center;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/principal-frame-final.vue?95861450"],"names":[],"mappings":";AA2EA;CACA,iBAAA;CACA,YAAA;;CAEA,kBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,mBAAA;CACA;AAEA;CACA,aAAA;CACA,kBAAA;CACA,kBAAA;CACA,YAAA;CACA,mBAAA;CACA,mBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA","file":"principal-frame-final.vue","sourcesContent":["<template>\n  <tr class=\"principal-frame-final\">\n\t<td class=\"name-column\" colspan=\"2\">\n\t  <input v-model=\"ship_name\" placeholder=\"Ship Name\" class=\"name-column-input\">\n\t</td>\n\n\t<td class=\"part-column\">{{principal_frame}}</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t</template>\n\t\n\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_design.weight_total}}</td>\n\n\t<td class=\"br-column\">{{se_design.cost_BR}}</td>\n\t<td class=\"sr-column\">{{se_design.cost_SR}}</td>\n\n\t<td class=\"power-cost-column\">{{se_design.cost_power}}</td>\n\t<td class=\"power-gen-column\">{{se_design.power_generation}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tprincipal_frame () {\n\t\t\treturn this.se_design.json['Principal Frame'];\n\t\t},\n\t\tstats () {\n\t\t\treturn this.se_design.stats;\n\t\t},\n\t\tcrew () {\n\t\t\treturn this.se_design.cost_crew;\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.se_design.build_time, 12, true);\n\t\t},\n\t\tship_name: {\n\t\t\tget () {\n\t\t\t\treturn this.se_design.json['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_design.json['Name'] = value;\n\t\t\t}\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.principal-frame-final {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n\n.name-column-input {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.build-time-column {\n\ttext-align: center;\n}\n\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.principal-frame-final[data-v-4654872a] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n.name-column-input[data-v-4654872a] {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.build-time-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.stat-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.br-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.sr-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-4654872a] {\n\ttext-align: center;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/principal-frame-final.vue?1b01337a"],"names":[],"mappings":";AA2EA;CACA,iBAAA;CACA,YAAA;;CAEA,kBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,mBAAA;CACA;AAEA;CACA,aAAA;CACA,kBAAA;CACA,kBAAA;CACA,YAAA;CACA,mBAAA;CACA,mBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA","file":"principal-frame-final.vue","sourcesContent":["<template>\n  <tr class=\"principal-frame-final\">\n\t<td class=\"name-column\" colspan=\"2\">\n\t  <input v-model=\"ship_name\" placeholder=\"Ship Name\" class=\"name-column-input\">\n\t</td>\n\n\t<td class=\"part-column\">{{principal_frame}}</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t</template>\n\t\n\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_design.weight_total}}</td>\n\n\t<td class=\"br-column\">{{se_design.cost_BR}}</td>\n\t<td class=\"sr-column\">{{se_design.cost_SR}}</td>\n\n\t<td class=\"power-cost-column\">{{se_design.cost_power}}</td>\n\t<td class=\"power-gen-column\">{{se_design.power_generation}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tprincipal_frame () {\n\t\t\treturn this.se_design.json['Principal Frame'];\n\t\t},\n\t\tstats () {\n\t\t\treturn this.se_design.stats;\n\t\t},\n\t\tcrew () {\n\t\t\treturn this.se_design.cost_crew;\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.se_design.build_time, 12, true);\n\t\t},\n\t\tship_name: {\n\t\t\tget () {\n\t\t\t\treturn this.se_design.json['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_design.json['Name'] = value;\n\t\t\t}\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.principal-frame-final {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n\n.name-column-input {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.build-time-column {\n\ttext-align: center;\n}\n\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -97648,7 +97701,7 @@ exports.push([module.i, "\n.principal-frame-final[data-v-4654872a] {\n\tbackgrou
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(96);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_functions_js__ = __webpack_require__(161);
@@ -97728,68 +97781,86 @@ exports.push([module.i, "\n.principal-frame-final[data-v-4654872a] {\n\tbackgrou
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('tr', {
-    staticClass: "principal-frame-final"
-  }, [_c('td', {
-    staticClass: "name-column",
-    attrs: {
-      "colspan": "2"
-    }
-  }, [_c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.ship_name),
-      expression: "ship_name"
-    }],
-    staticClass: "name-column-input",
-    attrs: {
-      "placeholder": "Ship Name"
-    },
-    domProps: {
-      "value": (_vm.ship_name)
-    },
-    on: {
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.ship_name = $event.target.value
-      }
-    }
-  })]), _vm._v(" "), _c('td', {
-    staticClass: "part-column"
-  }, [_vm._v(_vm._s(_vm.principal_frame))]), _vm._v(" "), _vm._l((_vm.stats.names), function(name) {
-    return [_c('StatlineCell', {
-      attrs: {
-        "stats": _vm.stats,
-        "name": name,
-        "fixed": 0
-      }
-    })]
-  }), _vm._v(" "), _c('td', {
-    staticClass: "weight-internal-column",
-    attrs: {
-      "colspan": "2"
-    }
-  }, [_vm._v(_vm._s(_vm.se_design.weight_total))]), _vm._v(" "), _c('td', {
-    staticClass: "br-column"
-  }, [_vm._v(_vm._s(_vm.se_design.cost_BR))]), _vm._v(" "), _c('td', {
-    staticClass: "sr-column"
-  }, [_vm._v(_vm._s(_vm.se_design.cost_SR))]), _vm._v(" "), _c('td', {
-    staticClass: "power-cost-column"
-  }, [_vm._v(_vm._s(_vm.se_design.cost_power))]), _vm._v(" "), _c('td', {
-    staticClass: "power-gen-column"
-  }, [_vm._v(_vm._s(_vm.se_design.power_generation))]), _vm._v(" "), _vm._l((_vm.crew.names), function(name) {
-    return [_c('StatlineCell', {
-      attrs: {
-        "stats": _vm.crew,
-        "name": name,
-        "fixed": 0
-      }
-    })]
-  }), _vm._v(" "), _c('td', {
-    staticClass: "build-time-column"
-  }, [_vm._v(_vm._s(_vm.build_time))])], 2)
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "tr",
+    { staticClass: "principal-frame-final" },
+    [
+      _c("td", { staticClass: "name-column", attrs: { colspan: "2" } }, [
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.ship_name,
+              expression: "ship_name"
+            }
+          ],
+          staticClass: "name-column-input",
+          attrs: { placeholder: "Ship Name" },
+          domProps: { value: _vm.ship_name },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.ship_name = $event.target.value
+            }
+          }
+        })
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "part-column" }, [
+        _vm._v(_vm._s(_vm.principal_frame))
+      ]),
+      _vm._v(" "),
+      _vm._l(_vm.stats.names, function(name) {
+        return [
+          _c("StatlineCell", {
+            attrs: { stats: _vm.stats, name: name, fixed: 0 }
+          })
+        ]
+      }),
+      _vm._v(" "),
+      _c(
+        "td",
+        { staticClass: "weight-internal-column", attrs: { colspan: "2" } },
+        [_vm._v(_vm._s(_vm.se_design.weight_total))]
+      ),
+      _vm._v(" "),
+      _c("td", { staticClass: "br-column" }, [
+        _vm._v(_vm._s(_vm.se_design.cost_BR))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "sr-column" }, [
+        _vm._v(_vm._s(_vm.se_design.cost_SR))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "power-cost-column" }, [
+        _vm._v(_vm._s(_vm.se_design.cost_power))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "power-gen-column" }, [
+        _vm._v(_vm._s(_vm.se_design.power_generation))
+      ]),
+      _vm._v(" "),
+      _vm._l(_vm.crew.names, function(name) {
+        return [
+          _c("StatlineCell", {
+            attrs: { stats: _vm.crew, name: name, fixed: 0 }
+          })
+        ]
+      }),
+      _vm._v(" "),
+      _c("td", { staticClass: "build-time-column" }, [
+        _vm._v(_vm._s(_vm.build_time))
+      ])
+    ],
+    2
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -97890,7 +97961,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n.name-cell {\n\tborder-style: none;\n}\n.part-cell {\n\tborder-style: none;\n}\n.part-select {\n\twidth: 100%;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/subsystem-summary.vue?618c96db"],"names":[],"mappings":";AA+DA;CACA,iBAAA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA","file":"subsystem-summary.vue","sourcesContent":["<template>\n\n  <tr class=\"subsystem-summary\">\n\t<td class=\"name-column\" colspan=\"2\">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t<td class=\"part-column\"></td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\">{{se_subsystem.weight_internal.toFixed(2)}}</td>\n\t<td class=\"weight-external-column\">{{se_subsystem.weight_external.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_subsystem.cost_BR.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_subsystem.cost_SR.toFixed(2)}}</td>\n\n\t<td class=\"power-cost-column\">{{se_subsystem.cost_power.toFixed(2)}}</td>\n\t<td class=\"power-gen-column\">{{se_subsystem.power_generation.toFixed(2)}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-cost-column\"></td>\n  </tr>\n\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'SubsystemSummary',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n\n.name-cell {\n\tborder-style: none;\n}\n\n.part-cell {\n\tborder-style: none;\n}\n\n.part-select {\n\twidth: 100%;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n.name-cell {\n\tborder-style: none;\n}\n.part-cell {\n\tborder-style: none;\n}\n.part-select {\n\twidth: 100%;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/subsystem-summary.vue?5f7a0206"],"names":[],"mappings":";AA+DA;CACA,iBAAA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA","file":"subsystem-summary.vue","sourcesContent":["<template>\n\n  <tr class=\"subsystem-summary\">\n\t<td class=\"name-column\" colspan=\"2\">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t<td class=\"part-column\"></td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\">{{se_subsystem.weight_internal.toFixed(2)}}</td>\n\t<td class=\"weight-external-column\">{{se_subsystem.weight_external.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_subsystem.cost_BR.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_subsystem.cost_SR.toFixed(2)}}</td>\n\n\t<td class=\"power-cost-column\">{{se_subsystem.cost_power.toFixed(2)}}</td>\n\t<td class=\"power-gen-column\">{{se_subsystem.power_generation.toFixed(2)}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-cost-column\"></td>\n  </tr>\n\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'SubsystemSummary',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n\n.name-cell {\n\tborder-style: none;\n}\n\n.part-cell {\n\tborder-style: none;\n}\n\n.part-select {\n\twidth: 100%;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -97900,7 +97971,7 @@ exports.push([module.i, "\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-s
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(96);
 //
@@ -97967,45 +98038,60 @@ exports.push([module.i, "\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-s
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('tr', {
-    staticClass: "subsystem-summary"
-  }, [_c('td', {
-    staticClass: "name-column",
-    attrs: {
-      "colspan": "2"
-    }
-  }, [_vm._v(_vm._s(_vm.se_subsystem.weight_internal.toFixed(2)) + "/" + _vm._s(_vm.se_subsystem.weight_cap.toFixed(2)))]), _vm._v(" "), _c('td', {
-    staticClass: "part-column"
-  }), _vm._v(" "), _vm._l((_vm.stats.names), function(name) {
-    return [_c('StatlineCell', {
-      attrs: {
-        "stats": _vm.stats,
-        "name": name
-      }
-    })]
-  }), _vm._v(" "), _c('td', {
-    staticClass: "weight-internal-column"
-  }, [_vm._v(_vm._s(_vm.se_subsystem.weight_internal.toFixed(2)))]), _vm._v(" "), _c('td', {
-    staticClass: "weight-external-column"
-  }, [_vm._v(_vm._s(_vm.se_subsystem.weight_external.toFixed(2)))]), _vm._v(" "), _c('td', {
-    staticClass: "br-column"
-  }, [_vm._v(_vm._s(_vm.se_subsystem.cost_BR.toFixed(2)))]), _vm._v(" "), _c('td', {
-    staticClass: "sr-column"
-  }, [_vm._v(_vm._s(_vm.se_subsystem.cost_SR.toFixed(2)))]), _vm._v(" "), _c('td', {
-    staticClass: "power-cost-column"
-  }, [_vm._v(_vm._s(_vm.se_subsystem.cost_power.toFixed(2)))]), _vm._v(" "), _c('td', {
-    staticClass: "power-gen-column"
-  }, [_vm._v(_vm._s(_vm.se_subsystem.power_generation.toFixed(2)))]), _vm._v(" "), _vm._l((_vm.crew.names), function(name) {
-    return [_c('StatlineCell', {
-      attrs: {
-        "stats": _vm.crew,
-        "name": name
-      }
-    })]
-  }), _vm._v(" "), _c('td', {
-    staticClass: "build-cost-column"
-  })], 2)
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "tr",
+    { staticClass: "subsystem-summary" },
+    [
+      _c("td", { staticClass: "name-column", attrs: { colspan: "2" } }, [
+        _vm._v(
+          _vm._s(_vm.se_subsystem.weight_internal.toFixed(2)) +
+            "/" +
+            _vm._s(_vm.se_subsystem.weight_cap.toFixed(2))
+        )
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "part-column" }),
+      _vm._v(" "),
+      _vm._l(_vm.stats.names, function(name) {
+        return [_c("StatlineCell", { attrs: { stats: _vm.stats, name: name } })]
+      }),
+      _vm._v(" "),
+      _c("td", { staticClass: "weight-internal-column" }, [
+        _vm._v(_vm._s(_vm.se_subsystem.weight_internal.toFixed(2)))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "weight-external-column" }, [
+        _vm._v(_vm._s(_vm.se_subsystem.weight_external.toFixed(2)))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "br-column" }, [
+        _vm._v(_vm._s(_vm.se_subsystem.cost_BR.toFixed(2)))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "sr-column" }, [
+        _vm._v(_vm._s(_vm.se_subsystem.cost_SR.toFixed(2)))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "power-cost-column" }, [
+        _vm._v(_vm._s(_vm.se_subsystem.cost_power.toFixed(2)))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "power-gen-column" }, [
+        _vm._v(_vm._s(_vm.se_subsystem.power_generation.toFixed(2)))
+      ]),
+      _vm._v(" "),
+      _vm._l(_vm.crew.names, function(name) {
+        return [_c("StatlineCell", { attrs: { stats: _vm.crew, name: name } })]
+      }),
+      _vm._v(" "),
+      _c("td", { staticClass: "build-cost-column" })
+    ],
+    2
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -98107,7 +98193,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.subsystem-frame {\n\tbackground: #ccc;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/subsystem-frame.vue?fb2748c0"],"names":[],"mappings":";AAoFA;CACA,iBAAA;CACA","file":"subsystem-frame.vue","sourcesContent":["<template>\n\n  <tr class=\"subsystem-frame\">\n\t<td class=\"name-column\" colspan=\"2\">{{se_subsystem.name}}</td>\n\n\t<td class=\"part-column\"><select v-model=\"sub_frame\" class=\"part-column-select\">\n\t\t<option v-for=\"sub_frame_value in se_subsystem.valid_frames\">{{sub_frame_value['Name']}}</option>\n\t</select></td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <td>{{stats_multiplier_pretty}}</td>\n\t</template>\n\n\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>\n\n\t<td class=\"power-cost-column\"></td>\n\t<td class=\"power-gen-column\"></td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew_mult_pretty\" :name=\"name\" :ispretty=\"false\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n\n\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'SubsystemFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tstats_multiplier_pretty() {\n\t\t\treturn this.se_subsystem.stats_multiplier.toFixed(2) + 'x';\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tcrew_mult_pretty() {\n\t\t\treturn this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\tsub_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.se_subsystem.sub_frame;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_subsystem.sub_frame = value;\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.subsystem-frame {\n\tbackground: #ccc;\n}\n\n</style>\n\n\n<style scoped>\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.subsystem-frame {\n\tbackground: #ccc;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/subsystem-frame.vue?0439046a"],"names":[],"mappings":";AAoFA;CACA,iBAAA;CACA","file":"subsystem-frame.vue","sourcesContent":["<template>\n\n  <tr class=\"subsystem-frame\">\n\t<td class=\"name-column\" colspan=\"2\">{{se_subsystem.name}}</td>\n\n\t<td class=\"part-column\"><select v-model=\"sub_frame\" class=\"part-column-select\">\n\t\t<option v-for=\"sub_frame_value in se_subsystem.valid_frames\">{{sub_frame_value['Name']}}</option>\n\t</select></td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <td>{{stats_multiplier_pretty}}</td>\n\t</template>\n\n\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>\n\n\t<td class=\"power-cost-column\"></td>\n\t<td class=\"power-gen-column\"></td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew_mult_pretty\" :name=\"name\" :ispretty=\"false\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n\n\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'SubsystemFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tstats_multiplier_pretty() {\n\t\t\treturn this.se_subsystem.stats_multiplier.toFixed(2) + 'x';\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tcrew_mult_pretty() {\n\t\t\treturn this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\tsub_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.se_subsystem.sub_frame;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_subsystem.sub_frame = value;\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.subsystem-frame {\n\tbackground: #ccc;\n}\n\n</style>\n\n\n<style scoped>\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -98157,7 +98243,7 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(96);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_functions_js__ = __webpack_require__(161);
@@ -98246,63 +98332,89 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('tr', {
-    staticClass: "subsystem-frame"
-  }, [_c('td', {
-    staticClass: "name-column",
-    attrs: {
-      "colspan": "2"
-    }
-  }, [_vm._v(_vm._s(_vm.se_subsystem.name))]), _vm._v(" "), _c('td', {
-    staticClass: "part-column"
-  }, [_c('select', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.sub_frame),
-      expression: "sub_frame"
-    }],
-    staticClass: "part-column-select",
-    on: {
-      "change": function($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function(o) {
-          return o.selected
-        }).map(function(o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val
-        });
-        _vm.sub_frame = $event.target.multiple ? $$selectedVal : $$selectedVal[0]
-      }
-    }
-  }, _vm._l((_vm.se_subsystem.valid_frames), function(sub_frame_value) {
-    return _c('option', [_vm._v(_vm._s(sub_frame_value['Name']))])
-  }))]), _vm._v(" "), _vm._l((_vm.stats.names), function(name) {
-    return [_c('td', [_vm._v(_vm._s(_vm.stats_multiplier_pretty))])]
-  }), _vm._v(" "), _c('td', {
-    staticClass: "weight-internal-column",
-    attrs: {
-      "colspan": "2"
-    }
-  }, [_vm._v(_vm._s(_vm.se_subsystem.weight_cap.toFixed(2)))]), _vm._v(" "), _c('td', {
-    staticClass: "br-column"
-  }, [_vm._v(_vm._s(_vm.se_subsystem.cost_BR_frame.toFixed(2)))]), _vm._v(" "), _c('td', {
-    staticClass: "sr-column"
-  }, [_vm._v(_vm._s(_vm.se_subsystem.cost_SR_mult.toFixed(2)) + "x")]), _vm._v(" "), _c('td', {
-    staticClass: "power-cost-column"
-  }), _vm._v(" "), _c('td', {
-    staticClass: "power-gen-column"
-  }), _vm._v(" "), _vm._l((_vm.crew.names), function(name) {
-    return [_c('StatlineCell', {
-      attrs: {
-        "stats": _vm.crew_mult_pretty,
-        "name": name,
-        "ispretty": false
-      }
-    })]
-  }), _vm._v(" "), _c('td', {
-    staticClass: "build-time-column"
-  }, [_vm._v(_vm._s(_vm.build_time))])], 2)
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "tr",
+    { staticClass: "subsystem-frame" },
+    [
+      _c("td", { staticClass: "name-column", attrs: { colspan: "2" } }, [
+        _vm._v(_vm._s(_vm.se_subsystem.name))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "part-column" }, [
+        _c(
+          "select",
+          {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.sub_frame,
+                expression: "sub_frame"
+              }
+            ],
+            staticClass: "part-column-select",
+            on: {
+              change: function($event) {
+                var $$selectedVal = Array.prototype.filter
+                  .call($event.target.options, function(o) {
+                    return o.selected
+                  })
+                  .map(function(o) {
+                    var val = "_value" in o ? o._value : o.value
+                    return val
+                  })
+                _vm.sub_frame = $event.target.multiple
+                  ? $$selectedVal
+                  : $$selectedVal[0]
+              }
+            }
+          },
+          _vm._l(_vm.se_subsystem.valid_frames, function(sub_frame_value) {
+            return _c("option", [_vm._v(_vm._s(sub_frame_value["Name"]))])
+          })
+        )
+      ]),
+      _vm._v(" "),
+      _vm._l(_vm.stats.names, function(name) {
+        return [_c("td", [_vm._v(_vm._s(_vm.stats_multiplier_pretty))])]
+      }),
+      _vm._v(" "),
+      _c(
+        "td",
+        { staticClass: "weight-internal-column", attrs: { colspan: "2" } },
+        [_vm._v(_vm._s(_vm.se_subsystem.weight_cap.toFixed(2)))]
+      ),
+      _vm._v(" "),
+      _c("td", { staticClass: "br-column" }, [
+        _vm._v(_vm._s(_vm.se_subsystem.cost_BR_frame.toFixed(2)))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "sr-column" }, [
+        _vm._v(_vm._s(_vm.se_subsystem.cost_SR_mult.toFixed(2)) + "x")
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "power-cost-column" }),
+      _vm._v(" "),
+      _c("td", { staticClass: "power-gen-column" }),
+      _vm._v(" "),
+      _vm._l(_vm.crew.names, function(name) {
+        return [
+          _c("StatlineCell", {
+            attrs: { stats: _vm.crew_mult_pretty, name: name, ispretty: false }
+          })
+        ]
+      }),
+      _vm._v(" "),
+      _c("td", { staticClass: "build-time-column" }, [
+        _vm._v(_vm._s(_vm.build_time))
+      ])
+    ],
+    2
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -98444,7 +98556,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.setting-tr[data-v-ec733cc4] {\n\tbackground: #ccc;\n}\n.setting-container[data-v-ec733cc4] {\n\tdisplay: flex;\n}\n\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/subsystem-settings.vue?2585b62e"],"names":[],"mappings":";AAyCA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA","file":"subsystem-settings.vue","sourcesContent":["<template>\n  <tr class=\"setting-tr\" v-if=\"has_settings\">\n\t<td class=\"settings-cell\" colspan=\"100\"> <!-- span all columns and we'll just fill it with settings -->\n\t  <SettingCell v-for=\"setting in settings\" :key=\"setting['Name']\" :setting=\"setting\"></SettingCell>\n\t</td>\n  </tr>\n</template>\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport SettingCell from './setting-cell.vue'\n\nexport default {\n\tname: 'SubsystemSettings',\n\tcomponents: {\n\t\tSettingCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\thas_settings () {\n\t\t\treturn this.se_subsystem.settings.length > 0;\n\t\t},\n\t\tsettings () {\n\t\t\treturn this.se_subsystem.settings;\n\t\t},\n\t},\n}\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-tr {\n\tbackground: #ccc;\n}\n\n.setting-container {\n\tdisplay: flex;\n}\n\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.setting-tr[data-v-ec733cc4] {\n\tbackground: #ccc;\n}\n.setting-container[data-v-ec733cc4] {\n\tdisplay: flex;\n}\n\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/subsystem-settings.vue?343842ba"],"names":[],"mappings":";AAyCA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA","file":"subsystem-settings.vue","sourcesContent":["<template>\n  <tr class=\"setting-tr\" v-if=\"has_settings\">\n\t<td class=\"settings-cell\" colspan=\"100\"> <!-- span all columns and we'll just fill it with settings -->\n\t  <SettingCell v-for=\"setting in settings\" :key=\"setting['Name']\" :setting=\"setting\"></SettingCell>\n\t</td>\n  </tr>\n</template>\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport SettingCell from './setting-cell.vue'\n\nexport default {\n\tname: 'SubsystemSettings',\n\tcomponents: {\n\t\tSettingCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\thas_settings () {\n\t\t\treturn this.se_subsystem.settings.length > 0;\n\t\t},\n\t\tsettings () {\n\t\t\treturn this.se_subsystem.settings;\n\t\t},\n\t},\n}\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-tr {\n\tbackground: #ccc;\n}\n\n.setting-container {\n\tdisplay: flex;\n}\n\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -98454,7 +98566,7 @@ exports.push([module.i, "\n.setting-tr[data-v-ec733cc4] {\n\tbackground: #ccc;\n
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__setting_cell_vue__ = __webpack_require__(632);
 //
@@ -98619,7 +98731,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.setting-cell[data-v-1ad72548] {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n.setting-input-number[data-v-1ad72548] {\n\twidth: 60px;\n}\n.setting-input-bool[data-v-1ad72548] {\n}\n.setting-name[data-v-1ad72548] {\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/setting-cell.vue?6504e512"],"names":[],"mappings":";AAwEA;CACA,YAAA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA;AAEA;CACA","file":"setting-cell.vue","sourcesContent":["<template>\n  <span class=\"setting-cell\">\n\t<span class=\"setting-name\">{{setting_name}}</span>\n\n\t<select\n\t  v-if=\"typeof(setting_value) === 'number'\"\n\t  class=\"setting-input-number\"\n\t  type=\"number\"\n\t  v-model=\"setting_value\">\n\t  <option v-for=\"num in valid_numbers\">{{num}}</option>\n\t</select>\n\n\t<input\n\t  v-if=\"typeof(setting_value) === 'boolean'\"\n\t  class=\"setting-input-bool\"\n\t  type=\"checkbox\"\n\t  v-model=\"setting_value\">\n  </span>\n</template>\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nexport default {\n\tname: 'SettingCell',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tsetting: Object,\n\t},\n\tcomputed: {\n\t\tvalid_numbers () {\n\t\t\treturn [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];\n\t\t},\n\t\tsetting_name: {\n\t\t\tget () {\n\t\t\t\treturn this.setting['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.setting['Name'] = value;\n\t\t\t},\n\t\t},\n\t\tsetting_type () {\n\t\t\treturn typeof(this.setting_value);\n\t\t},\n\t\tsetting_value: {\n\t\t\tget () {\n\t\t\t\treturn this.setting['Value'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tswitch (this.setting_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\tthis.setting['Value'] = parseInt(value);\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'boolean':\n\t\t\t\t\tthis.setting['Value'] = value;\n\t\t\t\t\tbreak;\n\t\t\t\t};\n\t\t\t},\n\t\t}\n\t},\n}\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-cell {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n\n.setting-input-number {\n\twidth: 60px;\n}\n\n.setting-input-bool {\n}\n\n.setting-name {\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.setting-cell[data-v-1ad72548] {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n.setting-input-number[data-v-1ad72548] {\n\twidth: 60px;\n}\n.setting-input-bool[data-v-1ad72548] {\n}\n.setting-name[data-v-1ad72548] {\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/setting-cell.vue?286ab987"],"names":[],"mappings":";AAwEA;CACA,YAAA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA;AAEA;CACA","file":"setting-cell.vue","sourcesContent":["<template>\n  <span class=\"setting-cell\">\n\t<span class=\"setting-name\">{{setting_name}}</span>\n\n\t<select\n\t  v-if=\"typeof(setting_value) === 'number'\"\n\t  class=\"setting-input-number\"\n\t  type=\"number\"\n\t  v-model=\"setting_value\">\n\t  <option v-for=\"num in valid_numbers\">{{num}}</option>\n\t</select>\n\n\t<input\n\t  v-if=\"typeof(setting_value) === 'boolean'\"\n\t  class=\"setting-input-bool\"\n\t  type=\"checkbox\"\n\t  v-model=\"setting_value\">\n  </span>\n</template>\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nexport default {\n\tname: 'SettingCell',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tsetting: Object,\n\t},\n\tcomputed: {\n\t\tvalid_numbers () {\n\t\t\treturn [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];\n\t\t},\n\t\tsetting_name: {\n\t\t\tget () {\n\t\t\t\treturn this.setting['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.setting['Name'] = value;\n\t\t\t},\n\t\t},\n\t\tsetting_type () {\n\t\t\treturn typeof(this.setting_value);\n\t\t},\n\t\tsetting_value: {\n\t\t\tget () {\n\t\t\t\treturn this.setting['Value'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tswitch (this.setting_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\tthis.setting['Value'] = parseInt(value);\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'boolean':\n\t\t\t\t\tthis.setting['Value'] = value;\n\t\t\t\t\tbreak;\n\t\t\t\t};\n\t\t\t},\n\t\t}\n\t},\n}\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-cell {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n\n.setting-input-number {\n\twidth: 60px;\n}\n\n.setting-input-bool {\n}\n\n.setting-name {\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -98629,7 +98741,7 @@ exports.push([module.i, "\n.setting-cell[data-v-1ad72548] {\n\tflex: 1 1 0;\n\tm
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
 //
 //
@@ -98699,68 +98811,92 @@ exports.push([module.i, "\n.setting-cell[data-v-1ad72548] {\n\tflex: 1 1 0;\n\tm
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('span', {
-    staticClass: "setting-cell"
-  }, [_c('span', {
-    staticClass: "setting-name"
-  }, [_vm._v(_vm._s(_vm.setting_name))]), _vm._v(" "), (typeof(_vm.setting_value) === 'number') ? _c('select', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.setting_value),
-      expression: "setting_value"
-    }],
-    staticClass: "setting-input-number",
-    attrs: {
-      "type": "number"
-    },
-    on: {
-      "change": function($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function(o) {
-          return o.selected
-        }).map(function(o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val
-        });
-        _vm.setting_value = $event.target.multiple ? $$selectedVal : $$selectedVal[0]
-      }
-    }
-  }, _vm._l((_vm.valid_numbers), function(num) {
-    return _c('option', [_vm._v(_vm._s(num))])
-  })) : _vm._e(), _vm._v(" "), (typeof(_vm.setting_value) === 'boolean') ? _c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.setting_value),
-      expression: "setting_value"
-    }],
-    staticClass: "setting-input-bool",
-    attrs: {
-      "type": "checkbox"
-    },
-    domProps: {
-      "checked": Array.isArray(_vm.setting_value) ? _vm._i(_vm.setting_value, null) > -1 : (_vm.setting_value)
-    },
-    on: {
-      "__c": function($event) {
-        var $$a = _vm.setting_value,
-          $$el = $event.target,
-          $$c = $$el.checked ? (true) : (false);
-        if (Array.isArray($$a)) {
-          var $$v = null,
-            $$i = _vm._i($$a, $$v);
-          if ($$el.checked) {
-            $$i < 0 && (_vm.setting_value = $$a.concat([$$v]))
-          } else {
-            $$i > -1 && (_vm.setting_value = $$a.slice(0, $$i).concat($$a.slice($$i + 1)))
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("span", { staticClass: "setting-cell" }, [
+    _c("span", { staticClass: "setting-name" }, [
+      _vm._v(_vm._s(_vm.setting_name))
+    ]),
+    _vm._v(" "),
+    typeof _vm.setting_value === "number"
+      ? _c(
+          "select",
+          {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.setting_value,
+                expression: "setting_value"
+              }
+            ],
+            staticClass: "setting-input-number",
+            attrs: { type: "number" },
+            on: {
+              change: function($event) {
+                var $$selectedVal = Array.prototype.filter
+                  .call($event.target.options, function(o) {
+                    return o.selected
+                  })
+                  .map(function(o) {
+                    var val = "_value" in o ? o._value : o.value
+                    return val
+                  })
+                _vm.setting_value = $event.target.multiple
+                  ? $$selectedVal
+                  : $$selectedVal[0]
+              }
+            }
+          },
+          _vm._l(_vm.valid_numbers, function(num) {
+            return _c("option", [_vm._v(_vm._s(num))])
+          })
+        )
+      : _vm._e(),
+    _vm._v(" "),
+    typeof _vm.setting_value === "boolean"
+      ? _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.setting_value,
+              expression: "setting_value"
+            }
+          ],
+          staticClass: "setting-input-bool",
+          attrs: { type: "checkbox" },
+          domProps: {
+            checked: Array.isArray(_vm.setting_value)
+              ? _vm._i(_vm.setting_value, null) > -1
+              : _vm.setting_value
+          },
+          on: {
+            __c: function($event) {
+              var $$a = _vm.setting_value,
+                $$el = $event.target,
+                $$c = $$el.checked ? true : false
+              if (Array.isArray($$a)) {
+                var $$v = null,
+                  $$i = _vm._i($$a, $$v)
+                if ($$el.checked) {
+                  $$i < 0 && (_vm.setting_value = $$a.concat([$$v]))
+                } else {
+                  $$i > -1 &&
+                    (_vm.setting_value = $$a
+                      .slice(0, $$i)
+                      .concat($$a.slice($$i + 1)))
+                }
+              } else {
+                _vm.setting_value = $$c
+              }
+            }
           }
-        } else {
-          _vm.setting_value = $$c
-        }
-      }
-    }
-  }) : _vm._e()])
+        })
+      : _vm._e()
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -98778,22 +98914,24 @@ if (false) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return (_vm.has_settings) ? _c('tr', {
-    staticClass: "setting-tr"
-  }, [_c('td', {
-    staticClass: "settings-cell",
-    attrs: {
-      "colspan": "100"
-    }
-  }, _vm._l((_vm.settings), function(setting) {
-    return _c('SettingCell', {
-      key: setting['Name'],
-      attrs: {
-        "setting": setting
-      }
-    })
-  }))]) : _vm._e()
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _vm.has_settings
+    ? _c("tr", { staticClass: "setting-tr" }, [
+        _c(
+          "td",
+          { staticClass: "settings-cell", attrs: { colspan: "100" } },
+          _vm._l(_vm.settings, function(setting) {
+            return _c("SettingCell", {
+              key: setting["Name"],
+              attrs: { setting: setting }
+            })
+          })
+        )
+      ])
+    : _vm._e()
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -98935,7 +99073,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.component-tr[data-v-702f1bb0] {\n\twidth: 100%;\n\tmargin: 0px;\n}\n.hasloaderror[data-v-702f1bb0] {\n\tbackground: #faa;\n}\n.hasquantityerror[data-v-702f1bb0] {\n\tbackground: #faa;\n}\n.quantity-column[data-v-702f1bb0] {\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/component.vue?8e1d4ad8"],"names":[],"mappings":";AAgLA;CACA,YAAA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA","file":"component.vue","sourcesContent":["<template>\n  <tr class=\"component-tr\" v-bind:class=\"{ hasloaderror: !isloaded }\">\n\t<td class=\"name-column\">{{se_component.name}}</td>\n\n\t<td class=\"quantity-column\" v-bind:class=\"{ hasquantityerror: has_quantity_error }\">\n\t  <select\n\t\tv-if=\"quantity_configurable\"\n\t\tclass=\"quantity-column-select\"\n\t\tv-model=\"quantity\"\n\t\tv-on:wheel=\"quantity_select_wheel_event\"\n\t\tv-bind:class=\"{ hasquantityerror: has_quantity_error }\">\n\n\t\t<option v-if=\"!valid_quantities.includes(quantity)\">{{quantity}}</option>\n\t\t<option v-for=\"valid_quantity in valid_quantities\">{{valid_quantity}}</option>\n\t  </select>\n\t  <span v-if=\"!quantity_configurable\">{{quantity_pretty}}</span>\n\t</td>\n\n\t<td class=\"part-column\">\n\t  <select\n\t\tv-model=\"part\"\n\t\tclass=\"part-column-select\">\n\t\t<option v-for=\"part_value in valid_parts\">{{part_value['Name']}}</option>\n\t  </select>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t<td class=\"br-column\">{{cost_br}}</td>\n\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\"></td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport {\n\tpretty,\n} from './ui-functions.js'\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ComponentTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_component: Object,\n\t},\n\tcomputed: {\n\t\thas_quantity_error () {\n\t\t\treturn this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));\n\t\t},\n\t\tpower_gen () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.power_generation : 0);\n\t\t},\n\t\tpower_cost () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_power : 0);\n\t\t},\n\t\tcost_sr () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_SR : 0);\n\t\t},\n\t\tcost_br () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_BR : 0);\n\t\t},\n\t\tweight_internal () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.weight_internal : 0);\n\t\t},\n\t\tweight_external () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.weight_external : 0);\n\t\t},\n\t\tisloaded () {\n\t\t\treturn (!!this.se_component.part_def)\n\t\t},\n\t\tvalid_parts () {\n\t\t\treturn this.se_component.valid_parts;\n\t\t},\n\t\tquantity_configurable () {\n\t\t\treturn this.se_component.is_quantity_configurable;\n\t\t},\n\t\tquantity_pretty () {\n\t\t\tif (this.quantity === Math.round(this.quantity)) {\n\t\t\t\treturn this.quantity;\n\t\t\t} else {\n\t\t\t\treturn this.quantity.toFixed(2);\n\t\t\t};\n\t\t},\n\t\tquantity: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.quantity;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_component.quantity = value;\n\t\t\t},\n\t\t},\n\t\tvalid_quantities () {\n\t\t\treturn this.se_component.valid_quantities;\n\t\t},\n\t\tstats () {\n\t\t\treturn this.isloaded ? this.se_component.stats : new ShipEngine.Statline(0);\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.isloaded ? this.se_component.cost_crew : new ShipEngine.Crewline(0);\n\t\t},\n\t\tpart: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.part;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_component.part = value;\n\t\t\t\tif (!this.quantity && !this.se_component.is_no_part) {\n\t\t\t\t\tthis.quantity = 1;\n\t\t\t\t};\n\t\t\t\tif (this.se_component.is_no_part) {\n\t\t\t\t\tthis.quantity = 0;\n\t\t\t\t};\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tis_quantity_valid (hypothesis) {\n\t\t\treturn this\n\t\t\t\t.valid_quantities\n\t\t\t\t.map((elem) => (elem === hypothesis))\n\t\t\t\t.reduce((acc, elem) => acc || elem);\n\t\t},\n\t\tincrement_quantity () {\n\t\t\tlet hypothesis = this.quantity + 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t};\n\t\t},\n\t\tdecrement_quantity () {\n\t\t\tlet hypothesis = this.quantity - 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t};\n\t\t},\n\n\t\tquantity_select_wheel_event (ev) {\n\t\t\tif (ev.deltaY > 0) {\n\t\t\t\tthis.decrement_quantity();\n\t\t\t} else if (ev.deltaY < 0) {\n\t\t\t\tthis.increment_quantity();\n\t\t\t};\n\t\t\tif (ev.preventDefault)\n\t\t\t\tev.preventDefault();\n\t\t\tev.returnValue = false;\n\t\t},\n\t},\n}\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.component-tr {\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n.hasloaderror {\n\tbackground: #faa;\n}\n\n.hasquantityerror {\n\tbackground: #faa;\n}\n\n.quantity-column {\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.component-tr[data-v-702f1bb0] {\n\twidth: 100%;\n\tmargin: 0px;\n}\n.hasloaderror[data-v-702f1bb0] {\n\tbackground: #faa;\n}\n.hasquantityerror[data-v-702f1bb0] {\n\tbackground: #faa;\n}\n.quantity-column[data-v-702f1bb0] {\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/component.vue?2a554abf"],"names":[],"mappings":";AAgLA;CACA,YAAA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA","file":"component.vue","sourcesContent":["<template>\n  <tr class=\"component-tr\" v-bind:class=\"{ hasloaderror: !isloaded }\">\n\t<td class=\"name-column\">{{se_component.name}}</td>\n\n\t<td class=\"quantity-column\" v-bind:class=\"{ hasquantityerror: has_quantity_error }\">\n\t  <select\n\t\tv-if=\"quantity_configurable\"\n\t\tclass=\"quantity-column-select\"\n\t\tv-model=\"quantity\"\n\t\tv-on:wheel=\"quantity_select_wheel_event\"\n\t\tv-bind:class=\"{ hasquantityerror: has_quantity_error }\">\n\n\t\t<option v-if=\"!valid_quantities.includes(quantity)\">{{quantity}}</option>\n\t\t<option v-for=\"valid_quantity in valid_quantities\">{{valid_quantity}}</option>\n\t  </select>\n\t  <span v-if=\"!quantity_configurable\">{{quantity_pretty}}</span>\n\t</td>\n\n\t<td class=\"part-column\">\n\t  <select\n\t\tv-model=\"part\"\n\t\tclass=\"part-column-select\">\n\t\t<option v-for=\"part_value in valid_parts\">{{part_value['Name']}}</option>\n\t  </select>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t<td class=\"br-column\">{{cost_br}}</td>\n\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\"></td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport {\n\tpretty,\n} from './ui-functions.js'\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ComponentTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_component: Object,\n\t},\n\tcomputed: {\n\t\thas_quantity_error () {\n\t\t\treturn this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));\n\t\t},\n\t\tpower_gen () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.power_generation : 0);\n\t\t},\n\t\tpower_cost () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_power : 0);\n\t\t},\n\t\tcost_sr () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_SR : 0);\n\t\t},\n\t\tcost_br () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_BR : 0);\n\t\t},\n\t\tweight_internal () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.weight_internal : 0);\n\t\t},\n\t\tweight_external () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.weight_external : 0);\n\t\t},\n\t\tisloaded () {\n\t\t\treturn (!!this.se_component.part_def)\n\t\t},\n\t\tvalid_parts () {\n\t\t\treturn this.se_component.valid_parts;\n\t\t},\n\t\tquantity_configurable () {\n\t\t\treturn this.se_component.is_quantity_configurable;\n\t\t},\n\t\tquantity_pretty () {\n\t\t\tif (this.quantity === Math.round(this.quantity)) {\n\t\t\t\treturn this.quantity;\n\t\t\t} else {\n\t\t\t\treturn this.quantity.toFixed(2);\n\t\t\t};\n\t\t},\n\t\tquantity: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.quantity;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_component.quantity = value;\n\t\t\t},\n\t\t},\n\t\tvalid_quantities () {\n\t\t\treturn this.se_component.valid_quantities;\n\t\t},\n\t\tstats () {\n\t\t\treturn this.isloaded ? this.se_component.stats : new ShipEngine.Statline(0);\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.isloaded ? this.se_component.cost_crew : new ShipEngine.Crewline(0);\n\t\t},\n\t\tpart: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.part;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_component.part = value;\n\t\t\t\tif (!this.quantity && !this.se_component.is_no_part) {\n\t\t\t\t\tthis.quantity = 1;\n\t\t\t\t};\n\t\t\t\tif (this.se_component.is_no_part) {\n\t\t\t\t\tthis.quantity = 0;\n\t\t\t\t};\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tis_quantity_valid (hypothesis) {\n\t\t\treturn this\n\t\t\t\t.valid_quantities\n\t\t\t\t.map((elem) => (elem === hypothesis))\n\t\t\t\t.reduce((acc, elem) => acc || elem);\n\t\t},\n\t\tincrement_quantity () {\n\t\t\tlet hypothesis = this.quantity + 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t};\n\t\t},\n\t\tdecrement_quantity () {\n\t\t\tlet hypothesis = this.quantity - 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t};\n\t\t},\n\n\t\tquantity_select_wheel_event (ev) {\n\t\t\tif (ev.deltaY > 0) {\n\t\t\t\tthis.decrement_quantity();\n\t\t\t} else if (ev.deltaY < 0) {\n\t\t\t\tthis.increment_quantity();\n\t\t\t};\n\t\t\tif (ev.preventDefault)\n\t\t\t\tev.preventDefault();\n\t\t\tev.returnValue = false;\n\t\t},\n\t},\n}\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.component-tr {\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n.hasloaderror {\n\tbackground: #faa;\n}\n\n.hasquantityerror {\n\tbackground: #faa;\n}\n\n.quantity-column {\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -98945,7 +99083,7 @@ exports.push([module.i, "\n.component-tr[data-v-702f1bb0] {\n\twidth: 100%;\n\tm
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ui_functions_js__ = __webpack_require__(161);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__statline_cell_vue__ = __webpack_require__(96);
@@ -99118,96 +99256,142 @@ exports.push([module.i, "\n.component-tr[data-v-702f1bb0] {\n\twidth: 100%;\n\tm
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('tr', {
-    staticClass: "component-tr",
-    class: {
-      hasloaderror: !_vm.isloaded
-    }
-  }, [_c('td', {
-    staticClass: "name-column"
-  }, [_vm._v(_vm._s(_vm.se_component.name))]), _vm._v(" "), _c('td', {
-    staticClass: "quantity-column",
-    class: {
-      hasquantityerror: _vm.has_quantity_error
-    }
-  }, [(_vm.quantity_configurable) ? _c('select', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.quantity),
-      expression: "quantity"
-    }],
-    staticClass: "quantity-column-select",
-    class: {
-      hasquantityerror: _vm.has_quantity_error
-    },
-    on: {
-      "wheel": _vm.quantity_select_wheel_event,
-      "change": function($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function(o) {
-          return o.selected
-        }).map(function(o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val
-        });
-        _vm.quantity = $event.target.multiple ? $$selectedVal : $$selectedVal[0]
-      }
-    }
-  }, [(!_vm.valid_quantities.includes(_vm.quantity)) ? _c('option', [_vm._v(_vm._s(_vm.quantity))]) : _vm._e(), _vm._v(" "), _vm._l((_vm.valid_quantities), function(valid_quantity) {
-    return _c('option', [_vm._v(_vm._s(valid_quantity))])
-  })], 2) : _vm._e(), _vm._v(" "), (!_vm.quantity_configurable) ? _c('span', [_vm._v(_vm._s(_vm.quantity_pretty))]) : _vm._e()]), _vm._v(" "), _c('td', {
-    staticClass: "part-column"
-  }, [_c('select', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.part),
-      expression: "part"
-    }],
-    staticClass: "part-column-select",
-    on: {
-      "change": function($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function(o) {
-          return o.selected
-        }).map(function(o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val
-        });
-        _vm.part = $event.target.multiple ? $$selectedVal : $$selectedVal[0]
-      }
-    }
-  }, _vm._l((_vm.valid_parts), function(part_value) {
-    return _c('option', [_vm._v(_vm._s(part_value['Name']))])
-  }))]), _vm._v(" "), _vm._l((_vm.stats.names), function(name) {
-    return [_c('StatlineCell', {
-      attrs: {
-        "stats": _vm.stats,
-        "name": name
-      }
-    })]
-  }), _vm._v(" "), _c('td', {
-    staticClass: "weight-internal-column"
-  }, [_vm._v(_vm._s(_vm.weight_internal))]), _vm._v(" "), _c('td', {
-    staticClass: "weight-external-column"
-  }, [_vm._v(_vm._s(_vm.weight_external))]), _vm._v(" "), _c('td', {
-    staticClass: "br-column"
-  }, [_vm._v(_vm._s(_vm.cost_br))]), _vm._v(" "), _c('td', {
-    staticClass: "sr-column"
-  }, [_vm._v(_vm._s(_vm.cost_sr))]), _vm._v(" "), _c('td', {
-    staticClass: "power-cost-column"
-  }, [_vm._v(_vm._s(_vm.power_cost))]), _vm._v(" "), _c('td', {
-    staticClass: "power-gen-column"
-  }, [_vm._v(_vm._s(_vm.power_gen))]), _vm._v(" "), _vm._l((_vm.crew.names), function(name) {
-    return [_c('StatlineCell', {
-      attrs: {
-        "stats": _vm.crew,
-        "name": name
-      }
-    })]
-  }), _vm._v(" "), _c('td', {
-    staticClass: "build-time-column"
-  })], 2)
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "tr",
+    { staticClass: "component-tr", class: { hasloaderror: !_vm.isloaded } },
+    [
+      _c("td", { staticClass: "name-column" }, [
+        _vm._v(_vm._s(_vm.se_component.name))
+      ]),
+      _vm._v(" "),
+      _c(
+        "td",
+        {
+          staticClass: "quantity-column",
+          class: { hasquantityerror: _vm.has_quantity_error }
+        },
+        [
+          _vm.quantity_configurable
+            ? _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.quantity,
+                      expression: "quantity"
+                    }
+                  ],
+                  staticClass: "quantity-column-select",
+                  class: { hasquantityerror: _vm.has_quantity_error },
+                  on: {
+                    wheel: _vm.quantity_select_wheel_event,
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.quantity = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
+                  }
+                },
+                [
+                  !_vm.valid_quantities.includes(_vm.quantity)
+                    ? _c("option", [_vm._v(_vm._s(_vm.quantity))])
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm._l(_vm.valid_quantities, function(valid_quantity) {
+                    return _c("option", [_vm._v(_vm._s(valid_quantity))])
+                  })
+                ],
+                2
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          !_vm.quantity_configurable
+            ? _c("span", [_vm._v(_vm._s(_vm.quantity_pretty))])
+            : _vm._e()
+        ]
+      ),
+      _vm._v(" "),
+      _c("td", { staticClass: "part-column" }, [
+        _c(
+          "select",
+          {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.part,
+                expression: "part"
+              }
+            ],
+            staticClass: "part-column-select",
+            on: {
+              change: function($event) {
+                var $$selectedVal = Array.prototype.filter
+                  .call($event.target.options, function(o) {
+                    return o.selected
+                  })
+                  .map(function(o) {
+                    var val = "_value" in o ? o._value : o.value
+                    return val
+                  })
+                _vm.part = $event.target.multiple
+                  ? $$selectedVal
+                  : $$selectedVal[0]
+              }
+            }
+          },
+          _vm._l(_vm.valid_parts, function(part_value) {
+            return _c("option", [_vm._v(_vm._s(part_value["Name"]))])
+          })
+        )
+      ]),
+      _vm._v(" "),
+      _vm._l(_vm.stats.names, function(name) {
+        return [_c("StatlineCell", { attrs: { stats: _vm.stats, name: name } })]
+      }),
+      _vm._v(" "),
+      _c("td", { staticClass: "weight-internal-column" }, [
+        _vm._v(_vm._s(_vm.weight_internal))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "weight-external-column" }, [
+        _vm._v(_vm._s(_vm.weight_external))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "br-column" }, [_vm._v(_vm._s(_vm.cost_br))]),
+      _vm._v(" "),
+      _c("td", { staticClass: "sr-column" }, [_vm._v(_vm._s(_vm.cost_sr))]),
+      _vm._v(" "),
+      _c("td", { staticClass: "power-cost-column" }, [
+        _vm._v(_vm._s(_vm.power_cost))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "power-gen-column" }, [
+        _vm._v(_vm._s(_vm.power_gen))
+      ]),
+      _vm._v(" "),
+      _vm._l(_vm.crew.names, function(name) {
+        return [_c("StatlineCell", { attrs: { stats: _vm.crew, name: name } })]
+      }),
+      _vm._v(" "),
+      _c("td", { staticClass: "build-time-column" })
+    ],
+    2
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -99349,7 +99533,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.module-tr[data-v-c0aaa36e] {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n.hasloaderror[data-v-c0aaa36e] {\n\tbackground: #faa;\n}\n.module-pair-span[data-v-c0aaa36e] {\n\tdisplay: flex;\n}\n.module-pair-type[data-v-c0aaa36e] {\n\tflex: 1 1 0;\n}\n.module-pair-variant[data-v-c0aaa36e] {\n\tflex: 1 1 0;\n}\n.part-column-select[data-v-c0aaa36e] {\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/module.vue?4535fbfc"],"names":[],"mappings":";AAiIA;CACA,iBAAA;;CAEA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA","file":"module.vue","sourcesContent":["<template>\n  <tr class=\"module-tr\" v-bind:class=\"{ hasloaderror: !isloaded }\">\n\t<td class=\"name-column\" colspan=\"2\">Module</td>\n\n\t<td class=\"part-column\">\n\t  <span class=\"module-pair-span\">\n\t\t<span class=\"module-pair-type\"><select v-model=\"module_type\" class=\"part-column-select\">\n\t\t\t<option v-for=\"module_type_value in valid_types\">{{module_type_value}}</option>\n\t\t</select></span>\n\t\t<span class=\"module-pair-variant\"><select v-model=\"module_variant\" class=\"part-column-select\">\n\t\t\t<option v-for=\"module_variant_value in valid_variants\">{{module_variant_value['Variant']}}</option>\n\t\t</select></span>\n\t  </span>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t<td class=\"br-column\">{{cost_br}}</td>\n\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport {\n\tpretty,\n\tfrac,\n} from './ui-functions.js'\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ModuleTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_module: Object,\n\t},\n\tcomputed: {\n\t\tbuild_time () {\n\t\t\treturn this.isloaded ? frac(this.se_module.build_time, 12) || '' : '';\n\t\t},\n\t\tpower_gen () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.power_generation : 0);\n\t\t},\n\t\tpower_cost () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.cost_power : 0);\n\t\t},\n\t\tcost_sr () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.cost_SR : 0);\n\t\t},\n\t\tcost_br () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.cost_BR : 0);\n\t\t},\n\t\tweight_internal () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.weight_internal : 0);\n\t\t},\n\t\tweight_external () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.weight_external : 0);\n\t\t},\n\t\tisloaded () {\n\t\t\treturn (!!this.se_module.module_def)\n\t\t},\n\t\tstats () {\n\t\t\treturn this.isloaded ? this.se_module.stats : new ShipEngine.Statline(0);\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.isloaded ? this.se_module.cost_crew : new ShipEngine.Crewline(0);\n\t\t},\n\n\t\tvalid_types () {\n\t\t\treturn this.se_db.valid_module_types();\n\t\t},\n\t\tvalid_variants () {\n\t\t\treturn this.se_db.find_modules(this.se_module.module_type);\n\t\t},\n\t\tmodule_type: {\n\t\t\tget () {\n\t\t\t\treturn this.se_module.module_type;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_module.module_type = value;\n\t\t\t\tthis.se_module.module_variant = this.valid_variants[0]['Variant'];\n\t\t\t},\n\t\t},\n\t\tmodule_variant: {\n\t\t\tget () {\n\t\t\t\treturn this.se_module.module_variant;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_module.module_variant = value;\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tlog_parts() {\n\t\t\tconsole.log('\"' + this.part + '\"');\n\t\t\tconsole.log(this.valid_parts.map((part) => part['Name']))\n\t\t\tconsole.log(this.se_db.find_part(this.part));\n\t\t\tthis.part = this.part;\n\t\t},\n\t},\n}\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.module-tr {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n\n.hasloaderror {\n\tbackground: #faa;\n}\n\n.module-pair-span {\n\tdisplay: flex;\n}\n\n.module-pair-type {\n\tflex: 1 1 0;\n}\n\n.module-pair-variant {\n\tflex: 1 1 0;\n}\n\n.part-column-select {\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.module-tr[data-v-c0aaa36e] {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n.hasloaderror[data-v-c0aaa36e] {\n\tbackground: #faa;\n}\n.module-pair-span[data-v-c0aaa36e] {\n\tdisplay: flex;\n}\n.module-pair-type[data-v-c0aaa36e] {\n\tflex: 1 1 0;\n}\n.module-pair-variant[data-v-c0aaa36e] {\n\tflex: 1 1 0;\n}\n.part-column-select[data-v-c0aaa36e] {\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/module.vue?beaf059e"],"names":[],"mappings":";AAiIA;CACA,iBAAA;;CAEA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA","file":"module.vue","sourcesContent":["<template>\n  <tr class=\"module-tr\" v-bind:class=\"{ hasloaderror: !isloaded }\">\n\t<td class=\"name-column\" colspan=\"2\">Module</td>\n\n\t<td class=\"part-column\">\n\t  <span class=\"module-pair-span\">\n\t\t<span class=\"module-pair-type\"><select v-model=\"module_type\" class=\"part-column-select\">\n\t\t\t<option v-for=\"module_type_value in valid_types\">{{module_type_value}}</option>\n\t\t</select></span>\n\t\t<span class=\"module-pair-variant\"><select v-model=\"module_variant\" class=\"part-column-select\">\n\t\t\t<option v-for=\"module_variant_value in valid_variants\">{{module_variant_value['Variant']}}</option>\n\t\t</select></span>\n\t  </span>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t<td class=\"br-column\">{{cost_br}}</td>\n\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport {\n\tpretty,\n\tfrac,\n} from './ui-functions.js'\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ModuleTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_module: Object,\n\t},\n\tcomputed: {\n\t\tbuild_time () {\n\t\t\treturn this.isloaded ? frac(this.se_module.build_time, 12) || '' : '';\n\t\t},\n\t\tpower_gen () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.power_generation : 0);\n\t\t},\n\t\tpower_cost () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.cost_power : 0);\n\t\t},\n\t\tcost_sr () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.cost_SR : 0);\n\t\t},\n\t\tcost_br () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.cost_BR : 0);\n\t\t},\n\t\tweight_internal () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.weight_internal : 0);\n\t\t},\n\t\tweight_external () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.weight_external : 0);\n\t\t},\n\t\tisloaded () {\n\t\t\treturn (!!this.se_module.module_def)\n\t\t},\n\t\tstats () {\n\t\t\treturn this.isloaded ? this.se_module.stats : new ShipEngine.Statline(0);\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.isloaded ? this.se_module.cost_crew : new ShipEngine.Crewline(0);\n\t\t},\n\n\t\tvalid_types () {\n\t\t\treturn this.se_db.valid_module_types();\n\t\t},\n\t\tvalid_variants () {\n\t\t\treturn this.se_db.find_modules(this.se_module.module_type);\n\t\t},\n\t\tmodule_type: {\n\t\t\tget () {\n\t\t\t\treturn this.se_module.module_type;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_module.module_type = value;\n\t\t\t\tthis.se_module.module_variant = this.valid_variants[0]['Variant'];\n\t\t\t},\n\t\t},\n\t\tmodule_variant: {\n\t\t\tget () {\n\t\t\t\treturn this.se_module.module_variant;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_module.module_variant = value;\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tlog_parts() {\n\t\t\tconsole.log('\"' + this.part + '\"');\n\t\t\tconsole.log(this.valid_parts.map((part) => part['Name']))\n\t\t\tconsole.log(this.se_db.find_part(this.part));\n\t\t\tthis.part = this.part;\n\t\t},\n\t},\n}\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.module-tr {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n\n.hasloaderror {\n\tbackground: #faa;\n}\n\n.module-pair-span {\n\tdisplay: flex;\n}\n\n.module-pair-type {\n\tflex: 1 1 0;\n}\n\n.module-pair-variant {\n\tflex: 1 1 0;\n}\n\n.part-column-select {\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -99359,7 +99543,7 @@ exports.push([module.i, "\n.module-tr[data-v-c0aaa36e] {\n\tbackground: #ccc;\n\
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ui_functions_js__ = __webpack_require__(161);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__statline_cell_vue__ = __webpack_require__(96);
@@ -99488,96 +99672,128 @@ exports.push([module.i, "\n.module-tr[data-v-c0aaa36e] {\n\tbackground: #ccc;\n\
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('tr', {
-    staticClass: "module-tr",
-    class: {
-      hasloaderror: !_vm.isloaded
-    }
-  }, [_c('td', {
-    staticClass: "name-column",
-    attrs: {
-      "colspan": "2"
-    }
-  }, [_vm._v("Module")]), _vm._v(" "), _c('td', {
-    staticClass: "part-column"
-  }, [_c('span', {
-    staticClass: "module-pair-span"
-  }, [_c('span', {
-    staticClass: "module-pair-type"
-  }, [_c('select', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.module_type),
-      expression: "module_type"
-    }],
-    staticClass: "part-column-select",
-    on: {
-      "change": function($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function(o) {
-          return o.selected
-        }).map(function(o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val
-        });
-        _vm.module_type = $event.target.multiple ? $$selectedVal : $$selectedVal[0]
-      }
-    }
-  }, _vm._l((_vm.valid_types), function(module_type_value) {
-    return _c('option', [_vm._v(_vm._s(module_type_value))])
-  }))]), _vm._v(" "), _c('span', {
-    staticClass: "module-pair-variant"
-  }, [_c('select', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.module_variant),
-      expression: "module_variant"
-    }],
-    staticClass: "part-column-select",
-    on: {
-      "change": function($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function(o) {
-          return o.selected
-        }).map(function(o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val
-        });
-        _vm.module_variant = $event.target.multiple ? $$selectedVal : $$selectedVal[0]
-      }
-    }
-  }, _vm._l((_vm.valid_variants), function(module_variant_value) {
-    return _c('option', [_vm._v(_vm._s(module_variant_value['Variant']))])
-  }))])])]), _vm._v(" "), _vm._l((_vm.stats.names), function(name) {
-    return [_c('StatlineCell', {
-      attrs: {
-        "stats": _vm.stats,
-        "name": name
-      }
-    })]
-  }), _vm._v(" "), _c('td', {
-    staticClass: "weight-internal-column"
-  }, [_vm._v(_vm._s(_vm.weight_internal))]), _vm._v(" "), _c('td', {
-    staticClass: "weight-external-column"
-  }, [_vm._v(_vm._s(_vm.weight_external))]), _vm._v(" "), _c('td', {
-    staticClass: "br-column"
-  }, [_vm._v(_vm._s(_vm.cost_br))]), _vm._v(" "), _c('td', {
-    staticClass: "sr-column"
-  }, [_vm._v(_vm._s(_vm.cost_sr))]), _vm._v(" "), _c('td', {
-    staticClass: "power-cost-column"
-  }, [_vm._v(_vm._s(_vm.power_cost))]), _vm._v(" "), _c('td', {
-    staticClass: "power-gen-column"
-  }, [_vm._v(_vm._s(_vm.power_gen))]), _vm._v(" "), _vm._l((_vm.crew.names), function(name) {
-    return [_c('StatlineCell', {
-      attrs: {
-        "stats": _vm.crew,
-        "name": name
-      }
-    })]
-  }), _vm._v(" "), _c('td', {
-    staticClass: "build-time-column"
-  }, [_vm._v(_vm._s(_vm.build_time))])], 2)
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "tr",
+    { staticClass: "module-tr", class: { hasloaderror: !_vm.isloaded } },
+    [
+      _c("td", { staticClass: "name-column", attrs: { colspan: "2" } }, [
+        _vm._v("Module")
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "part-column" }, [
+        _c("span", { staticClass: "module-pair-span" }, [
+          _c("span", { staticClass: "module-pair-type" }, [
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.module_type,
+                    expression: "module_type"
+                  }
+                ],
+                staticClass: "part-column-select",
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.module_type = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  }
+                }
+              },
+              _vm._l(_vm.valid_types, function(module_type_value) {
+                return _c("option", [_vm._v(_vm._s(module_type_value))])
+              })
+            )
+          ]),
+          _vm._v(" "),
+          _c("span", { staticClass: "module-pair-variant" }, [
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.module_variant,
+                    expression: "module_variant"
+                  }
+                ],
+                staticClass: "part-column-select",
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.module_variant = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  }
+                }
+              },
+              _vm._l(_vm.valid_variants, function(module_variant_value) {
+                return _c("option", [
+                  _vm._v(_vm._s(module_variant_value["Variant"]))
+                ])
+              })
+            )
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _vm._l(_vm.stats.names, function(name) {
+        return [_c("StatlineCell", { attrs: { stats: _vm.stats, name: name } })]
+      }),
+      _vm._v(" "),
+      _c("td", { staticClass: "weight-internal-column" }, [
+        _vm._v(_vm._s(_vm.weight_internal))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "weight-external-column" }, [
+        _vm._v(_vm._s(_vm.weight_external))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "br-column" }, [_vm._v(_vm._s(_vm.cost_br))]),
+      _vm._v(" "),
+      _c("td", { staticClass: "sr-column" }, [_vm._v(_vm._s(_vm.cost_sr))]),
+      _vm._v(" "),
+      _c("td", { staticClass: "power-cost-column" }, [
+        _vm._v(_vm._s(_vm.power_cost))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "power-gen-column" }, [
+        _vm._v(_vm._s(_vm.power_gen))
+      ]),
+      _vm._v(" "),
+      _vm._l(_vm.crew.names, function(name) {
+        return [_c("StatlineCell", { attrs: { stats: _vm.crew, name: name } })]
+      }),
+      _vm._v(" "),
+      _c("td", { staticClass: "build-time-column" }, [
+        _vm._v(_vm._s(_vm.build_time))
+      ])
+    ],
+    2
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -99595,59 +99811,107 @@ if (false) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "design-table"
-  }, [_c('table', [_vm._m(0), _vm._v(" "), _c('tbody', {
-    staticClass: "design-table-body"
-  }, [_c('PrincipalFrameFinal', {
-    attrs: {
-      "se_db": _vm.se_db,
-      "se_design": _vm.se_design
-    }
-  }), _vm._v(" "), _c('PrincipalFrameRaw', {
-    attrs: {
-      "se_db": _vm.se_db,
-      "se_design": _vm.se_design
-    }
-  }), _vm._v(" "), _vm._l((_vm.se_subsystems), function(se_subsystem) {
-    return [_c('SubsystemFrame', {
-      attrs: {
-        "se_db": _vm.se_db,
-        "se_subsystem": se_subsystem
-      }
-    }), _vm._v(" "), _c('SubsystemSummary', {
-      attrs: {
-        "se_db": _vm.se_db,
-        "se_subsystem": se_subsystem
-      }
-    }), _vm._v(" "), _c('SubsystemSettings', {
-      attrs: {
-        "se_db": _vm.se_db,
-        "se_subsystem": se_subsystem
-      }
-    }), _vm._v(" "), _vm._l((se_subsystem.components), function(se_component) {
-      return [_c('ComponentTr', {
-        attrs: {
-          "se_db": _vm.se_db,
-          "se_component": se_component
-        }
-      })]
-    })]
-  }), _vm._v(" "), _c('ModuleTr', {
-    attrs: {
-      "se_db": _vm.se_db,
-      "se_module": _vm.se_design.module
-    }
-  })], 2)])])
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "design-table" }, [
+    _c("table", [
+      _vm._m(0),
+      _vm._v(" "),
+      _c(
+        "tbody",
+        { staticClass: "design-table-body" },
+        [
+          _c("PrincipalFrameFinal", {
+            attrs: { se_db: _vm.se_db, se_design: _vm.se_design }
+          }),
+          _vm._v(" "),
+          _c("PrincipalFrameRaw", {
+            attrs: { se_db: _vm.se_db, se_design: _vm.se_design }
+          }),
+          _vm._v(" "),
+          _vm._l(_vm.se_subsystems, function(se_subsystem) {
+            return [
+              _c("SubsystemFrame", {
+                attrs: { se_db: _vm.se_db, se_subsystem: se_subsystem }
+              }),
+              _vm._v(" "),
+              _c("SubsystemSummary", {
+                attrs: { se_db: _vm.se_db, se_subsystem: se_subsystem }
+              }),
+              _vm._v(" "),
+              _c("SubsystemSettings", {
+                attrs: { se_db: _vm.se_db, se_subsystem: se_subsystem }
+              }),
+              _vm._v(" "),
+              _vm._l(se_subsystem.components, function(se_component) {
+                return [
+                  _c("ComponentTr", {
+                    attrs: { se_db: _vm.se_db, se_component: se_component }
+                  })
+                ]
+              })
+            ]
+          }),
+          _vm._v(" "),
+          _c("ModuleTr", {
+            attrs: { se_db: _vm.se_db, se_module: _vm.se_design.module }
+          })
+        ],
+        2
+      )
+    ])
+  ])
 }
-var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('thead', {
-    staticClass: "design-table-head"
-  }, [_c('tr', {
-    staticClass: "design-table-head-tr"
-  }, [_c('th'), _vm._v(" "), _c('th'), _vm._v(" "), _c('th'), _vm._v(" "), _c('th', [_vm._v("C")]), _vm._v(" "), _c('th', [_vm._v("S")]), _vm._v(" "), _c('th', [_vm._v("H")]), _vm._v(" "), _c('th', [_vm._v("L")]), _vm._v(" "), _c('th', [_vm._v("P")]), _vm._v(" "), _c('th', [_vm._v("D")]), _vm._v(" "), _c('th', [_vm._v("Wt (Int")]), _vm._v(" "), _c('th', [_vm._v("Ext)")]), _vm._v(" "), _c('th', [_vm._v("BR")]), _vm._v(" "), _c('th', [_vm._v("SR")]), _vm._v(" "), _c('th', [_vm._v("Pwr Cost")]), _vm._v(" "), _c('th', [_vm._v("Pwr Gen")]), _vm._v(" "), _c('th', [_vm._v("O")]), _vm._v(" "), _c('th', [_vm._v("E")]), _vm._v(" "), _c('th', [_vm._v("T")]), _vm._v(" "), _c('th', [_vm._v("Build Time")])])])
-}]
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", { staticClass: "design-table-head" }, [
+      _c("tr", { staticClass: "design-table-head-tr" }, [
+        _c("th"),
+        _vm._v(" "),
+        _c("th"),
+        _vm._v(" "),
+        _c("th"),
+        _vm._v(" "),
+        _c("th", [_vm._v("C")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("S")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("H")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("L")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("P")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("D")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Wt (Int")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Ext)")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("BR")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("SR")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Pwr Cost")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Pwr Gen")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("O")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("E")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("T")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Build Time")])
+      ])
+    ])
+  }
+]
 render._withStripped = true
 var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
@@ -99664,7 +99928,7 @@ if (false) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_import_export_vue__ = __webpack_require__(658);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_8a85d0ac_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_design_import_export_vue__ = __webpack_require__(660);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_8a85d0ac_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_design_import_export_vue__ = __webpack_require__(659);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
@@ -99746,7 +100010,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.design-import-export[data-v-8a85d0ac] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/design-import-export.vue?67ab7aaa"],"names":[],"mappings":";AAiIA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n  <div class=\"design-import-export\">\n    <input id=\"design-import-export-blueprint-string\" v-model=\"design_json_string\">\n    <input type=\"button\"\n\t   class=\"clipboard-copy-button\"\n\t   data-clipboard-target=\"#design-import-export-blueprint-string\"\n\t   value=\"Copy\"></input>\n\n    <select v-model=\"selected_save\">\n      <option v-for=\"blueprint in local_saves\">\n\t{{blueprint['Name']}} @{{blueprint['Blueprint Date']}}\n      </option>\n    </select>\n\n    <input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"></input>\n    <input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"></input>\n\n    <input type=\"button\" @click=\"local_saves_save_design\" value=\"Save current design\"></input>\n    <input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"></input>\n\n    <span class=\"design-import-export-status-message\">{{ status_message }}</span>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash'\nimport localforage from 'localforage'\nimport Clipboard from 'clipboard';\n\nnew Clipboard('.clipboard-copy-button');\n\nconst STATUS_DEFAULT_DURATION = 2000;\n\nexport default {\n    name: 'DesignImportExport',\n    components: {\n    },\n    data () {\n\treturn {\n\t    // local_saves is a straight array of blueprint objects,\n\t    // exactly the same as the design_info.data object.\n\t    local_saves: [],\n\t    // the currently selected element of the local_saves\n\t    // array. *not* the same as design_info.data! this is so\n\t    // the user can work with the list of locally saved\n\t    // blueprints without clobbering their current work.\n\t    // TODO: Consider binding to the actual blueprint\n\t    selected_save: null,\n\n\t    status_message: \"\",\n\n\t    status_message_timeout_id: null,\n\t};\n    },\n    props: {\n\tdesign_info: Object,\n    },\n    computed: {\n\tdesign_json_string: {\n\t    get () {\n\t\tlet timestamp = new Date();\n\t\t// timestamp.setSeconds(0);\n\t\ttimestamp.setMilliseconds(0);\n\t\tthis.design_info.data['Blueprint Date'] = timestamp.toISOString();\n\t\treturn JSON.stringify(this.design_info.data);\n\t    },\n\t    set (value) {\n\t\tthis.design_info.data = JSON.parse(value);\n\t    },\n\t},\n    },\n    mounted () {\n\tthis.local_saves_load_from_local_storage();\n    },\n    methods: {\n\tlocal_saves_delete_selected () {\n\t    // Remove the selected blueprint from local_saves\n\t    _.remove(this.local_saves, e => {\n\t\tlet tmp = this.selected_save.split(\" @\");\n\t\treturn e['Name'] === tmp[0] && e['Blueprint Date'] === tmp[1];\n\t    });\n\t    this.selected_save = null;\n\t    this.local_saves_save_to_local_storage();\n\t},\n\tlocal_saves_load_selected () {\n\t    this.design_info.data = this.selected_save;\n\t},\n\tlocal_saves_save_design () {\n\t    // TODO: add the user's current blueprint to local_saves\n\t    this.local_saves.push(_.clone(this.design_info.data));\n\t    this.local_saves_save_to_local_storage();\n\t},\n\n\tlocal_saves_load_from_local_storage () {\n\t    // TODO: implement this\n\t    localforage.getItem('local_saves').then(\n\t\tvalue => {\n\t\t    this.local_saves = value;\n\t\t    this.display_status_message(\"Blueprints loaded.\")\n\t\t}\n\t    )\n\t},\n\tlocal_saves_save_to_local_storage () {\n\t    // TODO: implement this\n\t    localforage.setItem('local_saves', this.local_saves).then(\n\t\tvalue => {\n\t\t    this.display_status_message(\"Blueprints saved.\");\n\t\t}\n\t    )\n\t},\n\n\tdisplay_status_message (status) {\n\t    clearTimeout(this.status_message_timeout_id)\n\t    // TODO: Add fade in/out\n\t    this.status_message = status;\n\t},\n\n\tclear_status_message () {\n\t    // TODO: implement\n\t}\n\t\n    },\n}\n</script>\n\n\n<style scoped>\n.design-import-export {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.design-import-export[data-v-8a85d0ac] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.design-import-export-status-message[data-v-8a85d0ac] {\n}\n.fade[data-v-8a85d0ac] {\n\tanimation: fadeanim-data-v-8a85d0ac 3s forwards;\n}\n@keyframes fadeanim-data-v-8a85d0ac {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/design-import-export.vue?b0bb0e24"],"names":[],"mappings":";AAuJA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n  <div class=\"design-import-export\">\n    <input id=\"design-import-export-blueprint-string\" v-model=\"design_json_string\">\n    <input type=\"button\"\n\t\t   class=\"clipboard-copy-button\"\n\t\t   data-clipboard-target=\"#design-import-export-blueprint-string\"\n\t\t   value=\"Copy\"></input>\n\n    <select v-model=\"selected_save_bp\">\n      <option v-for=\"blueprint in local_saves\">\n\t\t{{blueprint_save_name(blueprint)}}\n      </option>\n    </select>\n\n    <input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"></input>\n    <input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"></input>\n\n    <input type=\"button\" @click=\"local_saves_save_design\" value=\"Save current design\"></input>\n    <input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"></input>\n\n    <span\n\t  ref=\"status_message\"\n\t  class=\"design-import-export-status-message\"\n\t  @animationend=\"clear_status_message()\">{{ status_message }}</span>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\nimport Clipboard from 'clipboard';\nimport ShipEngine from '../lib/shipengine';\n\nnew Clipboard('.clipboard-copy-button');\n\nconst LOCAL_SAVES_KEY = 'local_saves';\nconst STATUS_DEFAULT_DURATION = 2000;\n\nconst comparison_slice = _.partial(_.pick, _, ['Name', 'Blueprint Date']);\n\nexport default {\n    name: 'DesignImportExport',\n    components: {\n    },\n    data () {\n\t\treturn {\n\t\t\t// local_saves is a straight array of blueprint objects,\n\t\t\t// exactly the same as the design_info.data object.\n\t\t\tlocal_saves: [],\n\t\t\t// the currently selected element of the local_saves\n\t\t\t// array. *not* the same as design_info.data! this is so\n\t\t\t// the user can work with the list of locally saved\n\t\t\t// blueprints without clobbering their current work.\n\t\t\tselected_save: null,\n\n\t\t\tstatus_message: \"\",\n\n\t\t\tstatus_message_timeout_id: null,\n\t\t};\n    },\n    props: {\n\t\tdesign_info: Object,\n\t\tse_db: Object,\n    },\n    computed: {\n\t\tselected_save_bp: {\n\t\t\tget () {\n\t\t\t\tif (this.selected_save) {\n\t\t\t\t\treturn this.blueprint_save_name(this.selected_save);\n\t\t\t\t} else {\n\t\t\t\t\t''\n\t\t\t\t};\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.selected_save = _.chain(this.local_saves).find(bp => this.blueprint_save_name(bp) === value).value();\n\t\t\t},\n\t\t},\n\t\tdesign_json_string: {\n\t\t\tget () {\n\t\t\t\treturn JSON.stringify(this.design_info.data);\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.design_info.data = JSON.parse(value);\n\t\t\t},\n\t\t},\n    },\n    mounted () {\n\t\tthis.local_saves_load_from_local_storage();\n\t\twindow.addEventListener('storage', this.local_saves_load_from_local_storage);\n    },\n    methods: {\n\t\tblueprint_save_name (bp) {\n\t\t\t// return bp['Name'] + ' @' + new Date(bp['Blueprint Date']).toLocaleString();\n\t\t\treturn bp['Name'] +\n\t\t\t\t' (' + (new Date(bp['Blueprint Date']).toLocaleString()) + ')' +\n\t\t\t\t' [' + (new ShipEngine.Design(this.se_db, bp).stats.toString()) + ']';\n\t\t},\n\t\tlocal_saves_delete_selected () {\n\t\t\tthis.local_saves = _.chain(this.local_saves).filter(bp => {\n\t\t\t\treturn _.isEqual(comparison_slice(bp), comparison_slice(this.selected_save));\n\t\t\t}).value();\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message(\"Blueprint deleted.\");\n\t\t},\n\t\tlocal_saves_load_selected () {\n\t\t\tthis.design_info.data = this.selected_save;\n\t\t\tthis.display_status_message(\"Blueprint loaded.\");\n\t\t},\n\t\tlocal_saves_save_design () {\n\t\t\tlet timestamp = new Date();\n\t\t\ttimestamp.setMilliseconds(0);\n\t\t\tthis.design_info.data['Blueprint Date'] = timestamp.toISOString();\n\t\t\tthis.local_saves.push(_.clone(this.design_info.data));\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message(\"Blueprint saved.\");\n\t\t},\n\n\t\tlocal_saves_load_from_local_storage () {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_SAVES_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_saves = [];\n\t\t\t\tthis.display_status_message(\"No Blueprints to load\");\n\t\t\t} else {\n\t\t\t\tthis.local_saves = JSON.parse(loaded);\n\t\t\t\tthis.display_status_message(\"Blueprints loaded.\");\n\t\t\t};\n\t\t},\n\t\tlocal_saves_save_to_local_storage () {\n\t\t\tlocalStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(this.local_saves))\n\t\t},\n\n\t\tdisplay_status_message (status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'design-import-export-status-message';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = \"design-import-export-status-message fade\";\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message () {\n\t\t\tthis.status_message = null;\n\t\t}\n\t\t\n    },\n}\n</script>\n\n\n<style scoped>\n.design-import-export {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.design-import-export-status-message {\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -99758,10 +100022,13 @@ exports.push([module.i, "\n.design-import-export[data-v-8a85d0ac] {\n\tbackgroun
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(97);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_localforage__ = __webpack_require__(659);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_localforage___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_localforage__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_clipboard__ = __webpack_require__(569);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_clipboard___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_clipboard__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_clipboard__ = __webpack_require__(569);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_clipboard___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_clipboard__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_shipengine__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_shipengine___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__lib_shipengine__);
+//
+//
+//
 //
 //
 //
@@ -99793,9 +100060,12 @@ exports.push([module.i, "\n.design-import-export[data-v-8a85d0ac] {\n\tbackgroun
 
 
 
-new __WEBPACK_IMPORTED_MODULE_2_clipboard___default.a('.clipboard-copy-button');
+new __WEBPACK_IMPORTED_MODULE_1_clipboard___default.a('.clipboard-copy-button');
 
+const LOCAL_SAVES_KEY = 'local_saves';
 const STATUS_DEFAULT_DURATION = 2000;
+
+const comparison_slice = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.partial(__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.pick, __WEBPACK_IMPORTED_MODULE_0_lodash___default.a, ['Name', 'Blueprint Date']);
 
 /* harmony default export */ __webpack_exports__["a"] = ({
 	name: 'DesignImportExport',
@@ -99809,7 +100079,6 @@ const STATUS_DEFAULT_DURATION = 2000;
 			// array. *not* the same as design_info.data! this is so
 			// the user can work with the list of locally saved
 			// blueprints without clobbering their current work.
-			// TODO: Consider binding to the actual blueprint
 			selected_save: null,
 
 			status_message: "",
@@ -99818,15 +100087,24 @@ const STATUS_DEFAULT_DURATION = 2000;
 		};
 	},
 	props: {
-		design_info: Object
+		design_info: Object,
+		se_db: Object
 	},
 	computed: {
+		selected_save_bp: {
+			get() {
+				if (this.selected_save) {
+					return this.blueprint_save_name(this.selected_save);
+				} else {
+					'';
+				};
+			},
+			set(value) {
+				this.selected_save = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.chain(this.local_saves).find(bp => this.blueprint_save_name(bp) === value).value();
+			}
+		},
 		design_json_string: {
 			get() {
-				let timestamp = new Date();
-				// timestamp.setSeconds(0);
-				timestamp.setMilliseconds(0);
-				this.design_info.data['Blueprint Date'] = timestamp.toISOString();
 				return JSON.stringify(this.design_info.data);
 			},
 			set(value) {
@@ -99836,48 +100114,58 @@ const STATUS_DEFAULT_DURATION = 2000;
 	},
 	mounted() {
 		this.local_saves_load_from_local_storage();
+		window.addEventListener('storage', this.local_saves_load_from_local_storage);
 	},
 	methods: {
+		blueprint_save_name(bp) {
+			// return bp['Name'] + ' @' + new Date(bp['Blueprint Date']).toLocaleString();
+			return bp['Name'] + ' (' + new Date(bp['Blueprint Date']).toLocaleString() + ')' + ' [' + new __WEBPACK_IMPORTED_MODULE_2__lib_shipengine___default.a.Design(this.se_db, bp).stats.toString() + ']';
+		},
 		local_saves_delete_selected() {
-			// Remove the selected blueprint from local_saves
-			__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.remove(this.local_saves, e => {
-				let tmp = this.selected_save.split(" @");
-				return e['Name'] === tmp[0] && e['Blueprint Date'] === tmp[1];
-			});
-			this.selected_save = null;
+			this.local_saves = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.chain(this.local_saves).filter(bp => {
+				return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEqual(comparison_slice(bp), comparison_slice(this.selected_save));
+			}).value();
 			this.local_saves_save_to_local_storage();
+			this.display_status_message("Blueprint deleted.");
 		},
 		local_saves_load_selected() {
 			this.design_info.data = this.selected_save;
+			this.display_status_message("Blueprint loaded.");
 		},
 		local_saves_save_design() {
-			// TODO: add the user's current blueprint to local_saves
+			let timestamp = new Date();
+			timestamp.setMilliseconds(0);
+			this.design_info.data['Blueprint Date'] = timestamp.toISOString();
 			this.local_saves.push(__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.clone(this.design_info.data));
 			this.local_saves_save_to_local_storage();
+			this.display_status_message("Blueprint saved.");
 		},
 
 		local_saves_load_from_local_storage() {
-			// TODO: implement this
-			__WEBPACK_IMPORTED_MODULE_1_localforage___default.a.getItem('local_saves').then(value => {
-				this.local_saves = value;
+			const loaded = localStorage.getItem(LOCAL_SAVES_KEY);
+			if (loaded === null) {
+				this.local_saves = [];
+				this.display_status_message("No Blueprints to load");
+			} else {
+				this.local_saves = JSON.parse(loaded);
 				this.display_status_message("Blueprints loaded.");
-			});
+			};
 		},
 		local_saves_save_to_local_storage() {
-			// TODO: implement this
-			__WEBPACK_IMPORTED_MODULE_1_localforage___default.a.setItem('local_saves', this.local_saves).then(value => {
-				this.display_status_message("Blueprints saved.");
-			});
+			localStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(this.local_saves));
 		},
 
 		display_status_message(status) {
-			clearTimeout(this.status_message_timeout_id);
-			// TODO: Add fade in/out
 			this.status_message = status;
+			this.$refs.status_message.className = 'design-import-export-status-message';
+			window.requestAnimationFrame(function (time) {
+				window.requestAnimationFrame(function (time) {
+					this.$refs.status_message.className = "design-import-export-status-message fade";
+				}.bind(this));
+			}.bind(this));
 		},
-
 		clear_status_message() {
-			// TODO: implement
+			this.status_message = null;
 		}
 
 	}
@@ -99885,2412 +100173,114 @@ const STATUS_DEFAULT_DURATION = 2000;
 
 /***/ }),
 /* 659 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {var require;var require;/*!
-    localForage -- Offline Storage, Improved
-    Version 1.5.0
-    https://localforage.github.io/localForage
-    (c) 2013-2017 Mozilla, Apache License 2.0
-*/
-(function(f){if(true){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.localforage = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw (f.code="MODULE_NOT_FOUND", f)}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
-(function (global){
-'use strict';
-var Mutation = global.MutationObserver || global.WebKitMutationObserver;
-
-var scheduleDrain;
-
-{
-  if (Mutation) {
-    var called = 0;
-    var observer = new Mutation(nextTick);
-    var element = global.document.createTextNode('');
-    observer.observe(element, {
-      characterData: true
-    });
-    scheduleDrain = function () {
-      element.data = (called = ++called % 2);
-    };
-  } else if (!global.setImmediate && typeof global.MessageChannel !== 'undefined') {
-    var channel = new global.MessageChannel();
-    channel.port1.onmessage = nextTick;
-    scheduleDrain = function () {
-      channel.port2.postMessage(0);
-    };
-  } else if ('document' in global && 'onreadystatechange' in global.document.createElement('script')) {
-    scheduleDrain = function () {
-
-      // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
-      // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-      var scriptEl = global.document.createElement('script');
-      scriptEl.onreadystatechange = function () {
-        nextTick();
-
-        scriptEl.onreadystatechange = null;
-        scriptEl.parentNode.removeChild(scriptEl);
-        scriptEl = null;
-      };
-      global.document.documentElement.appendChild(scriptEl);
-    };
-  } else {
-    scheduleDrain = function () {
-      setTimeout(nextTick, 0);
-    };
-  }
-}
-
-var draining;
-var queue = [];
-//named nextTick for less confusing stack traces
-function nextTick() {
-  draining = true;
-  var i, oldQueue;
-  var len = queue.length;
-  while (len) {
-    oldQueue = queue;
-    queue = [];
-    i = -1;
-    while (++i < len) {
-      oldQueue[i]();
-    }
-    len = queue.length;
-  }
-  draining = false;
-}
-
-module.exports = immediate;
-function immediate(task) {
-  if (queue.push(task) === 1 && !draining) {
-    scheduleDrain();
-  }
-}
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],2:[function(_dereq_,module,exports){
-'use strict';
-var immediate = _dereq_(1);
-
-/* istanbul ignore next */
-function INTERNAL() {}
-
-var handlers = {};
-
-var REJECTED = ['REJECTED'];
-var FULFILLED = ['FULFILLED'];
-var PENDING = ['PENDING'];
-
-module.exports = exports = Promise;
-
-function Promise(resolver) {
-  if (typeof resolver !== 'function') {
-    throw new TypeError('resolver must be a function');
-  }
-  this.state = PENDING;
-  this.queue = [];
-  this.outcome = void 0;
-  if (resolver !== INTERNAL) {
-    safelyResolveThenable(this, resolver);
-  }
-}
-
-Promise.prototype["catch"] = function (onRejected) {
-  return this.then(null, onRejected);
-};
-Promise.prototype.then = function (onFulfilled, onRejected) {
-  if (typeof onFulfilled !== 'function' && this.state === FULFILLED ||
-    typeof onRejected !== 'function' && this.state === REJECTED) {
-    return this;
-  }
-  var promise = new this.constructor(INTERNAL);
-  if (this.state !== PENDING) {
-    var resolver = this.state === FULFILLED ? onFulfilled : onRejected;
-    unwrap(promise, resolver, this.outcome);
-  } else {
-    this.queue.push(new QueueItem(promise, onFulfilled, onRejected));
-  }
-
-  return promise;
-};
-function QueueItem(promise, onFulfilled, onRejected) {
-  this.promise = promise;
-  if (typeof onFulfilled === 'function') {
-    this.onFulfilled = onFulfilled;
-    this.callFulfilled = this.otherCallFulfilled;
-  }
-  if (typeof onRejected === 'function') {
-    this.onRejected = onRejected;
-    this.callRejected = this.otherCallRejected;
-  }
-}
-QueueItem.prototype.callFulfilled = function (value) {
-  handlers.resolve(this.promise, value);
-};
-QueueItem.prototype.otherCallFulfilled = function (value) {
-  unwrap(this.promise, this.onFulfilled, value);
-};
-QueueItem.prototype.callRejected = function (value) {
-  handlers.reject(this.promise, value);
-};
-QueueItem.prototype.otherCallRejected = function (value) {
-  unwrap(this.promise, this.onRejected, value);
-};
-
-function unwrap(promise, func, value) {
-  immediate(function () {
-    var returnValue;
-    try {
-      returnValue = func(value);
-    } catch (e) {
-      return handlers.reject(promise, e);
-    }
-    if (returnValue === promise) {
-      handlers.reject(promise, new TypeError('Cannot resolve promise with itself'));
-    } else {
-      handlers.resolve(promise, returnValue);
-    }
-  });
-}
-
-handlers.resolve = function (self, value) {
-  var result = tryCatch(getThen, value);
-  if (result.status === 'error') {
-    return handlers.reject(self, result.value);
-  }
-  var thenable = result.value;
-
-  if (thenable) {
-    safelyResolveThenable(self, thenable);
-  } else {
-    self.state = FULFILLED;
-    self.outcome = value;
-    var i = -1;
-    var len = self.queue.length;
-    while (++i < len) {
-      self.queue[i].callFulfilled(value);
-    }
-  }
-  return self;
-};
-handlers.reject = function (self, error) {
-  self.state = REJECTED;
-  self.outcome = error;
-  var i = -1;
-  var len = self.queue.length;
-  while (++i < len) {
-    self.queue[i].callRejected(error);
-  }
-  return self;
-};
-
-function getThen(obj) {
-  // Make sure we only access the accessor once as required by the spec
-  var then = obj && obj.then;
-  if (obj && typeof obj === 'object' && typeof then === 'function') {
-    return function appyThen() {
-      then.apply(obj, arguments);
-    };
-  }
-}
-
-function safelyResolveThenable(self, thenable) {
-  // Either fulfill, reject or reject with error
-  var called = false;
-  function onError(value) {
-    if (called) {
-      return;
-    }
-    called = true;
-    handlers.reject(self, value);
-  }
-
-  function onSuccess(value) {
-    if (called) {
-      return;
-    }
-    called = true;
-    handlers.resolve(self, value);
-  }
-
-  function tryToUnwrap() {
-    thenable(onSuccess, onError);
-  }
-
-  var result = tryCatch(tryToUnwrap);
-  if (result.status === 'error') {
-    onError(result.value);
-  }
-}
-
-function tryCatch(func, value) {
-  var out = {};
-  try {
-    out.value = func(value);
-    out.status = 'success';
-  } catch (e) {
-    out.status = 'error';
-    out.value = e;
-  }
-  return out;
-}
-
-exports.resolve = resolve;
-function resolve(value) {
-  if (value instanceof this) {
-    return value;
-  }
-  return handlers.resolve(new this(INTERNAL), value);
-}
-
-exports.reject = reject;
-function reject(reason) {
-  var promise = new this(INTERNAL);
-  return handlers.reject(promise, reason);
-}
-
-exports.all = all;
-function all(iterable) {
-  var self = this;
-  if (Object.prototype.toString.call(iterable) !== '[object Array]') {
-    return this.reject(new TypeError('must be an array'));
-  }
-
-  var len = iterable.length;
-  var called = false;
-  if (!len) {
-    return this.resolve([]);
-  }
-
-  var values = new Array(len);
-  var resolved = 0;
-  var i = -1;
-  var promise = new this(INTERNAL);
-
-  while (++i < len) {
-    allResolver(iterable[i], i);
-  }
-  return promise;
-  function allResolver(value, i) {
-    self.resolve(value).then(resolveFromAll, function (error) {
-      if (!called) {
-        called = true;
-        handlers.reject(promise, error);
-      }
-    });
-    function resolveFromAll(outValue) {
-      values[i] = outValue;
-      if (++resolved === len && !called) {
-        called = true;
-        handlers.resolve(promise, values);
-      }
-    }
-  }
-}
-
-exports.race = race;
-function race(iterable) {
-  var self = this;
-  if (Object.prototype.toString.call(iterable) !== '[object Array]') {
-    return this.reject(new TypeError('must be an array'));
-  }
-
-  var len = iterable.length;
-  var called = false;
-  if (!len) {
-    return this.resolve([]);
-  }
-
-  var i = -1;
-  var promise = new this(INTERNAL);
-
-  while (++i < len) {
-    resolver(iterable[i]);
-  }
-  return promise;
-  function resolver(value) {
-    self.resolve(value).then(function (response) {
-      if (!called) {
-        called = true;
-        handlers.resolve(promise, response);
-      }
-    }, function (error) {
-      if (!called) {
-        called = true;
-        handlers.reject(promise, error);
-      }
-    });
-  }
-}
-
-},{"1":1}],3:[function(_dereq_,module,exports){
-(function (global){
-'use strict';
-if (typeof global.Promise !== 'function') {
-  global.Promise = _dereq_(2);
-}
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"2":2}],4:[function(_dereq_,module,exports){
-'use strict';
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function getIDB() {
-    /* global indexedDB,webkitIndexedDB,mozIndexedDB,OIndexedDB,msIndexedDB */
-    try {
-        if (typeof indexedDB !== 'undefined') {
-            return indexedDB;
-        }
-        if (typeof webkitIndexedDB !== 'undefined') {
-            return webkitIndexedDB;
-        }
-        if (typeof mozIndexedDB !== 'undefined') {
-            return mozIndexedDB;
-        }
-        if (typeof OIndexedDB !== 'undefined') {
-            return OIndexedDB;
-        }
-        if (typeof msIndexedDB !== 'undefined') {
-            return msIndexedDB;
-        }
-    } catch (e) {}
-}
-
-var idb = getIDB();
-
-function isIndexedDBValid() {
-    try {
-        // Initialize IndexedDB; fall back to vendor-prefixed versions
-        // if needed.
-        if (!idb) {
-            return false;
-        }
-        // We mimic PouchDB here;
-        //
-        // We test for openDatabase because IE Mobile identifies itself
-        // as Safari. Oh the lulz...
-        var isSafari = typeof openDatabase !== 'undefined' && /(Safari|iPhone|iPad|iPod)/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent) && !/BlackBerry/.test(navigator.platform);
-
-        var hasFetch = typeof fetch === 'function' && fetch.toString().indexOf('[native code') !== -1;
-
-        // Safari <10.1 does not meet our requirements for IDB support (#5572)
-        // since Safari 10.1 shipped with fetch, we can use that to detect it
-        return (!isSafari || hasFetch) && typeof indexedDB !== 'undefined' &&
-        // some outdated implementations of IDB that appear on Samsung
-        // and HTC Android devices <4.4 are missing IDBKeyRange
-        typeof IDBKeyRange !== 'undefined';
-    } catch (e) {
-        return false;
-    }
-}
-
-function isWebSQLValid() {
-    return typeof openDatabase === 'function';
-}
-
-function isLocalStorageValid() {
-    try {
-        return typeof localStorage !== 'undefined' && 'setItem' in localStorage && localStorage.setItem;
-    } catch (e) {
-        return false;
-    }
-}
-
-// Abstracts constructing a Blob object, so it also works in older
-// browsers that don't support the native Blob constructor. (i.e.
-// old QtWebKit versions, at least).
-// Abstracts constructing a Blob object, so it also works in older
-// browsers that don't support the native Blob constructor. (i.e.
-// old QtWebKit versions, at least).
-function createBlob(parts, properties) {
-    /* global BlobBuilder,MSBlobBuilder,MozBlobBuilder,WebKitBlobBuilder */
-    parts = parts || [];
-    properties = properties || {};
-    try {
-        return new Blob(parts, properties);
-    } catch (e) {
-        if (e.name !== 'TypeError') {
-            throw e;
-        }
-        var Builder = typeof BlobBuilder !== 'undefined' ? BlobBuilder : typeof MSBlobBuilder !== 'undefined' ? MSBlobBuilder : typeof MozBlobBuilder !== 'undefined' ? MozBlobBuilder : WebKitBlobBuilder;
-        var builder = new Builder();
-        for (var i = 0; i < parts.length; i += 1) {
-            builder.append(parts[i]);
-        }
-        return builder.getBlob(properties.type);
-    }
-}
-
-// This is CommonJS because lie is an external dependency, so Rollup
-// can just ignore it.
-if (typeof Promise === 'undefined') {
-    // In the "nopromises" build this will just throw if you don't have
-    // a global promise object, but it would throw anyway later.
-    _dereq_(3);
-}
-var Promise$1 = Promise;
-
-function executeCallback(promise, callback) {
-    if (callback) {
-        promise.then(function (result) {
-            callback(null, result);
-        }, function (error) {
-            callback(error);
-        });
-    }
-}
-
-function executeTwoCallbacks(promise, callback, errorCallback) {
-    if (typeof callback === 'function') {
-        promise.then(callback);
-    }
-
-    if (typeof errorCallback === 'function') {
-        promise["catch"](errorCallback);
-    }
-}
-
-// Some code originally from async_storage.js in
-// [Gaia](https://github.com/mozilla-b2g/gaia).
-
-var DETECT_BLOB_SUPPORT_STORE = 'local-forage-detect-blob-support';
-var supportsBlobs;
-var dbContexts;
-var toString = Object.prototype.toString;
-
-// Transform a binary string to an array buffer, because otherwise
-// weird stuff happens when you try to work with the binary string directly.
-// It is known.
-// From http://stackoverflow.com/questions/14967647/ (continues on next line)
-// encode-decode-image-with-base64-breaks-image (2013-04-21)
-function _binStringToArrayBuffer(bin) {
-    var length = bin.length;
-    var buf = new ArrayBuffer(length);
-    var arr = new Uint8Array(buf);
-    for (var i = 0; i < length; i++) {
-        arr[i] = bin.charCodeAt(i);
-    }
-    return buf;
-}
-
-//
-// Blobs are not supported in all versions of IndexedDB, notably
-// Chrome <37 and Android <5. In those versions, storing a blob will throw.
-//
-// Various other blob bugs exist in Chrome v37-42 (inclusive).
-// Detecting them is expensive and confusing to users, and Chrome 37-42
-// is at very low usage worldwide, so we do a hacky userAgent check instead.
-//
-// content-type bug: https://code.google.com/p/chromium/issues/detail?id=408120
-// 404 bug: https://code.google.com/p/chromium/issues/detail?id=447916
-// FileReader bug: https://code.google.com/p/chromium/issues/detail?id=447836
-//
-// Code borrowed from PouchDB. See:
-// https://github.com/pouchdb/pouchdb/blob/master/packages/node_modules/pouchdb-adapter-idb/src/blobSupport.js
-//
-function _checkBlobSupportWithoutCaching(idb) {
-    return new Promise$1(function (resolve) {
-        var txn = idb.transaction(DETECT_BLOB_SUPPORT_STORE, 'readwrite');
-        var blob = createBlob(['']);
-        txn.objectStore(DETECT_BLOB_SUPPORT_STORE).put(blob, 'key');
-
-        txn.onabort = function (e) {
-            // If the transaction aborts now its due to not being able to
-            // write to the database, likely due to the disk being full
-            e.preventDefault();
-            e.stopPropagation();
-            resolve(false);
-        };
-
-        txn.oncomplete = function () {
-            var matchedChrome = navigator.userAgent.match(/Chrome\/(\d+)/);
-            var matchedEdge = navigator.userAgent.match(/Edge\//);
-            // MS Edge pretends to be Chrome 42:
-            // https://msdn.microsoft.com/en-us/library/hh869301%28v=vs.85%29.aspx
-            resolve(matchedEdge || !matchedChrome || parseInt(matchedChrome[1], 10) >= 43);
-        };
-    })["catch"](function () {
-        return false; // error, so assume unsupported
-    });
-}
-
-function _checkBlobSupport(idb) {
-    if (typeof supportsBlobs === 'boolean') {
-        return Promise$1.resolve(supportsBlobs);
-    }
-    return _checkBlobSupportWithoutCaching(idb).then(function (value) {
-        supportsBlobs = value;
-        return supportsBlobs;
-    });
-}
-
-function _deferReadiness(dbInfo) {
-    var dbContext = dbContexts[dbInfo.name];
-
-    // Create a deferred object representing the current database operation.
-    var deferredOperation = {};
-
-    deferredOperation.promise = new Promise$1(function (resolve) {
-        deferredOperation.resolve = resolve;
-    });
-
-    // Enqueue the deferred operation.
-    dbContext.deferredOperations.push(deferredOperation);
-
-    // Chain its promise to the database readiness.
-    if (!dbContext.dbReady) {
-        dbContext.dbReady = deferredOperation.promise;
-    } else {
-        dbContext.dbReady = dbContext.dbReady.then(function () {
-            return deferredOperation.promise;
-        });
-    }
-}
-
-function _advanceReadiness(dbInfo) {
-    var dbContext = dbContexts[dbInfo.name];
-
-    // Dequeue a deferred operation.
-    var deferredOperation = dbContext.deferredOperations.pop();
-
-    // Resolve its promise (which is part of the database readiness
-    // chain of promises).
-    if (deferredOperation) {
-        deferredOperation.resolve();
-    }
-}
-
-function _getConnection(dbInfo, upgradeNeeded) {
-    return new Promise$1(function (resolve, reject) {
-
-        if (dbInfo.db) {
-            if (upgradeNeeded) {
-                _deferReadiness(dbInfo);
-                dbInfo.db.close();
-            } else {
-                return resolve(dbInfo.db);
-            }
-        }
-
-        var dbArgs = [dbInfo.name];
-
-        if (upgradeNeeded) {
-            dbArgs.push(dbInfo.version);
-        }
-
-        var openreq = idb.open.apply(idb, dbArgs);
-
-        if (upgradeNeeded) {
-            openreq.onupgradeneeded = function (e) {
-                var db = openreq.result;
-                try {
-                    db.createObjectStore(dbInfo.storeName);
-                    if (e.oldVersion <= 1) {
-                        // Added when support for blob shims was added
-                        db.createObjectStore(DETECT_BLOB_SUPPORT_STORE);
-                    }
-                } catch (ex) {
-                    if (ex.name === 'ConstraintError') {
-                        console.warn('The database "' + dbInfo.name + '"' + ' has been upgraded from version ' + e.oldVersion + ' to version ' + e.newVersion + ', but the storage "' + dbInfo.storeName + '" already exists.');
-                    } else {
-                        throw ex;
-                    }
-                }
-            };
-        }
-
-        openreq.onerror = function (e) {
-            e.preventDefault();
-            reject(openreq.error);
-        };
-
-        openreq.onsuccess = function () {
-            resolve(openreq.result);
-            _advanceReadiness(dbInfo);
-        };
-    });
-}
-
-function _getOriginalConnection(dbInfo) {
-    return _getConnection(dbInfo, false);
-}
-
-function _getUpgradedConnection(dbInfo) {
-    return _getConnection(dbInfo, true);
-}
-
-function _isUpgradeNeeded(dbInfo, defaultVersion) {
-    if (!dbInfo.db) {
-        return true;
-    }
-
-    var isNewStore = !dbInfo.db.objectStoreNames.contains(dbInfo.storeName);
-    var isDowngrade = dbInfo.version < dbInfo.db.version;
-    var isUpgrade = dbInfo.version > dbInfo.db.version;
-
-    if (isDowngrade) {
-        // If the version is not the default one
-        // then warn for impossible downgrade.
-        if (dbInfo.version !== defaultVersion) {
-            console.warn('The database "' + dbInfo.name + '"' + ' can\'t be downgraded from version ' + dbInfo.db.version + ' to version ' + dbInfo.version + '.');
-        }
-        // Align the versions to prevent errors.
-        dbInfo.version = dbInfo.db.version;
-    }
-
-    if (isUpgrade || isNewStore) {
-        // If the store is new then increment the version (if needed).
-        // This will trigger an "upgradeneeded" event which is required
-        // for creating a store.
-        if (isNewStore) {
-            var incVersion = dbInfo.db.version + 1;
-            if (incVersion > dbInfo.version) {
-                dbInfo.version = incVersion;
-            }
-        }
-
-        return true;
-    }
-
-    return false;
-}
-
-// encode a blob for indexeddb engines that don't support blobs
-function _encodeBlob(blob) {
-    return new Promise$1(function (resolve, reject) {
-        var reader = new FileReader();
-        reader.onerror = reject;
-        reader.onloadend = function (e) {
-            var base64 = btoa(e.target.result || '');
-            resolve({
-                __local_forage_encoded_blob: true,
-                data: base64,
-                type: blob.type
-            });
-        };
-        reader.readAsBinaryString(blob);
-    });
-}
-
-// decode an encoded blob
-function _decodeBlob(encodedBlob) {
-    var arrayBuff = _binStringToArrayBuffer(atob(encodedBlob.data));
-    return createBlob([arrayBuff], { type: encodedBlob.type });
-}
-
-// is this one of our fancy encoded blobs?
-function _isEncodedBlob(value) {
-    return value && value.__local_forage_encoded_blob;
-}
-
-// Specialize the default `ready()` function by making it dependent
-// on the current database operations. Thus, the driver will be actually
-// ready when it's been initialized (default) *and* there are no pending
-// operations on the database (initiated by some other instances).
-function _fullyReady(callback) {
-    var self = this;
-
-    var promise = self._initReady().then(function () {
-        var dbContext = dbContexts[self._dbInfo.name];
-
-        if (dbContext && dbContext.dbReady) {
-            return dbContext.dbReady;
-        }
-    });
-
-    executeTwoCallbacks(promise, callback, callback);
-    return promise;
-}
-
-// Open the IndexedDB database (automatically creates one if one didn't
-// previously exist), using any options set in the config.
-function _initStorage(options) {
-    var self = this;
-    var dbInfo = {
-        db: null
-    };
-
-    if (options) {
-        for (var i in options) {
-            dbInfo[i] = options[i];
-        }
-    }
-
-    // Initialize a singleton container for all running localForages.
-    if (!dbContexts) {
-        dbContexts = {};
-    }
-
-    // Get the current context of the database;
-    var dbContext = dbContexts[dbInfo.name];
-
-    // ...or create a new context.
-    if (!dbContext) {
-        dbContext = {
-            // Running localForages sharing a database.
-            forages: [],
-            // Shared database.
-            db: null,
-            // Database readiness (promise).
-            dbReady: null,
-            // Deferred operations on the database.
-            deferredOperations: []
-        };
-        // Register the new context in the global container.
-        dbContexts[dbInfo.name] = dbContext;
-    }
-
-    // Register itself as a running localForage in the current context.
-    dbContext.forages.push(self);
-
-    // Replace the default `ready()` function with the specialized one.
-    if (!self._initReady) {
-        self._initReady = self.ready;
-        self.ready = _fullyReady;
-    }
-
-    // Create an array of initialization states of the related localForages.
-    var initPromises = [];
-
-    function ignoreErrors() {
-        // Don't handle errors here,
-        // just makes sure related localForages aren't pending.
-        return Promise$1.resolve();
-    }
-
-    for (var j = 0; j < dbContext.forages.length; j++) {
-        var forage = dbContext.forages[j];
-        if (forage !== self) {
-            // Don't wait for itself...
-            initPromises.push(forage._initReady()["catch"](ignoreErrors));
-        }
-    }
-
-    // Take a snapshot of the related localForages.
-    var forages = dbContext.forages.slice(0);
-
-    // Initialize the connection process only when
-    // all the related localForages aren't pending.
-    return Promise$1.all(initPromises).then(function () {
-        dbInfo.db = dbContext.db;
-        // Get the connection or open a new one without upgrade.
-        return _getOriginalConnection(dbInfo);
-    }).then(function (db) {
-        dbInfo.db = db;
-        if (_isUpgradeNeeded(dbInfo, self._defaultConfig.version)) {
-            // Reopen the database for upgrading.
-            return _getUpgradedConnection(dbInfo);
-        }
-        return db;
-    }).then(function (db) {
-        dbInfo.db = dbContext.db = db;
-        self._dbInfo = dbInfo;
-        // Share the final connection amongst related localForages.
-        for (var k = 0; k < forages.length; k++) {
-            var forage = forages[k];
-            if (forage !== self) {
-                // Self is already up-to-date.
-                forage._dbInfo.db = dbInfo.db;
-                forage._dbInfo.version = dbInfo.version;
-            }
-        }
-    });
-}
-
-function getItem(key, callback) {
-    var self = this;
-
-    // Cast the key to a string, as that's all we can set as a key.
-    if (typeof key !== 'string') {
-        console.warn(key + ' used as a key, but it is not a string.');
-        key = String(key);
-    }
-
-    var promise = new Promise$1(function (resolve, reject) {
-        self.ready().then(function () {
-            var dbInfo = self._dbInfo;
-            var store = dbInfo.db.transaction(dbInfo.storeName, 'readonly').objectStore(dbInfo.storeName);
-            var req = store.get(key);
-
-            req.onsuccess = function () {
-                var value = req.result;
-                if (value === undefined) {
-                    value = null;
-                }
-                if (_isEncodedBlob(value)) {
-                    value = _decodeBlob(value);
-                }
-                resolve(value);
-            };
-
-            req.onerror = function () {
-                reject(req.error);
-            };
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-// Iterate over all items stored in database.
-function iterate(iterator, callback) {
-    var self = this;
-
-    var promise = new Promise$1(function (resolve, reject) {
-        self.ready().then(function () {
-            var dbInfo = self._dbInfo;
-            var store = dbInfo.db.transaction(dbInfo.storeName, 'readonly').objectStore(dbInfo.storeName);
-
-            var req = store.openCursor();
-            var iterationNumber = 1;
-
-            req.onsuccess = function () {
-                var cursor = req.result;
-
-                if (cursor) {
-                    var value = cursor.value;
-                    if (_isEncodedBlob(value)) {
-                        value = _decodeBlob(value);
-                    }
-                    var result = iterator(value, cursor.key, iterationNumber++);
-
-                    if (result !== void 0) {
-                        resolve(result);
-                    } else {
-                        cursor["continue"]();
-                    }
-                } else {
-                    resolve();
-                }
-            };
-
-            req.onerror = function () {
-                reject(req.error);
-            };
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-
-    return promise;
-}
-
-function setItem(key, value, callback) {
-    var self = this;
-
-    // Cast the key to a string, as that's all we can set as a key.
-    if (typeof key !== 'string') {
-        console.warn(key + ' used as a key, but it is not a string.');
-        key = String(key);
-    }
-
-    var promise = new Promise$1(function (resolve, reject) {
-        var dbInfo;
-        self.ready().then(function () {
-            dbInfo = self._dbInfo;
-            if (toString.call(value) === '[object Blob]') {
-                return _checkBlobSupport(dbInfo.db).then(function (blobSupport) {
-                    if (blobSupport) {
-                        return value;
-                    }
-                    return _encodeBlob(value);
-                });
-            }
-            return value;
-        }).then(function (value) {
-            var transaction = dbInfo.db.transaction(dbInfo.storeName, 'readwrite');
-            var store = transaction.objectStore(dbInfo.storeName);
-            var req = store.put(value, key);
-
-            // The reason we don't _save_ null is because IE 10 does
-            // not support saving the `null` type in IndexedDB. How
-            // ironic, given the bug below!
-            // See: https://github.com/mozilla/localForage/issues/161
-            if (value === null) {
-                value = undefined;
-            }
-
-            transaction.oncomplete = function () {
-                // Cast to undefined so the value passed to
-                // callback/promise is the same as what one would get out
-                // of `getItem()` later. This leads to some weirdness
-                // (setItem('foo', undefined) will return `null`), but
-                // it's not my fault localStorage is our baseline and that
-                // it's weird.
-                if (value === undefined) {
-                    value = null;
-                }
-
-                resolve(value);
-            };
-            transaction.onabort = transaction.onerror = function () {
-                var err = req.error ? req.error : req.transaction.error;
-                reject(err);
-            };
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-function removeItem(key, callback) {
-    var self = this;
-
-    // Cast the key to a string, as that's all we can set as a key.
-    if (typeof key !== 'string') {
-        console.warn(key + ' used as a key, but it is not a string.');
-        key = String(key);
-    }
-
-    var promise = new Promise$1(function (resolve, reject) {
-        self.ready().then(function () {
-            var dbInfo = self._dbInfo;
-            var transaction = dbInfo.db.transaction(dbInfo.storeName, 'readwrite');
-            var store = transaction.objectStore(dbInfo.storeName);
-
-            // We use a Grunt task to make this safe for IE and some
-            // versions of Android (including those used by Cordova).
-            // Normally IE won't like `.delete()` and will insist on
-            // using `['delete']()`, but we have a build step that
-            // fixes this for us now.
-            var req = store["delete"](key);
-            transaction.oncomplete = function () {
-                resolve();
-            };
-
-            transaction.onerror = function () {
-                reject(req.error);
-            };
-
-            // The request will be also be aborted if we've exceeded our storage
-            // space.
-            transaction.onabort = function () {
-                var err = req.error ? req.error : req.transaction.error;
-                reject(err);
-            };
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-function clear(callback) {
-    var self = this;
-
-    var promise = new Promise$1(function (resolve, reject) {
-        self.ready().then(function () {
-            var dbInfo = self._dbInfo;
-            var transaction = dbInfo.db.transaction(dbInfo.storeName, 'readwrite');
-            var store = transaction.objectStore(dbInfo.storeName);
-            var req = store.clear();
-
-            transaction.oncomplete = function () {
-                resolve();
-            };
-
-            transaction.onabort = transaction.onerror = function () {
-                var err = req.error ? req.error : req.transaction.error;
-                reject(err);
-            };
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-function length(callback) {
-    var self = this;
-
-    var promise = new Promise$1(function (resolve, reject) {
-        self.ready().then(function () {
-            var dbInfo = self._dbInfo;
-            var store = dbInfo.db.transaction(dbInfo.storeName, 'readonly').objectStore(dbInfo.storeName);
-            var req = store.count();
-
-            req.onsuccess = function () {
-                resolve(req.result);
-            };
-
-            req.onerror = function () {
-                reject(req.error);
-            };
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-function key(n, callback) {
-    var self = this;
-
-    var promise = new Promise$1(function (resolve, reject) {
-        if (n < 0) {
-            resolve(null);
-
-            return;
-        }
-
-        self.ready().then(function () {
-            var dbInfo = self._dbInfo;
-            var store = dbInfo.db.transaction(dbInfo.storeName, 'readonly').objectStore(dbInfo.storeName);
-
-            var advanced = false;
-            var req = store.openCursor();
-            req.onsuccess = function () {
-                var cursor = req.result;
-                if (!cursor) {
-                    // this means there weren't enough keys
-                    resolve(null);
-
-                    return;
-                }
-
-                if (n === 0) {
-                    // We have the first key, return it if that's what they
-                    // wanted.
-                    resolve(cursor.key);
-                } else {
-                    if (!advanced) {
-                        // Otherwise, ask the cursor to skip ahead n
-                        // records.
-                        advanced = true;
-                        cursor.advance(n);
-                    } else {
-                        // When we get here, we've got the nth key.
-                        resolve(cursor.key);
-                    }
-                }
-            };
-
-            req.onerror = function () {
-                reject(req.error);
-            };
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-function keys(callback) {
-    var self = this;
-
-    var promise = new Promise$1(function (resolve, reject) {
-        self.ready().then(function () {
-            var dbInfo = self._dbInfo;
-            var store = dbInfo.db.transaction(dbInfo.storeName, 'readonly').objectStore(dbInfo.storeName);
-
-            var req = store.openCursor();
-            var keys = [];
-
-            req.onsuccess = function () {
-                var cursor = req.result;
-
-                if (!cursor) {
-                    resolve(keys);
-                    return;
-                }
-
-                keys.push(cursor.key);
-                cursor["continue"]();
-            };
-
-            req.onerror = function () {
-                reject(req.error);
-            };
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-var asyncStorage = {
-    _driver: 'asyncStorage',
-    _initStorage: _initStorage,
-    iterate: iterate,
-    getItem: getItem,
-    setItem: setItem,
-    removeItem: removeItem,
-    clear: clear,
-    length: length,
-    key: key,
-    keys: keys
-};
-
-// Sadly, the best way to save binary data in WebSQL/localStorage is serializing
-// it to Base64, so this is how we store it to prevent very strange errors with less
-// verbose ways of binary <-> string data storage.
-var BASE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-
-var BLOB_TYPE_PREFIX = '~~local_forage_type~';
-var BLOB_TYPE_PREFIX_REGEX = /^~~local_forage_type~([^~]+)~/;
-
-var SERIALIZED_MARKER = '__lfsc__:';
-var SERIALIZED_MARKER_LENGTH = SERIALIZED_MARKER.length;
-
-// OMG the serializations!
-var TYPE_ARRAYBUFFER = 'arbf';
-var TYPE_BLOB = 'blob';
-var TYPE_INT8ARRAY = 'si08';
-var TYPE_UINT8ARRAY = 'ui08';
-var TYPE_UINT8CLAMPEDARRAY = 'uic8';
-var TYPE_INT16ARRAY = 'si16';
-var TYPE_INT32ARRAY = 'si32';
-var TYPE_UINT16ARRAY = 'ur16';
-var TYPE_UINT32ARRAY = 'ui32';
-var TYPE_FLOAT32ARRAY = 'fl32';
-var TYPE_FLOAT64ARRAY = 'fl64';
-var TYPE_SERIALIZED_MARKER_LENGTH = SERIALIZED_MARKER_LENGTH + TYPE_ARRAYBUFFER.length;
-
-var toString$1 = Object.prototype.toString;
-
-function stringToBuffer(serializedString) {
-    // Fill the string into a ArrayBuffer.
-    var bufferLength = serializedString.length * 0.75;
-    var len = serializedString.length;
-    var i;
-    var p = 0;
-    var encoded1, encoded2, encoded3, encoded4;
-
-    if (serializedString[serializedString.length - 1] === '=') {
-        bufferLength--;
-        if (serializedString[serializedString.length - 2] === '=') {
-            bufferLength--;
-        }
-    }
-
-    var buffer = new ArrayBuffer(bufferLength);
-    var bytes = new Uint8Array(buffer);
-
-    for (i = 0; i < len; i += 4) {
-        encoded1 = BASE_CHARS.indexOf(serializedString[i]);
-        encoded2 = BASE_CHARS.indexOf(serializedString[i + 1]);
-        encoded3 = BASE_CHARS.indexOf(serializedString[i + 2]);
-        encoded4 = BASE_CHARS.indexOf(serializedString[i + 3]);
-
-        /*jslint bitwise: true */
-        bytes[p++] = encoded1 << 2 | encoded2 >> 4;
-        bytes[p++] = (encoded2 & 15) << 4 | encoded3 >> 2;
-        bytes[p++] = (encoded3 & 3) << 6 | encoded4 & 63;
-    }
-    return buffer;
-}
-
-// Converts a buffer to a string to store, serialized, in the backend
-// storage library.
-function bufferToString(buffer) {
-    // base64-arraybuffer
-    var bytes = new Uint8Array(buffer);
-    var base64String = '';
-    var i;
-
-    for (i = 0; i < bytes.length; i += 3) {
-        /*jslint bitwise: true */
-        base64String += BASE_CHARS[bytes[i] >> 2];
-        base64String += BASE_CHARS[(bytes[i] & 3) << 4 | bytes[i + 1] >> 4];
-        base64String += BASE_CHARS[(bytes[i + 1] & 15) << 2 | bytes[i + 2] >> 6];
-        base64String += BASE_CHARS[bytes[i + 2] & 63];
-    }
-
-    if (bytes.length % 3 === 2) {
-        base64String = base64String.substring(0, base64String.length - 1) + '=';
-    } else if (bytes.length % 3 === 1) {
-        base64String = base64String.substring(0, base64String.length - 2) + '==';
-    }
-
-    return base64String;
-}
-
-// Serialize a value, afterwards executing a callback (which usually
-// instructs the `setItem()` callback/promise to be executed). This is how
-// we store binary data with localStorage.
-function serialize(value, callback) {
-    var valueType = '';
-    if (value) {
-        valueType = toString$1.call(value);
-    }
-
-    // Cannot use `value instanceof ArrayBuffer` or such here, as these
-    // checks fail when running the tests using casper.js...
-    //
-    // TODO: See why those tests fail and use a better solution.
-    if (value && (valueType === '[object ArrayBuffer]' || value.buffer && toString$1.call(value.buffer) === '[object ArrayBuffer]')) {
-        // Convert binary arrays to a string and prefix the string with
-        // a special marker.
-        var buffer;
-        var marker = SERIALIZED_MARKER;
-
-        if (value instanceof ArrayBuffer) {
-            buffer = value;
-            marker += TYPE_ARRAYBUFFER;
-        } else {
-            buffer = value.buffer;
-
-            if (valueType === '[object Int8Array]') {
-                marker += TYPE_INT8ARRAY;
-            } else if (valueType === '[object Uint8Array]') {
-                marker += TYPE_UINT8ARRAY;
-            } else if (valueType === '[object Uint8ClampedArray]') {
-                marker += TYPE_UINT8CLAMPEDARRAY;
-            } else if (valueType === '[object Int16Array]') {
-                marker += TYPE_INT16ARRAY;
-            } else if (valueType === '[object Uint16Array]') {
-                marker += TYPE_UINT16ARRAY;
-            } else if (valueType === '[object Int32Array]') {
-                marker += TYPE_INT32ARRAY;
-            } else if (valueType === '[object Uint32Array]') {
-                marker += TYPE_UINT32ARRAY;
-            } else if (valueType === '[object Float32Array]') {
-                marker += TYPE_FLOAT32ARRAY;
-            } else if (valueType === '[object Float64Array]') {
-                marker += TYPE_FLOAT64ARRAY;
-            } else {
-                callback(new Error('Failed to get type for BinaryArray'));
-            }
-        }
-
-        callback(marker + bufferToString(buffer));
-    } else if (valueType === '[object Blob]') {
-        // Conver the blob to a binaryArray and then to a string.
-        var fileReader = new FileReader();
-
-        fileReader.onload = function () {
-            // Backwards-compatible prefix for the blob type.
-            var str = BLOB_TYPE_PREFIX + value.type + '~' + bufferToString(this.result);
-
-            callback(SERIALIZED_MARKER + TYPE_BLOB + str);
-        };
-
-        fileReader.readAsArrayBuffer(value);
-    } else {
-        try {
-            callback(JSON.stringify(value));
-        } catch (e) {
-            console.error("Couldn't convert value into a JSON string: ", value);
-
-            callback(null, e);
-        }
-    }
-}
-
-// Deserialize data we've inserted into a value column/field. We place
-// special markers into our strings to mark them as encoded; this isn't
-// as nice as a meta field, but it's the only sane thing we can do whilst
-// keeping localStorage support intact.
-//
-// Oftentimes this will just deserialize JSON content, but if we have a
-// special marker (SERIALIZED_MARKER, defined above), we will extract
-// some kind of arraybuffer/binary data/typed array out of the string.
-function deserialize(value) {
-    // If we haven't marked this string as being specially serialized (i.e.
-    // something other than serialized JSON), we can just return it and be
-    // done with it.
-    if (value.substring(0, SERIALIZED_MARKER_LENGTH) !== SERIALIZED_MARKER) {
-        return JSON.parse(value);
-    }
-
-    // The following code deals with deserializing some kind of Blob or
-    // TypedArray. First we separate out the type of data we're dealing
-    // with from the data itself.
-    var serializedString = value.substring(TYPE_SERIALIZED_MARKER_LENGTH);
-    var type = value.substring(SERIALIZED_MARKER_LENGTH, TYPE_SERIALIZED_MARKER_LENGTH);
-
-    var blobType;
-    // Backwards-compatible blob type serialization strategy.
-    // DBs created with older versions of localForage will simply not have the blob type.
-    if (type === TYPE_BLOB && BLOB_TYPE_PREFIX_REGEX.test(serializedString)) {
-        var matcher = serializedString.match(BLOB_TYPE_PREFIX_REGEX);
-        blobType = matcher[1];
-        serializedString = serializedString.substring(matcher[0].length);
-    }
-    var buffer = stringToBuffer(serializedString);
-
-    // Return the right type based on the code/type set during
-    // serialization.
-    switch (type) {
-        case TYPE_ARRAYBUFFER:
-            return buffer;
-        case TYPE_BLOB:
-            return createBlob([buffer], { type: blobType });
-        case TYPE_INT8ARRAY:
-            return new Int8Array(buffer);
-        case TYPE_UINT8ARRAY:
-            return new Uint8Array(buffer);
-        case TYPE_UINT8CLAMPEDARRAY:
-            return new Uint8ClampedArray(buffer);
-        case TYPE_INT16ARRAY:
-            return new Int16Array(buffer);
-        case TYPE_UINT16ARRAY:
-            return new Uint16Array(buffer);
-        case TYPE_INT32ARRAY:
-            return new Int32Array(buffer);
-        case TYPE_UINT32ARRAY:
-            return new Uint32Array(buffer);
-        case TYPE_FLOAT32ARRAY:
-            return new Float32Array(buffer);
-        case TYPE_FLOAT64ARRAY:
-            return new Float64Array(buffer);
-        default:
-            throw new Error('Unkown type: ' + type);
-    }
-}
-
-var localforageSerializer = {
-    serialize: serialize,
-    deserialize: deserialize,
-    stringToBuffer: stringToBuffer,
-    bufferToString: bufferToString
-};
-
-/*
- * Includes code from:
- *
- * base64-arraybuffer
- * https://github.com/niklasvh/base64-arraybuffer
- *
- * Copyright (c) 2012 Niklas von Hertzen
- * Licensed under the MIT license.
- */
-// Open the WebSQL database (automatically creates one if one didn't
-// previously exist), using any options set in the config.
-function _initStorage$1(options) {
-    var self = this;
-    var dbInfo = {
-        db: null
-    };
-
-    if (options) {
-        for (var i in options) {
-            dbInfo[i] = typeof options[i] !== 'string' ? options[i].toString() : options[i];
-        }
-    }
-
-    var dbInfoPromise = new Promise$1(function (resolve, reject) {
-        // Open the database; the openDatabase API will automatically
-        // create it for us if it doesn't exist.
-        try {
-            dbInfo.db = openDatabase(dbInfo.name, String(dbInfo.version), dbInfo.description, dbInfo.size);
-        } catch (e) {
-            return reject(e);
-        }
-
-        // Create our key/value table if it doesn't exist.
-        dbInfo.db.transaction(function (t) {
-            t.executeSql('CREATE TABLE IF NOT EXISTS ' + dbInfo.storeName + ' (id INTEGER PRIMARY KEY, key unique, value)', [], function () {
-                self._dbInfo = dbInfo;
-                resolve();
-            }, function (t, error) {
-                reject(error);
-            });
-        });
-    });
-
-    dbInfo.serializer = localforageSerializer;
-    return dbInfoPromise;
-}
-
-function getItem$1(key, callback) {
-    var self = this;
-
-    // Cast the key to a string, as that's all we can set as a key.
-    if (typeof key !== 'string') {
-        console.warn(key + ' used as a key, but it is not a string.');
-        key = String(key);
-    }
-
-    var promise = new Promise$1(function (resolve, reject) {
-        self.ready().then(function () {
-            var dbInfo = self._dbInfo;
-            dbInfo.db.transaction(function (t) {
-                t.executeSql('SELECT * FROM ' + dbInfo.storeName + ' WHERE key = ? LIMIT 1', [key], function (t, results) {
-                    var result = results.rows.length ? results.rows.item(0).value : null;
-
-                    // Check to see if this is serialized content we need to
-                    // unpack.
-                    if (result) {
-                        result = dbInfo.serializer.deserialize(result);
-                    }
-
-                    resolve(result);
-                }, function (t, error) {
-
-                    reject(error);
-                });
-            });
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-function iterate$1(iterator, callback) {
-    var self = this;
-
-    var promise = new Promise$1(function (resolve, reject) {
-        self.ready().then(function () {
-            var dbInfo = self._dbInfo;
-
-            dbInfo.db.transaction(function (t) {
-                t.executeSql('SELECT * FROM ' + dbInfo.storeName, [], function (t, results) {
-                    var rows = results.rows;
-                    var length = rows.length;
-
-                    for (var i = 0; i < length; i++) {
-                        var item = rows.item(i);
-                        var result = item.value;
-
-                        // Check to see if this is serialized content
-                        // we need to unpack.
-                        if (result) {
-                            result = dbInfo.serializer.deserialize(result);
-                        }
-
-                        result = iterator(result, item.key, i + 1);
-
-                        // void(0) prevents problems with redefinition
-                        // of `undefined`.
-                        if (result !== void 0) {
-                            resolve(result);
-                            return;
-                        }
-                    }
-
-                    resolve();
-                }, function (t, error) {
-                    reject(error);
-                });
-            });
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-function _setItem(key, value, callback, retriesLeft) {
-    var self = this;
-
-    // Cast the key to a string, as that's all we can set as a key.
-    if (typeof key !== 'string') {
-        console.warn(key + ' used as a key, but it is not a string.');
-        key = String(key);
-    }
-
-    var promise = new Promise$1(function (resolve, reject) {
-        self.ready().then(function () {
-            // The localStorage API doesn't return undefined values in an
-            // "expected" way, so undefined is always cast to null in all
-            // drivers. See: https://github.com/mozilla/localForage/pull/42
-            if (value === undefined) {
-                value = null;
-            }
-
-            // Save the original value to pass to the callback.
-            var originalValue = value;
-
-            var dbInfo = self._dbInfo;
-            dbInfo.serializer.serialize(value, function (value, error) {
-                if (error) {
-                    reject(error);
-                } else {
-                    dbInfo.db.transaction(function (t) {
-                        t.executeSql('INSERT OR REPLACE INTO ' + dbInfo.storeName + ' (key, value) VALUES (?, ?)', [key, value], function () {
-                            resolve(originalValue);
-                        }, function (t, error) {
-                            reject(error);
-                        });
-                    }, function (sqlError) {
-                        // The transaction failed; check
-                        // to see if it's a quota error.
-                        if (sqlError.code === sqlError.QUOTA_ERR) {
-                            // We reject the callback outright for now, but
-                            // it's worth trying to re-run the transaction.
-                            // Even if the user accepts the prompt to use
-                            // more storage on Safari, this error will
-                            // be called.
-                            //
-                            // Try to re-run the transaction.
-                            if (retriesLeft > 0) {
-                                resolve(_setItem.apply(self, [key, originalValue, callback, retriesLeft - 1]));
-                                return;
-                            }
-                            reject(sqlError);
-                        }
-                    });
-                }
-            });
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-function setItem$1(key, value, callback) {
-    return _setItem.apply(this, [key, value, callback, 1]);
-}
-
-function removeItem$1(key, callback) {
-    var self = this;
-
-    // Cast the key to a string, as that's all we can set as a key.
-    if (typeof key !== 'string') {
-        console.warn(key + ' used as a key, but it is not a string.');
-        key = String(key);
-    }
-
-    var promise = new Promise$1(function (resolve, reject) {
-        self.ready().then(function () {
-            var dbInfo = self._dbInfo;
-            dbInfo.db.transaction(function (t) {
-                t.executeSql('DELETE FROM ' + dbInfo.storeName + ' WHERE key = ?', [key], function () {
-                    resolve();
-                }, function (t, error) {
-
-                    reject(error);
-                });
-            });
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-// Deletes every item in the table.
-// TODO: Find out if this resets the AUTO_INCREMENT number.
-function clear$1(callback) {
-    var self = this;
-
-    var promise = new Promise$1(function (resolve, reject) {
-        self.ready().then(function () {
-            var dbInfo = self._dbInfo;
-            dbInfo.db.transaction(function (t) {
-                t.executeSql('DELETE FROM ' + dbInfo.storeName, [], function () {
-                    resolve();
-                }, function (t, error) {
-                    reject(error);
-                });
-            });
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-// Does a simple `COUNT(key)` to get the number of items stored in
-// localForage.
-function length$1(callback) {
-    var self = this;
-
-    var promise = new Promise$1(function (resolve, reject) {
-        self.ready().then(function () {
-            var dbInfo = self._dbInfo;
-            dbInfo.db.transaction(function (t) {
-                // Ahhh, SQL makes this one soooooo easy.
-                t.executeSql('SELECT COUNT(key) as c FROM ' + dbInfo.storeName, [], function (t, results) {
-                    var result = results.rows.item(0).c;
-
-                    resolve(result);
-                }, function (t, error) {
-
-                    reject(error);
-                });
-            });
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-// Return the key located at key index X; essentially gets the key from a
-// `WHERE id = ?`. This is the most efficient way I can think to implement
-// this rarely-used (in my experience) part of the API, but it can seem
-// inconsistent, because we do `INSERT OR REPLACE INTO` on `setItem()`, so
-// the ID of each key will change every time it's updated. Perhaps a stored
-// procedure for the `setItem()` SQL would solve this problem?
-// TODO: Don't change ID on `setItem()`.
-function key$1(n, callback) {
-    var self = this;
-
-    var promise = new Promise$1(function (resolve, reject) {
-        self.ready().then(function () {
-            var dbInfo = self._dbInfo;
-            dbInfo.db.transaction(function (t) {
-                t.executeSql('SELECT key FROM ' + dbInfo.storeName + ' WHERE id = ? LIMIT 1', [n + 1], function (t, results) {
-                    var result = results.rows.length ? results.rows.item(0).key : null;
-                    resolve(result);
-                }, function (t, error) {
-                    reject(error);
-                });
-            });
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-function keys$1(callback) {
-    var self = this;
-
-    var promise = new Promise$1(function (resolve, reject) {
-        self.ready().then(function () {
-            var dbInfo = self._dbInfo;
-            dbInfo.db.transaction(function (t) {
-                t.executeSql('SELECT key FROM ' + dbInfo.storeName, [], function (t, results) {
-                    var keys = [];
-
-                    for (var i = 0; i < results.rows.length; i++) {
-                        keys.push(results.rows.item(i).key);
-                    }
-
-                    resolve(keys);
-                }, function (t, error) {
-
-                    reject(error);
-                });
-            });
-        })["catch"](reject);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-var webSQLStorage = {
-    _driver: 'webSQLStorage',
-    _initStorage: _initStorage$1,
-    iterate: iterate$1,
-    getItem: getItem$1,
-    setItem: setItem$1,
-    removeItem: removeItem$1,
-    clear: clear$1,
-    length: length$1,
-    key: key$1,
-    keys: keys$1
-};
-
-// Config the localStorage backend, using options set in the config.
-function _initStorage$2(options) {
-    var self = this;
-    var dbInfo = {};
-    if (options) {
-        for (var i in options) {
-            dbInfo[i] = options[i];
-        }
-    }
-
-    dbInfo.keyPrefix = dbInfo.name + '/';
-
-    if (dbInfo.storeName !== self._defaultConfig.storeName) {
-        dbInfo.keyPrefix += dbInfo.storeName + '/';
-    }
-
-    self._dbInfo = dbInfo;
-    dbInfo.serializer = localforageSerializer;
-
-    return Promise$1.resolve();
-}
-
-// Remove all keys from the datastore, effectively destroying all data in
-// the app's key/value store!
-function clear$2(callback) {
-    var self = this;
-    var promise = self.ready().then(function () {
-        var keyPrefix = self._dbInfo.keyPrefix;
-
-        for (var i = localStorage.length - 1; i >= 0; i--) {
-            var key = localStorage.key(i);
-
-            if (key.indexOf(keyPrefix) === 0) {
-                localStorage.removeItem(key);
-            }
-        }
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-// Retrieve an item from the store. Unlike the original async_storage
-// library in Gaia, we don't modify return values at all. If a key's value
-// is `undefined`, we pass that value to the callback function.
-function getItem$2(key, callback) {
-    var self = this;
-
-    // Cast the key to a string, as that's all we can set as a key.
-    if (typeof key !== 'string') {
-        console.warn(key + ' used as a key, but it is not a string.');
-        key = String(key);
-    }
-
-    var promise = self.ready().then(function () {
-        var dbInfo = self._dbInfo;
-        var result = localStorage.getItem(dbInfo.keyPrefix + key);
-
-        // If a result was found, parse it from the serialized
-        // string into a JS object. If result isn't truthy, the key
-        // is likely undefined and we'll pass it straight to the
-        // callback.
-        if (result) {
-            result = dbInfo.serializer.deserialize(result);
-        }
-
-        return result;
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-// Iterate over all items in the store.
-function iterate$2(iterator, callback) {
-    var self = this;
-
-    var promise = self.ready().then(function () {
-        var dbInfo = self._dbInfo;
-        var keyPrefix = dbInfo.keyPrefix;
-        var keyPrefixLength = keyPrefix.length;
-        var length = localStorage.length;
-
-        // We use a dedicated iterator instead of the `i` variable below
-        // so other keys we fetch in localStorage aren't counted in
-        // the `iterationNumber` argument passed to the `iterate()`
-        // callback.
-        //
-        // See: github.com/mozilla/localForage/pull/435#discussion_r38061530
-        var iterationNumber = 1;
-
-        for (var i = 0; i < length; i++) {
-            var key = localStorage.key(i);
-            if (key.indexOf(keyPrefix) !== 0) {
-                continue;
-            }
-            var value = localStorage.getItem(key);
-
-            // If a result was found, parse it from the serialized
-            // string into a JS object. If result isn't truthy, the
-            // key is likely undefined and we'll pass it straight
-            // to the iterator.
-            if (value) {
-                value = dbInfo.serializer.deserialize(value);
-            }
-
-            value = iterator(value, key.substring(keyPrefixLength), iterationNumber++);
-
-            if (value !== void 0) {
-                return value;
-            }
-        }
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-// Same as localStorage's key() method, except takes a callback.
-function key$2(n, callback) {
-    var self = this;
-    var promise = self.ready().then(function () {
-        var dbInfo = self._dbInfo;
-        var result;
-        try {
-            result = localStorage.key(n);
-        } catch (error) {
-            result = null;
-        }
-
-        // Remove the prefix from the key, if a key is found.
-        if (result) {
-            result = result.substring(dbInfo.keyPrefix.length);
-        }
-
-        return result;
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-function keys$2(callback) {
-    var self = this;
-    var promise = self.ready().then(function () {
-        var dbInfo = self._dbInfo;
-        var length = localStorage.length;
-        var keys = [];
-
-        for (var i = 0; i < length; i++) {
-            if (localStorage.key(i).indexOf(dbInfo.keyPrefix) === 0) {
-                keys.push(localStorage.key(i).substring(dbInfo.keyPrefix.length));
-            }
-        }
-
-        return keys;
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-// Supply the number of keys in the datastore to the callback function.
-function length$2(callback) {
-    var self = this;
-    var promise = self.keys().then(function (keys) {
-        return keys.length;
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-// Remove an item from the store, nice and simple.
-function removeItem$2(key, callback) {
-    var self = this;
-
-    // Cast the key to a string, as that's all we can set as a key.
-    if (typeof key !== 'string') {
-        console.warn(key + ' used as a key, but it is not a string.');
-        key = String(key);
-    }
-
-    var promise = self.ready().then(function () {
-        var dbInfo = self._dbInfo;
-        localStorage.removeItem(dbInfo.keyPrefix + key);
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-// Set a key's value and run an optional callback once the value is set.
-// Unlike Gaia's implementation, the callback function is passed the value,
-// in case you want to operate on that value only after you're sure it
-// saved, or something like that.
-function setItem$2(key, value, callback) {
-    var self = this;
-
-    // Cast the key to a string, as that's all we can set as a key.
-    if (typeof key !== 'string') {
-        console.warn(key + ' used as a key, but it is not a string.');
-        key = String(key);
-    }
-
-    var promise = self.ready().then(function () {
-        // Convert undefined values to null.
-        // https://github.com/mozilla/localForage/pull/42
-        if (value === undefined) {
-            value = null;
-        }
-
-        // Save the original value to pass to the callback.
-        var originalValue = value;
-
-        return new Promise$1(function (resolve, reject) {
-            var dbInfo = self._dbInfo;
-            dbInfo.serializer.serialize(value, function (value, error) {
-                if (error) {
-                    reject(error);
-                } else {
-                    try {
-                        localStorage.setItem(dbInfo.keyPrefix + key, value);
-                        resolve(originalValue);
-                    } catch (e) {
-                        // localStorage capacity exceeded.
-                        // TODO: Make this a specific error/event.
-                        if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-                            reject(e);
-                        }
-                        reject(e);
-                    }
-                }
-            });
-        });
-    });
-
-    executeCallback(promise, callback);
-    return promise;
-}
-
-var localStorageWrapper = {
-    _driver: 'localStorageWrapper',
-    _initStorage: _initStorage$2,
-    // Default API, from Gaia/localStorage.
-    iterate: iterate$2,
-    getItem: getItem$2,
-    setItem: setItem$2,
-    removeItem: removeItem$2,
-    clear: clear$2,
-    length: length$2,
-    key: key$2,
-    keys: keys$2
-};
-
-// Custom drivers are stored here when `defineDriver()` is called.
-// They are shared across all instances of localForage.
-var CustomDrivers = {};
-
-var DriverType = {
-    INDEXEDDB: 'asyncStorage',
-    LOCALSTORAGE: 'localStorageWrapper',
-    WEBSQL: 'webSQLStorage'
-};
-
-var DefaultDriverOrder = [DriverType.INDEXEDDB, DriverType.WEBSQL, DriverType.LOCALSTORAGE];
-
-var LibraryMethods = ['clear', 'getItem', 'iterate', 'key', 'keys', 'length', 'removeItem', 'setItem'];
-
-var DefaultConfig = {
-    description: '',
-    driver: DefaultDriverOrder.slice(),
-    name: 'localforage',
-    // Default DB size is _JUST UNDER_ 5MB, as it's the highest size
-    // we can use without a prompt.
-    size: 4980736,
-    storeName: 'keyvaluepairs',
-    version: 1.0
-};
-
-var driverSupport = {};
-// Check to see if IndexedDB is available and if it is the latest
-// implementation; it's our preferred backend library. We use "_spec_test"
-// as the name of the database because it's not the one we'll operate on,
-// but it's useful to make sure its using the right spec.
-// See: https://github.com/mozilla/localForage/issues/128
-driverSupport[DriverType.INDEXEDDB] = isIndexedDBValid();
-
-driverSupport[DriverType.WEBSQL] = isWebSQLValid();
-
-driverSupport[DriverType.LOCALSTORAGE] = isLocalStorageValid();
-
-var isArray = Array.isArray || function (arg) {
-    return Object.prototype.toString.call(arg) === '[object Array]';
-};
-
-function callWhenReady(localForageInstance, libraryMethod) {
-    localForageInstance[libraryMethod] = function () {
-        var _args = arguments;
-        return localForageInstance.ready().then(function () {
-            return localForageInstance[libraryMethod].apply(localForageInstance, _args);
-        });
-    };
-}
-
-function extend() {
-    for (var i = 1; i < arguments.length; i++) {
-        var arg = arguments[i];
-
-        if (arg) {
-            for (var key in arg) {
-                if (arg.hasOwnProperty(key)) {
-                    if (isArray(arg[key])) {
-                        arguments[0][key] = arg[key].slice();
-                    } else {
-                        arguments[0][key] = arg[key];
-                    }
-                }
-            }
-        }
-    }
-
-    return arguments[0];
-}
-
-function isLibraryDriver(driverName) {
-    for (var driver in DriverType) {
-        if (DriverType.hasOwnProperty(driver) && DriverType[driver] === driverName) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-var LocalForage = function () {
-    function LocalForage(options) {
-        _classCallCheck(this, LocalForage);
-
-        this.INDEXEDDB = DriverType.INDEXEDDB;
-        this.LOCALSTORAGE = DriverType.LOCALSTORAGE;
-        this.WEBSQL = DriverType.WEBSQL;
-
-        this._defaultConfig = extend({}, DefaultConfig);
-        this._config = extend({}, this._defaultConfig, options);
-        this._driverSet = null;
-        this._initDriver = null;
-        this._ready = false;
-        this._dbInfo = null;
-
-        this._wrapLibraryMethodsWithReady();
-        this.setDriver(this._config.driver)["catch"](function () {});
-    }
-
-    // Set any config values for localForage; can be called anytime before
-    // the first API call (e.g. `getItem`, `setItem`).
-    // We loop through options so we don't overwrite existing config
-    // values.
-
-
-    LocalForage.prototype.config = function config(options) {
-        // If the options argument is an object, we use it to set values.
-        // Otherwise, we return either a specified config value or all
-        // config values.
-        if ((typeof options === 'undefined' ? 'undefined' : _typeof(options)) === 'object') {
-            // If localforage is ready and fully initialized, we can't set
-            // any new configuration values. Instead, we return an error.
-            if (this._ready) {
-                return new Error("Can't call config() after localforage " + 'has been used.');
-            }
-
-            for (var i in options) {
-                if (i === 'storeName') {
-                    options[i] = options[i].replace(/\W/g, '_');
-                }
-
-                if (i === 'version' && typeof options[i] !== 'number') {
-                    return new Error('Database version must be a number.');
-                }
-
-                this._config[i] = options[i];
-            }
-
-            // after all config options are set and
-            // the driver option is used, try setting it
-            if ('driver' in options && options.driver) {
-                return this.setDriver(this._config.driver);
-            }
-
-            return true;
-        } else if (typeof options === 'string') {
-            return this._config[options];
-        } else {
-            return this._config;
-        }
-    };
-
-    // Used to define a custom driver, shared across all instances of
-    // localForage.
-
-
-    LocalForage.prototype.defineDriver = function defineDriver(driverObject, callback, errorCallback) {
-        var promise = new Promise$1(function (resolve, reject) {
-            try {
-                var driverName = driverObject._driver;
-                var complianceError = new Error('Custom driver not compliant; see ' + 'https://mozilla.github.io/localForage/#definedriver');
-                var namingError = new Error('Custom driver name already in use: ' + driverObject._driver);
-
-                // A driver name should be defined and not overlap with the
-                // library-defined, default drivers.
-                if (!driverObject._driver) {
-                    reject(complianceError);
-                    return;
-                }
-                if (isLibraryDriver(driverObject._driver)) {
-                    reject(namingError);
-                    return;
-                }
-
-                var customDriverMethods = LibraryMethods.concat('_initStorage');
-                for (var i = 0; i < customDriverMethods.length; i++) {
-                    var customDriverMethod = customDriverMethods[i];
-                    if (!customDriverMethod || !driverObject[customDriverMethod] || typeof driverObject[customDriverMethod] !== 'function') {
-                        reject(complianceError);
-                        return;
-                    }
-                }
-
-                var supportPromise = Promise$1.resolve(true);
-                if ('_support' in driverObject) {
-                    if (driverObject._support && typeof driverObject._support === 'function') {
-                        supportPromise = driverObject._support();
-                    } else {
-                        supportPromise = Promise$1.resolve(!!driverObject._support);
-                    }
-                }
-
-                supportPromise.then(function (supportResult) {
-                    driverSupport[driverName] = supportResult;
-                    CustomDrivers[driverName] = driverObject;
-                    resolve();
-                }, reject);
-            } catch (e) {
-                reject(e);
-            }
-        });
-
-        executeTwoCallbacks(promise, callback, errorCallback);
-        return promise;
-    };
-
-    LocalForage.prototype.driver = function driver() {
-        return this._driver || null;
-    };
-
-    LocalForage.prototype.getDriver = function getDriver(driverName, callback, errorCallback) {
-        var self = this;
-        var getDriverPromise = Promise$1.resolve().then(function () {
-            if (isLibraryDriver(driverName)) {
-                switch (driverName) {
-                    case self.INDEXEDDB:
-                        return asyncStorage;
-                    case self.LOCALSTORAGE:
-                        return localStorageWrapper;
-                    case self.WEBSQL:
-                        return webSQLStorage;
-                }
-            } else if (CustomDrivers[driverName]) {
-                return CustomDrivers[driverName];
-            } else {
-                throw new Error('Driver not found.');
-            }
-        });
-        executeTwoCallbacks(getDriverPromise, callback, errorCallback);
-        return getDriverPromise;
-    };
-
-    LocalForage.prototype.getSerializer = function getSerializer(callback) {
-        var serializerPromise = Promise$1.resolve(localforageSerializer);
-        executeTwoCallbacks(serializerPromise, callback);
-        return serializerPromise;
-    };
-
-    LocalForage.prototype.ready = function ready(callback) {
-        var self = this;
-
-        var promise = self._driverSet.then(function () {
-            if (self._ready === null) {
-                self._ready = self._initDriver();
-            }
-
-            return self._ready;
-        });
-
-        executeTwoCallbacks(promise, callback, callback);
-        return promise;
-    };
-
-    LocalForage.prototype.setDriver = function setDriver(drivers, callback, errorCallback) {
-        var self = this;
-
-        if (!isArray(drivers)) {
-            drivers = [drivers];
-        }
-
-        var supportedDrivers = this._getSupportedDrivers(drivers);
-
-        function setDriverToConfig() {
-            self._config.driver = self.driver();
-        }
-
-        function extendSelfWithDriver(driver) {
-            self._extend(driver);
-            setDriverToConfig();
-
-            self._ready = self._initStorage(self._config);
-            return self._ready;
-        }
-
-        function initDriver(supportedDrivers) {
-            return function () {
-                var currentDriverIndex = 0;
-
-                function driverPromiseLoop() {
-                    while (currentDriverIndex < supportedDrivers.length) {
-                        var driverName = supportedDrivers[currentDriverIndex];
-                        currentDriverIndex++;
-
-                        self._dbInfo = null;
-                        self._ready = null;
-
-                        return self.getDriver(driverName).then(extendSelfWithDriver)["catch"](driverPromiseLoop);
-                    }
-
-                    setDriverToConfig();
-                    var error = new Error('No available storage method found.');
-                    self._driverSet = Promise$1.reject(error);
-                    return self._driverSet;
-                }
-
-                return driverPromiseLoop();
-            };
-        }
-
-        // There might be a driver initialization in progress
-        // so wait for it to finish in order to avoid a possible
-        // race condition to set _dbInfo
-        var oldDriverSetDone = this._driverSet !== null ? this._driverSet["catch"](function () {
-            return Promise$1.resolve();
-        }) : Promise$1.resolve();
-
-        this._driverSet = oldDriverSetDone.then(function () {
-            var driverName = supportedDrivers[0];
-            self._dbInfo = null;
-            self._ready = null;
-
-            return self.getDriver(driverName).then(function (driver) {
-                self._driver = driver._driver;
-                setDriverToConfig();
-                self._wrapLibraryMethodsWithReady();
-                self._initDriver = initDriver(supportedDrivers);
-            });
-        })["catch"](function () {
-            setDriverToConfig();
-            var error = new Error('No available storage method found.');
-            self._driverSet = Promise$1.reject(error);
-            return self._driverSet;
-        });
-
-        executeTwoCallbacks(this._driverSet, callback, errorCallback);
-        return this._driverSet;
-    };
-
-    LocalForage.prototype.supports = function supports(driverName) {
-        return !!driverSupport[driverName];
-    };
-
-    LocalForage.prototype._extend = function _extend(libraryMethodsAndProperties) {
-        extend(this, libraryMethodsAndProperties);
-    };
-
-    LocalForage.prototype._getSupportedDrivers = function _getSupportedDrivers(drivers) {
-        var supportedDrivers = [];
-        for (var i = 0, len = drivers.length; i < len; i++) {
-            var driverName = drivers[i];
-            if (this.supports(driverName)) {
-                supportedDrivers.push(driverName);
-            }
-        }
-        return supportedDrivers;
-    };
-
-    LocalForage.prototype._wrapLibraryMethodsWithReady = function _wrapLibraryMethodsWithReady() {
-        // Add a stub for each driver API method that delays the call to the
-        // corresponding driver method until localForage is ready. These stubs
-        // will be replaced by the driver methods as soon as the driver is
-        // loaded, so there is no performance impact.
-        for (var i = 0; i < LibraryMethods.length; i++) {
-            callWhenReady(this, LibraryMethods[i]);
-        }
-    };
-
-    LocalForage.prototype.createInstance = function createInstance(options) {
-        return new LocalForage(options);
-    };
-
-    return LocalForage;
-}();
-
-// The actual localForage object that we expose as a module or via a
-// global. It's extended by pulling in one of our other libraries.
-
-
-var localforage_js = new LocalForage();
-
-module.exports = localforage_js;
-
-},{"3":3}]},{},[4])(4)
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47)))
-
-/***/ }),
-/* 660 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "design-import-export"
-  }, [_c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.design_json_string),
-      expression: "design_json_string"
-    }],
-    attrs: {
-      "id": "design-import-export-blueprint-string"
-    },
-    domProps: {
-      "value": (_vm.design_json_string)
-    },
-    on: {
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.design_json_string = $event.target.value
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "design-import-export" }, [
+    _c("input", {
+      directives: [
+        {
+          name: "model",
+          rawName: "v-model",
+          value: _vm.design_json_string,
+          expression: "design_json_string"
+        }
+      ],
+      attrs: { id: "design-import-export-blueprint-string" },
+      domProps: { value: _vm.design_json_string },
+      on: {
+        input: function($event) {
+          if ($event.target.composing) {
+            return
+          }
+          _vm.design_json_string = $event.target.value
+        }
       }
-    }
-  }), _vm._v(" "), _c('input', {
-    staticClass: "clipboard-copy-button",
-    attrs: {
-      "type": "button",
-      "data-clipboard-target": "#design-import-export-blueprint-string",
-      "value": "Copy"
-    }
-  }), _vm._v(" "), _c('select', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.selected_save),
-      expression: "selected_save"
-    }],
-    on: {
-      "change": function($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function(o) {
-          return o.selected
-        }).map(function(o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val
-        });
-        _vm.selected_save = $event.target.multiple ? $$selectedVal : $$selectedVal[0]
+    }),
+    _vm._v(" "),
+    _c("input", {
+      staticClass: "clipboard-copy-button",
+      attrs: {
+        type: "button",
+        "data-clipboard-target": "#design-import-export-blueprint-string",
+        value: "Copy"
       }
-    }
-  }, _vm._l((_vm.local_saves), function(blueprint) {
-    return _c('option', [_vm._v("\n\t" + _vm._s(blueprint['Name']) + " @" + _vm._s(blueprint['Blueprint Date']) + "\n      ")])
-  })), _vm._v(" "), _c('input', {
-    attrs: {
-      "type": "button",
-      "value": "Delete save"
-    },
-    on: {
-      "click": _vm.local_saves_delete_selected
-    }
-  }), _vm._v(" "), _c('input', {
-    attrs: {
-      "type": "button",
-      "value": "Load save"
-    },
-    on: {
-      "click": _vm.local_saves_load_selected
-    }
-  }), _vm._v(" "), _c('input', {
-    attrs: {
-      "type": "button",
-      "value": "Save current design"
-    },
-    on: {
-      "click": _vm.local_saves_save_design
-    }
-  }), _vm._v(" "), _c('input', {
-    attrs: {
-      "type": "button",
-      "value": "Refresh"
-    },
-    on: {
-      "click": _vm.local_saves_load_from_local_storage
-    }
-  }), _vm._v(" "), _c('span', {
-    staticClass: "design-import-export-status-message"
-  }, [_vm._v(_vm._s(_vm.status_message))])])
+    }),
+    _vm._v(" "),
+    _c(
+      "select",
+      {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.selected_save_bp,
+            expression: "selected_save_bp"
+          }
+        ],
+        on: {
+          change: function($event) {
+            var $$selectedVal = Array.prototype.filter
+              .call($event.target.options, function(o) {
+                return o.selected
+              })
+              .map(function(o) {
+                var val = "_value" in o ? o._value : o.value
+                return val
+              })
+            _vm.selected_save_bp = $event.target.multiple
+              ? $$selectedVal
+              : $$selectedVal[0]
+          }
+        }
+      },
+      _vm._l(_vm.local_saves, function(blueprint) {
+        return _c("option", [
+          _vm._v(
+            "\n\t\t" + _vm._s(_vm.blueprint_save_name(blueprint)) + "\n      "
+          )
+        ])
+      })
+    ),
+    _vm._v(" "),
+    _c("input", {
+      attrs: { type: "button", value: "Delete save" },
+      on: { click: _vm.local_saves_delete_selected }
+    }),
+    _vm._v(" "),
+    _c("input", {
+      attrs: { type: "button", value: "Load save" },
+      on: { click: _vm.local_saves_load_selected }
+    }),
+    _vm._v(" "),
+    _c("input", {
+      attrs: { type: "button", value: "Save current design" },
+      on: { click: _vm.local_saves_save_design }
+    }),
+    _vm._v(" "),
+    _c("input", {
+      attrs: { type: "button", value: "Refresh" },
+      on: { click: _vm.local_saves_load_from_local_storage }
+    }),
+    _vm._v(" "),
+    _c(
+      "span",
+      {
+        ref: "status_message",
+        staticClass: "design-import-export-status-message",
+        on: {
+          animationend: function($event) {
+            _vm.clear_status_message()
+          }
+        }
+      },
+      [_vm._v(_vm._s(_vm.status_message))]
+    )
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -102304,34 +100294,44 @@ if (false) {
 }
 
 /***/ }),
-/* 661 */
+/* 660 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "root"
-  }, [_c('div', {
-    staticClass: "header"
-  }, [_c('DesignSummary', {
-    attrs: {
-      "se_db": _vm.se_db,
-      "se_design": _vm.se_design
-    }
-  })], 1), _vm._v(" "), _c('div', {
-    staticClass: "design"
-  }, [_c('Design', {
-    attrs: {
-      "se_db": _vm.se_db,
-      "se_design": _vm.se_design
-    }
-  })], 1), _vm._v(" "), _c('div', {
-    staticClass: "footer"
-  }, [_c('DesignImportExport', {
-    attrs: {
-      "design_info": _vm.design_info
-    }
-  })], 1)])
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "root" }, [
+    _c(
+      "div",
+      { staticClass: "header" },
+      [
+        _c("DesignSummary", {
+          attrs: { se_db: _vm.se_db, se_design: _vm.se_design }
+        })
+      ],
+      1
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "design" },
+      [_c("Design", { attrs: { se_db: _vm.se_db, se_design: _vm.se_design } })],
+      1
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "footer" },
+      [
+        _c("DesignImportExport", {
+          attrs: { se_db: _vm.se_db, design_info: _vm.design_info }
+        })
+      ],
+      1
+    )
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true

@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 662);
+/******/ 	return __webpack_require__(__webpack_require__.s = 661);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -4444,7 +4444,7 @@ function factory (type, config, load, typed) {
   var addScalar = load(__webpack_require__(22));
   var latex = __webpack_require__(4);
   
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm04 = load(__webpack_require__(79));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm13 = load(__webpack_require__(8));
@@ -4740,7 +4740,7 @@ function factory (type, config, load, typed) {
   var addScalar = load(__webpack_require__(22));
   var unaryMinus = load(__webpack_require__(41));
 
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm03 = load(__webpack_require__(17));
   var algorithm05 = load(__webpack_require__(66));
   var algorithm10 = load(__webpack_require__(40));
@@ -5369,7 +5369,7 @@ exports.factory = factory;
 
 exports.array = __webpack_require__(2);
 exports['boolean'] = __webpack_require__(193);
-exports['function'] = __webpack_require__(35);
+exports['function'] = __webpack_require__(36);
 exports.number = __webpack_require__(3);
 exports.object = __webpack_require__(5);
 exports.string = __webpack_require__(9);
@@ -6476,378 +6476,6 @@ exports.factory = factory;
 
 /***/ }),
 /* 35 */
-/***/ (function(module, exports) {
-
-// function utils
-
-/*
- * Memoize a given function by caching the computed result.
- * The cache of a memoized function can be cleared by deleting the `cache`
- * property of the function.
- *
- * @param {function} fn                     The function to be memoized.
- *                                          Must be a pure function.
- * @param {function(args: Array)} [hasher]  A custom hash builder.
- *                                          Is JSON.stringify by default.
- * @return {function}                       Returns the memoized function
- */
-exports.memoize = function(fn, hasher) {
-  return function memoize() {
-    if (typeof memoize.cache !== 'object') {
-      memoize.cache = {};
-    }
-
-    var args = [];
-    for (var i = 0; i < arguments.length; i++) {
-      args[i] = arguments[i];
-    }
-
-    var hash = hasher ? hasher(args) : JSON.stringify(args);
-    if (!(hash in memoize.cache)) {
-      return memoize.cache[hash] = fn.apply(fn, args);
-    }
-    return memoize.cache[hash];
-  };
-};
-
-/**
- * Find the maximum number of arguments expected by a typed function.
- * @param {function} fn   A typed function
- * @return {number} Returns the maximum number of expected arguments.
- *                  Returns -1 when no signatures where found on the function.
- */
-exports.maxArgumentCount = function (fn) {
-  return Object.keys(fn.signatures || {})
-      .reduce(function (args, signature) {
-        var count = (signature.match(/,/g) || []).length + 1;
-        return Math.max(args, count);
-      }, -1);
-};
-
-/**
- * Call a typed function with the
- * @param {function} fn   A function or typed function
- * @return {number} Returns the maximum number of expected arguments.
- *                  Returns -1 when no signatures where found on the function.
- */
-exports.callWithRightArgumentCount = function (fn, args, argCount) {
-  return Object.keys(fn.signatures || {})
-      .reduce(function (args, signature) {
-        var count = (signature.match(/,/g) || []).length + 1;
-        return Math.max(args, count);
-      }, -1);
-};
-
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var DimensionError = __webpack_require__(10);
-
-function factory (type, config, load, typed) {
-
-  var DenseMatrix = type.DenseMatrix;
-
-  /**
-   * Iterates over SparseMatrix nonzero items and invokes the callback function f(Dij, Sij). 
-   * Callback function invoked NNZ times (number of nonzero items in SparseMatrix).
-   *
-   *
-   *          ┌  f(Dij, Sij)  ; S(i,j) !== 0
-   * C(i,j) = ┤
-   *          └  Dij          ; otherwise
-   *
-   *
-   * @param {Matrix}   denseMatrix       The DenseMatrix instance (D)
-   * @param {Matrix}   sparseMatrix      The SparseMatrix instance (S)
-   * @param {Function} callback          The f(Dij,Sij) operation to invoke, where Dij = DenseMatrix(i,j) and Sij = SparseMatrix(i,j)
-   * @param {boolean}  inverse           A true value indicates callback should be invoked f(Sij,Dij)
-   *
-   * @return {Matrix}                    DenseMatrix (C)
-   *
-   * see https://github.com/josdejong/mathjs/pull/346#issuecomment-97477571
-   */
-  var algorithm01 = function (denseMatrix, sparseMatrix, callback, inverse) {
-    // dense matrix arrays
-    var adata = denseMatrix._data;
-    var asize = denseMatrix._size;
-    var adt = denseMatrix._datatype;
-    // sparse matrix arrays
-    var bvalues = sparseMatrix._values;
-    var bindex = sparseMatrix._index;
-    var bptr = sparseMatrix._ptr;
-    var bsize = sparseMatrix._size;
-    var bdt = sparseMatrix._datatype;
-
-    // validate dimensions
-    if (asize.length !== bsize.length)
-      throw new DimensionError(asize.length, bsize.length);
-
-    // check rows & columns
-    if (asize[0] !== bsize[0] || asize[1] !== bsize[1])
-      throw new RangeError('Dimension mismatch. Matrix A (' + asize + ') must match Matrix B (' + bsize + ')');
-
-    // sparse matrix cannot be a Pattern matrix
-    if (!bvalues)
-      throw new Error('Cannot perform operation on Dense Matrix and Pattern Sparse Matrix');
-
-    // rows & columns
-    var rows = asize[0];
-    var columns = asize[1];
-
-    // process data types
-    var dt = typeof adt === 'string' && adt === bdt ? adt : undefined;
-    // callback function
-    var cf = dt ? typed.find(callback, [dt, dt]) : callback;
-
-    // vars
-    var i, j;
-    
-    // result (DenseMatrix)
-    var cdata = [];
-    // initialize c
-    for (i = 0; i < rows; i++)
-      cdata[i] = [];      
-    
-    // workspace
-    var x = [];
-    // marks indicating we have a value in x for a given column
-    var w = [];
-
-    // loop columns in b
-    for (j = 0; j < columns; j++) {
-      // column mark
-      var mark = j + 1;
-      // values in column j
-      for (var k0 = bptr[j], k1 = bptr[j + 1], k = k0; k < k1; k++) {
-        // row
-        i = bindex[k];
-        // update workspace
-        x[i] = inverse ? cf(bvalues[k], adata[i][j]) : cf(adata[i][j], bvalues[k]);
-        // mark i as updated
-        w[i] = mark;
-      }
-      // loop rows
-      for (i = 0; i < rows; i++) {
-        // check row is in workspace
-        if (w[i] === mark) {
-          // c[i][j] was already calculated
-          cdata[i][j] = x[i];
-        }
-        else {
-          // item does not exist in S
-          cdata[i][j] = adata[i][j];
-        }
-      }
-    }
-
-    // return dense matrix
-    return new DenseMatrix({
-      data: cdata,
-      size: [rows, columns],
-      datatype: dt
-    });
-  };
-  
-  return algorithm01;
-}
-
-exports.name = 'algorithm01';
-exports.factory = factory;
-
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var nearlyEqual = __webpack_require__(3).nearlyEqual;
-var bigNearlyEqual = __webpack_require__(39);
-
-function factory (type, config, load, typed) {
-  
-  var matrix = load(__webpack_require__(0));
-
-  var algorithm03 = load(__webpack_require__(17));
-  var algorithm07 = load(__webpack_require__(28));
-  var algorithm12 = load(__webpack_require__(18));
-  var algorithm13 = load(__webpack_require__(8));
-  var algorithm14 = load(__webpack_require__(6));
-
-  var latex = __webpack_require__(4);
-
-  /**
-   * Test whether value x is larger than y.
-   *
-   * The function returns true when x is larger than y and the relative
-   * difference between x and y is larger than the configured epsilon. The
-   * function cannot be used to compare values smaller than approximately 2.22e-16.
-   *
-   * For matrices, the function is evaluated element wise.
-   *
-   * Syntax:
-   *
-   *    math.larger(x, y)
-   *
-   * Examples:
-   *
-   *    math.larger(2, 3);             // returns false
-   *    math.larger(5, 2 + 2);         // returns true
-   *
-   *    var a = math.unit('5 cm');
-   *    var b = math.unit('2 inch');
-   *    math.larger(a, b);             // returns false
-   *
-   * See also:
-   *
-   *    equal, unequal, smaller, smallerEq, largerEq, compare
-   *
-   * @param  {number | BigNumber | Fraction | boolean | Unit | string | Array | Matrix} x First value to compare
-   * @param  {number | BigNumber | Fraction | boolean | Unit | string | Array | Matrix} y Second value to compare
-   * @return {boolean | Array | Matrix} Returns true when the x is larger than y, else returns false
-   */
-  var larger = typed('larger', {
-
-    'boolean, boolean': function (x, y) {
-      return x > y;
-    },
-
-    'number, number': function (x, y) {
-      return x > y && !nearlyEqual(x, y, config.epsilon);
-    },
-
-    'BigNumber, BigNumber': function (x, y) {
-      return x.gt(y) && !bigNearlyEqual(x, y, config.epsilon);
-    },
-
-    'Fraction, Fraction': function (x, y) {
-      return x.compare(y) === 1;
-    },
-
-    'Complex, Complex': function () {
-      throw new TypeError('No ordering relation is defined for complex numbers');
-    },
-
-    'Unit, Unit': function (x, y) {
-      if (!x.equalBase(y)) {
-        throw new Error('Cannot compare units with different base');
-      }
-      return larger(x.value, y.value);
-    },
-
-    'string, string': function (x, y) {
-      return x > y;
-    },
-
-    'Matrix, Matrix': function (x, y) {
-      // result
-      var c;
-
-      // process matrix storage
-      switch (x.storage()) {
-        case 'sparse':
-          switch (y.storage()) {
-            case 'sparse':
-              // sparse + sparse
-              c = algorithm07(x, y, larger);
-              break;
-            default:
-              // sparse + dense
-              c = algorithm03(y, x, larger, true);
-              break;
-          }
-          break;
-        default:
-          switch (y.storage()) {
-            case 'sparse':
-              // dense + sparse
-              c = algorithm03(x, y, larger, false);
-              break;
-            default:
-              // dense + dense
-              c = algorithm13(x, y, larger);
-              break;
-          }
-          break;
-      }
-      return c;
-    },
-
-    'Array, Array': function (x, y) {
-      // use matrix implementation
-      return larger(matrix(x), matrix(y)).valueOf();
-    },
-
-    'Array, Matrix': function (x, y) {
-      // use matrix implementation
-      return larger(matrix(x), y);
-    },
-
-    'Matrix, Array': function (x, y) {
-      // use matrix implementation
-      return larger(x, matrix(y));
-    },
-
-    'Matrix, any': function (x, y) {
-      // result
-      var c;
-      // check storage format
-      switch (x.storage()) {
-        case 'sparse':
-          c = algorithm12(x, y, larger, false);
-          break;
-        default:
-          c = algorithm14(x, y, larger, false);
-          break;
-      }
-      return c;
-    },
-
-    'any, Matrix': function (x, y) {
-      // result
-      var c;
-      // check storage format
-      switch (y.storage()) {
-        case 'sparse':
-          c = algorithm12(y, x, larger, true);
-          break;
-        default:
-          c = algorithm14(y, x, larger, true);
-          break;
-      }
-      return c;
-    },
-
-    'Array, any': function (x, y) {
-      // use matrix implementation
-      return algorithm14(matrix(x), y, larger, false).valueOf();
-    },
-
-    'any, Array': function (x, y) {
-      // use matrix implementation
-      return algorithm14(matrix(y), x, larger, true).valueOf();
-    }
-  });
-
-  larger.toTex = {
-    2: '\\left(${args[0]}' + latex.operators['larger'] + '${args[1]}\\right)'
-  };
-
-  return larger;
-}
-
-exports.name = 'larger';
-exports.factory = factory;
-
-
-/***/ }),
-/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const util = __webpack_require__(98);
@@ -8345,6 +7973,378 @@ module.exports.Design = Design;
 module.exports.DB = DB;
 module.exports.Statline = Statline;
 module.exports.Crewline = Crewline;
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports) {
+
+// function utils
+
+/*
+ * Memoize a given function by caching the computed result.
+ * The cache of a memoized function can be cleared by deleting the `cache`
+ * property of the function.
+ *
+ * @param {function} fn                     The function to be memoized.
+ *                                          Must be a pure function.
+ * @param {function(args: Array)} [hasher]  A custom hash builder.
+ *                                          Is JSON.stringify by default.
+ * @return {function}                       Returns the memoized function
+ */
+exports.memoize = function(fn, hasher) {
+  return function memoize() {
+    if (typeof memoize.cache !== 'object') {
+      memoize.cache = {};
+    }
+
+    var args = [];
+    for (var i = 0; i < arguments.length; i++) {
+      args[i] = arguments[i];
+    }
+
+    var hash = hasher ? hasher(args) : JSON.stringify(args);
+    if (!(hash in memoize.cache)) {
+      return memoize.cache[hash] = fn.apply(fn, args);
+    }
+    return memoize.cache[hash];
+  };
+};
+
+/**
+ * Find the maximum number of arguments expected by a typed function.
+ * @param {function} fn   A typed function
+ * @return {number} Returns the maximum number of expected arguments.
+ *                  Returns -1 when no signatures where found on the function.
+ */
+exports.maxArgumentCount = function (fn) {
+  return Object.keys(fn.signatures || {})
+      .reduce(function (args, signature) {
+        var count = (signature.match(/,/g) || []).length + 1;
+        return Math.max(args, count);
+      }, -1);
+};
+
+/**
+ * Call a typed function with the
+ * @param {function} fn   A function or typed function
+ * @return {number} Returns the maximum number of expected arguments.
+ *                  Returns -1 when no signatures where found on the function.
+ */
+exports.callWithRightArgumentCount = function (fn, args, argCount) {
+  return Object.keys(fn.signatures || {})
+      .reduce(function (args, signature) {
+        var count = (signature.match(/,/g) || []).length + 1;
+        return Math.max(args, count);
+      }, -1);
+};
+
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var DimensionError = __webpack_require__(10);
+
+function factory (type, config, load, typed) {
+
+  var DenseMatrix = type.DenseMatrix;
+
+  /**
+   * Iterates over SparseMatrix nonzero items and invokes the callback function f(Dij, Sij). 
+   * Callback function invoked NNZ times (number of nonzero items in SparseMatrix).
+   *
+   *
+   *          ┌  f(Dij, Sij)  ; S(i,j) !== 0
+   * C(i,j) = ┤
+   *          └  Dij          ; otherwise
+   *
+   *
+   * @param {Matrix}   denseMatrix       The DenseMatrix instance (D)
+   * @param {Matrix}   sparseMatrix      The SparseMatrix instance (S)
+   * @param {Function} callback          The f(Dij,Sij) operation to invoke, where Dij = DenseMatrix(i,j) and Sij = SparseMatrix(i,j)
+   * @param {boolean}  inverse           A true value indicates callback should be invoked f(Sij,Dij)
+   *
+   * @return {Matrix}                    DenseMatrix (C)
+   *
+   * see https://github.com/josdejong/mathjs/pull/346#issuecomment-97477571
+   */
+  var algorithm01 = function (denseMatrix, sparseMatrix, callback, inverse) {
+    // dense matrix arrays
+    var adata = denseMatrix._data;
+    var asize = denseMatrix._size;
+    var adt = denseMatrix._datatype;
+    // sparse matrix arrays
+    var bvalues = sparseMatrix._values;
+    var bindex = sparseMatrix._index;
+    var bptr = sparseMatrix._ptr;
+    var bsize = sparseMatrix._size;
+    var bdt = sparseMatrix._datatype;
+
+    // validate dimensions
+    if (asize.length !== bsize.length)
+      throw new DimensionError(asize.length, bsize.length);
+
+    // check rows & columns
+    if (asize[0] !== bsize[0] || asize[1] !== bsize[1])
+      throw new RangeError('Dimension mismatch. Matrix A (' + asize + ') must match Matrix B (' + bsize + ')');
+
+    // sparse matrix cannot be a Pattern matrix
+    if (!bvalues)
+      throw new Error('Cannot perform operation on Dense Matrix and Pattern Sparse Matrix');
+
+    // rows & columns
+    var rows = asize[0];
+    var columns = asize[1];
+
+    // process data types
+    var dt = typeof adt === 'string' && adt === bdt ? adt : undefined;
+    // callback function
+    var cf = dt ? typed.find(callback, [dt, dt]) : callback;
+
+    // vars
+    var i, j;
+    
+    // result (DenseMatrix)
+    var cdata = [];
+    // initialize c
+    for (i = 0; i < rows; i++)
+      cdata[i] = [];      
+    
+    // workspace
+    var x = [];
+    // marks indicating we have a value in x for a given column
+    var w = [];
+
+    // loop columns in b
+    for (j = 0; j < columns; j++) {
+      // column mark
+      var mark = j + 1;
+      // values in column j
+      for (var k0 = bptr[j], k1 = bptr[j + 1], k = k0; k < k1; k++) {
+        // row
+        i = bindex[k];
+        // update workspace
+        x[i] = inverse ? cf(bvalues[k], adata[i][j]) : cf(adata[i][j], bvalues[k]);
+        // mark i as updated
+        w[i] = mark;
+      }
+      // loop rows
+      for (i = 0; i < rows; i++) {
+        // check row is in workspace
+        if (w[i] === mark) {
+          // c[i][j] was already calculated
+          cdata[i][j] = x[i];
+        }
+        else {
+          // item does not exist in S
+          cdata[i][j] = adata[i][j];
+        }
+      }
+    }
+
+    // return dense matrix
+    return new DenseMatrix({
+      data: cdata,
+      size: [rows, columns],
+      datatype: dt
+    });
+  };
+  
+  return algorithm01;
+}
+
+exports.name = 'algorithm01';
+exports.factory = factory;
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var nearlyEqual = __webpack_require__(3).nearlyEqual;
+var bigNearlyEqual = __webpack_require__(39);
+
+function factory (type, config, load, typed) {
+  
+  var matrix = load(__webpack_require__(0));
+
+  var algorithm03 = load(__webpack_require__(17));
+  var algorithm07 = load(__webpack_require__(28));
+  var algorithm12 = load(__webpack_require__(18));
+  var algorithm13 = load(__webpack_require__(8));
+  var algorithm14 = load(__webpack_require__(6));
+
+  var latex = __webpack_require__(4);
+
+  /**
+   * Test whether value x is larger than y.
+   *
+   * The function returns true when x is larger than y and the relative
+   * difference between x and y is larger than the configured epsilon. The
+   * function cannot be used to compare values smaller than approximately 2.22e-16.
+   *
+   * For matrices, the function is evaluated element wise.
+   *
+   * Syntax:
+   *
+   *    math.larger(x, y)
+   *
+   * Examples:
+   *
+   *    math.larger(2, 3);             // returns false
+   *    math.larger(5, 2 + 2);         // returns true
+   *
+   *    var a = math.unit('5 cm');
+   *    var b = math.unit('2 inch');
+   *    math.larger(a, b);             // returns false
+   *
+   * See also:
+   *
+   *    equal, unequal, smaller, smallerEq, largerEq, compare
+   *
+   * @param  {number | BigNumber | Fraction | boolean | Unit | string | Array | Matrix} x First value to compare
+   * @param  {number | BigNumber | Fraction | boolean | Unit | string | Array | Matrix} y Second value to compare
+   * @return {boolean | Array | Matrix} Returns true when the x is larger than y, else returns false
+   */
+  var larger = typed('larger', {
+
+    'boolean, boolean': function (x, y) {
+      return x > y;
+    },
+
+    'number, number': function (x, y) {
+      return x > y && !nearlyEqual(x, y, config.epsilon);
+    },
+
+    'BigNumber, BigNumber': function (x, y) {
+      return x.gt(y) && !bigNearlyEqual(x, y, config.epsilon);
+    },
+
+    'Fraction, Fraction': function (x, y) {
+      return x.compare(y) === 1;
+    },
+
+    'Complex, Complex': function () {
+      throw new TypeError('No ordering relation is defined for complex numbers');
+    },
+
+    'Unit, Unit': function (x, y) {
+      if (!x.equalBase(y)) {
+        throw new Error('Cannot compare units with different base');
+      }
+      return larger(x.value, y.value);
+    },
+
+    'string, string': function (x, y) {
+      return x > y;
+    },
+
+    'Matrix, Matrix': function (x, y) {
+      // result
+      var c;
+
+      // process matrix storage
+      switch (x.storage()) {
+        case 'sparse':
+          switch (y.storage()) {
+            case 'sparse':
+              // sparse + sparse
+              c = algorithm07(x, y, larger);
+              break;
+            default:
+              // sparse + dense
+              c = algorithm03(y, x, larger, true);
+              break;
+          }
+          break;
+        default:
+          switch (y.storage()) {
+            case 'sparse':
+              // dense + sparse
+              c = algorithm03(x, y, larger, false);
+              break;
+            default:
+              // dense + dense
+              c = algorithm13(x, y, larger);
+              break;
+          }
+          break;
+      }
+      return c;
+    },
+
+    'Array, Array': function (x, y) {
+      // use matrix implementation
+      return larger(matrix(x), matrix(y)).valueOf();
+    },
+
+    'Array, Matrix': function (x, y) {
+      // use matrix implementation
+      return larger(matrix(x), y);
+    },
+
+    'Matrix, Array': function (x, y) {
+      // use matrix implementation
+      return larger(x, matrix(y));
+    },
+
+    'Matrix, any': function (x, y) {
+      // result
+      var c;
+      // check storage format
+      switch (x.storage()) {
+        case 'sparse':
+          c = algorithm12(x, y, larger, false);
+          break;
+        default:
+          c = algorithm14(x, y, larger, false);
+          break;
+      }
+      return c;
+    },
+
+    'any, Matrix': function (x, y) {
+      // result
+      var c;
+      // check storage format
+      switch (y.storage()) {
+        case 'sparse':
+          c = algorithm12(y, x, larger, true);
+          break;
+        default:
+          c = algorithm14(y, x, larger, true);
+          break;
+      }
+      return c;
+    },
+
+    'Array, any': function (x, y) {
+      // use matrix implementation
+      return algorithm14(matrix(x), y, larger, false).valueOf();
+    },
+
+    'any, Array': function (x, y) {
+      // use matrix implementation
+      return algorithm14(matrix(y), x, larger, true).valueOf();
+    }
+  });
+
+  larger.toTex = {
+    2: '\\left(${args[0]}' + latex.operators['larger'] + '${args[1]}\\right)'
+  };
+
+  return larger;
+}
+
+exports.name = 'larger';
+exports.factory = factory;
+
 
 /***/ }),
 /* 39 */
@@ -36680,7 +36680,7 @@ exports.factory = factory;
 /* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var memoize = __webpack_require__(35).memoize;
+var memoize = __webpack_require__(36).memoize;
 
 /**
  * Calculate BigNumber e
@@ -39087,7 +39087,7 @@ var reduce = __webpack_require__(71);
 var containsCollections = __webpack_require__(72);
 
 function factory (type, config, load, typed) {
-  var larger = load(__webpack_require__(37));
+  var larger = load(__webpack_require__(38));
 
   /**
    * Compute the maximum value of a matrix or a  list with values.
@@ -41312,7 +41312,7 @@ function factory (type, config, load, typed) {
   var divideScalar = load(__webpack_require__(21));
   var multiplyScalar = load(__webpack_require__(25));
   var subtract = load(__webpack_require__(23));
-  var larger = load(__webpack_require__(37));
+  var larger = load(__webpack_require__(38));
   var equalScalar = load(__webpack_require__(11));
   var unaryMinus = load(__webpack_require__(41));
   
@@ -43030,7 +43030,7 @@ function factory (type, config, load, typed) {
   var combinations = load(__webpack_require__(76));
   var isNegative = load(__webpack_require__(62));
   var isInteger = load(__webpack_require__(53));
-  var larger = load(__webpack_require__(37));
+  var larger = load(__webpack_require__(38));
 
   /**
    * The Stirling numbers of the second kind, counts the number of ways to partition
@@ -43375,7 +43375,7 @@ exports.factory = factory;
 "use strict";
 
 
-var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
 
 function factory (type, config, load, typed) {
   /**
@@ -44253,7 +44253,7 @@ const util = __webpack_require__(98);
 const NamedVector = __webpack_require__(99).NamedVector;
 
 const Papa = __webpack_require__(567);
-const ShipEngine = __webpack_require__(38);
+const ShipEngine = __webpack_require__(35);
 
 const COMPONENT_MAPPING = [{
 	name: "Warp Core",
@@ -63712,7 +63712,7 @@ exports.factory = factory;
 function factory (type, config, load, typed) {
   
   var smaller = load(__webpack_require__(49));
-  var larger = load(__webpack_require__(37));
+  var larger = load(__webpack_require__(38));
   
   var oneOverLogPhi = 1.0 / Math.log((1.0 + Math.sqrt(5.0)) / 2.0);
   
@@ -73158,7 +73158,7 @@ exports.factory = factory;
 
 var filter = __webpack_require__(2).filter;
 var filterRegExp = __webpack_require__(2).filterRegExp;
-var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
 
 /**
  * Attach a transform function to math.filter
@@ -73253,7 +73253,7 @@ exports.factory = factory;
 "use strict";
 
 
-var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
 var forEach = __webpack_require__(2).forEach;
 
 /**
@@ -73390,7 +73390,7 @@ exports.factory = factory;
 "use strict";
 
 
-var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
 var map = __webpack_require__(2).map;
 
 /**
@@ -76604,7 +76604,7 @@ function factory (type, config, load) {
   var divideScalar = load(__webpack_require__(21));
   var multiply = load(__webpack_require__(12));
   
-  var larger = load(__webpack_require__(37));
+  var larger = load(__webpack_require__(38));
   var largerEq = load(__webpack_require__(137));
   
   var cs_spsolve = load(__webpack_require__(438));
@@ -78052,7 +78052,7 @@ function factory (type, config, load, typed) {
 
   var matrix = load(__webpack_require__(0));
 
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm04 = load(__webpack_require__(79));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm13 = load(__webpack_require__(8));
@@ -78919,7 +78919,7 @@ function factory (type, config, load, typed) {
   var sqrt        = load(__webpack_require__(61));
   var multiply    = load(__webpack_require__(12));
   var equalScalar = load(__webpack_require__(11));
-  var larger      = load(__webpack_require__(37));
+  var larger      = load(__webpack_require__(38));
   var smaller     = load(__webpack_require__(49));
   var matrix      = load(__webpack_require__(0));
   var trace       = load(__webpack_require__(145));
@@ -79137,7 +79137,7 @@ function factory (type, config, load, typed) {
 
   var matrix = load(__webpack_require__(0));
 
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm02 = load(__webpack_require__(26));
   var algorithm06 = load(__webpack_require__(74));
   var algorithm11 = load(__webpack_require__(19));
@@ -80050,7 +80050,7 @@ function factory (type, config, load, typed) {
 
   var matrix = load(__webpack_require__(0));
 
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm04 = load(__webpack_require__(79));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm13 = load(__webpack_require__(8));
@@ -80489,7 +80489,7 @@ function factory (type, config, load, typed) {
   var equalScalar = load(__webpack_require__(11));
   var zeros = load(__webpack_require__(42));
 
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm02 = load(__webpack_require__(26));
   var algorithm08 = load(__webpack_require__(93));
   var algorithm10 = load(__webpack_require__(40));
@@ -80705,7 +80705,7 @@ function factory (type, config, load, typed) {
   var equalScalar = load(__webpack_require__(11));
   var zeros = load(__webpack_require__(42));
 
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm02 = load(__webpack_require__(26));
   var algorithm08 = load(__webpack_require__(93));
   var algorithm10 = load(__webpack_require__(40));
@@ -80926,7 +80926,7 @@ function factory (type, config, load, typed) {
   var equalScalar = load(__webpack_require__(11));
   var zeros = load(__webpack_require__(42));
 
-  var algorithm01 = load(__webpack_require__(36));
+  var algorithm01 = load(__webpack_require__(37));
   var algorithm02 = load(__webpack_require__(26));
   var algorithm08 = load(__webpack_require__(93));
   var algorithm10 = load(__webpack_require__(40));
@@ -81163,7 +81163,7 @@ function factory (type, config, load, typed) {
   var add = load(__webpack_require__(22));
   var isPositive = load(__webpack_require__(60));
   var isInteger = load(__webpack_require__(53));
-  var larger = load(__webpack_require__(37));
+  var larger = load(__webpack_require__(38));
 
   /**
    * The composition counts of n into k parts.
@@ -82872,7 +82872,7 @@ exports.factory = factory;
 
 var filter = __webpack_require__(2).filter;
 var filterRegExp = __webpack_require__(2).filterRegExp;
-var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
 
 function factory (type, config, load, typed) {
   var matrix = load(__webpack_require__(0));
@@ -83013,7 +83013,7 @@ exports.factory = factory;
 "use strict";
 
 
-var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
 var forEach = __webpack_require__(2).forEach;
 
 function factory (type, config, load, typed) {
@@ -84343,7 +84343,7 @@ module.exports = [
   __webpack_require__(34),
   __webpack_require__(514),
   __webpack_require__(33),
-  __webpack_require__(37),
+  __webpack_require__(38),
   __webpack_require__(137),
   __webpack_require__(49),
   __webpack_require__(515),
@@ -96552,14 +96552,13 @@ exports.clearImmediate = clearImmediate;
 /* 658 */,
 /* 659 */,
 /* 660 */,
-/* 661 */,
-/* 662 */
+/* 661 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(163);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__partbuilder_vue__ = __webpack_require__(663);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__partbuilder_vue__ = __webpack_require__(662);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dist_design_json__ = __webpack_require__(577);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dist_design_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__dist_design_json__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dist_parts_C8_csv__ = __webpack_require__(158);
@@ -96570,7 +96569,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_bluebird__ = __webpack_require__(578);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__lib_shipengine__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__lib_shipengine__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__lib_shipengine___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7__lib_shipengine__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__lib_shipimporter__ = __webpack_require__(162);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__lib_shipimporter___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8__lib_shipimporter__);
@@ -96597,17 +96596,17 @@ new __WEBPACK_IMPORTED_MODULE_0_vue__["a" /* default */]({
 });
 
 /***/ }),
-/* 663 */
+/* 662 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_partbuilder_vue__ = __webpack_require__(668);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_65fa2a8a_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_partbuilder_vue__ = __webpack_require__(704);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_partbuilder_vue__ = __webpack_require__(667);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_65fa2a8a_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_partbuilder_vue__ = __webpack_require__(703);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(664)
-  __webpack_require__(666)
+  __webpack_require__(663)
+  __webpack_require__(665)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -96651,13 +96650,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 664 */
+/* 663 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(665);
+var content = __webpack_require__(664);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -96677,7 +96676,7 @@ if(false) {
 }
 
 /***/ }),
-/* 665 */
+/* 664 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -96685,19 +96684,19 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.root[data-v-65fa2a8a] {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\n\tfont-family: arial, sans-serif;\n\tfont-size: 13px;\n\tfont-stretch: 100%;\n\tfont-style: 100%;\n\tfont-variant-caps: normal;\n\tfont-variant-ligatures: normal;\n\tfont-variant-numeric: normal;\n\tfont-weight: 400;\n}\n.header[data-v-65fa2a8a] {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n.editor[data-v-65fa2a8a] {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n.footer[data-v-65fa2a8a] {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/partbuilder.vue?7848b8f5"],"names":[],"mappings":";AAuMA;CACA,YAAA;CACA,aAAA;;CAEA,cAAA;CACA,uBAAA;CACA,kBAAA;;CAEA,+BAAA;CACA,gBAAA;CACA,mBAAA;CACA,iBAAA;CACA,0BAAA;CACA,+BAAA;CACA,6BAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,yBAAA;CACA;AAEA;CACA,eAAA;CACA,mBAAA,yCAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,sBAAA;CACA","file":"partbuilder.vue","sourcesContent":["<template>\n  <div class=\"root\">\n\t<div class=\"header\">\n\t  <PartsListHeader :partslist=\"partslist_info.data\" :schema=\"schema\" :display=\"display\"></PartsListHeader>\n\t</div>\n\t<div class=\"editor\">\n\t  <PartsListEditor :partslist=\"partslist_info.data\" :schema=\"schema\" :display=\"display\"></PartsListEditor>\n\t</div>\n\t<div class=\"footer\">\n\t  <PartsListFooter :partslist_info=\"partslist_info\"></PartsListFooter>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\n\nimport canon_parts from '../dist/parts_C8.csv';\nimport canon_modules from '../dist/modules_C8.csv';\nimport canon_frames from '../dist/frames_C8.csv';\n\nimport PartsListHeader from './parts-list-header.vue';\nimport PartsListFooter from './parts-list-footer.vue';\nimport PartsListEditor from './parts-list-editor.vue';\n\nconst SCHEMA = [\n\t{\n\t\tname: 'Type Sort',\n\t\tid: 'type-sort',\n\t\tedit_type: 'number',\n\t\tfixed: 0,\n\t\twidth: 30,\n\t\talign: 'right',\n\t},\n\t{\n\t\tname: 'Type',\n\t\tid: 'type',\n\t\tedit_type: 'string',\n\t\twidth: 162,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Tier',\n\t\tid: 'tier',\n\t\tedit_type: 'number',\n\t\tfixed: 0,\n\t\twidth: 26,\n\t\talign: 'right',\n\t},\n\t{\n\t\tname: 'Size Sort',\n\t\tid: 'size-sort',\n\t\tedit_type: 'number',\n\t\tfixed: 0,\n\t\twidth: 30,\n\t\talign: 'right',\n\t},\n\t{\n\t\tname: 'Size Class',\n\t\tid: 'size-class',\n\t\tedit_type: 'string',\n\t\twidth: 68,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Name',\n\t\tid: 'name',\n\t\tedit_type: 'string',\n\t\twidth: 345,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Effect',\n\t\tid: 'effect',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 56,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Weight O/H',\n\t\tid: 'weightoh',\n\t\tedit_type: 'number',\n\t\tfixed: null,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Scale Weight',\n\t\tid: 'scaleweight',\n\t\tedit_type: 'number',\n\t\tfixed: null,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Unit Weight',\n\t\tid: 'unitweight',\n\t\tedit_type: 'number',\n\t\tfixed: 2,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'SR Cost x',\n\t\tid: 'srcostx',\n\t\tedit_type: 'number',\n\t\tfixed: 5,\n\t\twidth: 65,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Pwr O/H',\n\t\tid: 'poweroh',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 54,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Scale Pwr',\n\t\tid: 'scalepower',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Unit Power',\n\t\tid: 'unitpower',\n\t\tedit_type: 'number',\n\t\tfixed: 2,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'O',\n\t\tid: 'ocost',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 51,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'E',\n\t\tid: 'ecost',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 51,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'T',\n\t\tid: 'tcost',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 44,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Reliability',\n\t\tid: 'reliability',\n\t\tedit_type: 'number',\n\t\tfixed: 7,\n\t\twidth: 66,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Year Available (SF)',\n\t\tid: 'year',\n\t\tedit_type: 'string',\n\t\twidth: 123,\n\t\talign: 'right',\n\t},\n];\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tPartsListHeader,\n\t\tPartsListFooter,\n\t\tPartsListEditor,\n\t},\n\tdata () {\n\t\treturn {\n\t\t\tpartslist_info: { data: canon_parts },\n\t\t\tschema: SCHEMA,\n\t\t\tdisplay: { types: [_(canon_parts).minBy((part) => part['Type Sort'])['Type']] },\n\t\t};\n\t},\n\tcomputed: {\n\t},\n};\n\n</script>\n\n<style scoped>\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\n\tfont-family: arial, sans-serif;\n\tfont-size: 13px;\n\tfont-stretch: 100%;\n\tfont-style: 100%;\n\tfont-variant-caps: normal;\n\tfont-variant-ligatures: normal;\n\tfont-variant-numeric: normal;\n\tfont-weight: 400;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.editor {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n\n<style>\n\nbutton, input, select, textarea {\n\tfont-family : inherit;\n\tfont-size   : 100%;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.root[data-v-65fa2a8a] {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\n\tfont-family: arial, sans-serif;\n\tfont-size: 13px;\n\tfont-stretch: 100%;\n\tfont-style: 100%;\n\tfont-variant-caps: normal;\n\tfont-variant-ligatures: normal;\n\tfont-variant-numeric: normal;\n\tfont-weight: 400;\n}\n.header[data-v-65fa2a8a] {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n.editor[data-v-65fa2a8a] {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n.footer[data-v-65fa2a8a] {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/partbuilder.vue?23ed4f2a"],"names":[],"mappings":";AAuMA;CACA,YAAA;CACA,aAAA;;CAEA,cAAA;CACA,uBAAA;CACA,kBAAA;;CAEA,+BAAA;CACA,gBAAA;CACA,mBAAA;CACA,iBAAA;CACA,0BAAA;CACA,+BAAA;CACA,6BAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,yBAAA;CACA;AAEA;CACA,eAAA;CACA,mBAAA,yCAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,sBAAA;CACA","file":"partbuilder.vue","sourcesContent":["<template>\n  <div class=\"root\">\n\t<div class=\"header\">\n\t  <PartsListHeader :partslist=\"partslist_info.data\" :schema=\"schema\" :display=\"display\"></PartsListHeader>\n\t</div>\n\t<div class=\"editor\">\n\t  <PartsListEditor :partslist=\"partslist_info.data\" :schema=\"schema\" :display=\"display\"></PartsListEditor>\n\t</div>\n\t<div class=\"footer\">\n\t  <PartsListFooter :partslist_info=\"partslist_info\"></PartsListFooter>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\n\nimport canon_parts from '../dist/parts_C8.csv';\nimport canon_modules from '../dist/modules_C8.csv';\nimport canon_frames from '../dist/frames_C8.csv';\n\nimport PartsListHeader from './parts-list-header.vue';\nimport PartsListFooter from './parts-list-footer.vue';\nimport PartsListEditor from './parts-list-editor.vue';\n\nconst SCHEMA = [\n\t{\n\t\tname: 'Type Sort',\n\t\tid: 'type-sort',\n\t\tedit_type: 'number',\n\t\tfixed: 0,\n\t\twidth: 30,\n\t\talign: 'right',\n\t},\n\t{\n\t\tname: 'Type',\n\t\tid: 'type',\n\t\tedit_type: 'string',\n\t\twidth: 162,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Tier',\n\t\tid: 'tier',\n\t\tedit_type: 'number',\n\t\tfixed: 0,\n\t\twidth: 26,\n\t\talign: 'right',\n\t},\n\t{\n\t\tname: 'Size Sort',\n\t\tid: 'size-sort',\n\t\tedit_type: 'number',\n\t\tfixed: 0,\n\t\twidth: 30,\n\t\talign: 'right',\n\t},\n\t{\n\t\tname: 'Size Class',\n\t\tid: 'size-class',\n\t\tedit_type: 'string',\n\t\twidth: 68,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Name',\n\t\tid: 'name',\n\t\tedit_type: 'string',\n\t\twidth: 345,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Effect',\n\t\tid: 'effect',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 56,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Weight O/H',\n\t\tid: 'weightoh',\n\t\tedit_type: 'number',\n\t\tfixed: null,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Scale Weight',\n\t\tid: 'scaleweight',\n\t\tedit_type: 'number',\n\t\tfixed: null,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Unit Weight',\n\t\tid: 'unitweight',\n\t\tedit_type: 'number',\n\t\tfixed: 2,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'SR Cost x',\n\t\tid: 'srcostx',\n\t\tedit_type: 'number',\n\t\tfixed: 5,\n\t\twidth: 65,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Pwr O/H',\n\t\tid: 'poweroh',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 54,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Scale Pwr',\n\t\tid: 'scalepower',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Unit Power',\n\t\tid: 'unitpower',\n\t\tedit_type: 'number',\n\t\tfixed: 2,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'O',\n\t\tid: 'ocost',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 51,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'E',\n\t\tid: 'ecost',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 51,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'T',\n\t\tid: 'tcost',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 44,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Reliability',\n\t\tid: 'reliability',\n\t\tedit_type: 'number',\n\t\tfixed: 7,\n\t\twidth: 66,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Year Available (SF)',\n\t\tid: 'year',\n\t\tedit_type: 'string',\n\t\twidth: 123,\n\t\talign: 'right',\n\t},\n];\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tPartsListHeader,\n\t\tPartsListFooter,\n\t\tPartsListEditor,\n\t},\n\tdata () {\n\t\treturn {\n\t\t\tpartslist_info: { data: canon_parts },\n\t\t\tschema: SCHEMA,\n\t\t\tdisplay: { types: [_(canon_parts).minBy((part) => part['Type Sort'])['Type']] },\n\t\t};\n\t},\n\tcomputed: {\n\t},\n};\n\n</script>\n\n<style scoped>\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\n\tfont-family: arial, sans-serif;\n\tfont-size: 13px;\n\tfont-stretch: 100%;\n\tfont-style: 100%;\n\tfont-variant-caps: normal;\n\tfont-variant-ligatures: normal;\n\tfont-variant-numeric: normal;\n\tfont-weight: 400;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.editor {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n\n<style>\n\nbutton, input, select, textarea {\n\tfont-family : inherit;\n\tfont-size   : 100%;\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 666 */
+/* 665 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(667);
+var content = __webpack_require__(666);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -96717,7 +96716,7 @@ if(false) {
 }
 
 /***/ }),
-/* 667 */
+/* 666 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -96725,13 +96724,13 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\nbutton, input, select, textarea {\n\tfont-family : inherit;\n\tfont-size   : 100%;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/partbuilder.vue?7848b8f5"],"names":[],"mappings":";AA6OA;CACA,sBAAA;CACA,mBAAA;CACA","file":"partbuilder.vue","sourcesContent":["<template>\n  <div class=\"root\">\n\t<div class=\"header\">\n\t  <PartsListHeader :partslist=\"partslist_info.data\" :schema=\"schema\" :display=\"display\"></PartsListHeader>\n\t</div>\n\t<div class=\"editor\">\n\t  <PartsListEditor :partslist=\"partslist_info.data\" :schema=\"schema\" :display=\"display\"></PartsListEditor>\n\t</div>\n\t<div class=\"footer\">\n\t  <PartsListFooter :partslist_info=\"partslist_info\"></PartsListFooter>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\n\nimport canon_parts from '../dist/parts_C8.csv';\nimport canon_modules from '../dist/modules_C8.csv';\nimport canon_frames from '../dist/frames_C8.csv';\n\nimport PartsListHeader from './parts-list-header.vue';\nimport PartsListFooter from './parts-list-footer.vue';\nimport PartsListEditor from './parts-list-editor.vue';\n\nconst SCHEMA = [\n\t{\n\t\tname: 'Type Sort',\n\t\tid: 'type-sort',\n\t\tedit_type: 'number',\n\t\tfixed: 0,\n\t\twidth: 30,\n\t\talign: 'right',\n\t},\n\t{\n\t\tname: 'Type',\n\t\tid: 'type',\n\t\tedit_type: 'string',\n\t\twidth: 162,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Tier',\n\t\tid: 'tier',\n\t\tedit_type: 'number',\n\t\tfixed: 0,\n\t\twidth: 26,\n\t\talign: 'right',\n\t},\n\t{\n\t\tname: 'Size Sort',\n\t\tid: 'size-sort',\n\t\tedit_type: 'number',\n\t\tfixed: 0,\n\t\twidth: 30,\n\t\talign: 'right',\n\t},\n\t{\n\t\tname: 'Size Class',\n\t\tid: 'size-class',\n\t\tedit_type: 'string',\n\t\twidth: 68,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Name',\n\t\tid: 'name',\n\t\tedit_type: 'string',\n\t\twidth: 345,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Effect',\n\t\tid: 'effect',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 56,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Weight O/H',\n\t\tid: 'weightoh',\n\t\tedit_type: 'number',\n\t\tfixed: null,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Scale Weight',\n\t\tid: 'scaleweight',\n\t\tedit_type: 'number',\n\t\tfixed: null,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Unit Weight',\n\t\tid: 'unitweight',\n\t\tedit_type: 'number',\n\t\tfixed: 2,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'SR Cost x',\n\t\tid: 'srcostx',\n\t\tedit_type: 'number',\n\t\tfixed: 5,\n\t\twidth: 65,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Pwr O/H',\n\t\tid: 'poweroh',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 54,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Scale Pwr',\n\t\tid: 'scalepower',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Unit Power',\n\t\tid: 'unitpower',\n\t\tedit_type: 'number',\n\t\tfixed: 2,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'O',\n\t\tid: 'ocost',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 51,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'E',\n\t\tid: 'ecost',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 51,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'T',\n\t\tid: 'tcost',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 44,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Reliability',\n\t\tid: 'reliability',\n\t\tedit_type: 'number',\n\t\tfixed: 7,\n\t\twidth: 66,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Year Available (SF)',\n\t\tid: 'year',\n\t\tedit_type: 'string',\n\t\twidth: 123,\n\t\talign: 'right',\n\t},\n];\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tPartsListHeader,\n\t\tPartsListFooter,\n\t\tPartsListEditor,\n\t},\n\tdata () {\n\t\treturn {\n\t\t\tpartslist_info: { data: canon_parts },\n\t\t\tschema: SCHEMA,\n\t\t\tdisplay: { types: [_(canon_parts).minBy((part) => part['Type Sort'])['Type']] },\n\t\t};\n\t},\n\tcomputed: {\n\t},\n};\n\n</script>\n\n<style scoped>\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\n\tfont-family: arial, sans-serif;\n\tfont-size: 13px;\n\tfont-stretch: 100%;\n\tfont-style: 100%;\n\tfont-variant-caps: normal;\n\tfont-variant-ligatures: normal;\n\tfont-variant-numeric: normal;\n\tfont-weight: 400;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.editor {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n\n<style>\n\nbutton, input, select, textarea {\n\tfont-family : inherit;\n\tfont-size   : 100%;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\nbutton, input, select, textarea {\n\tfont-family : inherit;\n\tfont-size   : 100%;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/partbuilder.vue?23ed4f2a"],"names":[],"mappings":";AA6OA;CACA,sBAAA;CACA,mBAAA;CACA","file":"partbuilder.vue","sourcesContent":["<template>\n  <div class=\"root\">\n\t<div class=\"header\">\n\t  <PartsListHeader :partslist=\"partslist_info.data\" :schema=\"schema\" :display=\"display\"></PartsListHeader>\n\t</div>\n\t<div class=\"editor\">\n\t  <PartsListEditor :partslist=\"partslist_info.data\" :schema=\"schema\" :display=\"display\"></PartsListEditor>\n\t</div>\n\t<div class=\"footer\">\n\t  <PartsListFooter :partslist_info=\"partslist_info\"></PartsListFooter>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\n\nimport canon_parts from '../dist/parts_C8.csv';\nimport canon_modules from '../dist/modules_C8.csv';\nimport canon_frames from '../dist/frames_C8.csv';\n\nimport PartsListHeader from './parts-list-header.vue';\nimport PartsListFooter from './parts-list-footer.vue';\nimport PartsListEditor from './parts-list-editor.vue';\n\nconst SCHEMA = [\n\t{\n\t\tname: 'Type Sort',\n\t\tid: 'type-sort',\n\t\tedit_type: 'number',\n\t\tfixed: 0,\n\t\twidth: 30,\n\t\talign: 'right',\n\t},\n\t{\n\t\tname: 'Type',\n\t\tid: 'type',\n\t\tedit_type: 'string',\n\t\twidth: 162,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Tier',\n\t\tid: 'tier',\n\t\tedit_type: 'number',\n\t\tfixed: 0,\n\t\twidth: 26,\n\t\talign: 'right',\n\t},\n\t{\n\t\tname: 'Size Sort',\n\t\tid: 'size-sort',\n\t\tedit_type: 'number',\n\t\tfixed: 0,\n\t\twidth: 30,\n\t\talign: 'right',\n\t},\n\t{\n\t\tname: 'Size Class',\n\t\tid: 'size-class',\n\t\tedit_type: 'string',\n\t\twidth: 68,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Name',\n\t\tid: 'name',\n\t\tedit_type: 'string',\n\t\twidth: 345,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Effect',\n\t\tid: 'effect',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 56,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Weight O/H',\n\t\tid: 'weightoh',\n\t\tedit_type: 'number',\n\t\tfixed: null,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Scale Weight',\n\t\tid: 'scaleweight',\n\t\tedit_type: 'number',\n\t\tfixed: null,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Unit Weight',\n\t\tid: 'unitweight',\n\t\tedit_type: 'number',\n\t\tfixed: 2,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'SR Cost x',\n\t\tid: 'srcostx',\n\t\tedit_type: 'number',\n\t\tfixed: 5,\n\t\twidth: 65,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Pwr O/H',\n\t\tid: 'poweroh',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 54,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Scale Pwr',\n\t\tid: 'scalepower',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Unit Power',\n\t\tid: 'unitpower',\n\t\tedit_type: 'number',\n\t\tfixed: 2,\n\t\twidth: 40,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'O',\n\t\tid: 'ocost',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 51,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'E',\n\t\tid: 'ecost',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 51,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'T',\n\t\tid: 'tcost',\n\t\tedit_type: 'number',\n\t\tfixed: 3,\n\t\twidth: 44,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Reliability',\n\t\tid: 'reliability',\n\t\tedit_type: 'number',\n\t\tfixed: 7,\n\t\twidth: 66,\n\t\talign: 'left',\n\t},\n\t{\n\t\tname: 'Year Available (SF)',\n\t\tid: 'year',\n\t\tedit_type: 'string',\n\t\twidth: 123,\n\t\talign: 'right',\n\t},\n];\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tPartsListHeader,\n\t\tPartsListFooter,\n\t\tPartsListEditor,\n\t},\n\tdata () {\n\t\treturn {\n\t\t\tpartslist_info: { data: canon_parts },\n\t\t\tschema: SCHEMA,\n\t\t\tdisplay: { types: [_(canon_parts).minBy((part) => part['Type Sort'])['Type']] },\n\t\t};\n\t},\n\tcomputed: {\n\t},\n};\n\n</script>\n\n<style scoped>\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\n\tfont-family: arial, sans-serif;\n\tfont-size: 13px;\n\tfont-stretch: 100%;\n\tfont-style: 100%;\n\tfont-variant-caps: normal;\n\tfont-variant-ligatures: normal;\n\tfont-variant-numeric: normal;\n\tfont-weight: 400;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.editor {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n\n<style>\n\nbutton, input, select, textarea {\n\tfont-family : inherit;\n\tfont-size   : 100%;\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 668 */
+/* 667 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -96743,9 +96742,9 @@ exports.push([module.i, "\nbutton, input, select, textarea {\n\tfont-family : in
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dist_modules_C8_csv___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__dist_modules_C8_csv__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dist_frames_C8_csv__ = __webpack_require__(160);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dist_frames_C8_csv___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__dist_frames_C8_csv__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__parts_list_header_vue__ = __webpack_require__(669);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__parts_list_footer_vue__ = __webpack_require__(676);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__parts_list_editor_vue__ = __webpack_require__(683);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__parts_list_header_vue__ = __webpack_require__(668);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__parts_list_footer_vue__ = __webpack_require__(675);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__parts_list_editor_vue__ = __webpack_require__(682);
 //
 //
 //
@@ -96922,17 +96921,17 @@ const SCHEMA = [{
 });
 
 /***/ }),
-/* 669 */
+/* 668 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_header_vue__ = __webpack_require__(674);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_17d5f5e2_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_header_vue__ = __webpack_require__(675);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_header_vue__ = __webpack_require__(673);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_17d5f5e2_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_header_vue__ = __webpack_require__(674);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(670)
-  __webpack_require__(672)
+  __webpack_require__(669)
+  __webpack_require__(671)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -96976,13 +96975,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 670 */
+/* 669 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(671);
+var content = __webpack_require__(670);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97002,7 +97001,7 @@ if(false) {
 }
 
 /***/ }),
-/* 671 */
+/* 670 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97010,19 +97009,19 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.header[data-v-17d5f5e2] {\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n\tcursor: pointer;\n}\n.type-tab[data-v-17d5f5e2] {\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #666;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n.type-tab[data-v-17d5f5e2]:active {\n\tbackground: #aaa;\n\tborder-style: inset;\n}\n.type-tab-selected[data-v-17d5f5e2] {\n\tborder: 1px solid #eee;\n\tbackground: #999;\n}\n.type-tab-text[data-v-17d5f5e2] {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n.indicator-lamp-wrapper[data-v-17d5f5e2] {\n\tdisplay: flex;\n\tflex-direction: column;\n\n\theight: 100%;\n\n\tfloat: right;\n\tmargin-left: 4px;\n\tmargin-top: 0px;\n\tmargin-bottom: 0px;\n\tmargin-right: 0px;\n\t\n\twidth: 10px;\n}\n.indicator-lamp-spacer[data-v-17d5f5e2] {\n\tflex: 1 0 0;\n}\n.indicator-lamp[data-v-17d5f5e2] {\n\t/* width: 10px; */\n\tflex: 0 0 10px;\n\tbackground: black;\n}\n.indicator-lamp-selected[data-v-17d5f5e2] {\n\tbackground: #2f2;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/parts-list-header.vue?9c50762a"],"names":[],"mappings":";AA6EA;CACA,cAAA;CACA,oBAAA;CACA,gBAAA;CACA,4BAAA;CACA,gBAAA;CACA;AAEA;CACA,eAAA;CACA,aAAA;CACA,wBAAA;CACA,iBAAA;;CAEA,oBAAA;CACA,0BAAA;CACA,kCAAA;CACA,wBAAA;CACA;AAEA;CACA,iBAAA;CACA,oBAAA;CACA;AAEA;CACA,uBAAA;CACA,iBAAA;CACA;AAEA;CACA,qBAAA;CACA,YAAA;CACA;AAEA;CACA,cAAA;CACA,uBAAA;;CAEA,aAAA;;CAEA,aAAA;CACA,iBAAA;CACA,gBAAA;CACA,mBAAA;CACA,kBAAA;;CAEA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,kBAAA;CACA,eAAA;CACA,kBAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"parts-list-header.vue","sourcesContent":["<template>\n  <div class=\"header\">\n\t<div class=\"type-tab\"\n\t\t v-for=\"type in types\"\n\t\t @click=\"set_filter(type)\"\n\t\t v-bind:class=\"tab_class(type)\">\n\t  <div class=\"type-tab-text\">{{type}}</div>\n\t  <div class=\"indicator-lamp-wrapper\">\n\t\t<div class=\"indicator-lamp-spacer\"></div>\n\t\t<div class=\"indicator-lamp\" v-bind:class=\"lamp_class(type)\"></div>\n\t\t<div class=\"indicator-lamp-spacer\"></div>\n\t  </div>\n\t</div>\n  </div>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nexport default {\n\tname: 'PartsListHeader',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tpartslist: {\n\t\t\ttype: Array,\n\t\t},\n\t\tschema: {\n\t\t\ttype: Array,\n\t\t},\n\t\tdisplay: {\n\t\t\ttype: Object,\n\t\t},\n\t},\n\tcomputed: {\n\t\ttypes () {\n\n\t\t\tlet type_sort_map = _.chain(this.partslist)\n\t\t\t\t.map((part) => { return { [part['Type']]: part['Type Sort'] }; })\n\t\t\t\t.reduce(_.assign, {})\n\t\t\t\t.value();\n\t\t\t\n\t\t\treturn _.chain(type_sort_map)\n\t\t\t\t.map((tsort, type) => { return { 'Type': type, 'Type Sort': tsort }; })\n\t\t\t\t.sortBy((elem) => elem['Type Sort'])\n\t\t\t\t.map((elem) => elem['Type'])\n\t\t\t\t.value();\n\t\t},\n\t},\n\tmethods: {\n\t\tset_filter(type) {\n\t\t\tif (this.display.types.includes(type)) {\n\t\t\t\tthis.display.types = _.filter(this.display.types, (elem) => !(elem === type));\n\t\t\t} else {\n\t\t\t\tthis.display.types.push(type);\n\t\t\t};\n\t\t},\n\t\tdisplaying_type(type) {\n\t\t\treturn \n\t\t},\n\t\ttab_class(type) {\n\t\t\treturn {\n\t\t\t\t'type-tab-selected': this.display.types.includes(type),\n\t\t\t};\n\t\t},\n\t\tlamp_class(type) {\n\t\t\treturn {\n\t\t\t\t'indicator-lamp-selected': this.display.types.includes(type),\n\t\t\t};\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.header {\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n\tcursor: pointer;\n}\n\n.type-tab {\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #666;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n\n.type-tab:active {\n\tbackground: #aaa;\n\tborder-style: inset;\n}\n\n.type-tab-selected {\n\tborder: 1px solid #eee;\n\tbackground: #999;\n}\n\n.type-tab-text {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n\n.indicator-lamp-wrapper {\n\tdisplay: flex;\n\tflex-direction: column;\n\n\theight: 100%;\n\n\tfloat: right;\n\tmargin-left: 4px;\n\tmargin-top: 0px;\n\tmargin-bottom: 0px;\n\tmargin-right: 0px;\n\t\n\twidth: 10px;\n}\n\n.indicator-lamp-spacer {\n\tflex: 1 0 0;\n}\n\n.indicator-lamp {\n\t/* width: 10px; */\n\tflex: 0 0 10px;\n\tbackground: black;\n}\n\n.indicator-lamp-selected {\n\tbackground: #2f2;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.header[data-v-17d5f5e2] {\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n\tcursor: pointer;\n}\n.type-tab[data-v-17d5f5e2] {\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #666;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n.type-tab[data-v-17d5f5e2]:active {\n\tbackground: #aaa;\n\tborder-style: inset;\n}\n.type-tab-selected[data-v-17d5f5e2] {\n\tborder: 1px solid #eee;\n\tbackground: #999;\n}\n.type-tab-text[data-v-17d5f5e2] {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n.indicator-lamp-wrapper[data-v-17d5f5e2] {\n\tdisplay: flex;\n\tflex-direction: column;\n\n\theight: 100%;\n\n\tfloat: right;\n\tmargin-left: 4px;\n\tmargin-top: 0px;\n\tmargin-bottom: 0px;\n\tmargin-right: 0px;\n\t\n\twidth: 10px;\n}\n.indicator-lamp-spacer[data-v-17d5f5e2] {\n\tflex: 1 0 0;\n}\n.indicator-lamp[data-v-17d5f5e2] {\n\t/* width: 10px; */\n\tflex: 0 0 10px;\n\tbackground: black;\n}\n.indicator-lamp-selected[data-v-17d5f5e2] {\n\tbackground: #2f2;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/parts-list-header.vue?83d0eac0"],"names":[],"mappings":";AA6EA;CACA,cAAA;CACA,oBAAA;CACA,gBAAA;CACA,4BAAA;CACA,gBAAA;CACA;AAEA;CACA,eAAA;CACA,aAAA;CACA,wBAAA;CACA,iBAAA;;CAEA,oBAAA;CACA,0BAAA;CACA,kCAAA;CACA,wBAAA;CACA;AAEA;CACA,iBAAA;CACA,oBAAA;CACA;AAEA;CACA,uBAAA;CACA,iBAAA;CACA;AAEA;CACA,qBAAA;CACA,YAAA;CACA;AAEA;CACA,cAAA;CACA,uBAAA;;CAEA,aAAA;;CAEA,aAAA;CACA,iBAAA;CACA,gBAAA;CACA,mBAAA;CACA,kBAAA;;CAEA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,kBAAA;CACA,eAAA;CACA,kBAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"parts-list-header.vue","sourcesContent":["<template>\n  <div class=\"header\">\n\t<div class=\"type-tab\"\n\t\t v-for=\"type in types\"\n\t\t @click=\"set_filter(type)\"\n\t\t v-bind:class=\"tab_class(type)\">\n\t  <div class=\"type-tab-text\">{{type}}</div>\n\t  <div class=\"indicator-lamp-wrapper\">\n\t\t<div class=\"indicator-lamp-spacer\"></div>\n\t\t<div class=\"indicator-lamp\" v-bind:class=\"lamp_class(type)\"></div>\n\t\t<div class=\"indicator-lamp-spacer\"></div>\n\t  </div>\n\t</div>\n  </div>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nexport default {\n\tname: 'PartsListHeader',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tpartslist: {\n\t\t\ttype: Array,\n\t\t},\n\t\tschema: {\n\t\t\ttype: Array,\n\t\t},\n\t\tdisplay: {\n\t\t\ttype: Object,\n\t\t},\n\t},\n\tcomputed: {\n\t\ttypes () {\n\n\t\t\tlet type_sort_map = _.chain(this.partslist)\n\t\t\t\t.map((part) => { return { [part['Type']]: part['Type Sort'] }; })\n\t\t\t\t.reduce(_.assign, {})\n\t\t\t\t.value();\n\t\t\t\n\t\t\treturn _.chain(type_sort_map)\n\t\t\t\t.map((tsort, type) => { return { 'Type': type, 'Type Sort': tsort }; })\n\t\t\t\t.sortBy((elem) => elem['Type Sort'])\n\t\t\t\t.map((elem) => elem['Type'])\n\t\t\t\t.value();\n\t\t},\n\t},\n\tmethods: {\n\t\tset_filter(type) {\n\t\t\tif (this.display.types.includes(type)) {\n\t\t\t\tthis.display.types = _.filter(this.display.types, (elem) => !(elem === type));\n\t\t\t} else {\n\t\t\t\tthis.display.types.push(type);\n\t\t\t};\n\t\t},\n\t\tdisplaying_type(type) {\n\t\t\treturn \n\t\t},\n\t\ttab_class(type) {\n\t\t\treturn {\n\t\t\t\t'type-tab-selected': this.display.types.includes(type),\n\t\t\t};\n\t\t},\n\t\tlamp_class(type) {\n\t\t\treturn {\n\t\t\t\t'indicator-lamp-selected': this.display.types.includes(type),\n\t\t\t};\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.header {\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n\tcursor: pointer;\n}\n\n.type-tab {\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #666;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n\n.type-tab:active {\n\tbackground: #aaa;\n\tborder-style: inset;\n}\n\n.type-tab-selected {\n\tborder: 1px solid #eee;\n\tbackground: #999;\n}\n\n.type-tab-text {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n\n.indicator-lamp-wrapper {\n\tdisplay: flex;\n\tflex-direction: column;\n\n\theight: 100%;\n\n\tfloat: right;\n\tmargin-left: 4px;\n\tmargin-top: 0px;\n\tmargin-bottom: 0px;\n\tmargin-right: 0px;\n\t\n\twidth: 10px;\n}\n\n.indicator-lamp-spacer {\n\tflex: 1 0 0;\n}\n\n.indicator-lamp {\n\t/* width: 10px; */\n\tflex: 0 0 10px;\n\tbackground: black;\n}\n\n.indicator-lamp-selected {\n\tbackground: #2f2;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 672 */
+/* 671 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(673);
+var content = __webpack_require__(672);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97042,7 +97041,7 @@ if(false) {
 }
 
 /***/ }),
-/* 673 */
+/* 672 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97056,7 +97055,7 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 
 /***/ }),
-/* 674 */
+/* 673 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -97133,35 +97132,46 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 });
 
 /***/ }),
-/* 675 */
+/* 674 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "header"
-  }, _vm._l((_vm.types), function(type) {
-    return _c('div', {
-      staticClass: "type-tab",
-      class: _vm.tab_class(type),
-      on: {
-        "click": function($event) {
-          _vm.set_filter(type)
-        }
-      }
-    }, [_c('div', {
-      staticClass: "type-tab-text"
-    }, [_vm._v(_vm._s(type))]), _vm._v(" "), _c('div', {
-      staticClass: "indicator-lamp-wrapper"
-    }, [_c('div', {
-      staticClass: "indicator-lamp-spacer"
-    }), _vm._v(" "), _c('div', {
-      staticClass: "indicator-lamp",
-      class: _vm.lamp_class(type)
-    }), _vm._v(" "), _c('div', {
-      staticClass: "indicator-lamp-spacer"
-    })])])
-  }))
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "header" },
+    _vm._l(_vm.types, function(type) {
+      return _c(
+        "div",
+        {
+          staticClass: "type-tab",
+          class: _vm.tab_class(type),
+          on: {
+            click: function($event) {
+              _vm.set_filter(type)
+            }
+          }
+        },
+        [
+          _c("div", { staticClass: "type-tab-text" }, [_vm._v(_vm._s(type))]),
+          _vm._v(" "),
+          _c("div", { staticClass: "indicator-lamp-wrapper" }, [
+            _c("div", { staticClass: "indicator-lamp-spacer" }),
+            _vm._v(" "),
+            _c("div", {
+              staticClass: "indicator-lamp",
+              class: _vm.lamp_class(type)
+            }),
+            _vm._v(" "),
+            _c("div", { staticClass: "indicator-lamp-spacer" })
+          ])
+        ]
+      )
+    })
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -97175,17 +97185,17 @@ if (false) {
 }
 
 /***/ }),
-/* 676 */
+/* 675 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_footer_vue__ = __webpack_require__(681);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_12b8dc20_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_footer_vue__ = __webpack_require__(682);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_footer_vue__ = __webpack_require__(680);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_12b8dc20_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_footer_vue__ = __webpack_require__(681);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(677)
-  __webpack_require__(679)
+  __webpack_require__(676)
+  __webpack_require__(678)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -97229,13 +97239,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 677 */
+/* 676 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(678);
+var content = __webpack_require__(677);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97255,7 +97265,7 @@ if(false) {
 }
 
 /***/ }),
-/* 678 */
+/* 677 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97263,19 +97273,19 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.footer[data-v-12b8dc20] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/parts-list-footer.vue?6bc986da"],"names":[],"mappings":";AAoCA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;CACA","file":"parts-list-footer.vue","sourcesContent":["<template>\n  <div class=\"footer\">\n\t<input id=\"partslist-import-export-string\" v-model=\"partslist_json_string\">\n\t<input type=\"button\" class=\"clipboard-copy-button\" data-clipboard-target=\"#partslist-import-export-string\" value=\"Copy\"></input>\n  </div>\n</template>\n\n<script>\n\nimport Clipboard from 'clipboard';\n\nnew Clipboard('.clipboard-copy-button');\n\nexport default {\n\tname: 'PartsListFooter',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tpartslist_info: {\n\t\t\ttype: Object,\n\t\t},\n\t},\n\tcomputed: {\n\t\tpartslist_json_string: {\n\t\t\tget () {\n\t\t\t\treturn JSON.stringify(this.partslist_info.data);\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.partslist_info.data = JSON.parse(value);\n\t\t\t},\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n.footer {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.footer[data-v-12b8dc20] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/parts-list-footer.vue?7c884df6"],"names":[],"mappings":";AAoCA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;CACA","file":"parts-list-footer.vue","sourcesContent":["<template>\n  <div class=\"footer\">\n\t<input id=\"partslist-import-export-string\" v-model=\"partslist_json_string\">\n\t<input type=\"button\" class=\"clipboard-copy-button\" data-clipboard-target=\"#partslist-import-export-string\" value=\"Copy\"></input>\n  </div>\n</template>\n\n<script>\n\nimport Clipboard from 'clipboard';\n\nnew Clipboard('.clipboard-copy-button');\n\nexport default {\n\tname: 'PartsListFooter',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tpartslist_info: {\n\t\t\ttype: Object,\n\t\t},\n\t},\n\tcomputed: {\n\t\tpartslist_json_string: {\n\t\t\tget () {\n\t\t\t\treturn JSON.stringify(this.partslist_info.data);\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.partslist_info.data = JSON.parse(value);\n\t\t\t},\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n.footer {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 679 */
+/* 678 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(680);
+var content = __webpack_require__(679);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97295,7 +97305,7 @@ if(false) {
 }
 
 /***/ }),
-/* 680 */
+/* 679 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97309,7 +97319,7 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 
 /***/ }),
-/* 681 */
+/* 680 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -97349,40 +97359,45 @@ new __WEBPACK_IMPORTED_MODULE_0_clipboard___default.a('.clipboard-copy-button');
 });
 
 /***/ }),
-/* 682 */
+/* 681 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "footer"
-  }, [_c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.partslist_json_string),
-      expression: "partslist_json_string"
-    }],
-    attrs: {
-      "id": "partslist-import-export-string"
-    },
-    domProps: {
-      "value": (_vm.partslist_json_string)
-    },
-    on: {
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.partslist_json_string = $event.target.value
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "footer" }, [
+    _c("input", {
+      directives: [
+        {
+          name: "model",
+          rawName: "v-model",
+          value: _vm.partslist_json_string,
+          expression: "partslist_json_string"
+        }
+      ],
+      attrs: { id: "partslist-import-export-string" },
+      domProps: { value: _vm.partslist_json_string },
+      on: {
+        input: function($event) {
+          if ($event.target.composing) {
+            return
+          }
+          _vm.partslist_json_string = $event.target.value
+        }
       }
-    }
-  }), _vm._v(" "), _c('input', {
-    staticClass: "clipboard-copy-button",
-    attrs: {
-      "type": "button",
-      "data-clipboard-target": "#partslist-import-export-string",
-      "value": "Copy"
-    }
-  })])
+    }),
+    _vm._v(" "),
+    _c("input", {
+      staticClass: "clipboard-copy-button",
+      attrs: {
+        type: "button",
+        "data-clipboard-target": "#partslist-import-export-string",
+        value: "Copy"
+      }
+    })
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -97396,17 +97411,17 @@ if (false) {
 }
 
 /***/ }),
-/* 683 */
+/* 682 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_editor_vue__ = __webpack_require__(688);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_4532c4c2_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_editor_vue__ = __webpack_require__(703);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_editor_vue__ = __webpack_require__(687);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_4532c4c2_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_editor_vue__ = __webpack_require__(702);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(684)
-  __webpack_require__(686)
+  __webpack_require__(683)
+  __webpack_require__(685)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -97450,13 +97465,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 684 */
+/* 683 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(685);
+var content = __webpack_require__(684);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97476,7 +97491,7 @@ if(false) {
 }
 
 /***/ }),
-/* 685 */
+/* 684 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97484,19 +97499,19 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.editor[data-v-4532c4c2] {\n\t/* width: 1500px; */\n\ttable-layout: fixed;\n\tborder-collapse: collapse;\n}\n.column-header[data-v-4532c4c2] {\n\tcursor: pointer;\n\tborder: 1px solid #eee;\n}\n.delete-column[data-v-4532c4c2] {\n\twidth: 30px;\n}\n.new-part-button[data-v-4532c4c2] {\n\tmargin: 5px;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/parts-list-editor.vue?4394fca8"],"names":[],"mappings":";AA0GA;CACA,oBAAA;CACA,oBAAA;CACA,0BAAA;CACA;AAEA;CACA,gBAAA;CACA,uBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA","file":"parts-list-editor.vue","sourcesContent":["<template>\n  <div width=\"100%\" height=\"100%\">\n  <table class=\"editor\">\n\t<thead>\n\t  <th v-for=\"field in fields\"\n\t\t  @click=\"sort_list(field.name)\"\n\t\t  class=\"column-header\"\n\t\t  v-bind:style=\"header_style(field)\">{{field.name}}</th>\n\t  <th class=\"column-header delete-column\"></th>\n\t</thead>\n\t<tbody>\n\t  <PartsListPart v-for=\"part in displayed_parts\" key=\"part.name\" :partslist=\"partslist\" :part=\"part\" :schema=\"schema\"></PartsListPart>\n\t</tbody>\n  </table>\n  <input type=\"button\" value=\"Add new part\" @click=\"add_new_part\" class=\"new-part-button\">\n  </div>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nimport PartsListPart from './parts-list-part.vue';\n\nfunction string_compare(a, b, ascending) {\n\tlet invert = ascending ? 1 : -1;\n\treturn a.localeCompare(b) * invert;\n};\n\nfunction number_compare(a, b, ascending) {\n\tlet invert = ascending ? 1 : -1;\n\treturn (a - b) * invert;\n};\n\nexport default {\n\tname: 'PartsListEditor',\n\tcomponents: {\n\t\tPartsListPart,\n\t},\n\tdata () {\n\t\treturn {\n\t\t\tcurrent_sort: {\n\t\t\t\tfield: null,\n\t\t\t\tascending: true,\n\t\t\t},\n\t\t};\n\t},\n\tprops: {\n\t\tpartslist: {\n\t\t\ttype: Array,\n\t\t},\n\t\tschema: {\n\t\t\ttype: Array,\n\t\t},\n\t\tdisplay: {\n\t\t\ttype: Object,\n\t\t},\n\t},\n\tcomputed: {\n\t\tfields () {\n\t\t\treturn this.schema;\n\t\t},\n\t\tdisplayed_parts () {\n\t\t\treturn _(this.partslist).filter((part) => this.display.types.includes(part['Type'])).value();\n\t\t},\n\t},\n\tmethods: {\n\t\tadd_new_part () {\n\t\t\tlet new_part = _.chain(this.fields)\n\t\t\t\t.map((field) => [field.name, null])\n\t\t\t\t.fromPairs()\n\t\t\t\t.value();\n\n\t\t\tconst last_part = this.displayed_parts[this.displayed_parts.length - 1];\n\t\t\tnew_part['Type'] = last_part['Type'];\n\t\t\tnew_part['Type Sort'] = last_part['Type Sort'];\n\t\t\tthis.partslist.push(new_part)\n\t\t},\n\t\theader_style (field) {\n\t\t\treturn {\n\t\t\t\twidth: field.width.toString() + 'px',\n\t\t\t};\n\t\t},\n\t\tsort_list (field) {\n\t\t\tif (this.current_sort.field === field) {\n\t\t\t\tthis.current_sort.ascending = !this.current_sort.ascending;\n\t\t\t} else {\n\t\t\t\tthis.current_sort.field = field;\n\t\t\t\tthis.current_sort.ascending = true;\n\t\t\t};\n\n\t\t\tswitch (typeof(this.partslist[0][field])) {\n\t\t\tcase 'number':\n\t\t\t\tthis.partslist.sort((a, b) => number_compare(a[field], b[field], this.current_sort.ascending));\n\t\t\t\tbreak;\n\t\t\tcase 'string':\n\t\t\t\tthis.partslist.sort((a, b) => string_compare(a[field], b[field], this.current_sort.ascending));\n\t\t\t\tbreak;\n\t\t\t};\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.editor {\n\t/* width: 1500px; */\n\ttable-layout: fixed;\n\tborder-collapse: collapse;\n}\n\n.column-header {\n\tcursor: pointer;\n\tborder: 1px solid #eee;\n}\n\n.delete-column {\n\twidth: 30px;\n}\n\n.new-part-button {\n\tmargin: 5px;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.editor[data-v-4532c4c2] {\n\t/* width: 1500px; */\n\ttable-layout: fixed;\n\tborder-collapse: collapse;\n}\n.column-header[data-v-4532c4c2] {\n\tcursor: pointer;\n\tborder: 1px solid #eee;\n}\n.delete-column[data-v-4532c4c2] {\n\twidth: 30px;\n}\n.new-part-button[data-v-4532c4c2] {\n\tmargin: 5px;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/parts-list-editor.vue?53460521"],"names":[],"mappings":";AA0GA;CACA,oBAAA;CACA,oBAAA;CACA,0BAAA;CACA;AAEA;CACA,gBAAA;CACA,uBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA","file":"parts-list-editor.vue","sourcesContent":["<template>\n  <div width=\"100%\" height=\"100%\">\n  <table class=\"editor\">\n\t<thead>\n\t  <th v-for=\"field in fields\"\n\t\t  @click=\"sort_list(field.name)\"\n\t\t  class=\"column-header\"\n\t\t  v-bind:style=\"header_style(field)\">{{field.name}}</th>\n\t  <th class=\"column-header delete-column\"></th>\n\t</thead>\n\t<tbody>\n\t  <PartsListPart v-for=\"part in displayed_parts\" key=\"part.name\" :partslist=\"partslist\" :part=\"part\" :schema=\"schema\"></PartsListPart>\n\t</tbody>\n  </table>\n  <input type=\"button\" value=\"Add new part\" @click=\"add_new_part\" class=\"new-part-button\">\n  </div>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nimport PartsListPart from './parts-list-part.vue';\n\nfunction string_compare(a, b, ascending) {\n\tlet invert = ascending ? 1 : -1;\n\treturn a.localeCompare(b) * invert;\n};\n\nfunction number_compare(a, b, ascending) {\n\tlet invert = ascending ? 1 : -1;\n\treturn (a - b) * invert;\n};\n\nexport default {\n\tname: 'PartsListEditor',\n\tcomponents: {\n\t\tPartsListPart,\n\t},\n\tdata () {\n\t\treturn {\n\t\t\tcurrent_sort: {\n\t\t\t\tfield: null,\n\t\t\t\tascending: true,\n\t\t\t},\n\t\t};\n\t},\n\tprops: {\n\t\tpartslist: {\n\t\t\ttype: Array,\n\t\t},\n\t\tschema: {\n\t\t\ttype: Array,\n\t\t},\n\t\tdisplay: {\n\t\t\ttype: Object,\n\t\t},\n\t},\n\tcomputed: {\n\t\tfields () {\n\t\t\treturn this.schema;\n\t\t},\n\t\tdisplayed_parts () {\n\t\t\treturn _(this.partslist).filter((part) => this.display.types.includes(part['Type'])).value();\n\t\t},\n\t},\n\tmethods: {\n\t\tadd_new_part () {\n\t\t\tlet new_part = _.chain(this.fields)\n\t\t\t\t.map((field) => [field.name, null])\n\t\t\t\t.fromPairs()\n\t\t\t\t.value();\n\n\t\t\tconst last_part = this.displayed_parts[this.displayed_parts.length - 1];\n\t\t\tnew_part['Type'] = last_part['Type'];\n\t\t\tnew_part['Type Sort'] = last_part['Type Sort'];\n\t\t\tthis.partslist.push(new_part)\n\t\t},\n\t\theader_style (field) {\n\t\t\treturn {\n\t\t\t\twidth: field.width.toString() + 'px',\n\t\t\t};\n\t\t},\n\t\tsort_list (field) {\n\t\t\tif (this.current_sort.field === field) {\n\t\t\t\tthis.current_sort.ascending = !this.current_sort.ascending;\n\t\t\t} else {\n\t\t\t\tthis.current_sort.field = field;\n\t\t\t\tthis.current_sort.ascending = true;\n\t\t\t};\n\n\t\t\tswitch (typeof(this.partslist[0][field])) {\n\t\t\tcase 'number':\n\t\t\t\tthis.partslist.sort((a, b) => number_compare(a[field], b[field], this.current_sort.ascending));\n\t\t\t\tbreak;\n\t\t\tcase 'string':\n\t\t\t\tthis.partslist.sort((a, b) => string_compare(a[field], b[field], this.current_sort.ascending));\n\t\t\t\tbreak;\n\t\t\t};\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.editor {\n\t/* width: 1500px; */\n\ttable-layout: fixed;\n\tborder-collapse: collapse;\n}\n\n.column-header {\n\tcursor: pointer;\n\tborder: 1px solid #eee;\n}\n\n.delete-column {\n\twidth: 30px;\n}\n\n.new-part-button {\n\tmargin: 5px;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 686 */
+/* 685 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(687);
+var content = __webpack_require__(686);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97516,7 +97531,7 @@ if(false) {
 }
 
 /***/ }),
-/* 687 */
+/* 686 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97530,13 +97545,13 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 
 /***/ }),
-/* 688 */
+/* 687 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(97);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__parts_list_part_vue__ = __webpack_require__(689);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__parts_list_part_vue__ = __webpack_require__(688);
 //
 //
 //
@@ -97638,17 +97653,17 @@ function number_compare(a, b, ascending) {
 });
 
 /***/ }),
-/* 689 */
+/* 688 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_part_vue__ = __webpack_require__(694);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_0da6ff88_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_part_vue__ = __webpack_require__(702);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_part_vue__ = __webpack_require__(693);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_0da6ff88_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_part_vue__ = __webpack_require__(701);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(690)
-  __webpack_require__(692)
+  __webpack_require__(689)
+  __webpack_require__(691)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -97692,13 +97707,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 690 */
+/* 689 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(691);
+var content = __webpack_require__(690);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97718,7 +97733,7 @@ if(false) {
 }
 
 /***/ }),
-/* 691 */
+/* 690 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97726,19 +97741,19 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.part[data-v-0da6ff88] {\n}\n.delete-cell[data-v-0da6ff88] {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n.delete-button[data-v-0da6ff88] {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/parts-list-part.vue?019956fa"],"names":[],"mappings":";AAgDA;CACA;AAEA;CACA,YAAA;CACA,uBAAA;CACA;AAEA;CACA,WAAA;CACA,gBAAA;;CAEA,YAAA;IACA,uBAAA;CACA","file":"parts-list-part.vue","sourcesContent":["<template>\n  <tr class=\"part\">\n\t<PartsListCell v-for=\"field in fields\" :key=\"field.name\" :part=\"part\" :field=\"field\"></PartsListCell>\n\t<td class=\"delete-cell\"><input type=\"button\" class=\"delete-button\" value=\"X\" @click=\"delete_this_part\"></td>\n  </tr>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nimport PartsListCell from './parts-list-cell.vue';\n\nexport default {\n\tname: 'PartsListPart',\n\tcomponents: {\n\t\tPartsListCell,\n\t},\n\tprops: {\n\t\tpartslist: {\n\t\t\ttype: Array,\n\t\t},\n\t\tpart: {\n\t\t\ttype: Object,\n\t\t},\n\t\tschema: {\n\t\t\ttype: Array,\n\t\t},\n\t},\n\tcomputed: {\n\t\tfields () {\n\t\t\treturn this.schema;\n\t\t},\n\t},\n\tmethods: {\n\t\tdelete_this_part () {\n\t\t\tconst idx = this.partslist.findIndex((part) => part['Name'] === this.part['Name']);\n\t\t\tconsole.log(idx);\n\t\t\tif (idx >= 0) {\n\t\t\t\tthis.partslist.splice(idx, 1);\n\t\t\t};\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.part {\n}\n\n.delete-cell {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n\n.delete-button {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.part[data-v-0da6ff88] {\n}\n.delete-cell[data-v-0da6ff88] {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n.delete-button[data-v-0da6ff88] {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/parts-list-part.vue?82e2b7b6"],"names":[],"mappings":";AAgDA;CACA;AAEA;CACA,YAAA;CACA,uBAAA;CACA;AAEA;CACA,WAAA;CACA,gBAAA;;CAEA,YAAA;IACA,uBAAA;CACA","file":"parts-list-part.vue","sourcesContent":["<template>\n  <tr class=\"part\">\n\t<PartsListCell v-for=\"field in fields\" :key=\"field.name\" :part=\"part\" :field=\"field\"></PartsListCell>\n\t<td class=\"delete-cell\"><input type=\"button\" class=\"delete-button\" value=\"X\" @click=\"delete_this_part\"></td>\n  </tr>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nimport PartsListCell from './parts-list-cell.vue';\n\nexport default {\n\tname: 'PartsListPart',\n\tcomponents: {\n\t\tPartsListCell,\n\t},\n\tprops: {\n\t\tpartslist: {\n\t\t\ttype: Array,\n\t\t},\n\t\tpart: {\n\t\t\ttype: Object,\n\t\t},\n\t\tschema: {\n\t\t\ttype: Array,\n\t\t},\n\t},\n\tcomputed: {\n\t\tfields () {\n\t\t\treturn this.schema;\n\t\t},\n\t},\n\tmethods: {\n\t\tdelete_this_part () {\n\t\t\tconst idx = this.partslist.findIndex((part) => part['Name'] === this.part['Name']);\n\t\t\tconsole.log(idx);\n\t\t\tif (idx >= 0) {\n\t\t\t\tthis.partslist.splice(idx, 1);\n\t\t\t};\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.part {\n}\n\n.delete-cell {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n\n.delete-button {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 692 */
+/* 691 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(693);
+var content = __webpack_require__(692);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97758,7 +97773,7 @@ if(false) {
 }
 
 /***/ }),
-/* 693 */
+/* 692 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97772,13 +97787,13 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 
 /***/ }),
-/* 694 */
+/* 693 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(97);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__parts_list_cell_vue__ = __webpack_require__(695);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__parts_list_cell_vue__ = __webpack_require__(694);
 //
 //
 //
@@ -97825,17 +97840,17 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 });
 
 /***/ }),
-/* 695 */
+/* 694 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_cell_vue__ = __webpack_require__(700);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_dfba5512_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_cell_vue__ = __webpack_require__(701);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_cell_vue__ = __webpack_require__(699);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_dfba5512_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_cell_vue__ = __webpack_require__(700);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(696)
-  __webpack_require__(698)
+  __webpack_require__(695)
+  __webpack_require__(697)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -97879,13 +97894,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 696 */
+/* 695 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(697);
+var content = __webpack_require__(696);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97905,7 +97920,7 @@ if(false) {
 }
 
 /***/ }),
-/* 697 */
+/* 696 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97913,19 +97928,19 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\ninput[type=\"number\"][data-v-dfba5512]::-webkit-outer-spin-button,\ninput[type=\"number\"][data-v-dfba5512]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\ninput[type=\"number\"][data-v-dfba5512] {\n    -moz-appearance: textfield;\n}\n.cell[data-v-dfba5512] {\n\tborder: 1px solid #eee;\n\tcursor: cell;\n}\n.display-span[data-v-dfba5512] {\n\twidth: 100%;\n}\n.edit-input[data-v-dfba5512] {\n\tpadding: 0px;\n\tborder-width: 0;\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/src/parts-list-cell.vue?4c76dbb8"],"names":[],"mappings":";AAuHA;;IAEA,yBAAA;IACA,UAAA;CACA;AACA;IACA,2BAAA;CACA;AAEA;CACA,uBAAA;CACA,aAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,aAAA;CACA,gBAAA;CACA,YAAA;IACA,uBAAA;CACA","file":"parts-list-cell.vue","sourcesContent":["<template>\n  <td class=\"cell\"\n\t  @click=\"edit_cell\"\n\t  @focus=\"edit_cell\"\n\t  tabindex=\"0\"\n\t  v-bind:style=\"computed_style\">\n\n\t<span\n\t  class=\"display-span\"\n\t  v-show=\"!is_editing\">{{display_value}}</span>\n\t\n\t<input\n\t  v-if=\"is_editing\"\n\t  class=\"edit-input\"\n\t  ref=\"input\"\n\t  type=\"text\"\n\t  @blur=\"commit_edit\"\n\t  @keydown=\"on_keydown\"\n\t  v-focus\n\t  v-model=\"temp_value\"></input>\n  </td>\n</template>\n\n<script>\n\nexport default {\n\tname: 'PartsListCell',\n\tcomponents: {\n\t},\n\tdirectives: {\n\t\tfocus: {\n\t\t\tinserted (el) {\n\t\t\t\tel.focus();\n\t\t\t},\n\t\t},\n\t},\n\tprops: {\n\t\tpart: {\n\t\t\ttype: Object,\n\t\t},\n\t\tfield: {\n\t\t\ttype: Object,\n\t\t},\n\t},\n\tdata () {\n\t\treturn {\n\t\t\tis_editing: false,\n\t\t\ttemp_value: null,\n\t\t};\n\t},\n\tcomputed: {\n\t\tcomputed_style () {\n\t\t\treturn {\n\t\t\t\t'width': this.field.width.toString() + 'px',\n\t\t\t\t'text-align': this.field.align,\n\t\t\t};\n\t\t},\n\t\tdisplay_value () {\n\t\t\treturn this.value;\n\t\t},\n\t\tvalue: {\n\t\t\tget () {\n\t\t\t\tswitch (this.field.edit_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\treturn this.value_number;\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'string':\n\t\t\t\t\treturn this.value_string;\n\t\t\t\t\tbreak;\n\t\t\t\t};\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tswitch (this.field.edit_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\tthis.value_number = value;\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'string':\n\t\t\t\t\tthis.value_string = value;\n\t\t\t\t\tbreak;\n\t\t\t\t};\n\t\t\t},\n\t\t},\n\t\tvalue_number: {\n\t\t\tget () {\n\t\t\t\treturn this.part[this.field.name];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.part[this.field.name] = parseFloat(value);\n\t\t\t},\n\t\t},\n\t\tvalue_string: {\n\t\t\tget () {\n\t\t\t\treturn this.part[this.field.name];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.part[this.field.name] = value;\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\ton_keydown(ev) {\n\t\t\tif (ev.key === 'Enter') {\n\t\t\t\tthis.$refs.input.blur();\n\t\t\t};\n\t\t},\n\t\tedit_cell (ev) {\n\t\t\tthis.is_editing = true;\n\t\t\tthis.temp_value = this.value;\n\t\t},\n\t\tcommit_edit (ev) {\n\t\t\tthis.is_editing = false;\n\t\t\tthis.value = this.temp_value;\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\ninput[type=\"number\"]::-webkit-outer-spin-button,\ninput[type=\"number\"]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\ninput[type=\"number\"] {\n    -moz-appearance: textfield;\n}\n\n.cell {\n\tborder: 1px solid #eee;\n\tcursor: cell;\n}\n\n.display-span {\n\twidth: 100%;\n}\n\n.edit-input {\n\tpadding: 0px;\n\tborder-width: 0;\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\ninput[type=\"number\"][data-v-dfba5512]::-webkit-outer-spin-button,\ninput[type=\"number\"][data-v-dfba5512]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\ninput[type=\"number\"][data-v-dfba5512] {\n    -moz-appearance: textfield;\n}\n.cell[data-v-dfba5512] {\n\tborder: 1px solid #eee;\n\tcursor: cell;\n}\n.display-span[data-v-dfba5512] {\n\twidth: 100%;\n}\n.edit-input[data-v-dfba5512] {\n\tpadding: 0px;\n\tborder-width: 0;\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/parts-list-cell.vue?2082587c"],"names":[],"mappings":";AAiIA;;IAEA,yBAAA;IACA,UAAA;CACA;AACA;IACA,2BAAA;CACA;AAEA;CACA,uBAAA;CACA,aAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,aAAA;CACA,gBAAA;CACA,YAAA;IACA,uBAAA;CACA","file":"parts-list-cell.vue","sourcesContent":["<template>\n  <td class=\"cell\"\n\t  @click=\"edit_cell\"\n\t  @focus=\"edit_cell\"\n\t  tabindex=\"0\"\n\t  v-bind:style=\"computed_style\">\n\n\t<span\n\t  class=\"display-span\"\n\t  v-show=\"!is_editing\">{{display_value}}</span>\n\t\n\t<input\n\t  v-if=\"is_editing\"\n\t  class=\"edit-input\"\n\t  ref=\"input\"\n\t  type=\"text\"\n\t  @blur=\"commit_edit\"\n\t  @keydown=\"on_keydown\"\n\t  v-focus\n\t  v-model=\"temp_value\"></input>\n  </td>\n</template>\n\n<script>\n\nexport default {\n\tname: 'PartsListCell',\n\tcomponents: {\n\t},\n\tdirectives: {\n\t\tfocus: {\n\t\t\tinserted (el) {\n\t\t\t\tel.focus();\n\t\t\t},\n\t\t},\n\t},\n\tprops: {\n\t\tpart: {\n\t\t\ttype: Object,\n\t\t},\n\t\tfield: {\n\t\t\ttype: Object,\n\t\t},\n\t},\n\tdata () {\n\t\treturn {\n\t\t\tis_editing: false,\n\t\t\ttemp_value: null,\n\t\t};\n\t},\n\tcomputed: {\n\t\tcomputed_style () {\n\t\t\treturn {\n\t\t\t\t'width': this.field.width.toString() + 'px',\n\t\t\t\t'text-align': this.field.align,\n\t\t\t};\n\t\t},\n\t\tdisplay_value () {\n\t\t\treturn this.value;\n\t\t},\n\t\tvalue: {\n\t\t\tget () {\n\t\t\t\tswitch (this.field.edit_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\treturn this.value_number;\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'string':\n\t\t\t\t\treturn this.value_string;\n\t\t\t\t\tbreak;\n\t\t\t\t};\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tswitch (this.field.edit_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\tthis.value_number = value;\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'string':\n\t\t\t\t\tthis.value_string = value;\n\t\t\t\t\tbreak;\n\t\t\t\t};\n\t\t\t},\n\t\t},\n\t\tvalue_number: {\n\t\t\tget () {\n\t\t\t\treturn this.part[this.field.name];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.part[this.field.name] = parseFloat(value);\n\t\t\t},\n\t\t},\n\t\tvalue_string: {\n\t\t\tget () {\n\t\t\t\treturn this.part[this.field.name];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.part[this.field.name] = value;\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\ton_keydown(ev) {\n\t\t\tswitch (ev.key){\n\t\t\tcase 'Enter':\n\t\t\t\t// leave focus and let the app save changes\n\t\t\t\tthis.commit_edit();\n\t\t\t\tbreak;\n\t\t\tcase 'Escape':\n\t\t\t\tthis.abort_edit();\n\t\t\t\tbreak;\n\t\t\t};\n\t\t},\n\t\tabort_edit () {\n\t\t\tthis.temp_value = this.value;\n\t\t\tthis.is_editing = false;\n\t\t},\n\t\tedit_cell (ev) {\n\t\t\tthis.is_editing = true;\n\t\t\tthis.temp_value = this.value;\n\t\t},\n\t\tcommit_edit (ev) {\n\t\t\tthis.is_editing = false;\n\t\t\tthis.value = this.temp_value;\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\ninput[type=\"number\"]::-webkit-outer-spin-button,\ninput[type=\"number\"]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\ninput[type=\"number\"] {\n    -moz-appearance: textfield;\n}\n\n.cell {\n\tborder: 1px solid #eee;\n\tcursor: cell;\n}\n\n.display-span {\n\twidth: 100%;\n}\n\n.edit-input {\n\tpadding: 0px;\n\tborder-width: 0;\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 698 */
+/* 697 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(699);
+var content = __webpack_require__(698);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97945,7 +97960,7 @@ if(false) {
 }
 
 /***/ }),
-/* 699 */
+/* 698 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97953,13 +97968,13 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-cell.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-cell.vue","sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 700 */
+/* 699 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -98063,9 +98078,19 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 	},
 	methods: {
 		on_keydown(ev) {
-			if (ev.key === 'Enter') {
-				this.$refs.input.blur();
+			switch (ev.key) {
+				case 'Enter':
+					// leave focus and let the app save changes
+					this.commit_edit();
+					break;
+				case 'Escape':
+					this.abort_edit();
+					break;
 			};
+		},
+		abort_edit() {
+			this.temp_value = this.value;
+			this.is_editing = false;
 		},
 		edit_cell(ev) {
 			this.is_editing = true;
@@ -98079,56 +98104,68 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 });
 
 /***/ }),
-/* 701 */
+/* 700 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('td', {
-    staticClass: "cell",
-    style: (_vm.computed_style),
-    attrs: {
-      "tabindex": "0"
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "td",
+    {
+      staticClass: "cell",
+      style: _vm.computed_style,
+      attrs: { tabindex: "0" },
+      on: { click: _vm.edit_cell, focus: _vm.edit_cell }
     },
-    on: {
-      "click": _vm.edit_cell,
-      "focus": _vm.edit_cell
-    }
-  }, [_c('span', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (!_vm.is_editing),
-      expression: "!is_editing"
-    }],
-    staticClass: "display-span"
-  }, [_vm._v(_vm._s(_vm.display_value))]), _vm._v(" "), (_vm.is_editing) ? _c('input', {
-    directives: [{
-      name: "focus",
-      rawName: "v-focus"
-    }, {
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.temp_value),
-      expression: "temp_value"
-    }],
-    ref: "input",
-    staticClass: "edit-input",
-    attrs: {
-      "type": "text"
-    },
-    domProps: {
-      "value": (_vm.temp_value)
-    },
-    on: {
-      "blur": _vm.commit_edit,
-      "keydown": _vm.on_keydown,
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.temp_value = $event.target.value
-      }
-    }
-  }) : _vm._e()])
+    [
+      _c(
+        "span",
+        {
+          directives: [
+            {
+              name: "show",
+              rawName: "v-show",
+              value: !_vm.is_editing,
+              expression: "!is_editing"
+            }
+          ],
+          staticClass: "display-span"
+        },
+        [_vm._v(_vm._s(_vm.display_value))]
+      ),
+      _vm._v(" "),
+      _vm.is_editing
+        ? _c("input", {
+            directives: [
+              { name: "focus", rawName: "v-focus" },
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.temp_value,
+                expression: "temp_value"
+              }
+            ],
+            ref: "input",
+            staticClass: "edit-input",
+            attrs: { type: "text" },
+            domProps: { value: _vm.temp_value },
+            on: {
+              blur: _vm.commit_edit,
+              keydown: _vm.on_keydown,
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.temp_value = $event.target.value
+              }
+            }
+          })
+        : _vm._e()
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -98142,33 +98179,35 @@ if (false) {
 }
 
 /***/ }),
-/* 702 */
+/* 701 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('tr', {
-    staticClass: "part"
-  }, [_vm._l((_vm.fields), function(field) {
-    return _c('PartsListCell', {
-      key: field.name,
-      attrs: {
-        "part": _vm.part,
-        "field": field
-      }
-    })
-  }), _vm._v(" "), _c('td', {
-    staticClass: "delete-cell"
-  }, [_c('input', {
-    staticClass: "delete-button",
-    attrs: {
-      "type": "button",
-      "value": "X"
-    },
-    on: {
-      "click": _vm.delete_this_part
-    }
-  })])], 2)
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "tr",
+    { staticClass: "part" },
+    [
+      _vm._l(_vm.fields, function(field) {
+        return _c("PartsListCell", {
+          key: field.name,
+          attrs: { part: _vm.part, field: field }
+        })
+      }),
+      _vm._v(" "),
+      _c("td", { staticClass: "delete-cell" }, [
+        _c("input", {
+          staticClass: "delete-button",
+          attrs: { type: "button", value: "X" },
+          on: { click: _vm.delete_this_part }
+        })
+      ])
+    ],
+    2
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -98182,49 +98221,57 @@ if (false) {
 }
 
 /***/ }),
-/* 703 */
+/* 702 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    attrs: {
-      "width": "100%",
-      "height": "100%"
-    }
-  }, [_c('table', {
-    staticClass: "editor"
-  }, [_c('thead', [_vm._l((_vm.fields), function(field) {
-    return _c('th', {
-      staticClass: "column-header",
-      style: (_vm.header_style(field)),
-      on: {
-        "click": function($event) {
-          _vm.sort_list(field.name)
-        }
-      }
-    }, [_vm._v(_vm._s(field.name))])
-  }), _vm._v(" "), _c('th', {
-    staticClass: "column-header delete-column"
-  })], 2), _vm._v(" "), _c('tbody', _vm._l((_vm.displayed_parts), function(part) {
-    return _c('PartsListPart', {
-      key: "part.name",
-      attrs: {
-        "partslist": _vm.partslist,
-        "part": part,
-        "schema": _vm.schema
-      }
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { attrs: { width: "100%", height: "100%" } }, [
+    _c("table", { staticClass: "editor" }, [
+      _c(
+        "thead",
+        [
+          _vm._l(_vm.fields, function(field) {
+            return _c(
+              "th",
+              {
+                staticClass: "column-header",
+                style: _vm.header_style(field),
+                on: {
+                  click: function($event) {
+                    _vm.sort_list(field.name)
+                  }
+                }
+              },
+              [_vm._v(_vm._s(field.name))]
+            )
+          }),
+          _vm._v(" "),
+          _c("th", { staticClass: "column-header delete-column" })
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "tbody",
+        _vm._l(_vm.displayed_parts, function(part) {
+          return _c("PartsListPart", {
+            key: "part.name",
+            attrs: { partslist: _vm.partslist, part: part, schema: _vm.schema }
+          })
+        })
+      )
+    ]),
+    _vm._v(" "),
+    _c("input", {
+      staticClass: "new-part-button",
+      attrs: { type: "button", value: "Add new part" },
+      on: { click: _vm.add_new_part }
     })
-  }))]), _vm._v(" "), _c('input', {
-    staticClass: "new-part-button",
-    attrs: {
-      "type": "button",
-      "value": "Add new part"
-    },
-    on: {
-      "click": _vm.add_new_part
-    }
-  })])
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -98238,36 +98285,54 @@ if (false) {
 }
 
 /***/ }),
-/* 704 */
+/* 703 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "root"
-  }, [_c('div', {
-    staticClass: "header"
-  }, [_c('PartsListHeader', {
-    attrs: {
-      "partslist": _vm.partslist_info.data,
-      "schema": _vm.schema,
-      "display": _vm.display
-    }
-  })], 1), _vm._v(" "), _c('div', {
-    staticClass: "editor"
-  }, [_c('PartsListEditor', {
-    attrs: {
-      "partslist": _vm.partslist_info.data,
-      "schema": _vm.schema,
-      "display": _vm.display
-    }
-  })], 1), _vm._v(" "), _c('div', {
-    staticClass: "footer"
-  }, [_c('PartsListFooter', {
-    attrs: {
-      "partslist_info": _vm.partslist_info
-    }
-  })], 1)])
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "root" }, [
+    _c(
+      "div",
+      { staticClass: "header" },
+      [
+        _c("PartsListHeader", {
+          attrs: {
+            partslist: _vm.partslist_info.data,
+            schema: _vm.schema,
+            display: _vm.display
+          }
+        })
+      ],
+      1
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "editor" },
+      [
+        _c("PartsListEditor", {
+          attrs: {
+            partslist: _vm.partslist_info.data,
+            schema: _vm.schema,
+            display: _vm.display
+          }
+        })
+      ],
+      1
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "footer" },
+      [
+        _c("PartsListFooter", { attrs: { partslist_info: _vm.partslist_info } })
+      ],
+      1
+    )
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
