@@ -29,7 +29,6 @@
 <script>
 
 import _ from 'lodash';
-import localforage from 'localforage';
 import Clipboard from 'clipboard';
 import ShipEngine from '../lib/shipengine';
 
@@ -101,9 +100,11 @@ export default {
 				return _.isEqual(comparison_slice(bp), comparison_slice(this.selected_save));
 			}).value();
 			this.local_saves_save_to_local_storage();
+			this.display_status_message("Blueprint deleted.");
 		},
 		local_saves_load_selected () {
 			this.design_info.data = this.selected_save;
+			this.display_status_message("Blueprint loaded.");
 		},
 		local_saves_save_design () {
 			let timestamp = new Date();
@@ -111,27 +112,21 @@ export default {
 			this.design_info.data['Blueprint Date'] = timestamp.toISOString();
 			this.local_saves.push(_.clone(this.design_info.data));
 			this.local_saves_save_to_local_storage();
+			this.display_status_message("Blueprint saved.");
 		},
 
 		local_saves_load_from_local_storage () {
-			localforage.getItem(LOCAL_SAVES_KEY).then(
-				value => {
-					if (value === null) {
-						this.local_saves = [];
-						this.display_status_message("No Blueprints to load");
-					} else {
-						this.local_saves = value;
-						this.display_status_message("Blueprints loaded.");
-					};
-				}
-			)
+			const loaded = localStorage.getItem(LOCAL_SAVES_KEY);
+			if (loaded === null) {
+				this.local_saves = [];
+				this.display_status_message("No Blueprints to load");
+			} else {
+				this.local_saves = JSON.parse(loaded);
+				this.display_status_message("Blueprints loaded.");
+			};
 		},
 		local_saves_save_to_local_storage () {
-			localforage.setItem(LOCAL_SAVES_KEY, this.local_saves).then(
-				value => {
-					this.display_status_message("Blueprints saved.");
-				}
-			)
+			localStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(this.local_saves))
 		},
 
 		display_status_message (status) {
