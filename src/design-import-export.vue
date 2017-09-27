@@ -28,19 +28,17 @@
 
 <script>
 
-import _ from 'lodash'
-import localforage from 'localforage'
+import _ from 'lodash';
+import localforage from 'localforage';
 import Clipboard from 'clipboard';
+import ShipEngine from '../lib/shipengine';
 
 new Clipboard('.clipboard-copy-button');
 
+const LOCAL_SAVES_KEY = 'local_saves';
 const STATUS_DEFAULT_DURATION = 2000;
 
 const comparison_slice = _.partial(_.pick, _, ['Name', 'Blueprint Date']);
-
-function blueprint_save_name (bp) {
-	return bp['Name'] + ' @' + new Date(bp['Blueprint Date']).toLocaleString();
-}
 
 export default {
     name: 'DesignImportExport',
@@ -64,18 +62,19 @@ export default {
     },
     props: {
 		design_info: Object,
+		se_db: Object,
     },
     computed: {
 		selected_save_bp: {
 			get () {
 				if (this.selected_save) {
-					return blueprint_save_name(this.selected_save);
+					return this.blueprint_save_name(this.selected_save);
 				} else {
 					''
 				};
 			},
 			set (value) {
-				this.selected_save = _.chain(this.local_saves).find(bp => blueprint_save_name(bp) === value).value();
+				this.selected_save = _.chain(this.local_saves).find(bp => this.blueprint_save_name(bp) === value).value();
 			},
 		},
 		design_json_string: {
@@ -91,7 +90,12 @@ export default {
 		this.local_saves_load_from_local_storage();
     },
     methods: {
-		blueprint_save_name,
+		blueprint_save_name (bp) {
+			// return bp['Name'] + ' @' + new Date(bp['Blueprint Date']).toLocaleString();
+			return bp['Name'] +
+				' (' + (new Date(bp['Blueprint Date']).toLocaleString()) + ')' +
+				' [' + (new ShipEngine.Design(this.se_db, bp).stats.toString()) + ']';
+		},
 		local_saves_delete_selected () {
 			this.local_saves = _.chain(this.local_saves).filter(bp => {
 				return _.isEqual(comparison_slice(bp), comparison_slice(this.selected_save));
@@ -110,7 +114,7 @@ export default {
 		},
 
 		local_saves_load_from_local_storage () {
-			localforage.getItem('local_saves').then(
+			localforage.getItem(LOCAL_SAVES_KEY).then(
 				value => {
 					if (value === null) {
 						this.local_saves = [];
@@ -123,7 +127,7 @@ export default {
 			)
 		},
 		local_saves_save_to_local_storage () {
-			localforage.setItem('local_saves', this.local_saves).then(
+			localforage.setItem(LOCAL_SAVES_KEY, this.local_saves).then(
 				value => {
 					this.display_status_message("Blueprints saved.");
 				}

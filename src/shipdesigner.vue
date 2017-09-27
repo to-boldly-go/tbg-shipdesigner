@@ -7,7 +7,7 @@
 	  <Design :se_db="se_db" :se_design="se_design"></Design>
 	</div>
 	<div class="footer">
-	  <DesignImportExport :design_info="design_info"></DesignImportExport>
+	  <DesignImportExport :se_db="se_db" :design_info="design_info"></DesignImportExport>
 	</div>
   </div>
 </template>
