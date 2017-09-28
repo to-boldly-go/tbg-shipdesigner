@@ -3,9 +3,12 @@
   <tr class="subsystem-frame">
 	<td class="name-column" colspan="2">{{se_subsystem.name}}</td>
 
-	<td class="part-column"><select v-model="sub_frame" class="part-column-select">
+	<td class="part-column">
+	  <select v-model="sub_frame" class="part-column-select" v-bind:class="part_column_select_computed">
 		<option v-for="sub_frame_value in se_subsystem.valid_frames">{{sub_frame_value['Name']}}</option>
-	</select></td>
+		<option v-if="!is_valid_frame">{{sub_frame}}</option>
+	  </select>
+	</td>
 
 	<template v-for="name in stats.names">
 	  <td>{{stats_multiplier_pretty}}</td>
@@ -48,6 +51,19 @@ export default {
 		se_subsystem: Object,
 	},
 	computed: {
+		part_column_select_computed () {
+			return {
+				['has-error']: !this.is_valid_frame,
+			};
+		},
+		is_valid_frame () {
+			return this.valid_frames
+				.map((frame) => frame['Name'])
+				.includes(this.sub_frame);
+		},
+		valid_frames () {
+			return this.se_subsystem.valid_frames;
+		},
 		se_components () {
 			return this.se_subsystem.components;
 		},
@@ -82,12 +98,16 @@ export default {
 
 
 <style>
-.subsystem-frame {
-	background: #ccc;
-}
 
 </style>
 
 
 <style scoped>
+.subsystem-frame {
+	background: #ccc;
+}
+
+.has-error {
+	background: #faa;
+}
 </style>
