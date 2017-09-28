@@ -1,7 +1,9 @@
 <template>
 
   <tr class="subsystem-summary">
-	<td class="name-column" colspan="2">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>
+	<td class="name-column"
+		v-bind:class="weight_summary_class"
+		colspan="2">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>
 
 	<td class="part-column"></td>
 
@@ -9,7 +11,7 @@
 	  <StatlineCell :stats="stats" :name="name"></StatlineCell>
 	</template>
 
-	<td class="weight-internal-column">{{se_subsystem.weight_internal.toFixed(2)}}</td>
+	<td class="weight-internal-column" v-bind:class="weight_summary_class">{{se_subsystem.weight_internal.toFixed(2)}}</td>
 	<td class="weight-external-column">{{se_subsystem.weight_external.toFixed(2)}}</td>
 
 	<td class="br-column">{{se_subsystem.cost_BR.toFixed(2)}}</td>
@@ -44,6 +46,14 @@ export default {
 		se_subsystem: Object,
 	},
 	computed: {
+		weight_summary_class () {
+			return {
+				['has-error']: this.has_weight_error,
+			};
+		},
+		has_weight_error () {
+			return this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;
+		},
 		se_components () {
 			return this.se_subsystem.components;
 		},
@@ -60,7 +70,7 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
 .subsystem-summary {
 	background: #ccc;
 	border-style: none;
@@ -77,4 +87,12 @@ export default {
 .part-select {
 	width: 100%;
 }
+
+.has-error {
+	background: #faa;
+}
+</style>
+
+<style>
+
 </style>

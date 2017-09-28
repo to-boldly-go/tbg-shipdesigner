@@ -2,15 +2,17 @@
   <tr class="principal-frame-raw">
 	<td class="name-column" colspan="2">Size: {{frame_size.toFixed(2)}}</td>
 
-	<td class="part-column"><select v-model="principal_frame" class="part-column-select">
-	  <option v-for="princ_frame_value in se_design.valid_frames">{{princ_frame_value['Name']}}</option>
-	</select></td>
+	<td class="part-column">
+	  <select v-model="principal_frame" class="part-column-select">
+		<option v-for="princ_frame_value in se_design.valid_frames">{{princ_frame_value['Name']}}</option>
+	  </select>
+	</td>
 
 	<template v-for="name in stats_raw.names">
 	  <StatlineCell :stats="stats_raw" :name="name"></StatlineCell>
 	</template>
 	
-	<td class="weight-internal-column">{{se_design.weight_internal.toFixed(2)}}</td>
+	<td class="weight-internal-column" v-bind:class="weight_summary_class">{{se_design.weight_internal.toFixed(2)}}</td>
 	<td class="weight-external-column">{{se_design.weight_external.toFixed(2)}}</td>
 
 	<td class="br-column">{{se_design.cost_BR_raw.toFixed(2)}}</td>
@@ -46,6 +48,14 @@ export default {
 		se_design: Object,
 	},
 	computed: {
+		weight_summary_class () {
+			return {
+				['has-error']: this.has_weight_error,
+			};
+		},
+		has_weight_error () {
+			return this.se_design.weight_internal > this.se_design.frame_max_size_raw;
+		},
 		principal_frame: {
 			get () {
 				return this.se_design.json['Principal Frame'];
@@ -91,5 +101,9 @@ export default {
 
 .name-column {
 	text-align: right;
+}
+
+.has-error {
+	background: #d60000;
 }
 </style>
