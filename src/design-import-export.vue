@@ -6,6 +6,8 @@
 		   data-clipboard-target="#design-import-export-blueprint-string"
 		   value="Copy"></input>
 
+	<span><a v-bind:href="'shipdesigner.html#' + design_json_url_encoded_string">Link to this design</a></span>
+
     <select v-model="selected_save_bp">
       <option v-for="blueprint in local_saves">
 		{{blueprint_save_name(blueprint)}}
@@ -83,6 +85,9 @@ export default {
 			set (value) {
 				this.design_info.data = JSON.parse(value);
 			},
+		},
+		design_json_url_encoded_string () {
+			return encodeURI(this.design_json_string);
 		},
     },
     mounted () {

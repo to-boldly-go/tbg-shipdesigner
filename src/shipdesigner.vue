@@ -45,9 +45,17 @@ export default {
 		DesignImportExport,
 	},
 	data () {
+		let design_json;
+		let hash = new URL(location).hash;
+		if (hash) {
+			design_json = JSON.parse(decodeURI(hash.substring(1)));
+		} else {
+			design_json = design_json_init;
+		};
+
 		return {
 			design_info: {
-				data: design_json_init,
+				data: design_json,
 			},
 			parts_info: {
 				parts: canon_parts,
