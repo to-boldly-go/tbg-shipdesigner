@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 581);
+/******/ 	return __webpack_require__(__webpack_require__.s = 580);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1901,7 +1901,7 @@ exports.factory = factory;
 
 
 var formatNumber = __webpack_require__(3).format;
-var formatBigNumber = __webpack_require__(184).format;
+var formatBigNumber = __webpack_require__(183).format;
 var isBigNumber = __webpack_require__(77);
 
 /**
@@ -3291,7 +3291,7 @@ if (typeof DEBUG !== 'undefined' && DEBUG) {
   ) }
 }
 
-var listToStyles = __webpack_require__(164)
+var listToStyles = __webpack_require__(163)
 
 /*
 type StyleObject = {
@@ -4444,7 +4444,7 @@ function factory (type, config, load, typed) {
   var addScalar = load(__webpack_require__(22));
   var latex = __webpack_require__(4);
   
-  var algorithm01 = load(__webpack_require__(37));
+  var algorithm01 = load(__webpack_require__(36));
   var algorithm04 = load(__webpack_require__(79));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm13 = load(__webpack_require__(8));
@@ -4740,7 +4740,7 @@ function factory (type, config, load, typed) {
   var addScalar = load(__webpack_require__(22));
   var unaryMinus = load(__webpack_require__(41));
 
-  var algorithm01 = load(__webpack_require__(37));
+  var algorithm01 = load(__webpack_require__(36));
   var algorithm03 = load(__webpack_require__(17));
   var algorithm05 = load(__webpack_require__(66));
   var algorithm10 = load(__webpack_require__(40));
@@ -5368,13 +5368,13 @@ exports.factory = factory;
 
 
 exports.array = __webpack_require__(2);
-exports['boolean'] = __webpack_require__(193);
-exports['function'] = __webpack_require__(36);
+exports['boolean'] = __webpack_require__(192);
+exports['function'] = __webpack_require__(35);
 exports.number = __webpack_require__(3);
 exports.object = __webpack_require__(5);
 exports.string = __webpack_require__(9);
 exports.types = __webpack_require__(65);
-exports.emitter = __webpack_require__(101);
+exports.emitter = __webpack_require__(100);
 
 
 /***/ }),
@@ -6208,7 +6208,7 @@ exports.factory = factory;
 "use strict";
 
 
-var naturalSort = __webpack_require__(502);
+var naturalSort = __webpack_require__(501);
 
 function factory (type, config, load, typed) {
   var getTypeOf = load(__webpack_require__(82));
@@ -6476,11 +6476,383 @@ exports.factory = factory;
 
 /***/ }),
 /* 35 */
+/***/ (function(module, exports) {
+
+// function utils
+
+/*
+ * Memoize a given function by caching the computed result.
+ * The cache of a memoized function can be cleared by deleting the `cache`
+ * property of the function.
+ *
+ * @param {function} fn                     The function to be memoized.
+ *                                          Must be a pure function.
+ * @param {function(args: Array)} [hasher]  A custom hash builder.
+ *                                          Is JSON.stringify by default.
+ * @return {function}                       Returns the memoized function
+ */
+exports.memoize = function(fn, hasher) {
+  return function memoize() {
+    if (typeof memoize.cache !== 'object') {
+      memoize.cache = {};
+    }
+
+    var args = [];
+    for (var i = 0; i < arguments.length; i++) {
+      args[i] = arguments[i];
+    }
+
+    var hash = hasher ? hasher(args) : JSON.stringify(args);
+    if (!(hash in memoize.cache)) {
+      return memoize.cache[hash] = fn.apply(fn, args);
+    }
+    return memoize.cache[hash];
+  };
+};
+
+/**
+ * Find the maximum number of arguments expected by a typed function.
+ * @param {function} fn   A typed function
+ * @return {number} Returns the maximum number of expected arguments.
+ *                  Returns -1 when no signatures where found on the function.
+ */
+exports.maxArgumentCount = function (fn) {
+  return Object.keys(fn.signatures || {})
+      .reduce(function (args, signature) {
+        var count = (signature.match(/,/g) || []).length + 1;
+        return Math.max(args, count);
+      }, -1);
+};
+
+/**
+ * Call a typed function with the
+ * @param {function} fn   A function or typed function
+ * @return {number} Returns the maximum number of expected arguments.
+ *                  Returns -1 when no signatures where found on the function.
+ */
+exports.callWithRightArgumentCount = function (fn, args, argCount) {
+  return Object.keys(fn.signatures || {})
+      .reduce(function (args, signature) {
+        var count = (signature.match(/,/g) || []).length + 1;
+        return Math.max(args, count);
+      }, -1);
+};
+
+
+/***/ }),
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const util = __webpack_require__(99);
-const NamedVector = __webpack_require__(100).NamedVector;
-const math = __webpack_require__(167);
+"use strict";
+
+
+var DimensionError = __webpack_require__(10);
+
+function factory (type, config, load, typed) {
+
+  var DenseMatrix = type.DenseMatrix;
+
+  /**
+   * Iterates over SparseMatrix nonzero items and invokes the callback function f(Dij, Sij). 
+   * Callback function invoked NNZ times (number of nonzero items in SparseMatrix).
+   *
+   *
+   *          ┌  f(Dij, Sij)  ; S(i,j) !== 0
+   * C(i,j) = ┤
+   *          └  Dij          ; otherwise
+   *
+   *
+   * @param {Matrix}   denseMatrix       The DenseMatrix instance (D)
+   * @param {Matrix}   sparseMatrix      The SparseMatrix instance (S)
+   * @param {Function} callback          The f(Dij,Sij) operation to invoke, where Dij = DenseMatrix(i,j) and Sij = SparseMatrix(i,j)
+   * @param {boolean}  inverse           A true value indicates callback should be invoked f(Sij,Dij)
+   *
+   * @return {Matrix}                    DenseMatrix (C)
+   *
+   * see https://github.com/josdejong/mathjs/pull/346#issuecomment-97477571
+   */
+  var algorithm01 = function (denseMatrix, sparseMatrix, callback, inverse) {
+    // dense matrix arrays
+    var adata = denseMatrix._data;
+    var asize = denseMatrix._size;
+    var adt = denseMatrix._datatype;
+    // sparse matrix arrays
+    var bvalues = sparseMatrix._values;
+    var bindex = sparseMatrix._index;
+    var bptr = sparseMatrix._ptr;
+    var bsize = sparseMatrix._size;
+    var bdt = sparseMatrix._datatype;
+
+    // validate dimensions
+    if (asize.length !== bsize.length)
+      throw new DimensionError(asize.length, bsize.length);
+
+    // check rows & columns
+    if (asize[0] !== bsize[0] || asize[1] !== bsize[1])
+      throw new RangeError('Dimension mismatch. Matrix A (' + asize + ') must match Matrix B (' + bsize + ')');
+
+    // sparse matrix cannot be a Pattern matrix
+    if (!bvalues)
+      throw new Error('Cannot perform operation on Dense Matrix and Pattern Sparse Matrix');
+
+    // rows & columns
+    var rows = asize[0];
+    var columns = asize[1];
+
+    // process data types
+    var dt = typeof adt === 'string' && adt === bdt ? adt : undefined;
+    // callback function
+    var cf = dt ? typed.find(callback, [dt, dt]) : callback;
+
+    // vars
+    var i, j;
+    
+    // result (DenseMatrix)
+    var cdata = [];
+    // initialize c
+    for (i = 0; i < rows; i++)
+      cdata[i] = [];      
+    
+    // workspace
+    var x = [];
+    // marks indicating we have a value in x for a given column
+    var w = [];
+
+    // loop columns in b
+    for (j = 0; j < columns; j++) {
+      // column mark
+      var mark = j + 1;
+      // values in column j
+      for (var k0 = bptr[j], k1 = bptr[j + 1], k = k0; k < k1; k++) {
+        // row
+        i = bindex[k];
+        // update workspace
+        x[i] = inverse ? cf(bvalues[k], adata[i][j]) : cf(adata[i][j], bvalues[k]);
+        // mark i as updated
+        w[i] = mark;
+      }
+      // loop rows
+      for (i = 0; i < rows; i++) {
+        // check row is in workspace
+        if (w[i] === mark) {
+          // c[i][j] was already calculated
+          cdata[i][j] = x[i];
+        }
+        else {
+          // item does not exist in S
+          cdata[i][j] = adata[i][j];
+        }
+      }
+    }
+
+    // return dense matrix
+    return new DenseMatrix({
+      data: cdata,
+      size: [rows, columns],
+      datatype: dt
+    });
+  };
+  
+  return algorithm01;
+}
+
+exports.name = 'algorithm01';
+exports.factory = factory;
+
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var nearlyEqual = __webpack_require__(3).nearlyEqual;
+var bigNearlyEqual = __webpack_require__(39);
+
+function factory (type, config, load, typed) {
+  
+  var matrix = load(__webpack_require__(0));
+
+  var algorithm03 = load(__webpack_require__(17));
+  var algorithm07 = load(__webpack_require__(28));
+  var algorithm12 = load(__webpack_require__(18));
+  var algorithm13 = load(__webpack_require__(8));
+  var algorithm14 = load(__webpack_require__(6));
+
+  var latex = __webpack_require__(4);
+
+  /**
+   * Test whether value x is larger than y.
+   *
+   * The function returns true when x is larger than y and the relative
+   * difference between x and y is larger than the configured epsilon. The
+   * function cannot be used to compare values smaller than approximately 2.22e-16.
+   *
+   * For matrices, the function is evaluated element wise.
+   *
+   * Syntax:
+   *
+   *    math.larger(x, y)
+   *
+   * Examples:
+   *
+   *    math.larger(2, 3);             // returns false
+   *    math.larger(5, 2 + 2);         // returns true
+   *
+   *    var a = math.unit('5 cm');
+   *    var b = math.unit('2 inch');
+   *    math.larger(a, b);             // returns false
+   *
+   * See also:
+   *
+   *    equal, unequal, smaller, smallerEq, largerEq, compare
+   *
+   * @param  {number | BigNumber | Fraction | boolean | Unit | string | Array | Matrix} x First value to compare
+   * @param  {number | BigNumber | Fraction | boolean | Unit | string | Array | Matrix} y Second value to compare
+   * @return {boolean | Array | Matrix} Returns true when the x is larger than y, else returns false
+   */
+  var larger = typed('larger', {
+
+    'boolean, boolean': function (x, y) {
+      return x > y;
+    },
+
+    'number, number': function (x, y) {
+      return x > y && !nearlyEqual(x, y, config.epsilon);
+    },
+
+    'BigNumber, BigNumber': function (x, y) {
+      return x.gt(y) && !bigNearlyEqual(x, y, config.epsilon);
+    },
+
+    'Fraction, Fraction': function (x, y) {
+      return x.compare(y) === 1;
+    },
+
+    'Complex, Complex': function () {
+      throw new TypeError('No ordering relation is defined for complex numbers');
+    },
+
+    'Unit, Unit': function (x, y) {
+      if (!x.equalBase(y)) {
+        throw new Error('Cannot compare units with different base');
+      }
+      return larger(x.value, y.value);
+    },
+
+    'string, string': function (x, y) {
+      return x > y;
+    },
+
+    'Matrix, Matrix': function (x, y) {
+      // result
+      var c;
+
+      // process matrix storage
+      switch (x.storage()) {
+        case 'sparse':
+          switch (y.storage()) {
+            case 'sparse':
+              // sparse + sparse
+              c = algorithm07(x, y, larger);
+              break;
+            default:
+              // sparse + dense
+              c = algorithm03(y, x, larger, true);
+              break;
+          }
+          break;
+        default:
+          switch (y.storage()) {
+            case 'sparse':
+              // dense + sparse
+              c = algorithm03(x, y, larger, false);
+              break;
+            default:
+              // dense + dense
+              c = algorithm13(x, y, larger);
+              break;
+          }
+          break;
+      }
+      return c;
+    },
+
+    'Array, Array': function (x, y) {
+      // use matrix implementation
+      return larger(matrix(x), matrix(y)).valueOf();
+    },
+
+    'Array, Matrix': function (x, y) {
+      // use matrix implementation
+      return larger(matrix(x), y);
+    },
+
+    'Matrix, Array': function (x, y) {
+      // use matrix implementation
+      return larger(x, matrix(y));
+    },
+
+    'Matrix, any': function (x, y) {
+      // result
+      var c;
+      // check storage format
+      switch (x.storage()) {
+        case 'sparse':
+          c = algorithm12(x, y, larger, false);
+          break;
+        default:
+          c = algorithm14(x, y, larger, false);
+          break;
+      }
+      return c;
+    },
+
+    'any, Matrix': function (x, y) {
+      // result
+      var c;
+      // check storage format
+      switch (y.storage()) {
+        case 'sparse':
+          c = algorithm12(y, x, larger, true);
+          break;
+        default:
+          c = algorithm14(y, x, larger, true);
+          break;
+      }
+      return c;
+    },
+
+    'Array, any': function (x, y) {
+      // use matrix implementation
+      return algorithm14(matrix(x), y, larger, false).valueOf();
+    },
+
+    'any, Array': function (x, y) {
+      // use matrix implementation
+      return algorithm14(matrix(y), x, larger, true).valueOf();
+    }
+  });
+
+  larger.toTex = {
+    2: '\\left(${args[0]}' + latex.operators['larger'] + '${args[1]}\\right)'
+  };
+
+  return larger;
+}
+
+exports.name = 'larger';
+exports.factory = factory;
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const util = __webpack_require__(98);
+const NamedVector = __webpack_require__(99).NamedVector;
+const math = __webpack_require__(166);
 
 // AL6, $AL$6
 const SIZE_TO_WEIGHT_CAP_MULTIPLIER = 300;
@@ -7298,7 +7670,7 @@ class DesignSubsystem {
 	}
 
 	get valid_frames() {
-		return this.db.find_frames(this.name).filter(frame => !frame['Name'].match(/^x/));
+		return this.db.find_frames(this.name).filter(frame => frame['Weight Class'] == this.design.weight_class_raw).filter(frame => !frame['Name'].match(/^x/));
 	}
 
 	// CV20, CV41
@@ -7975,378 +8347,6 @@ module.exports.Statline = Statline;
 module.exports.Crewline = Crewline;
 
 /***/ }),
-/* 36 */
-/***/ (function(module, exports) {
-
-// function utils
-
-/*
- * Memoize a given function by caching the computed result.
- * The cache of a memoized function can be cleared by deleting the `cache`
- * property of the function.
- *
- * @param {function} fn                     The function to be memoized.
- *                                          Must be a pure function.
- * @param {function(args: Array)} [hasher]  A custom hash builder.
- *                                          Is JSON.stringify by default.
- * @return {function}                       Returns the memoized function
- */
-exports.memoize = function(fn, hasher) {
-  return function memoize() {
-    if (typeof memoize.cache !== 'object') {
-      memoize.cache = {};
-    }
-
-    var args = [];
-    for (var i = 0; i < arguments.length; i++) {
-      args[i] = arguments[i];
-    }
-
-    var hash = hasher ? hasher(args) : JSON.stringify(args);
-    if (!(hash in memoize.cache)) {
-      return memoize.cache[hash] = fn.apply(fn, args);
-    }
-    return memoize.cache[hash];
-  };
-};
-
-/**
- * Find the maximum number of arguments expected by a typed function.
- * @param {function} fn   A typed function
- * @return {number} Returns the maximum number of expected arguments.
- *                  Returns -1 when no signatures where found on the function.
- */
-exports.maxArgumentCount = function (fn) {
-  return Object.keys(fn.signatures || {})
-      .reduce(function (args, signature) {
-        var count = (signature.match(/,/g) || []).length + 1;
-        return Math.max(args, count);
-      }, -1);
-};
-
-/**
- * Call a typed function with the
- * @param {function} fn   A function or typed function
- * @return {number} Returns the maximum number of expected arguments.
- *                  Returns -1 when no signatures where found on the function.
- */
-exports.callWithRightArgumentCount = function (fn, args, argCount) {
-  return Object.keys(fn.signatures || {})
-      .reduce(function (args, signature) {
-        var count = (signature.match(/,/g) || []).length + 1;
-        return Math.max(args, count);
-      }, -1);
-};
-
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var DimensionError = __webpack_require__(10);
-
-function factory (type, config, load, typed) {
-
-  var DenseMatrix = type.DenseMatrix;
-
-  /**
-   * Iterates over SparseMatrix nonzero items and invokes the callback function f(Dij, Sij). 
-   * Callback function invoked NNZ times (number of nonzero items in SparseMatrix).
-   *
-   *
-   *          ┌  f(Dij, Sij)  ; S(i,j) !== 0
-   * C(i,j) = ┤
-   *          └  Dij          ; otherwise
-   *
-   *
-   * @param {Matrix}   denseMatrix       The DenseMatrix instance (D)
-   * @param {Matrix}   sparseMatrix      The SparseMatrix instance (S)
-   * @param {Function} callback          The f(Dij,Sij) operation to invoke, where Dij = DenseMatrix(i,j) and Sij = SparseMatrix(i,j)
-   * @param {boolean}  inverse           A true value indicates callback should be invoked f(Sij,Dij)
-   *
-   * @return {Matrix}                    DenseMatrix (C)
-   *
-   * see https://github.com/josdejong/mathjs/pull/346#issuecomment-97477571
-   */
-  var algorithm01 = function (denseMatrix, sparseMatrix, callback, inverse) {
-    // dense matrix arrays
-    var adata = denseMatrix._data;
-    var asize = denseMatrix._size;
-    var adt = denseMatrix._datatype;
-    // sparse matrix arrays
-    var bvalues = sparseMatrix._values;
-    var bindex = sparseMatrix._index;
-    var bptr = sparseMatrix._ptr;
-    var bsize = sparseMatrix._size;
-    var bdt = sparseMatrix._datatype;
-
-    // validate dimensions
-    if (asize.length !== bsize.length)
-      throw new DimensionError(asize.length, bsize.length);
-
-    // check rows & columns
-    if (asize[0] !== bsize[0] || asize[1] !== bsize[1])
-      throw new RangeError('Dimension mismatch. Matrix A (' + asize + ') must match Matrix B (' + bsize + ')');
-
-    // sparse matrix cannot be a Pattern matrix
-    if (!bvalues)
-      throw new Error('Cannot perform operation on Dense Matrix and Pattern Sparse Matrix');
-
-    // rows & columns
-    var rows = asize[0];
-    var columns = asize[1];
-
-    // process data types
-    var dt = typeof adt === 'string' && adt === bdt ? adt : undefined;
-    // callback function
-    var cf = dt ? typed.find(callback, [dt, dt]) : callback;
-
-    // vars
-    var i, j;
-    
-    // result (DenseMatrix)
-    var cdata = [];
-    // initialize c
-    for (i = 0; i < rows; i++)
-      cdata[i] = [];      
-    
-    // workspace
-    var x = [];
-    // marks indicating we have a value in x for a given column
-    var w = [];
-
-    // loop columns in b
-    for (j = 0; j < columns; j++) {
-      // column mark
-      var mark = j + 1;
-      // values in column j
-      for (var k0 = bptr[j], k1 = bptr[j + 1], k = k0; k < k1; k++) {
-        // row
-        i = bindex[k];
-        // update workspace
-        x[i] = inverse ? cf(bvalues[k], adata[i][j]) : cf(adata[i][j], bvalues[k]);
-        // mark i as updated
-        w[i] = mark;
-      }
-      // loop rows
-      for (i = 0; i < rows; i++) {
-        // check row is in workspace
-        if (w[i] === mark) {
-          // c[i][j] was already calculated
-          cdata[i][j] = x[i];
-        }
-        else {
-          // item does not exist in S
-          cdata[i][j] = adata[i][j];
-        }
-      }
-    }
-
-    // return dense matrix
-    return new DenseMatrix({
-      data: cdata,
-      size: [rows, columns],
-      datatype: dt
-    });
-  };
-  
-  return algorithm01;
-}
-
-exports.name = 'algorithm01';
-exports.factory = factory;
-
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var nearlyEqual = __webpack_require__(3).nearlyEqual;
-var bigNearlyEqual = __webpack_require__(39);
-
-function factory (type, config, load, typed) {
-  
-  var matrix = load(__webpack_require__(0));
-
-  var algorithm03 = load(__webpack_require__(17));
-  var algorithm07 = load(__webpack_require__(28));
-  var algorithm12 = load(__webpack_require__(18));
-  var algorithm13 = load(__webpack_require__(8));
-  var algorithm14 = load(__webpack_require__(6));
-
-  var latex = __webpack_require__(4);
-
-  /**
-   * Test whether value x is larger than y.
-   *
-   * The function returns true when x is larger than y and the relative
-   * difference between x and y is larger than the configured epsilon. The
-   * function cannot be used to compare values smaller than approximately 2.22e-16.
-   *
-   * For matrices, the function is evaluated element wise.
-   *
-   * Syntax:
-   *
-   *    math.larger(x, y)
-   *
-   * Examples:
-   *
-   *    math.larger(2, 3);             // returns false
-   *    math.larger(5, 2 + 2);         // returns true
-   *
-   *    var a = math.unit('5 cm');
-   *    var b = math.unit('2 inch');
-   *    math.larger(a, b);             // returns false
-   *
-   * See also:
-   *
-   *    equal, unequal, smaller, smallerEq, largerEq, compare
-   *
-   * @param  {number | BigNumber | Fraction | boolean | Unit | string | Array | Matrix} x First value to compare
-   * @param  {number | BigNumber | Fraction | boolean | Unit | string | Array | Matrix} y Second value to compare
-   * @return {boolean | Array | Matrix} Returns true when the x is larger than y, else returns false
-   */
-  var larger = typed('larger', {
-
-    'boolean, boolean': function (x, y) {
-      return x > y;
-    },
-
-    'number, number': function (x, y) {
-      return x > y && !nearlyEqual(x, y, config.epsilon);
-    },
-
-    'BigNumber, BigNumber': function (x, y) {
-      return x.gt(y) && !bigNearlyEqual(x, y, config.epsilon);
-    },
-
-    'Fraction, Fraction': function (x, y) {
-      return x.compare(y) === 1;
-    },
-
-    'Complex, Complex': function () {
-      throw new TypeError('No ordering relation is defined for complex numbers');
-    },
-
-    'Unit, Unit': function (x, y) {
-      if (!x.equalBase(y)) {
-        throw new Error('Cannot compare units with different base');
-      }
-      return larger(x.value, y.value);
-    },
-
-    'string, string': function (x, y) {
-      return x > y;
-    },
-
-    'Matrix, Matrix': function (x, y) {
-      // result
-      var c;
-
-      // process matrix storage
-      switch (x.storage()) {
-        case 'sparse':
-          switch (y.storage()) {
-            case 'sparse':
-              // sparse + sparse
-              c = algorithm07(x, y, larger);
-              break;
-            default:
-              // sparse + dense
-              c = algorithm03(y, x, larger, true);
-              break;
-          }
-          break;
-        default:
-          switch (y.storage()) {
-            case 'sparse':
-              // dense + sparse
-              c = algorithm03(x, y, larger, false);
-              break;
-            default:
-              // dense + dense
-              c = algorithm13(x, y, larger);
-              break;
-          }
-          break;
-      }
-      return c;
-    },
-
-    'Array, Array': function (x, y) {
-      // use matrix implementation
-      return larger(matrix(x), matrix(y)).valueOf();
-    },
-
-    'Array, Matrix': function (x, y) {
-      // use matrix implementation
-      return larger(matrix(x), y);
-    },
-
-    'Matrix, Array': function (x, y) {
-      // use matrix implementation
-      return larger(x, matrix(y));
-    },
-
-    'Matrix, any': function (x, y) {
-      // result
-      var c;
-      // check storage format
-      switch (x.storage()) {
-        case 'sparse':
-          c = algorithm12(x, y, larger, false);
-          break;
-        default:
-          c = algorithm14(x, y, larger, false);
-          break;
-      }
-      return c;
-    },
-
-    'any, Matrix': function (x, y) {
-      // result
-      var c;
-      // check storage format
-      switch (y.storage()) {
-        case 'sparse':
-          c = algorithm12(y, x, larger, true);
-          break;
-        default:
-          c = algorithm14(y, x, larger, true);
-          break;
-      }
-      return c;
-    },
-
-    'Array, any': function (x, y) {
-      // use matrix implementation
-      return algorithm14(matrix(x), y, larger, false).valueOf();
-    },
-
-    'any, Array': function (x, y) {
-      // use matrix implementation
-      return algorithm14(matrix(y), x, larger, true).valueOf();
-    }
-  });
-
-  larger.toTex = {
-    2: '\\left(${args[0]}' + latex.operators['larger'] + '${args[1]}\\right)'
-  };
-
-  return larger;
-}
-
-exports.name = 'larger';
-exports.factory = factory;
-
-
-/***/ }),
 /* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8744,15 +8744,15 @@ var ArgumentsError = __webpack_require__(55);
 var deepMap = __webpack_require__(1);
 
 function factory (type, config, load, typed) {
-  var AccessorNode            = load(__webpack_require__(113));
+  var AccessorNode            = load(__webpack_require__(112));
   var ArrayNode               = load(__webpack_require__(86));
-  var AssignmentNode          = load(__webpack_require__(115));
-  var BlockNode               = load(__webpack_require__(116));
-  var ConditionalNode         = load(__webpack_require__(117));
+  var AssignmentNode          = load(__webpack_require__(114));
+  var BlockNode               = load(__webpack_require__(115));
+  var ConditionalNode         = load(__webpack_require__(116));
   var ConstantNode            = load(__webpack_require__(58));
-  var FunctionAssignmentNode  = load(__webpack_require__(118));
+  var FunctionAssignmentNode  = load(__webpack_require__(117));
   var IndexNode               = load(__webpack_require__(84));
-  var ObjectNode              = load(__webpack_require__(120));
+  var ObjectNode              = load(__webpack_require__(119));
   var OperatorNode            = load(__webpack_require__(68));
   var ParenthesisNode         = load(__webpack_require__(69));
   var FunctionNode            = load(__webpack_require__(59));
@@ -11674,7 +11674,7 @@ function factory (type, config, load, typed) {
   var eye = load(__webpack_require__(67));
   var multiply = load(__webpack_require__(12));
   var matrix = load(__webpack_require__(0));
-  var fraction = load(__webpack_require__(103));
+  var fraction = load(__webpack_require__(102));
   var number = load(__webpack_require__(80));
 
   /**
@@ -11899,7 +11899,7 @@ function factory (type, config, load, typed) {
 
   var divideScalar = load(__webpack_require__(21));
   var multiply     = load(__webpack_require__(12));
-  var inv          = load(__webpack_require__(125));
+  var inv          = load(__webpack_require__(124));
   var matrix       = load(__webpack_require__(0));
 
   var algorithm11 = load(__webpack_require__(19));
@@ -12922,7 +12922,7 @@ var hasOwnProperty = __webpack_require__(5).hasOwnProperty;
 var map = __webpack_require__(2).map;
 var join = __webpack_require__(2).join;
 var validateSafeMethod = __webpack_require__(15).validateSafeMethod;
-var getUniqueArgumentName = __webpack_require__(119);
+var getUniqueArgumentName = __webpack_require__(118);
 
 function factory (type, config, load, typed, math) {
   var register = load(__webpack_require__(7)).register;
@@ -15362,7 +15362,7 @@ exports.factory = factory;
 "use strict";
 
 
-var scatter = __webpack_require__(455);
+var scatter = __webpack_require__(454);
 var DimensionError = __webpack_require__(10);
 
 function factory (type, config, load, typed) {
@@ -15535,7 +15535,7 @@ exports.factory = factory;
 var deepMap = __webpack_require__(1);
 
 function factory (type, config, load, typed) {
-  var gamma = load(__webpack_require__(148));
+  var gamma = load(__webpack_require__(147));
   var latex = __webpack_require__(4);
 
   /**
@@ -16433,7 +16433,7 @@ function factory (type, config, load, typed) {
   var RangeNode = load(__webpack_require__(85));
   var SymbolNode = load(__webpack_require__(44));
 
-  var Range = load(__webpack_require__(104));
+  var Range = load(__webpack_require__(103));
 
   var isArray = Array.isArray;
 
@@ -17913,7 +17913,7 @@ function factory (type, config, load, typed, math) {
   var array = __webpack_require__(2);
 
   // seeded pseudo random number generator
-  var rng = load(__webpack_require__(509));
+  var rng = load(__webpack_require__(508));
 
   /**
    * Create a distribution object with a set of random functions for given
@@ -18203,22 +18203,16 @@ exports.factory = factory;
 
 /***/ }),
 /* 96 */
-/***/ (function(module, exports) {
-
-module.exports = [{"Type Sort":1,"Type":"Phasers","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Phasers","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"Size Filter","Full Tier List":"Tier Filter"},{"Type Sort":1,"Type":"Phasers","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Model 31 Phaser Bank","Effect":0.28,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0.6,"Scale Pwr":0.8,"Unit Power":1.5,"O":0.18,"E":0.2,"T":0.03,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"Light","Full Tier List":"T-3"},{"Type Sort":1,"Type":"Phasers","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Model 28 Twin Phaser Bank","Effect":0.425,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0.8,"Unit Power":1.8,"O":0.35,"E":0.35,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"Medium","Full Tier List":"T-2"},{"Type Sort":1,"Type":"Phasers","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Model 47 Phaser Bank","Effect":0.32,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0.6,"Scale Pwr":0.8,"Unit Power":1.5,"O":0.18,"E":0.2,"T":0.03,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"Heavy","Full Tier List":"T-1"},{"Type Sort":1,"Type":"Phasers","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Model 44 Twin Phaser Bank","Effect":0.5,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0.8,"Unit Power":1.8,"O":0.35,"E":0.35,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":"T0"},{"Type Sort":1,"Type":"Phasers","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Model 68 Phaser Bank","Effect":0.36,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0.6,"Scale Pwr":0.8,"Unit Power":1.5,"O":0.18,"E":0.2,"T":0.03,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":"T1"},{"Type Sort":1,"Type":"Phasers","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Model 62 Twin Phaser Bank","Effect":0.625,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0.8,"Unit Power":1.8,"O":0.35,"E":0.35,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":"T2"},{"Type Sort":1,"Type":"Phasers","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Model 83 Phaser Bank","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.085,"Pwr O/H":0.65,"Scale Pwr":0.8,"Unit Power":1.1,"O":0.18,"E":0.2,"T":0.02,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":"T3"},{"Type Sort":1,"Type":"Phasers","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Model 83 Twin Phaser Bank","Effect":0.75,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.08,"Pwr O/H":1,"Scale Pwr":0.8,"Unit Power":2,"O":0.34,"E":0.34,"T":0.01,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":"T4"},{"Type Sort":1,"Type":"Phasers","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type IV Single Phaser Bank","Effect":0.44,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.065,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.18,"E":0.2,"T":0.02,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-IV Twin Phaser Bank","Effect":0.825,"Weight O/H":8,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.33,"E":0.33,"T":0.01,"Reliability":0.99995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type V Single Phaser Bank","Effect":0.48,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.065,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.175,"E":0.19,"T":0.02,"Reliability":0.995,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Type-V Twin Phaser Bank","Effect":0.9,"Weight O/H":8,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.32,"E":0.32,"T":0.01,"Reliability":0.99995,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type VI Single Phaser Bank","Effect":0.52,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.065,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.175,"E":0.19,"T":0.02,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Type-VI Twin Phaser Bank","Effect":0.975,"Weight O/H":8,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.32,"E":0.32,"T":0.01,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Type IX Experimental Phaser Array Mid Bank","Effect":0.8,"Weight O/H":8,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.13,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.225,"E":0.25,"T":0.025,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Type-IX Experimental Phaser Array Full Bank","Effect":1.2,"Weight O/H":12,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.16,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.35,"E":0.35,"T":0.02,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T-2] Type 48 Phaser Bank","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":0.995,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Torp","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] TSF-2 Torpedo System","Effect":0.4,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.035,"Pwr O/H":2.5,"Scale Pwr":0.1,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mod 3a Battery System","Effect":0.4,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.07,"Pwr O/H":5,"Scale Pwr":0.05,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] TSF-3 Torpedo System","Effect":0.45,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.035,"Pwr O/H":2.5,"Scale Pwr":0.1,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mod 4 Battery System","Effect":0.45,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.07,"Pwr O/H":5,"Scale Pwr":0.05,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mk-I Torpedo System","Effect":0.5,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.035,"Pwr O/H":2.5,"Scale Pwr":0.1,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Type-I Auto System","Effect":0.5,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.07,"Pwr O/H":5,"Scale Pwr":0.05,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mk-II LW Torpedo System","Effect":0.55,"Weight O/H":8,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":0.3,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mk-II Torpedo System","Effect":0.55,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.045,"Pwr O/H":2.5,"Scale Pwr":0.2,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.99995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-II Auto System","Effect":0.55,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.09,"Pwr O/H":5,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mk-III LW Torpedo System","Effect":0.6,"Weight O/H":8,"Scale Weight":0,"Unit Weight":9.5,"SR Cost x":0.085,"Pwr O/H":4.5,"Scale Pwr":0.25,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mk-III Torpedo System","Effect":0.6,"Weight O/H":12,"Scale Weight":0,"Unit Weight":9.5,"SR Cost x":0.0475,"Pwr O/H":2.25,"Scale Pwr":0.175,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.9998,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-III Auto System","Effect":0.6,"Weight O/H":15.5,"Scale Weight":0,"Unit Weight":10.5,"SR Cost x":0.095,"Pwr O/H":4.5,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mk-IV LW Torpedo System","Effect":0.65,"Weight O/H":8,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.09,"Pwr O/H":4,"Scale Pwr":0.2,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][SR-] Mk-IV Torpedo System","Effect":0.65,"Weight O/H":12,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.05,"Pwr O/H":2,"Scale Pwr":0.15,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.9998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][C-] Type-IV Auto System","Effect":0.65,"Weight O/H":15,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":4,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mk-V LW Torpedo System","Effect":0.7,"Weight O/H":8,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.09,"Pwr O/H":4,"Scale Pwr":0.2,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][SR-] Mk-V Torpedo System","Effect":0.7,"Weight O/H":12,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.05,"Pwr O/H":2,"Scale Pwr":0.15,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.9998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][C-] Type-V Auto System","Effect":0.7,"Weight O/H":15,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":4,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sensor","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mark-I-Light LR Sensor Array","Effect":0.15,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Mark-I-Heavy LR Sensors","Effect":0.225,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12.5,"SR Cost x":0.06,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.06,"E":0.16,"T":0.3,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-II-Heavy LR Sensor Array","Effect":0.4,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.13,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Mark-II-Light LR Sensor Array","Effect":0.175,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Mark-II-Heavy LR Sensors","Effect":0.25,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12.5,"SR Cost x":0.06,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.06,"E":0.16,"T":0.3,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-III-Heavy LR Sensor Array","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.13,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Mark-III-Light LR Sensor Array","Effect":0.2,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mark-III-Heavy LR Sensors","Effect":0.275,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12.5,"SR Cost x":0.06,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.06,"E":0.16,"T":0.3,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mark-IV-Heavy LR Sensor Array","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.13,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Grade LR Sensor Array","Effect":0.1,"Weight O/H":0.5,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":0.5,"O":0.05,"E":0.04,"T":0.06,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mark-V-Light LR Sensor Array","Effect":0.225,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mark-V LR Sensor Array","Effect":0.3,"Weight O/H":2,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.11,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Mark-V-Heavy LR Sensor Array","Effect":0.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mark-VI-Light LR Sensor Array","Effect":0.225,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.75,"SR Cost x":0.18,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mark-VI LR Sensor Array","Effect":0.325,"Weight O/H":2,"Scale Weight":0,"Unit Weight":9.5,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mark-VI-Heavy LR Sensor Array","Effect":0.525,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mark-VII-Light LR Sensor Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.25,"SR Cost x":0.18,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mark-VII LR Sensor Array","Effect":0.35,"Weight O/H":2,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mark-VII-Heavy LR Sensor Array","Effect":0.55,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mark-VIII-Light LR Sensor Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.18,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mark-VIII LR Sensor Array","Effect":0.375,"Weight O/H":2,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mark-VIII-Heavy LR Sensor Array","Effect":0.575,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Subspace Flux Detector *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Subspace Pulse Scanner *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Subspace Phased Array Scanner *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Subspace Interferometry Suite *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sensor","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mark-I-Light SR Lateral Sensor Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Mark-I-Medium SR Lateral Sensor Array","Effect":0.375,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-I-Heavy SR Lateral Sensor Array","Effect":0.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21.5,"SR Cost x":0.05,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":"No","Size Class":"Light","Name":"[T-2][L] Mark-III-Light SR Lateral Sensor Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Mark-III-Medium SR Lateral Sensor Array","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-III-Heavy SR Lateral Sensor Array","Effect":0.55,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21.5,"SR Cost x":0.05,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Grade SR Lateral Sensor","Effect":0.1,"Weight O/H":0.5,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":0.5,"O":0.02,"E":0.04,"T":0.06,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mark-IV SR Lateral Sensor Array","Effect":0.3,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.02,"E":0.06,"T":0.09,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mark-IV-Heavy SR Lateral Sensor Array","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Mark-V-Heavy SR Lateral Sensor Array","Effect":0.65,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21.5,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.025,"E":0.06,"T":0.105,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mark-VB-Light SR Lateral Sensor Array","Effect":0.2375,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.75,"SR Cost x":0.1,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.15,"O":0.025,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mark-VB SR Lateral Sensor Array","Effect":0.335,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.75,"SR Cost x":0.1,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.15,"O":0.025,"E":0.06,"T":0.105,"Reliability":0.99999,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mark-VB-Heavy SR Lateral Sensor Array","Effect":0.7,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.15,"O":0.05,"E":0.1,"T":0.135,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mark-VI-Light SR Lateral Sensor Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.6,"SR Cost x":0.12,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.025,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2312,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mark-VI SR Lateral Sensor Array","Effect":0.35,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.6,"SR Cost x":0.1,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.06,"E":0.12,"T":0.15,"Reliability":0.99999,"Year Available (SF)":2312,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mark-VI-Heavy SR Lateral Sensor Array","Effect":0.75,"Weight O/H":5,"Scale Weight":0,"Unit Weight":20.75,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.1,"T":0.135,"Reliability":1,"Year Available (SF)":2312,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mark-VII-Light SR Lateral Sensor Array","Effect":0.2675,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.7,"SR Cost x":0.125,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.115,"T":0.1425,"Reliability":0.9995,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mark-VII SR Lateral Sensor Array","Effect":0.365,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.8,"SR Cost x":0.115,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.0065,"E":0.125,"T":0.1725,"Reliability":0.99999,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mark-VII-Heavy SR Lateral Sensor Array","Effect":0.8,"Weight O/H":6.5,"Scale Weight":0,"Unit Weight":21.25,"SR Cost x":0.07,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.055,"E":0.105,"T":0.1425,"Reliability":1,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Mark-VII-Light SR Lateral Sensor Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.7,"SR Cost x":0.125,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.115,"T":0.1425,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Mark-VII SR Lateral Sensor Array","Effect":0.38,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.8,"SR Cost x":0.115,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.0065,"E":0.125,"T":0.1725,"Reliability":0.99999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Mark-VII-Heavy SR Lateral Sensor Array","Effect":0.85,"Weight O/H":6.5,"Scale Weight":0,"Unit Weight":21.25,"SR Cost x":0.07,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.055,"E":0.105,"T":0.1425,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Full Spectrum Sensor Array","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sensor","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mark-I-Light Nav Sensors","Effect":0.15,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-I-Heavy Nav Sensors","Effect":0.4,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-II-Heavy Nav Array","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Mark-II-Light Nav Sensors","Effect":0.175,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-II-Heavy Nav Sensors","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-III-Heavy Nav Array","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Mark-III-Light Nav Sensors","Effect":0.2,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mark-III-Heavy Nav Sensors","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mark-IV-Heavy Nav Array","Effect":0.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mark-V Nav Sensors","Effect":0.3,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mark-VI-Light Nav Array","Effect":0.225,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.75,"SR Cost x":0.15,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.3,"O":0.02,"E":0.15,"T":0.2475,"Reliability":0.9995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mark-VI Nav Array","Effect":0.325,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":9.75,"SR Cost x":0.11,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.04,"E":0.15,"T":0.2625,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mark-VI-Heavy Nav Array","Effect":0.525,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18.5,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mark-VII-Light Nav Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.6,"SR Cost x":0.15,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.4,"O":0.02,"E":0.15,"T":0.2475,"Reliability":0.9995,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mark-VII Nav Array","Effect":0.35,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":9.6,"SR Cost x":0.11,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.15,"T":0.2625,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mark-VII-Heavy Nav Array","Effect":0.55,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18.25,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mark-VIII-Light Nav Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.6,"SR Cost x":0.15,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.4,"O":0.02,"E":0.15,"T":0.2475,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mark-VIII Nav Array","Effect":0.375,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":9.6,"SR Cost x":0.11,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.15,"T":0.2625,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mark-VIII-Heavy Nav Array","Effect":0.575,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18.25,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Basic Nav Sensor Package","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Mass Detector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Gaseous Anomaly Detector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Subspace Gradient Analytics","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Astrometric Course Optimizer","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Survey Sensors","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Basic Survey Sensor Package","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Basic Survey Sensor Package *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] EM/Subspace Heterodyne Circuit *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Ground-Penetrating Spectroscope *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Stellar Core Imager *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T5] Polycyclic Subspace Tomograph *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Science","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Pattern U Compact Lab","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.06,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Pattern V Lab","Effect":0.475,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0.25,"Unit Power":0.25,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Pattern S Lab","Effect":0.6,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.06,"Pwr O/H":1,"Scale Pwr":0.35,"Unit Power":0.25,"O":0.25,"E":0.2,"T":0.25,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Pattern W Compact Lab","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.06,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Pattern X Lab","Effect":0.525,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0.25,"Unit Power":0.25,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Pattern Y Lab","Effect":0.7,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.06,"Pwr O/H":1,"Scale Pwr":0.35,"Unit Power":0.25,"O":0.25,"E":0.2,"T":0.25,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Pattern D Compact Lab","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.06,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Pattern C Lab","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0.25,"Unit Power":0.25,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Pattern E Lab","Effect":0.8,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.06,"Pwr O/H":1,"Scale Pwr":0.35,"Unit Power":0.25,"O":0.25,"E":0.2,"T":0.25,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Pattern-K Compact Lab","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.08,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Pattern C2 Lab","Effect":0.675,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.08,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Spock-Pattern Lab","Effect":0.9,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.05,"E":0.05,"T":0.22,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Pattern-K2 Compact Lab","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":14.667,"SR Cost x":0.09,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Cruiser Pattern Lab","Effect":0.75,"Weight O/H":0,"Scale Weight":0,"Unit Weight":29.333,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.06,"E":0.1,"T":0.25,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Spock-B Pattern Lab","Effect":1,"Weight O/H":3,"Scale Weight":0,"Unit Weight":44,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.055,"E":0.055,"T":0.23,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Pattern-K3 Compact Lab","Effect":0.55,"Weight O/H":0,"Scale Weight":0,"Unit Weight":14.333,"SR Cost x":0.09,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Cruiser-2 Pattern Lab","Effect":0.825,"Weight O/H":0,"Scale Weight":0,"Unit Weight":28.667,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.06,"E":0.1,"T":0.25,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Spock-C Pattern Lab","Effect":1.1,"Weight O/H":3,"Scale Weight":0,"Unit Weight":43,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.055,"E":0.055,"T":0.23,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Pattern-K4 Compact Lab","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.09,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Cruiser-3 Pattern Lab","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":28,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.06,"E":0.1,"T":0.25,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Spock-D Pattern Lab","Effect":1.2,"Weight O/H":3,"Scale Weight":0,"Unit Weight":42,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.055,"E":0.055,"T":0.23,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Core","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mkv V Monotronic Core","Effect":0.325,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.04,"T":0.18,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mk V-B Monotronic Core","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.225,"Pwr O/H":4.12,"Scale Pwr":2.5,"Unit Power":0,"O":0.1,"E":0.03,"T":0.125,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] SFA Mk1 Duotronic Core","Effect":0.375,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.04,"T":0.18,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] SFA MkI-B Duotronic Core","Effect":0.45,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.225,"Pwr O/H":4.12,"Scale Pwr":2.5,"Unit Power":0,"O":0.1,"E":0.03,"T":0.125,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Type-I Duotronic Core","Effect":0.425,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.04,"T":0.18,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Type-I-B Duotronic Core","Effect":0.475,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.225,"Pwr O/H":4.12,"Scale Pwr":2.5,"Unit Power":0,"O":0.1,"E":0.03,"T":0.125,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Generic Monotronic Civilian Core","Effect":0.2,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.02,"T":0.09,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Type-II Duotronic Core","Effect":0.475,"Weight O/H":20,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.2,"Pwr O/H":6.5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0.02,"T":0.135,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Type-III Duotronic Core","Effect":0.5,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":5.2,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.09,"Reliability":0.998,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-II Heavy Duotronic Core","Effect":0.525,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.2,"Pwr O/H":6.5,"Scale Pwr":2,"Unit Power":0,"O":0.1,"E":0.02,"T":0.08,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type-III-A Duotronic Core","Effect":0.6,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":1,"Unit Power":0,"O":0,"E":0.02,"T":0.1,"Reliability":0.9999,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Type-IV Duotronic Core","Effect":0.625,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.998,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-IV Heavy Duotronic Core","Effect":0.66,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type-IV-B Duotronic Core","Effect":0.64,"Weight O/H":10,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.4,"Pwr O/H":7,"Scale Pwr":0.5,"Unit Power":0,"O":0,"E":0.02,"T":0.11,"Reliability":0.998,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Type-IV-A Duotronic Core","Effect":0.68,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":7,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.9999,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Type-IV-C Heavy Duotronic Core","Effect":0.7,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type-V Compact Duotronic Core","Effect":0.68,"Weight O/H":10,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.4,"Pwr O/H":7,"Scale Pwr":0.5,"Unit Power":0,"O":0,"E":0.02,"T":0.11,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Type-V Duotronic Core","Effect":0.72,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":7,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.9999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Type-V Heavy Duotronic Core","Effect":0.76,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Type-VI Compact Duotronic Core","Effect":0.72,"Weight O/H":10,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.4,"Pwr O/H":7,"Scale Pwr":0.5,"Unit Power":0,"O":0,"E":0.02,"T":0.11,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Type-VI Duotronic Core","Effect":0.79,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":7,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.9999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Type-VI Heavy Duotronic Core","Effect":0.9,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No OS","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-3,"Size Sort":-99,"Size Class":"N/A","Name":"[T-3] Majel OS","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Majel 1.5 OS","Effect":0.475,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-1,"Size Sort":-99,"Size Class":"N/A","Name":"[T-1] Majel 2.0 OS","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Civilian OS","Effect":0.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.0125,"E":0.0075,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":0,"Size Sort":-99,"Size Class":"N/A","Name":"[T0] Majel 2.1 OS","Effect":0.525,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.85,"Scale Pwr":0.125,"Unit Power":0.4,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":1,"Size Sort":-99,"Size Class":"N/A","Name":"[T1] Majel 3.0 OS","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.2,"Unit Power":1,"O":0.1375,"E":0.0825,"T":0.11,"Reliability":0.9998,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":2,"Size Sort":-99,"Size Class":"N/A","Name":"[T2] Majel 3.1 Explorer OS","Effect":1.05,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":5,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.1,"E":0.06,"T":0.08,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":2,"Size Sort":-99,"Size Class":"N/A","Name":"[T2] Majel 3.1 OS","Effect":1.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.25,"Unit Power":1.1,"O":0.13125,"E":0.07875,"T":0.105,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":3,"Size Sort":-99,"Size Class":"N/A","Name":"[T3] Majel 3.5 OS","Effect":1.2,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.25,"Unit Power":1.1,"O":0.125,"E":0.075,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":4,"Size Sort":-99,"Size Class":"N/A","Name":"[T4] Majel 4.0 OS","Effect":1.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.25,"Unit Power":1.1,"O":0.125,"E":0.075,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No TCU","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Model 17 Light TCU","Effect":0.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Model 31 Advanced TCU","Effect":0.325,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Model 20 Heavy TCU","Effect":0.375,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Model 37 Light TCU","Effect":0.275,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Model 42 Advanced TCU","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Model 39 Heavy TCU","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Model 57 Light TCU","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Model 64 Advanced TCU","Effect":0.375,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Model 57 Heavy TCU","Effect":0.425,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian TCU","Effect":0.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.045,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Type-I Duotronic TCU","Effect":0.325,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Type-1 TCU","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-1-A 'Seeker' TCU","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.065,"Pwr O/H":0.8,"Scale Pwr":0.45,"Unit Power":1.8,"O":0.1,"E":0.05,"T":0.05,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type-II Duotronic TCU","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Type-2 TCU","Effect":0.425,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2.05,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] 'Dauntless' Tracking System","Effect":0.575,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.1,"Pwr O/H":1.2,"Scale Pwr":0.6,"Unit Power":2.2,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.9992,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type-III Duotronic TCU","Effect":0.375,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.975,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Type-3 TCU","Effect":0.475,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2.1,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] DI-4 Predictive Targeting Array","Effect":0.675,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.098,"Pwr O/H":1.15,"Scale Pwr":0.575,"Unit Power":2.3,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.9999,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type-IV Duotronic TCU","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.975,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Type-4 TCU","Effect":0.525,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2.1,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] TH-5 Rangemaster Unit","Effect":0.775,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.098,"Pwr O/H":1.15,"Scale Pwr":0.575,"Unit Power":2.3,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.9999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Diplomacy","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Escort Diplomatic Package '24","Effect":0.7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.035,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.015,"E":0,"T":0.015,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Cruiser Diplomatic Package '20","Effect":0.85,"Weight O/H":14,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.07,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.03,"E":0.02,"T":0.03,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Explorer Diplomatic Package '28","Effect":1.1,"Weight O/H":45,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.2,"Scale Pwr":0.4,"Unit Power":2.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Escort Diplomatic Package '41","Effect":0.75,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.035,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.015,"E":0,"T":0.015,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Cruiser Diplomatic Package '39","Effect":0.9,"Weight O/H":14,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.07,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.03,"E":0.02,"T":0.03,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Explorer Diplomatic Package '45","Effect":1.35,"Weight O/H":45,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.2,"Scale Pwr":0.4,"Unit Power":2.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Escort Diplomatic Package '61","Effect":0.8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.035,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.015,"E":0,"T":0.015,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Cruiser Diplomatic Package '61","Effect":1,"Weight O/H":14,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.07,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.03,"E":0.02,"T":0.03,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Explorer Diplomatic Package '67","Effect":1.5,"Weight O/H":45,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.2,"Scale Pwr":0.4,"Unit Power":2.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Escort Diplomatic Package '85","Effect":0.85,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.075,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":3,"O":0.02,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Explorer Diplomatic Package '85","Effect":1.6,"Weight O/H":50,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":3.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Lwaxana '04 Escort Protocol","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.08,"Pwr O/H":2,"Scale Pwr":0.5,"Unit Power":2.75,"O":0.06,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2309,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Lwaxana '04 General Protocol","Effect":1.2,"Weight O/H":16,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.105,"Pwr O/H":2,"Scale Pwr":0.5,"Unit Power":3.25,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2309,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Lwaxana '04 Explorer Protocol","Effect":1.75,"Weight O/H":60,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":0.5,"Unit Power":3.75,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2309,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Lwaxana '12 Escort Protocol","Effect":1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.08,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3,"O":0.06,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Lwaxana '12 General Protocol","Effect":1.3,"Weight O/H":16,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.105,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Lwaxana '12 Explorer Protocol","Effect":2,"Weight O/H":64,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.12,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":4,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Lwaxana '21 Escort Protocol","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.08,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3,"O":0.06,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Lwaxana '21 General Protocol","Effect":1.425,"Weight O/H":16,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.105,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Lwaxana '21 Explorer Protocol","Effect":2.25,"Weight O/H":64,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.12,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":4,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Onboard Recreation","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] 2260s Rec Space","Effect":0.3,"Weight O/H":4,"Scale Weight":0,"Unit Weight":17.5,"SR Cost x":0.03,"Pwr O/H":1,"Scale Pwr":0.4,"Unit Power":2,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] 2280s Rec Space","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":4,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] 2300s Compact Rec Space","Effect":0.2,"Weight O/H":6,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.04,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":4,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] 2300s Rec Space","Effect":0.6,"Weight O/H":8,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":8,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] 2310s Compact Rec Space","Effect":0.275,"Weight O/H":6,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.04,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":4,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] 2310s Rec Space","Effect":0.725,"Weight O/H":8,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":8,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sickbay","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] S-Medical '24 Standard Sickbay","Effect":0.2,"Weight O/H":0,"Scale Weight":0,"Unit Weight":13,"SR Cost x":0.04,"Pwr O/H":0.5,"Scale Pwr":0.27,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] S-Medical '25 Explorer Sickbay","Effect":0.3,"Weight O/H":10,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] S-Medical '42 Standard Sickbay","Effect":0.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":13,"SR Cost x":0.04,"Pwr O/H":0.5,"Scale Pwr":0.27,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] S-Medical '46 Explorer Sickbay","Effect":0.35,"Weight O/H":10,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] S-Medical '61 Standard Sickbay","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":13,"SR Cost x":0.04,"Pwr O/H":0.5,"Scale Pwr":0.27,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] S-Medical '68 Explorer Sickbay","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] S-Medical '84 Pattern Sickbay","Effect":0.5,"Weight O/H":10,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.06,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] S-Medical '04 Pattern Sickbay","Effect":0.6,"Weight O/H":10,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.18,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] T'Koren Pattern Small Sickbay","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.045,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] T'Koren Pattern Large Sickbay","Effect":0.7,"Weight O/H":10,"Scale Weight":0,"Unit Weight":22,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] T'Koren-B Pattern Small Sickbay","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.045,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2319,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] T'Koren-B Pattern Large Sickbay","Effect":0.8,"Weight O/H":10,"Scale Weight":0,"Unit Weight":22,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2319,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] T'Koren-B Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] T'Koren-C Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T5] T'Koren-D Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T6] Pulaski Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Single Alloy-2 Duranium Hull","Effect":0.33,"Weight O/H":0,"Scale Weight":15,"Unit Weight":0,"SR Cost x":0.011,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.25,"T":0.04,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Double Alloy-2 Duranium Hull","Effect":0.62,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.014,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.02,"E":0.4,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Duranium w/ Bartridium Rebar","Effect":0.725,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.0375,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.2,"E":0.5,"T":0.2,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Single Alloy-4 Duranium Hull","Effect":0.34,"Weight O/H":0,"Scale Weight":14,"Unit Weight":0,"SR Cost x":0.011,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.25,"T":0.04,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Double Alloy-4 Duranium Hull","Effect":0.66,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.014,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.02,"E":0.4,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Duranium w/ Bartridium Rebar","Effect":0.775,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.0375,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.2,"E":0.5,"T":0.2,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Single Duranium Hull","Effect":0.35,"Weight O/H":0,"Scale Weight":13,"Unit Weight":0,"SR Cost x":0.011,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.25,"T":0.04,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Double Duranium Hull","Effect":0.7,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.014,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.02,"E":0.4,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Duranium w/ Exotic Rebar","Effect":0.8,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.0375,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.2,"E":0.5,"T":0.2,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Grade","Effect":0.25,"Weight O/H":0,"Scale Weight":11.5,"Unit Weight":0,"SR Cost x":0.001,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Lt. Alloy-1 Duranium Hull","Effect":0.36,"Weight O/H":0,"Scale Weight":12.5,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Duranium-335 Alloy Hull","Effect":0.74,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.05,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Duranium-447 Alloy Hull","Effect":0.85,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.016,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Lt. Alloy-2 Duranium Hull","Effect":0.37,"Weight O/H":0,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Med. Alloy-2 Duranium Hull","Effect":0.78,"Weight O/H":35,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.015,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.075,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Hvy. Alloy-2 Duranium Hull","Effect":0.9,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.018,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Lt. Alloy-3 Duranium Hull","Effect":0.38,"Weight O/H":0,"Scale Weight":11.5,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Med. Alloy-3 Duranium Hull","Effect":0.82,"Weight O/H":35,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.015,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.075,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Hvy. Alloy-3 Duranium Hull","Effect":0.95,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.018,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Lt. Alloy-4 Duranium Hull","Effect":0.4,"Weight O/H":0,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Med. Alloy-4 Duranium Hull","Effect":0.86,"Weight O/H":35,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.015,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.075,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Hvy. Alloy-4 Duranium Hull","Effect":1,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.018,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No SIF","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Type-I-L SIF","Effect":0.215,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Type-I SIF","Effect":0.375,"Weight O/H":10,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.05,"E":0.35,"T":0.05,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mars-III Special SIF","Effect":0.5,"Weight O/H":27,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.22,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.08,"E":0.4,"T":0.075,"Reliability":0.998,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Type-II-L SIF","Effect":0.25,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Type-II SIF","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.05,"E":0.35,"T":0.05,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mars-IV Special SIF","Effect":0.6,"Weight O/H":27,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.22,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.08,"E":0.4,"T":0.075,"Reliability":0.998,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Type-III-L SIF","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Type-III SIF","Effect":0.45,"Weight O/H":10,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.05,"E":0.35,"T":0.05,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mars-V Special SIF","Effect":0.7,"Weight O/H":27,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.22,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.08,"E":0.4,"T":0.075,"Reliability":0.998,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Type-IV-L SIF","Effect":0.6,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Type-IV SIF","Effect":0.75,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-IV-H SIF","Effect":0.9,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type-V-L SIF","Effect":0.65,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Type-V SIF","Effect":0.8,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-V-H SIF","Effect":0.95,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type-VI-L SIF","Effect":0.675,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Type-VI SIF","Effect":0.825,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Type-VI-H SIF","Effect":0.975,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type-VII-L SIF","Effect":0.7,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Type-VII SIF","Effect":0.85,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Type-VII-H SIF","Effect":1,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Type-VIII-L SIF","Effect":0.725,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Type-VIII SIF","Effect":0.9,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Type-VIII-H SIF","Effect":1.1,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Shields","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] AAE-L Monophasic Escort Pattern","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":2,"Unit Power":1.5,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] AAE-M Cyclic Monophasic","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.1,"E":0.005,"T":0.14,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] AAE-H Monophasic Heavy Pattern","Effect":0.8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.175,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] AAE-B-L Monophasic Escort Pattern","Effect":0.7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":2,"Unit Power":1.5,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] AAE-B-M Cyclic Monophasic","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.1,"E":0.005,"T":0.14,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] AAE-B-H Monophasic Heavy Pattern","Effect":1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.175,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Mk1 Monophasic Escort Pattern","Effect":0.8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":2,"Unit Power":1.5,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mk1 Cyclic Monophasic E-Type","Effect":1.05,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.1,"E":0.005,"T":0.14,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mk1 Monophasic Heavy Pattern","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.175,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mk-III-E Shield Gens","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mk-III-H Shield Gens","Effect":1.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":4,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Mk-III-SH Shield Gens","Effect":1.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.135,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":4,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mk-IV-E Shield Gens","Effect":0.95,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mk-IV-H Shield Gens","Effect":1.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":4.5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mk-V-E Shield Gens","Effect":1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mk-V-H Shield Gens","Effect":1.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mk-V-SH Shield Gens","Effect":1.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.135,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mk-VI-E Shield Gens","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mk-VI-H Shield Gens","Effect":1.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mk-VI-SH Shield Gens","Effect":2.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.135,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Monophasic Shields (2260s DS)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Biphasic Shields (DS I)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Detuned Ellipsoidal Shields (DS II)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Polyphasic Shields (DS III)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Self-Integrating Shields (DS IV)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"xNo Nav Deflector","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Saucer-Only Polyphasic Deflector","Effect":0.2,"Weight O/H":2,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.04,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Polyphasic Deflector","Effect":0.25,"Weight O/H":4,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.06,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Advanced Polyphasic Deflector","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.08,"E":0.075,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Saucer-Only Gravitic Deflector","Effect":0.25,"Weight O/H":2,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.04,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Gravitic Deflector","Effect":0.3,"Weight O/H":4,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.06,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Advanced Gravitic Deflector","Effect":0.5,"Weight O/H":4,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.08,"E":0.075,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Saucer-Only Graviton Deflector","Effect":0.3,"Weight O/H":2,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.04,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Graviton Deflector","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.06,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Advanced Graviton Deflector","Effect":0.6,"Weight O/H":4,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.08,"E":0.075,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Graviton Beam Deflector Saucer-Only","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.11,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Advanced Graviton Beam Deflector","Effect":0.65,"Weight O/H":8,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.11,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Modulated Graviton Beam Deflector Saucer-Only","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.11,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Modulated Graviton Beam Deflector","Effect":0.7,"Weight O/H":7.5,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.11,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Graviton Wavefront Deflector Saucer-Only","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.1,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2317,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Graviton Wavefront Deflector","Effect":0.75,"Weight O/H":7.5,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.1,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":2317,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Shaped Wavefront Deflector Saucer-Only","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.1,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Shaped Wavefront Deflector","Effect":0.825,"Weight O/H":7.5,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.1,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Graviton Beam Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Modulated Graviton Beam Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Graviton Wavefront Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Shaped Wavefront Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Astrodynamic Wavefront Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] SDB-26 Std Impulse","Effect":0.18,"Weight O/H":5,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.17,"Unit Power":0.35,"O":0,"E":0.1,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] SDB R-Type Heavy Impulse","Effect":0.45,"Weight O/H":35,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.09,"Pwr O/H":0.1,"Scale Pwr":0.12,"Unit Power":0.25,"O":0.1,"E":0.045,"T":0.045,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] SDB-44 Std Impulse","Effect":0.2,"Weight O/H":5,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.17,"Unit Power":0.35,"O":0,"E":0.1,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] SDB C-Type Heavy Impulse","Effect":0.55,"Weight O/H":35,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.09,"Pwr O/H":0.1,"Scale Pwr":0.12,"Unit Power":0.25,"O":0.1,"E":0.045,"T":0.045,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] SDB-65 Std Impulse","Effect":0.22,"Weight O/H":5,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.17,"Unit Power":0.35,"O":0,"E":0.1,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] SDB E-Type Heavy Impulse","Effect":0.65,"Weight O/H":35,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.09,"Pwr O/H":0.1,"Scale Pwr":0.12,"Unit Power":0.25,"O":0.1,"E":0.045,"T":0.045,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Basic Impulse","Effect":0.2,"Weight O/H":10,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.02,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.2,"O":0,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] SDB-86 Impulse Drive Sys","Effect":0.26,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] SDB-97 High-Power Impulse Drive Sys","Effect":0.3,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] SDB-97 High-Efficiency Impulse Drive Sys","Effect":0.75,"Weight O/H":45,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.025,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] SDB-09 High-Power Impulse Drive Sys","Effect":0.36,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] SDB-09 High-Efficiency Impulse Drive Sys","Effect":0.85,"Weight O/H":45,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.025,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] SDB-09 High-Power Impulse Drive Sys","Effect":0.42,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] SDB-09 High-Efficiency Impulse Drive Sys","Effect":0.95,"Weight O/H":45,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.025,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Warp Drive","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] 2 X Saladin Nacelles","Effect":0.77,"Weight O/H":5,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] 2 X Ranger Heavy Nacelles","Effect":1.1,"Weight O/H":10,"Scale Weight":0,"Unit Weight":85,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] 2 X Soyuz Nacelles","Effect":0.89,"Weight O/H":5,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] 2 X Constitution Heavy Nacelles","Effect":1.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":85,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] 2 X Miranda Nacelles","Effect":1.084,"Weight O/H":5,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] 4 X Constellation Nacelles","Effect":1.088,"Weight O/H":5,"Scale Weight":0,"Unit Weight":55,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] 2 X Constitution-A Heavy Nacelles","Effect":1.626,"Weight O/H":10,"Scale Weight":0,"Unit Weight":85,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] 2 X Centaur Nacelles","Effect":1.174,"Weight O/H":5,"Scale Weight":0,"Unit Weight":65,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] 2 X Excelsior Pattern Nacelles","Effect":2.457,"Weight O/H":20,"Scale Weight":0,"Unit Weight":120,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] 2 X Centaur-A Pattern Nacelle","Effect":1.536,"Weight O/H":5,"Scale Weight":0,"Unit Weight":50,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":4,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] 2 X 2305 Cruiser Nacelle","Effect":2.16,"Weight O/H":10,"Scale Weight":0,"Unit Weight":80,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3.5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] 2 X Excelsior Type-II Pattern Nacelles","Effect":2.52,"Weight O/H":20,"Scale Weight":0,"Unit Weight":135,"SR Cost x":0.16,"Pwr O/H":5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] 2 X New Orleans Pattern Nacelles","Effect":1.85,"Weight O/H":5.25,"Scale Weight":0,"Unit Weight":52,"SR Cost x":0.15,"Pwr O/H":6,"Scale Pwr":6,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] 2 X Ambassador Pattern Nacelles","Effect":2.64,"Weight O/H":20,"Scale Weight":0,"Unit Weight":125,"SR Cost x":0.16,"Pwr O/H":5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T-1] Constitution-A Pattern Nacelles","Effect":1.25,"Weight O/H":10,"Scale Weight":0,"Unit Weight":55,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Dual Layer Field Effect Coils","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Onboard Industry","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] S-Medical Mk I Protein Synth","Effect":0.1,"Weight O/H":7,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] S-Medical Mk I High-Endurance Protein Synth","Effect":0.2,"Weight O/H":7,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] S-Medical Mk II Protein Synth","Effect":0.15,"Weight O/H":7,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] S-Medical Mk II High-Endurance Protein Synth","Effect":0.25,"Weight O/H":7,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] S-Medical Mk III Protein Synth","Effect":0.2,"Weight O/H":7,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] S-Medical Mk III High-Endurance Protein Synth","Effect":0.375,"Weight O/H":7,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] S-Medical Mk IV Protein Synth","Effect":0.3,"Weight O/H":7,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] S-Medical Mk IV High-Endurance Protein Synth","Effect":0.5,"Weight O/H":7,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] S-Medical Mk V Protein Synth","Effect":0.4,"Weight O/H":7,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] S-Medical Mk V High-Endurance Protein Synth","Effect":0.625,"Weight O/H":7,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] S-Medical Mk VI Protein Synth","Effect":0.5,"Weight O/H":7,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] S-Medical Mk VI High-Endurance Protein Synth","Effect":0.75,"Weight O/H":7,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Fuel","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] 2220-Light Pattern Deuterium Tanks","Effect":0.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] 2220-Heavy Pattern Deuterium Tanks","Effect":0.4,"Weight O/H":30,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] 2220-Large Ship Pattern Deuterium Tanks","Effect":0.8,"Weight O/H":80,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.0675,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] 2240-Light Pattern Deuterium Tanks","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] 2240-Heavy Pattern Deuterium Tanks","Effect":0.55,"Weight O/H":30,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] 2240-Large Ship Pattern Deuterium Tanks","Effect":0.9,"Weight O/H":80,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.0675,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] 2260-Light Pattern Deuterium Tanks","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] 2260-Heavy Pattern Deuterium Tanks","Effect":0.7,"Weight O/H":30,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] 2260-Large Ship Pattern Deuterium Tanks","Effect":1,"Weight O/H":80,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.0675,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] 2295-Light Pattern Deuterium Tanks","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] 2285-Super-Heavy Pattern Deuterium","Effect":1.2,"Weight O/H":85,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] 2305-Light Pattern Deuterium Tanks","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2304,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] 2305-Heavy Pattern Deuterium Tanks","Effect":1.1,"Weight O/H":40,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2304,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] 2305-Super-Heavy Pattern Deuterium","Effect":1.4,"Weight O/H":85,"Scale Weight":0,"Unit Weight":3,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2304,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] 2310-Light Pattern Deuterium Tanks","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] 2310-Heavy Pattern Deuterium Tanks","Effect":1.25,"Weight O/H":40,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] 2310-Super-Heavy Pattern Deuterium","Effect":1.6,"Weight O/H":85,"Scale Weight":0,"Unit Weight":3,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] 2310-Light Pattern Deuterium Tanks","Effect":0.7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] 2310-Heavy Pattern Deuterium Tanks","Effect":1.4,"Weight O/H":40,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] 2310-Super-Heavy Pattern Deuterium","Effect":1.8,"Weight O/H":85,"Scale Weight":0,"Unit Weight":3,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Mk1 Antimatter Containment Tank","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Yoyodyne Pulse Fusion (Fusion Only)","Effect":10,"Weight O/H":8,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.05,"T":0.05,"Reliability":1,"Year Available (SF)":2120,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][C+] Delta Vega-12 Warp Core","Effect":26,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][R+C+] Venus-I C-Layout Warp Core","Effect":34,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][C-SR+] YYD-VI Heavy Core","Effect":34,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][C+] Delta Vega-12 Warp Core","Effect":28,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][R+C+] Venus-II C-Layout Warp Core","Effect":36,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][C-SR+] Type-E Block-1 Automated Core","Effect":36,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][C+] Delta Vega-24 Warp Core","Effect":29,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][R+C+] Venus-III C-Layout Warp Core","Effect":38,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][C-SR+] Type-E Block-2 Automated Core","Effect":38,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][R-C-SR+] Delta Vega-28 Automated Core","Effect":30,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.025,"T":0.05,"Reliability":0.995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][C+] Delta Vega-26 Warp Core","Effect":30,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][R+C+] Venus-IV C-Layout Warp Core","Effect":40,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][C-SR+] Type-E Block-3 Automated Core","Effect":40,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R---C+] Type-I Experimental (40E) Warp Core","Effect":40,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.98,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R---C+] Type-II Experimental (Venus) Warp Core","Effect":50,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.13,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.98,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R+C-] Type-E Block-4 Automated Core","Effect":42,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.999,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R--C-SR+] ONA-III-L Experimental","Effect":41,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.16,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.065,"T":0.05,"Reliability":0.99,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][C+] Type-I Block-A (40E) Warp Core","Effect":41,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.997,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R--C-SR+] ONA-III-M Experimental","Effect":51,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.06,"E":0.075,"T":0.06,"Reliability":0.99,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R-C+] Type-III Block-A (YYD) Warp Core","Effect":51,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.11,"E":0.16,"T":0.11,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R--C-SR+] ONA-III-H Experimental","Effect":61,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.085,"T":0.07,"Reliability":0.99,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][C+] Type-II Block-A (Venus) Warp Core","Effect":61,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.12,"E":0.17,"T":0.12,"Reliability":0.997,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R-C-SR+] ONA-IV-L Standard","Effect":42,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.065,"T":0.05,"Reliability":0.995,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R+C+] Type-I Block-B (40E) Warp Core","Effect":42,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.999,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][R-C-SR+] ONA-IV-M Standard","Effect":52,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.16,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.06,"E":0.075,"T":0.06,"Reliability":0.995,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][C+] Type-III Block-B (YYD) Warp Core","Effect":52,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.11,"E":0.16,"T":0.11,"Reliability":0.997,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R-C-SR+] ONA-IV-H Standard","Effect":62,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.16,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.085,"T":0.07,"Reliability":0.995,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R+C+] Type-II Block-B (Venus) Warp Core","Effect":62,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.12,"E":0.17,"T":0.12,"Reliability":0.999,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2][R--]Integrated Injectors","Effect":-4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":0.99,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][C-] Luna-I High-Efficiency M/AM System","Effect":6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M][R+] Mk IV M/AM System","Effect":9,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.5,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][C+SR+] Mk IV High Volume M/AM System","Effect":13.5,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.5,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][C-] Luna-II High-Efficiency M/AM System","Effect":7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M][R+] Mk V M/AM System","Effect":10.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.5,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][C+SR+] Mk V High Volume M/AM System","Effect":15.75,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.5,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][C-] Luna-III High-Efficiency M/AM System","Effect":8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M][R+] Mk VI M/AM System","Effect":12,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.5,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][C+SR+] Mk VI High Volume M/AM System","Effect":18,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.5,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][C-] Luna-IV High-Efficiency M/AM System","Effect":9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.2,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M][R+] Mk VII Sublimator-Compressor","Effect":13.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.77,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][C+SR+] Mk VII Complex Sublimator-Compressor","Effect":20.25,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.81,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R-C-] Luna-V High-Efficiency M/AM System","Effect":10,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mk VIII Sublimator-Compressor","Effect":15,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.04,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R-C+SR+] Mk VIII High Volume Compressor","Effect":22.5,"Weight O/H":12,"Scale Weight":0,"Unit Weight":16.12,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R-C-] Luna-VI High-Efficiency M/AM System","Effect":11,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.6,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mk IX Sublimator-Compressor","Effect":16.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.31,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R-C+SR+] Mk IX High Volume Compressor","Effect":24.75,"Weight O/H":12,"Scale Weight":0,"Unit Weight":16.43,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R-C-] Luna-VII High-Efficiency M/AM System","Effect":12,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.8,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mk X Sublimator-Compressor","Effect":18,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.58,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R-C+SR+] Mk X High Volume Compressor","Effect":27,"Weight O/H":12,"Scale Weight":0,"Unit Weight":16.74,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L][R-C-] Luna-VIII High-Efficiency M/AM System","Effect":13,"Weight O/H":0,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Mk XI Sublimator-Compressor","Effect":19.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.85,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H][R-C+SR+] Mk XI High Volume Compressor","Effect":29.25,"Weight O/H":12,"Scale Weight":0,"Unit Weight":17.05,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2][R-SR-] Integrated Coolant","Effect":-15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][R-] Mk IV Mod L Coolant System","Effect":-14.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Mk IV Yoyodyne Coolant System","Effect":-11,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][R-] Mk V Mod L Coolant System","Effect":-14,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Mk V Yoyodyne Coolant System","Effect":-10.25,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][R-] Mk V Mod L Coolant System","Effect":-13,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mk V Yoyodyne Coolant System","Effect":-10,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][R-SR-] VSA-12-L Efficient Coolant System","Effect":-12.1875,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.03,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mk VI Mod L Yoyodyne Coolant System","Effect":-9.75,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][SR-] SBD-VI Efficient Coolant System","Effect":-4.875,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][R+] Mk VI Mod H Yoyodyne Coolant System","Effect":-3.9,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R-SR-] VSA-13-L Efficient Coolant System","Effect":-11.875,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mk VII Mod L Yoyodyne Coolant System","Effect":-9.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][SR-] SBD-VII Efficient Coolant System","Effect":-4.75,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R+] Mk VII Mod H Yoyodyne Coolant System","Effect":-3.8,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R-SR-] VSA-14-L Efficient Coolant System","Effect":-11.5625,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mk VIII Mod L Yoyodyne Coolant System","Effect":-9.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R+SR+] Mars-8 Experimental Coolant System","Effect":-7.4,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.0125,"E":0.0125,"T":0.0125,"Reliability":1.005,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][SR-] SBD-VIII Efficient Coolant System","Effect":-4.625,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R+] Mk VIII Mod H Yododyne SBD Coolant System","Effect":-3.7,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R-SR-] VSA-15-L Efficient Coolant System","Effect":-11.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mk IX Mod L Yoyodyne Coolant System","Effect":-9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][R+SR+] Mars-9 Experimental Coolant System","Effect":-7.2,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.0125,"E":0.0125,"T":0.0125,"Reliability":1.005,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][SR-] SBD-IX Efficient Coolant System","Effect":-4.5,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R+] Mk IX Mod H Yoyodyne Coolant System","Effect":-3.6,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T-1] Constitution Coolant System","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Basic Plasma Intercooler","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Mk II Plasma Intercooler","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"xNo EPS Manifold","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][R+] Tellar HIG-63 Pulse Injection Manifold","Effect":7,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M][R++E+] VSA-1 Plasma Manifold","Effect":10.25,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][R++O+] YYD-M3 Manifold","Effect":13,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][R+] Tellar HIG-76 Pulse Injection Manifold","Effect":8,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M][R++E+] VSA-2 Plasma Manifold","Effect":11.5,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][R++O+] YYD-M4 Manifold","Effect":14,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][R+] Tellar HIG-84 Pulse Injection Manifold","Effect":9,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M][R++E+] VSA-3 Plasma Manifold","Effect":13,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][R++O+] SBD-1 Manifold","Effect":15.5,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][R+] Tellar HIG-92 Pulse Injection Manifold","Effect":10,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] VSA-4 Pulse Injection Manifold","Effect":14,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][R-] SF-V Performance Manifold","Effect":17,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R+] Tellar HIG-103 Pulse Injection Manifold","Effect":11,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] VSA-5 Pulse Injection Manifold","Effect":15.25,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][SR-] 40EA-I Industrial Injection Manifold","Effect":9,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R+] Tellar HIG-110 Pulse Injection Manifold","Effect":12,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][SR-] SBD-A Efficient Manifold","Effect":12.375,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.997,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R+] VSA-6 Pulse Injection Manifold","Effect":16.5,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R-SR-] YYD-4 Performance Manifold","Effect":15,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.995,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] SF-VII Performance Manifold","Effect":20,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.997,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][SR-] 40EA-II Industrial Injection Manifold","Effect":9.75,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.998,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R+] Tellar HIG-117 Pulse Injection Manifold","Effect":13,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9995,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][SR-] SBD-B Efficient Manifold","Effect":13.3125,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][R+] VSA-7 Pulse Injection Manifold","Effect":17.75,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R-SR-] YYD-5 Performance Manifold","Effect":16.125,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.996,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] SF-VIII Performance Manifold","Effect":21.5,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L][SR-] 40EA-III Industrial Injection Manifold","Effect":10.5,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L][R+] Tellar HIG-122 Pulse Injection Manifold","Effect":14,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M][SR-] SBD-C Efficient Manifold","Effect":14.25,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M][R+] VSA-8 Pulse Injection Manifold","Effect":19,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H][R-SR-] YYD-7 Performance Manifold","Effect":17.25,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.996,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] SF-IX Performance Manifold","Effect":23,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Ion Distributor","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Pulse Injection Manifold","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Phased Injection Manifold","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Eject","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":0.7,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-3,"Size Sort":-99,"Size Class":"N/A","Name":"[T-3] Manual Ejection - Early Mechanical","Effect":0,"Weight O/H":15,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.65,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Manual Ejection - Mechanical","Effect":0,"Weight O/H":15,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.6,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-1,"Size Sort":-99,"Size Class":"N/A","Name":"[T-1] Manual Ejection - Basic EM Rails","Effect":0,"Weight O/H":10,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":1,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.5,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":0,"Size Sort":-99,"Size Class":"N/A","Name":"[T0] EngOS Monitoring - Heavy EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.45,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":1,"Size Sort":-99,"Size Class":"N/A","Name":"[T1] EngOS Monitoring - Super Heavy EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.375,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":2,"Size Sort":-99,"Size Class":"N/A","Name":"[T2] EngOS Monitoring - Anak-Krueger EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.365,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":3,"Size Sort":-99,"Size Class":"N/A","Name":"[T3] EngOS 3.1 Monitoring - YYD-Emergency VI EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.36,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""}]
-
-/***/ }),
-/* 97 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__ = __webpack_require__(606);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_e32b200c_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_statline_cell_vue__ = __webpack_require__(607);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__ = __webpack_require__(605);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_e32b200c_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_statline_cell_vue__ = __webpack_require__(606);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(602)
-  __webpack_require__(604)
+  __webpack_require__(601)
+  __webpack_require__(603)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -18262,7 +18256,7 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 98 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -35354,7 +35348,7 @@ if (false) {(function () {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47), __webpack_require__(568)(module)))
 
 /***/ }),
-/* 99 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -35882,7 +35876,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(165);
+exports.isBuffer = __webpack_require__(164);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -35926,7 +35920,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(166);
+exports.inherits = __webpack_require__(165);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -35947,7 +35941,7 @@ function hasOwnProperty(obj, prop) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47), __webpack_require__(63)))
 
 /***/ }),
-/* 100 */
+/* 99 */
 /***/ (function(module, exports) {
 
 
@@ -36031,10 +36025,10 @@ class NamedVector {
 module.exports.NamedVector = NamedVector;
 
 /***/ }),
-/* 101 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Emitter = __webpack_require__(172);
+var Emitter = __webpack_require__(171);
 
 /**
  * Extend given object with emitter functions `on`, `off`, `once`, `emit`
@@ -36056,10 +36050,10 @@ exports.mixin = function (obj) {
 
 
 /***/ }),
-/* 102 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Complex = __webpack_require__(187);
+var Complex = __webpack_require__(186);
 var format = __webpack_require__(3).format;
 var isNumber = __webpack_require__(3).isNumber;
 
@@ -36259,7 +36253,7 @@ exports.math = true; // request access to the math namespace
 
 
 /***/ }),
-/* 103 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36335,7 +36329,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 104 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36658,7 +36652,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 105 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36736,10 +36730,10 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 106 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var memoize = __webpack_require__(36).memoize;
+var memoize = __webpack_require__(35).memoize;
 
 /**
  * Calculate BigNumber e
@@ -36791,7 +36785,7 @@ function hasher (args) {
 
 
 /***/ }),
-/* 107 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36863,7 +36857,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 108 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37044,7 +37038,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 109 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37165,7 +37159,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 110 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 function factory (construction, config, load, typed) {
@@ -37173,39 +37167,39 @@ function factory (construction, config, load, typed) {
 
 
   // construction functions
-  docs.bignumber = __webpack_require__(211);
-  docs['boolean'] = __webpack_require__(212);
-  docs.complex = __webpack_require__(213);
-  docs.createUnit = __webpack_require__(214);
-  docs.fraction = __webpack_require__(215);
-  docs.index = __webpack_require__(216);
-  docs.matrix = __webpack_require__(217);
-  docs.number = __webpack_require__(218);
-  docs.sparse = __webpack_require__(219);
-  docs.splitUnit = __webpack_require__(220);
-  docs.string = __webpack_require__(221);
-  docs.unit = __webpack_require__(222);
+  docs.bignumber = __webpack_require__(210);
+  docs['boolean'] = __webpack_require__(211);
+  docs.complex = __webpack_require__(212);
+  docs.createUnit = __webpack_require__(213);
+  docs.fraction = __webpack_require__(214);
+  docs.index = __webpack_require__(215);
+  docs.matrix = __webpack_require__(216);
+  docs.number = __webpack_require__(217);
+  docs.sparse = __webpack_require__(218);
+  docs.splitUnit = __webpack_require__(219);
+  docs.string = __webpack_require__(220);
+  docs.unit = __webpack_require__(221);
 
   // constants
-  docs.e = __webpack_require__(111);
-  docs.E = __webpack_require__(111);
-  docs['false'] = __webpack_require__(223);
-  docs.i = __webpack_require__(224);
-  docs['Infinity'] = __webpack_require__(225);
-  docs.LN2 = __webpack_require__(226);
-  docs.LN10 = __webpack_require__(227);
-  docs.LOG2E = __webpack_require__(228);
-  docs.LOG10E = __webpack_require__(229);
-  docs.NaN = __webpack_require__(230);
-  docs['null'] = __webpack_require__(231);
-  docs.pi = __webpack_require__(112);
-  docs.PI = __webpack_require__(112);
-  docs.phi = __webpack_require__(232);
-  docs.SQRT1_2 = __webpack_require__(233);
-  docs.SQRT2 = __webpack_require__(234);
-  docs.tau = __webpack_require__(235);
-  docs['true'] = __webpack_require__(236);
-  docs.version = __webpack_require__(237);
+  docs.e = __webpack_require__(110);
+  docs.E = __webpack_require__(110);
+  docs['false'] = __webpack_require__(222);
+  docs.i = __webpack_require__(223);
+  docs['Infinity'] = __webpack_require__(224);
+  docs.LN2 = __webpack_require__(225);
+  docs.LN10 = __webpack_require__(226);
+  docs.LOG2E = __webpack_require__(227);
+  docs.LOG10E = __webpack_require__(228);
+  docs.NaN = __webpack_require__(229);
+  docs['null'] = __webpack_require__(230);
+  docs.pi = __webpack_require__(111);
+  docs.PI = __webpack_require__(111);
+  docs.phi = __webpack_require__(231);
+  docs.SQRT1_2 = __webpack_require__(232);
+  docs.SQRT2 = __webpack_require__(233);
+  docs.tau = __webpack_require__(234);
+  docs['true'] = __webpack_require__(235);
+  docs.version = __webpack_require__(236);
 
   // physical constants
   // TODO: more detailed docs for physical constants
@@ -37268,206 +37262,206 @@ function factory (construction, config, load, typed) {
   docs.planckTemperature = {description: 'Planck temperature', examples: ['planckTemperature']};
 
   // functions - algebra
-  docs.derivative = __webpack_require__(238);
-  docs.lsolve = __webpack_require__(239);
-  docs.lup = __webpack_require__(240);
-  docs.lusolve = __webpack_require__(241);
-  docs.simplify = __webpack_require__(242);
-  docs.slu = __webpack_require__(243);
-  docs.usolve = __webpack_require__(244);
-  docs.qr = __webpack_require__(245);
+  docs.derivative = __webpack_require__(237);
+  docs.lsolve = __webpack_require__(238);
+  docs.lup = __webpack_require__(239);
+  docs.lusolve = __webpack_require__(240);
+  docs.simplify = __webpack_require__(241);
+  docs.slu = __webpack_require__(242);
+  docs.usolve = __webpack_require__(243);
+  docs.qr = __webpack_require__(244);
 
   // functions - arithmetic
-  docs.abs = __webpack_require__(246);
-  docs.add = __webpack_require__(247);
-  docs.cbrt = __webpack_require__(248);
-  docs.ceil = __webpack_require__(249);
-  docs.cube = __webpack_require__(250);
-  docs.divide = __webpack_require__(251);
-  docs.dotDivide = __webpack_require__(252);
-  docs.dotMultiply = __webpack_require__(253);
-  docs.dotPow = __webpack_require__(254);
-  docs.exp = __webpack_require__(255);
-  docs.fix = __webpack_require__(256);
-  docs.floor = __webpack_require__(257);
-  docs.gcd = __webpack_require__(258);
-  docs.hypot = __webpack_require__(259);
-  docs.lcm = __webpack_require__(260);
-  docs.log = __webpack_require__(261);
-  docs.log10 = __webpack_require__(262);
-  docs.mod = __webpack_require__(263);
-  docs.multiply = __webpack_require__(264);
-  docs.norm = __webpack_require__(265);
-  docs.nthRoot = __webpack_require__(266);
-  docs.pow = __webpack_require__(267);
-  docs.round = __webpack_require__(268);
-  docs.sign = __webpack_require__(269);
-  docs.sqrt = __webpack_require__(270);
-  docs.square = __webpack_require__(271);
-  docs.subtract = __webpack_require__(272);
-  docs.unaryMinus = __webpack_require__(273);
-  docs.unaryPlus = __webpack_require__(274);
-  docs.xgcd = __webpack_require__(275);
+  docs.abs = __webpack_require__(245);
+  docs.add = __webpack_require__(246);
+  docs.cbrt = __webpack_require__(247);
+  docs.ceil = __webpack_require__(248);
+  docs.cube = __webpack_require__(249);
+  docs.divide = __webpack_require__(250);
+  docs.dotDivide = __webpack_require__(251);
+  docs.dotMultiply = __webpack_require__(252);
+  docs.dotPow = __webpack_require__(253);
+  docs.exp = __webpack_require__(254);
+  docs.fix = __webpack_require__(255);
+  docs.floor = __webpack_require__(256);
+  docs.gcd = __webpack_require__(257);
+  docs.hypot = __webpack_require__(258);
+  docs.lcm = __webpack_require__(259);
+  docs.log = __webpack_require__(260);
+  docs.log10 = __webpack_require__(261);
+  docs.mod = __webpack_require__(262);
+  docs.multiply = __webpack_require__(263);
+  docs.norm = __webpack_require__(264);
+  docs.nthRoot = __webpack_require__(265);
+  docs.pow = __webpack_require__(266);
+  docs.round = __webpack_require__(267);
+  docs.sign = __webpack_require__(268);
+  docs.sqrt = __webpack_require__(269);
+  docs.square = __webpack_require__(270);
+  docs.subtract = __webpack_require__(271);
+  docs.unaryMinus = __webpack_require__(272);
+  docs.unaryPlus = __webpack_require__(273);
+  docs.xgcd = __webpack_require__(274);
 
   // functions - bitwise
-  docs.bitAnd = __webpack_require__(276);
-  docs.bitNot = __webpack_require__(277);
-  docs.bitOr = __webpack_require__(278);
-  docs.bitXor = __webpack_require__(279);
-  docs.leftShift = __webpack_require__(280);
-  docs.rightArithShift = __webpack_require__(281);
-  docs.rightLogShift = __webpack_require__(282);
+  docs.bitAnd = __webpack_require__(275);
+  docs.bitNot = __webpack_require__(276);
+  docs.bitOr = __webpack_require__(277);
+  docs.bitXor = __webpack_require__(278);
+  docs.leftShift = __webpack_require__(279);
+  docs.rightArithShift = __webpack_require__(280);
+  docs.rightLogShift = __webpack_require__(281);
 
   // functions - combinatorics
-  docs.bellNumbers = __webpack_require__(283);
-  docs.catalan = __webpack_require__(284);
-  docs.composition = __webpack_require__(285);
-  docs.stirlingS2 = __webpack_require__(286);
+  docs.bellNumbers = __webpack_require__(282);
+  docs.catalan = __webpack_require__(283);
+  docs.composition = __webpack_require__(284);
+  docs.stirlingS2 = __webpack_require__(285);
 
   // functions - core
-  docs['config'] =  __webpack_require__(287);
-  docs['import'] =  __webpack_require__(288);
-  docs['typed'] =  __webpack_require__(289);
+  docs['config'] =  __webpack_require__(286);
+  docs['import'] =  __webpack_require__(287);
+  docs['typed'] =  __webpack_require__(288);
 
   // functions - complex
-  docs.arg = __webpack_require__(290);
-  docs.conj = __webpack_require__(291);
-  docs.re = __webpack_require__(292);
-  docs.im = __webpack_require__(293);
+  docs.arg = __webpack_require__(289);
+  docs.conj = __webpack_require__(290);
+  docs.re = __webpack_require__(291);
+  docs.im = __webpack_require__(292);
 
   // functions - expression
-  docs['eval'] =  __webpack_require__(294);
-  docs.help =  __webpack_require__(295);
+  docs['eval'] =  __webpack_require__(293);
+  docs.help =  __webpack_require__(294);
 
   // functions - geometry
-  docs.distance = __webpack_require__(296);
-  docs.intersect = __webpack_require__(297);
+  docs.distance = __webpack_require__(295);
+  docs.intersect = __webpack_require__(296);
 
   // functions - logical
-  docs['and'] = __webpack_require__(298);
-  docs['not'] = __webpack_require__(299);
-  docs['or'] = __webpack_require__(300);
-  docs['xor'] = __webpack_require__(301);
+  docs['and'] = __webpack_require__(297);
+  docs['not'] = __webpack_require__(298);
+  docs['or'] = __webpack_require__(299);
+  docs['xor'] = __webpack_require__(300);
 
   // functions - matrix
-  docs['concat'] = __webpack_require__(302);
-  docs.cross = __webpack_require__(303);
-  docs.det = __webpack_require__(304);
-  docs.diag = __webpack_require__(305);
-  docs.dot = __webpack_require__(306);
-  docs.eye = __webpack_require__(307);
-  docs.filter =  __webpack_require__(308);
-  docs.flatten = __webpack_require__(309);
-  docs.forEach =  __webpack_require__(310);
-  docs.inv = __webpack_require__(311);
-  docs.kron = __webpack_require__(312);
-  docs.map =  __webpack_require__(313);
-  docs.ones = __webpack_require__(314);
-  docs.partitionSelect =  __webpack_require__(315);
-  docs.range = __webpack_require__(316);
-  docs.resize = __webpack_require__(317);
-  docs.reshape = __webpack_require__(318);
-  docs.size = __webpack_require__(319);
-  docs.sort =  __webpack_require__(320);
-  docs.squeeze = __webpack_require__(321);
-  docs.subset = __webpack_require__(322);
-  docs.trace = __webpack_require__(323);
-  docs.transpose = __webpack_require__(324);
-  docs.zeros = __webpack_require__(325);
+  docs['concat'] = __webpack_require__(301);
+  docs.cross = __webpack_require__(302);
+  docs.det = __webpack_require__(303);
+  docs.diag = __webpack_require__(304);
+  docs.dot = __webpack_require__(305);
+  docs.eye = __webpack_require__(306);
+  docs.filter =  __webpack_require__(307);
+  docs.flatten = __webpack_require__(308);
+  docs.forEach =  __webpack_require__(309);
+  docs.inv = __webpack_require__(310);
+  docs.kron = __webpack_require__(311);
+  docs.map =  __webpack_require__(312);
+  docs.ones = __webpack_require__(313);
+  docs.partitionSelect =  __webpack_require__(314);
+  docs.range = __webpack_require__(315);
+  docs.resize = __webpack_require__(316);
+  docs.reshape = __webpack_require__(317);
+  docs.size = __webpack_require__(318);
+  docs.sort =  __webpack_require__(319);
+  docs.squeeze = __webpack_require__(320);
+  docs.subset = __webpack_require__(321);
+  docs.trace = __webpack_require__(322);
+  docs.transpose = __webpack_require__(323);
+  docs.zeros = __webpack_require__(324);
 
   // functions - probability
-  docs.combinations = __webpack_require__(326);
+  docs.combinations = __webpack_require__(325);
   //docs.distribution = require('./function/probability/distribution');
-  docs.factorial = __webpack_require__(327);
-  docs.gamma = __webpack_require__(328);
-  docs.kldivergence = __webpack_require__(329);
-  docs.multinomial = __webpack_require__(330);
-  docs.permutations = __webpack_require__(331);
-  docs.pickRandom = __webpack_require__(332);
-  docs.random = __webpack_require__(333);
-  docs.randomInt = __webpack_require__(334);
+  docs.factorial = __webpack_require__(326);
+  docs.gamma = __webpack_require__(327);
+  docs.kldivergence = __webpack_require__(328);
+  docs.multinomial = __webpack_require__(329);
+  docs.permutations = __webpack_require__(330);
+  docs.pickRandom = __webpack_require__(331);
+  docs.random = __webpack_require__(332);
+  docs.randomInt = __webpack_require__(333);
 
   // functions - relational
-  docs.compare = __webpack_require__(335);
-  docs.compareNatural = __webpack_require__(336);
-  docs.deepEqual = __webpack_require__(337);
-  docs['equal'] = __webpack_require__(338);
-  docs.larger = __webpack_require__(339);
-  docs.largerEq = __webpack_require__(340);
-  docs.smaller = __webpack_require__(341);
-  docs.smallerEq = __webpack_require__(342);
-  docs.unequal = __webpack_require__(343);
+  docs.compare = __webpack_require__(334);
+  docs.compareNatural = __webpack_require__(335);
+  docs.deepEqual = __webpack_require__(336);
+  docs['equal'] = __webpack_require__(337);
+  docs.larger = __webpack_require__(338);
+  docs.largerEq = __webpack_require__(339);
+  docs.smaller = __webpack_require__(340);
+  docs.smallerEq = __webpack_require__(341);
+  docs.unequal = __webpack_require__(342);
 
   // functions - set
-  docs.setCartesian = __webpack_require__(344);
-  docs.setDifference = __webpack_require__(345);
-  docs.setDistinct = __webpack_require__(346);
-  docs.setIntersect = __webpack_require__(347);
-  docs.setIsSubset = __webpack_require__(348);
-  docs.setMultiplicity = __webpack_require__(349);
-  docs.setPowerset = __webpack_require__(350);
-  docs.setSize = __webpack_require__(351);
-  docs.setSymDifference = __webpack_require__(352);
-  docs.setUnion = __webpack_require__(353);
+  docs.setCartesian = __webpack_require__(343);
+  docs.setDifference = __webpack_require__(344);
+  docs.setDistinct = __webpack_require__(345);
+  docs.setIntersect = __webpack_require__(346);
+  docs.setIsSubset = __webpack_require__(347);
+  docs.setMultiplicity = __webpack_require__(348);
+  docs.setPowerset = __webpack_require__(349);
+  docs.setSize = __webpack_require__(350);
+  docs.setSymDifference = __webpack_require__(351);
+  docs.setUnion = __webpack_require__(352);
 
   // functions - special
-  docs.erf = __webpack_require__(354);
+  docs.erf = __webpack_require__(353);
 
   // functions - statistics
-  docs.mad = __webpack_require__(355);
-  docs.max = __webpack_require__(356);
-  docs.mean = __webpack_require__(357);
-  docs.median = __webpack_require__(358);
-  docs.min = __webpack_require__(359);
-  docs.mode = __webpack_require__(360);
-  docs.prod = __webpack_require__(361);
-  docs.quantileSeq = __webpack_require__(362);
-  docs.std = __webpack_require__(363);
-  docs.sum = __webpack_require__(364);
-  docs['var'] = __webpack_require__(365);
+  docs.mad = __webpack_require__(354);
+  docs.max = __webpack_require__(355);
+  docs.mean = __webpack_require__(356);
+  docs.median = __webpack_require__(357);
+  docs.min = __webpack_require__(358);
+  docs.mode = __webpack_require__(359);
+  docs.prod = __webpack_require__(360);
+  docs.quantileSeq = __webpack_require__(361);
+  docs.std = __webpack_require__(362);
+  docs.sum = __webpack_require__(363);
+  docs['var'] = __webpack_require__(364);
 
   // functions - trigonometry
-  docs.acos = __webpack_require__(366);
-  docs.acosh = __webpack_require__(367);
-  docs.acot = __webpack_require__(368);
-  docs.acoth = __webpack_require__(369);
-  docs.acsc = __webpack_require__(370);
-  docs.acsch = __webpack_require__(371);
-  docs.asec = __webpack_require__(372);
-  docs.asech = __webpack_require__(373);
-  docs.asin = __webpack_require__(374);
-  docs.asinh = __webpack_require__(375);
-  docs.atan = __webpack_require__(376);
-  docs.atanh = __webpack_require__(377);
-  docs.atan2 = __webpack_require__(378);
-  docs.cos = __webpack_require__(379);
-  docs.cosh = __webpack_require__(380);
-  docs.cot = __webpack_require__(381);
-  docs.coth = __webpack_require__(382);
-  docs.csc = __webpack_require__(383);
-  docs.csch = __webpack_require__(384);
-  docs.sec = __webpack_require__(385);
-  docs.sech = __webpack_require__(386);
-  docs.sin = __webpack_require__(387);
-  docs.sinh = __webpack_require__(388);
-  docs.tan = __webpack_require__(389);
-  docs.tanh = __webpack_require__(390);
+  docs.acos = __webpack_require__(365);
+  docs.acosh = __webpack_require__(366);
+  docs.acot = __webpack_require__(367);
+  docs.acoth = __webpack_require__(368);
+  docs.acsc = __webpack_require__(369);
+  docs.acsch = __webpack_require__(370);
+  docs.asec = __webpack_require__(371);
+  docs.asech = __webpack_require__(372);
+  docs.asin = __webpack_require__(373);
+  docs.asinh = __webpack_require__(374);
+  docs.atan = __webpack_require__(375);
+  docs.atanh = __webpack_require__(376);
+  docs.atan2 = __webpack_require__(377);
+  docs.cos = __webpack_require__(378);
+  docs.cosh = __webpack_require__(379);
+  docs.cot = __webpack_require__(380);
+  docs.coth = __webpack_require__(381);
+  docs.csc = __webpack_require__(382);
+  docs.csch = __webpack_require__(383);
+  docs.sec = __webpack_require__(384);
+  docs.sech = __webpack_require__(385);
+  docs.sin = __webpack_require__(386);
+  docs.sinh = __webpack_require__(387);
+  docs.tan = __webpack_require__(388);
+  docs.tanh = __webpack_require__(389);
 
   // functions - units
-  docs.to = __webpack_require__(391);
+  docs.to = __webpack_require__(390);
 
   // functions - utils
-  docs.clone = __webpack_require__(392);
-  docs.format = __webpack_require__(393);
-  docs.isNaN = __webpack_require__(394);
-  docs.isInteger = __webpack_require__(395);
-  docs.isNegative = __webpack_require__(396);
-  docs.isNumeric = __webpack_require__(397);
-  docs.isPositive = __webpack_require__(398);
-  docs.isPrime = __webpack_require__(399);
-  docs.isZero = __webpack_require__(400);
+  docs.clone = __webpack_require__(391);
+  docs.format = __webpack_require__(392);
+  docs.isNaN = __webpack_require__(393);
+  docs.isInteger = __webpack_require__(394);
+  docs.isNegative = __webpack_require__(395);
+  docs.isNumeric = __webpack_require__(396);
+  docs.isPositive = __webpack_require__(397);
+  docs.isPrime = __webpack_require__(398);
+  docs.isZero = __webpack_require__(399);
   // docs.print = require('./function/utils/print'); // TODO: add documentation for print as soon as the parser supports objects.
-  docs['typeof'] =  __webpack_require__(401);
+  docs['typeof'] =  __webpack_require__(400);
 
   return docs;
 }
@@ -37478,7 +37472,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 111 */
+/* 110 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -37499,7 +37493,7 @@ module.exports = {
 
 
 /***/ }),
-/* 112 */
+/* 111 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -37518,7 +37512,7 @@ module.exports = {
 
 
 /***/ }),
-/* 113 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37532,7 +37526,7 @@ function factory (type, config, load, typed) {
   var compile = load(__webpack_require__(7)).compile;
   var Node = load(__webpack_require__(16));
   var IndexNode = load(__webpack_require__(84));
-  var access = load(__webpack_require__(114));
+  var access = load(__webpack_require__(113));
 
   /**
    * @constructor AccessorNode
@@ -37723,7 +37717,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 114 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37779,7 +37773,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 115 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37796,8 +37790,8 @@ function factory (type, config, load, typed) {
   var Node = load(__webpack_require__(16));
   var ArrayNode = load(__webpack_require__(86));
   var matrix = load(__webpack_require__(0));
-  var assign = load(__webpack_require__(404));
-  var access = load(__webpack_require__(114));
+  var assign = load(__webpack_require__(403));
+  var access = load(__webpack_require__(113));
 
   var keywords = __webpack_require__(83);
   var operators = __webpack_require__(57);
@@ -38081,7 +38075,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 116 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38094,7 +38088,7 @@ function factory (type, config, load, typed) {
   var register = load(__webpack_require__(7)).register;
   var compile = load(__webpack_require__(7)).compile;
   var Node = load(__webpack_require__(16));
-  var ResultSet = load(__webpack_require__(105));
+  var ResultSet = load(__webpack_require__(104));
 
   /**
    * @constructor BlockNode
@@ -38259,7 +38253,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 117 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38495,7 +38489,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 118 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38509,7 +38503,7 @@ var join = __webpack_require__(2).join;
 var latex = __webpack_require__(4);
 var operators = __webpack_require__(57);
 var setSafeProperty = __webpack_require__(15).setSafeProperty;
-var getUniqueArgumentName = __webpack_require__(119);
+var getUniqueArgumentName = __webpack_require__(118);
 
 function factory (type, config, load, typed) {
   var register = load(__webpack_require__(7)).register;
@@ -38704,7 +38698,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 119 */
+/* 118 */
 /***/ (function(module, exports) {
 
 /**
@@ -38721,7 +38715,7 @@ module.exports = getUniqueArgumentName;
 
 
 /***/ }),
-/* 120 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38899,14 +38893,14 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 121 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 function factory (type, config, load, typed, math) {
-  var Parser = load(__webpack_require__(122));
+  var Parser = load(__webpack_require__(121));
 
   /**
    * Create a parser. The function creates a new `math.expression.Parser` object.
@@ -38964,7 +38958,7 @@ exports.math = true; // requires the math namespace as 5th argument
 
 
 /***/ }),
-/* 122 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39135,7 +39129,7 @@ exports.math = true; // requires the math namespace as 5th argument
 
 
 /***/ }),
-/* 123 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39146,7 +39140,7 @@ var reduce = __webpack_require__(71);
 var containsCollections = __webpack_require__(72);
 
 function factory (type, config, load, typed) {
-  var larger = load(__webpack_require__(38));
+  var larger = load(__webpack_require__(37));
 
   /**
    * Compute the maximum value of a matrix or a  list with values.
@@ -39241,7 +39235,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 124 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39346,7 +39340,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 125 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39360,7 +39354,7 @@ function factory (type, config, load, typed) {
   var addScalar    = load(__webpack_require__(22));
   var multiply     = load(__webpack_require__(12));
   var unaryMinus   = load(__webpack_require__(41));
-  var det          = load(__webpack_require__(126));
+  var det          = load(__webpack_require__(125));
   var eye          = load(__webpack_require__(67));
 
   /**
@@ -39560,7 +39554,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 126 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39735,7 +39729,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 127 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39841,7 +39835,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 128 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40127,7 +40121,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 129 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40142,11 +40136,11 @@ function factory (type, config, load, typed, math) {
   var ParenthesisNode = load(__webpack_require__(69));
   var SymbolNode = load(__webpack_require__(44));
   var Node = load(__webpack_require__(16));
-  var simplifyConstant = load(__webpack_require__(425));
-  var simplifyCore = load(__webpack_require__(426));
-  var resolve = load(__webpack_require__(427));
+  var simplifyConstant = load(__webpack_require__(424));
+  var simplifyCore = load(__webpack_require__(425));
+  var resolve = load(__webpack_require__(426));
 
-  var util = load(__webpack_require__(130));
+  var util = load(__webpack_require__(129));
   var isCommutative = util.isCommutative;
   var isAssociative = util.isAssociative;
   var flatten = util.flatten;
@@ -40799,7 +40793,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 130 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40963,7 +40957,7 @@ exports.factory = factory;
 exports.math = true;
 
 /***/ }),
-/* 131 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41004,7 +40998,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 132 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41215,7 +41209,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 133 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41291,7 +41285,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 134 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41353,7 +41347,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 135 */
+/* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41371,7 +41365,7 @@ function factory (type, config, load, typed) {
   var divideScalar = load(__webpack_require__(21));
   var multiplyScalar = load(__webpack_require__(25));
   var subtract = load(__webpack_require__(23));
-  var larger = load(__webpack_require__(38));
+  var larger = load(__webpack_require__(37));
   var equalScalar = load(__webpack_require__(11));
   var unaryMinus = load(__webpack_require__(41));
   
@@ -41747,7 +41741,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 136 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41761,8 +41755,8 @@ var number = util.number,
 
 function factory (type, config, load, typed) {
 
-  var cs_sqr = load(__webpack_require__(429));
-  var cs_lu = load(__webpack_require__(437));
+  var cs_sqr = load(__webpack_require__(428));
+  var cs_lu = load(__webpack_require__(436));
 
   /**
    * Calculate the Sparse Matrix LU decomposition with full pivoting. Sparse Matrix `A` is decomposed in two matrices (`L`, `U`) and two permutation vectors (`pinv`, `q`) where
@@ -41826,7 +41820,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 137 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41885,7 +41879,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 138 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42067,7 +42061,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 139 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42097,7 +42091,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 140 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42129,7 +42123,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 141 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42323,7 +42317,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 142 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42518,7 +42512,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 143 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42670,7 +42664,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 144 */
+/* 143 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42826,7 +42820,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 145 */
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42919,7 +42913,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 146 */
+/* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43073,7 +43067,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 147 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43089,7 +43083,7 @@ function factory (type, config, load, typed) {
   var combinations = load(__webpack_require__(76));
   var isNegative = load(__webpack_require__(62));
   var isInteger = load(__webpack_require__(53));
-  var larger = load(__webpack_require__(38));
+  var larger = load(__webpack_require__(37));
 
   /**
    * The Stirling numbers of the second kind, counts the number of ways to partition
@@ -43149,7 +43143,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 148 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43358,7 +43352,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 149 */
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43428,13 +43422,13 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 150 */
+/* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
 
 function factory (type, config, load, typed) {
   /**
@@ -43514,7 +43508,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 151 */
+/* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43645,7 +43639,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 152 */
+/* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43736,7 +43730,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 153 */
+/* 152 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43818,7 +43812,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 154 */
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43892,7 +43886,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 155 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43904,9 +43898,9 @@ function factory (type, config, load, typed) {
   var index = load(__webpack_require__(29));
   var concat = load(__webpack_require__(70));
   var size = load(__webpack_require__(30));
-  var sort = load(__webpack_require__(151));
+  var sort = load(__webpack_require__(150));
   var subset = load(__webpack_require__(24));
-  var setDifference = load(__webpack_require__(153));
+  var setDifference = load(__webpack_require__(152));
   
   /**
    * Create the symmetric difference of two (multi)sets.
@@ -43951,7 +43945,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 156 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44076,7 +44070,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 157 */
+/* 156 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44211,7 +44205,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 158 */
+/* 157 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44286,19 +44280,13 @@ exports.factory = factory;
 
 
 /***/ }),
+/* 158 */
+/***/ (function(module, exports) {
+
+module.exports = [{"Type Sort":1,"Type":"Phasers","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Phasers","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"Size Filter","Full Tier List":"Tier Filter"},{"Type Sort":1,"Type":"Phasers","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Model 31 Phaser Bank","Effect":0.28,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0.6,"Scale Pwr":0.8,"Unit Power":1.5,"O":0.18,"E":0.2,"T":0.03,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"Light","Full Tier List":"T-3"},{"Type Sort":1,"Type":"Phasers","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Model 28 Twin Phaser Bank","Effect":0.425,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0.8,"Unit Power":1.8,"O":0.35,"E":0.35,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"Medium","Full Tier List":"T-2"},{"Type Sort":1,"Type":"Phasers","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Model 47 Phaser Bank","Effect":0.32,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0.6,"Scale Pwr":0.8,"Unit Power":1.5,"O":0.18,"E":0.2,"T":0.03,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"Heavy","Full Tier List":"T-1"},{"Type Sort":1,"Type":"Phasers","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Model 44 Twin Phaser Bank","Effect":0.5,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0.8,"Unit Power":1.8,"O":0.35,"E":0.35,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":"T0"},{"Type Sort":1,"Type":"Phasers","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Model 68 Phaser Bank","Effect":0.36,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0.6,"Scale Pwr":0.8,"Unit Power":1.5,"O":0.18,"E":0.2,"T":0.03,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":"T1"},{"Type Sort":1,"Type":"Phasers","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Model 62 Twin Phaser Bank","Effect":0.625,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0.8,"Unit Power":1.8,"O":0.35,"E":0.35,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":"T2"},{"Type Sort":1,"Type":"Phasers","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Model 83 Phaser Bank","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.085,"Pwr O/H":0.65,"Scale Pwr":0.8,"Unit Power":1.1,"O":0.18,"E":0.2,"T":0.02,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":"T3"},{"Type Sort":1,"Type":"Phasers","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Model 83 Twin Phaser Bank","Effect":0.75,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.08,"Pwr O/H":1,"Scale Pwr":0.8,"Unit Power":2,"O":0.34,"E":0.34,"T":0.01,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":"T4"},{"Type Sort":1,"Type":"Phasers","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type IV Single Phaser Bank","Effect":0.44,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.065,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.18,"E":0.2,"T":0.02,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-IV Twin Phaser Bank","Effect":0.825,"Weight O/H":8,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.33,"E":0.33,"T":0.01,"Reliability":0.99995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type V Single Phaser Bank","Effect":0.48,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.065,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.175,"E":0.19,"T":0.02,"Reliability":0.995,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Type-V Twin Phaser Bank","Effect":0.9,"Weight O/H":8,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.32,"E":0.32,"T":0.01,"Reliability":0.99995,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type VI Single Phaser Bank","Effect":0.52,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.065,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.175,"E":0.19,"T":0.02,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Type-VI Twin Phaser Bank","Effect":0.975,"Weight O/H":8,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.32,"E":0.32,"T":0.01,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Type IX Experimental Phaser Array Mid Bank","Effect":0.8,"Weight O/H":8,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.13,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.225,"E":0.25,"T":0.025,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Type-IX Experimental Phaser Array Full Bank","Effect":1.2,"Weight O/H":12,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.16,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.35,"E":0.35,"T":0.02,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T-2] Type 48 Phaser Bank","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":0.995,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Torp","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] TSF-2 Torpedo System","Effect":0.4,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.035,"Pwr O/H":2.5,"Scale Pwr":0.1,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mod 3a Battery System","Effect":0.4,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.07,"Pwr O/H":5,"Scale Pwr":0.05,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] TSF-3 Torpedo System","Effect":0.45,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.035,"Pwr O/H":2.5,"Scale Pwr":0.1,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mod 4 Battery System","Effect":0.45,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.07,"Pwr O/H":5,"Scale Pwr":0.05,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mk-I Torpedo System","Effect":0.5,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.035,"Pwr O/H":2.5,"Scale Pwr":0.1,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Type-I Auto System","Effect":0.5,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.07,"Pwr O/H":5,"Scale Pwr":0.05,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mk-II LW Torpedo System","Effect":0.55,"Weight O/H":8,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":0.3,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mk-II Torpedo System","Effect":0.55,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.045,"Pwr O/H":2.5,"Scale Pwr":0.2,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.99995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-II Auto System","Effect":0.55,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.09,"Pwr O/H":5,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mk-III LW Torpedo System","Effect":0.6,"Weight O/H":8,"Scale Weight":0,"Unit Weight":9.5,"SR Cost x":0.085,"Pwr O/H":4.5,"Scale Pwr":0.25,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mk-III Torpedo System","Effect":0.6,"Weight O/H":12,"Scale Weight":0,"Unit Weight":9.5,"SR Cost x":0.0475,"Pwr O/H":2.25,"Scale Pwr":0.175,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.9998,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-III Auto System","Effect":0.6,"Weight O/H":15.5,"Scale Weight":0,"Unit Weight":10.5,"SR Cost x":0.095,"Pwr O/H":4.5,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mk-IV LW Torpedo System","Effect":0.65,"Weight O/H":8,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.09,"Pwr O/H":4,"Scale Pwr":0.2,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][SR-] Mk-IV Torpedo System","Effect":0.65,"Weight O/H":12,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.05,"Pwr O/H":2,"Scale Pwr":0.15,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.9998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][C-] Type-IV Auto System","Effect":0.65,"Weight O/H":15,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":4,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mk-V LW Torpedo System","Effect":0.7,"Weight O/H":8,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.09,"Pwr O/H":4,"Scale Pwr":0.2,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][SR-] Mk-V Torpedo System","Effect":0.7,"Weight O/H":12,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.05,"Pwr O/H":2,"Scale Pwr":0.15,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.9998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][C-] Type-V Auto System","Effect":0.7,"Weight O/H":15,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":4,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sensor","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mark-I-Light LR Sensor Array","Effect":0.15,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Mark-I-Heavy LR Sensors","Effect":0.225,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12.5,"SR Cost x":0.06,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.06,"E":0.16,"T":0.3,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-II-Heavy LR Sensor Array","Effect":0.4,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.13,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Mark-II-Light LR Sensor Array","Effect":0.175,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Mark-II-Heavy LR Sensors","Effect":0.25,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12.5,"SR Cost x":0.06,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.06,"E":0.16,"T":0.3,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-III-Heavy LR Sensor Array","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.13,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Mark-III-Light LR Sensor Array","Effect":0.2,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mark-III-Heavy LR Sensors","Effect":0.275,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12.5,"SR Cost x":0.06,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.06,"E":0.16,"T":0.3,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mark-IV-Heavy LR Sensor Array","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.13,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Grade LR Sensor Array","Effect":0.1,"Weight O/H":0.5,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":0.5,"O":0.05,"E":0.04,"T":0.06,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mark-V-Light LR Sensor Array","Effect":0.225,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mark-V LR Sensor Array","Effect":0.3,"Weight O/H":2,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.11,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Mark-V-Heavy LR Sensor Array","Effect":0.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mark-VI-Light LR Sensor Array","Effect":0.225,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.75,"SR Cost x":0.18,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mark-VI LR Sensor Array","Effect":0.325,"Weight O/H":2,"Scale Weight":0,"Unit Weight":9.5,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mark-VI-Heavy LR Sensor Array","Effect":0.525,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mark-VII-Light LR Sensor Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.25,"SR Cost x":0.18,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mark-VII LR Sensor Array","Effect":0.35,"Weight O/H":2,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mark-VII-Heavy LR Sensor Array","Effect":0.55,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mark-VIII-Light LR Sensor Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.18,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mark-VIII LR Sensor Array","Effect":0.375,"Weight O/H":2,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mark-VIII-Heavy LR Sensor Array","Effect":0.575,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Subspace Flux Detector *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Subspace Pulse Scanner *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Subspace Phased Array Scanner *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Subspace Interferometry Suite *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sensor","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mark-I-Light SR Lateral Sensor Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Mark-I-Medium SR Lateral Sensor Array","Effect":0.375,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-I-Heavy SR Lateral Sensor Array","Effect":0.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21.5,"SR Cost x":0.05,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":"No","Size Class":"Light","Name":"[T-2][L] Mark-III-Light SR Lateral Sensor Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Mark-III-Medium SR Lateral Sensor Array","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-III-Heavy SR Lateral Sensor Array","Effect":0.55,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21.5,"SR Cost x":0.05,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Grade SR Lateral Sensor","Effect":0.1,"Weight O/H":0.5,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":0.5,"O":0.02,"E":0.04,"T":0.06,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mark-IV SR Lateral Sensor Array","Effect":0.3,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.02,"E":0.06,"T":0.09,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mark-IV-Heavy SR Lateral Sensor Array","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Mark-V-Heavy SR Lateral Sensor Array","Effect":0.65,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21.5,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.025,"E":0.06,"T":0.105,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mark-VB-Light SR Lateral Sensor Array","Effect":0.2375,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.75,"SR Cost x":0.1,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.15,"O":0.025,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mark-VB SR Lateral Sensor Array","Effect":0.335,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.75,"SR Cost x":0.1,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.15,"O":0.025,"E":0.06,"T":0.105,"Reliability":0.99999,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mark-VB-Heavy SR Lateral Sensor Array","Effect":0.7,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.15,"O":0.05,"E":0.1,"T":0.135,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mark-VI-Light SR Lateral Sensor Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.6,"SR Cost x":0.12,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.025,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2312,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mark-VI SR Lateral Sensor Array","Effect":0.35,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.6,"SR Cost x":0.1,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.06,"E":0.12,"T":0.15,"Reliability":0.99999,"Year Available (SF)":2312,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mark-VI-Heavy SR Lateral Sensor Array","Effect":0.75,"Weight O/H":5,"Scale Weight":0,"Unit Weight":20.75,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.1,"T":0.135,"Reliability":1,"Year Available (SF)":2312,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mark-VII-Light SR Lateral Sensor Array","Effect":0.2675,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.7,"SR Cost x":0.125,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.115,"T":0.1425,"Reliability":0.9995,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mark-VII SR Lateral Sensor Array","Effect":0.365,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.8,"SR Cost x":0.115,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.0065,"E":0.125,"T":0.1725,"Reliability":0.99999,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mark-VII-Heavy SR Lateral Sensor Array","Effect":0.8,"Weight O/H":6.5,"Scale Weight":0,"Unit Weight":21.25,"SR Cost x":0.07,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.055,"E":0.105,"T":0.1425,"Reliability":1,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Mark-VII-Light SR Lateral Sensor Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.7,"SR Cost x":0.125,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.115,"T":0.1425,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Mark-VII SR Lateral Sensor Array","Effect":0.38,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.8,"SR Cost x":0.115,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.0065,"E":0.125,"T":0.1725,"Reliability":0.99999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Mark-VII-Heavy SR Lateral Sensor Array","Effect":0.85,"Weight O/H":6.5,"Scale Weight":0,"Unit Weight":21.25,"SR Cost x":0.07,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.055,"E":0.105,"T":0.1425,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Full Spectrum Sensor Array","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sensor","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mark-I-Light Nav Sensors","Effect":0.15,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-I-Heavy Nav Sensors","Effect":0.4,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-II-Heavy Nav Array","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Mark-II-Light Nav Sensors","Effect":0.175,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-II-Heavy Nav Sensors","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-III-Heavy Nav Array","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Mark-III-Light Nav Sensors","Effect":0.2,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mark-III-Heavy Nav Sensors","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mark-IV-Heavy Nav Array","Effect":0.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mark-V Nav Sensors","Effect":0.3,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mark-VI-Light Nav Array","Effect":0.225,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.75,"SR Cost x":0.15,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.3,"O":0.02,"E":0.15,"T":0.2475,"Reliability":0.9995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mark-VI Nav Array","Effect":0.325,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":9.75,"SR Cost x":0.11,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.04,"E":0.15,"T":0.2625,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mark-VI-Heavy Nav Array","Effect":0.525,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18.5,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mark-VII-Light Nav Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.6,"SR Cost x":0.15,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.4,"O":0.02,"E":0.15,"T":0.2475,"Reliability":0.9995,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mark-VII Nav Array","Effect":0.35,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":9.6,"SR Cost x":0.11,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.15,"T":0.2625,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mark-VII-Heavy Nav Array","Effect":0.55,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18.25,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mark-VIII-Light Nav Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.6,"SR Cost x":0.15,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.4,"O":0.02,"E":0.15,"T":0.2475,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mark-VIII Nav Array","Effect":0.375,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":9.6,"SR Cost x":0.11,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.15,"T":0.2625,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mark-VIII-Heavy Nav Array","Effect":0.575,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18.25,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Basic Nav Sensor Package","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Mass Detector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Gaseous Anomaly Detector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Subspace Gradient Analytics","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Astrometric Course Optimizer","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Survey Sensors","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Basic Survey Sensor Package","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Basic Survey Sensor Package *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] EM/Subspace Heterodyne Circuit *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Ground-Penetrating Spectroscope *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Stellar Core Imager *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T5] Polycyclic Subspace Tomograph *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Science","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Pattern U Compact Lab","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.06,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Pattern V Lab","Effect":0.475,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0.25,"Unit Power":0.25,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Pattern S Lab","Effect":0.6,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.06,"Pwr O/H":1,"Scale Pwr":0.35,"Unit Power":0.25,"O":0.25,"E":0.2,"T":0.25,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Pattern W Compact Lab","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.06,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Pattern X Lab","Effect":0.525,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0.25,"Unit Power":0.25,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Pattern Y Lab","Effect":0.7,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.06,"Pwr O/H":1,"Scale Pwr":0.35,"Unit Power":0.25,"O":0.25,"E":0.2,"T":0.25,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Pattern D Compact Lab","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.06,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Pattern C Lab","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0.25,"Unit Power":0.25,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Pattern E Lab","Effect":0.8,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.06,"Pwr O/H":1,"Scale Pwr":0.35,"Unit Power":0.25,"O":0.25,"E":0.2,"T":0.25,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Pattern-K Compact Lab","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.08,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Pattern C2 Lab","Effect":0.675,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.08,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Spock-Pattern Lab","Effect":0.9,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.05,"E":0.05,"T":0.22,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Pattern-K2 Compact Lab","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":14.667,"SR Cost x":0.09,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Cruiser Pattern Lab","Effect":0.75,"Weight O/H":0,"Scale Weight":0,"Unit Weight":29.333,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.06,"E":0.1,"T":0.25,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Spock-B Pattern Lab","Effect":1,"Weight O/H":3,"Scale Weight":0,"Unit Weight":44,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.055,"E":0.055,"T":0.23,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Pattern-K3 Compact Lab","Effect":0.55,"Weight O/H":0,"Scale Weight":0,"Unit Weight":14.333,"SR Cost x":0.09,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Cruiser-2 Pattern Lab","Effect":0.825,"Weight O/H":0,"Scale Weight":0,"Unit Weight":28.667,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.06,"E":0.1,"T":0.25,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Spock-C Pattern Lab","Effect":1.1,"Weight O/H":3,"Scale Weight":0,"Unit Weight":43,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.055,"E":0.055,"T":0.23,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Pattern-K4 Compact Lab","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.09,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Cruiser-3 Pattern Lab","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":28,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.06,"E":0.1,"T":0.25,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Spock-D Pattern Lab","Effect":1.2,"Weight O/H":3,"Scale Weight":0,"Unit Weight":42,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.055,"E":0.055,"T":0.23,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Core","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mkv V Monotronic Core","Effect":0.325,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.04,"T":0.18,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mk V-B Monotronic Core","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.225,"Pwr O/H":4.12,"Scale Pwr":2.5,"Unit Power":0,"O":0.1,"E":0.03,"T":0.125,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] SFA Mk1 Duotronic Core","Effect":0.375,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.04,"T":0.18,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] SFA MkI-B Duotronic Core","Effect":0.45,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.225,"Pwr O/H":4.12,"Scale Pwr":2.5,"Unit Power":0,"O":0.1,"E":0.03,"T":0.125,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Type-I Duotronic Core","Effect":0.425,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.04,"T":0.18,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Type-I-B Duotronic Core","Effect":0.475,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.225,"Pwr O/H":4.12,"Scale Pwr":2.5,"Unit Power":0,"O":0.1,"E":0.03,"T":0.125,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Generic Monotronic Civilian Core","Effect":0.2,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.02,"T":0.09,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Type-II Duotronic Core","Effect":0.475,"Weight O/H":20,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.2,"Pwr O/H":6.5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0.02,"T":0.135,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Type-III Duotronic Core","Effect":0.5,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":5.2,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.09,"Reliability":0.998,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-II Heavy Duotronic Core","Effect":0.525,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.2,"Pwr O/H":6.5,"Scale Pwr":2,"Unit Power":0,"O":0.1,"E":0.02,"T":0.08,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type-III-A Duotronic Core","Effect":0.6,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":1,"Unit Power":0,"O":0,"E":0.02,"T":0.1,"Reliability":0.9999,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Type-IV Duotronic Core","Effect":0.625,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.998,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-IV Heavy Duotronic Core","Effect":0.66,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type-IV-B Duotronic Core","Effect":0.64,"Weight O/H":10,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.4,"Pwr O/H":7,"Scale Pwr":0.5,"Unit Power":0,"O":0,"E":0.02,"T":0.11,"Reliability":0.998,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Type-IV-A Duotronic Core","Effect":0.68,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":7,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.9999,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Type-IV-C Heavy Duotronic Core","Effect":0.7,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type-V Compact Duotronic Core","Effect":0.68,"Weight O/H":10,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.4,"Pwr O/H":7,"Scale Pwr":0.5,"Unit Power":0,"O":0,"E":0.02,"T":0.11,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Type-V Duotronic Core","Effect":0.72,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":7,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.9999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Type-V Heavy Duotronic Core","Effect":0.76,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Type-VI Compact Duotronic Core","Effect":0.72,"Weight O/H":10,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.4,"Pwr O/H":7,"Scale Pwr":0.5,"Unit Power":0,"O":0,"E":0.02,"T":0.11,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Type-VI Duotronic Core","Effect":0.79,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":7,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.9999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Type-VI Heavy Duotronic Core","Effect":0.9,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No OS","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-3,"Size Sort":-99,"Size Class":"N/A","Name":"[T-3] Majel OS","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Majel 1.5 OS","Effect":0.475,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-1,"Size Sort":-99,"Size Class":"N/A","Name":"[T-1] Majel 2.0 OS","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Civilian OS","Effect":0.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.0125,"E":0.0075,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":0,"Size Sort":-99,"Size Class":"N/A","Name":"[T0] Majel 2.1 OS","Effect":0.525,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.85,"Scale Pwr":0.125,"Unit Power":0.4,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":1,"Size Sort":-99,"Size Class":"N/A","Name":"[T1] Majel 3.0 OS","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.2,"Unit Power":1,"O":0.1375,"E":0.0825,"T":0.11,"Reliability":0.9998,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":2,"Size Sort":-99,"Size Class":"N/A","Name":"[T2] Majel 3.1 Explorer OS","Effect":1.05,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":5,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.1,"E":0.06,"T":0.08,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":2,"Size Sort":-99,"Size Class":"N/A","Name":"[T2] Majel 3.1 OS","Effect":1.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.25,"Unit Power":1.1,"O":0.13125,"E":0.07875,"T":0.105,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":3,"Size Sort":-99,"Size Class":"N/A","Name":"[T3] Majel 3.5 OS","Effect":1.2,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.25,"Unit Power":1.1,"O":0.125,"E":0.075,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":4,"Size Sort":-99,"Size Class":"N/A","Name":"[T4] Majel 4.0 OS","Effect":1.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.25,"Unit Power":1.1,"O":0.125,"E":0.075,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No TCU","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Model 17 Light TCU","Effect":0.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Model 31 Advanced TCU","Effect":0.325,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Model 20 Heavy TCU","Effect":0.375,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Model 37 Light TCU","Effect":0.275,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Model 42 Advanced TCU","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Model 39 Heavy TCU","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Model 57 Light TCU","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Model 64 Advanced TCU","Effect":0.375,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Model 57 Heavy TCU","Effect":0.425,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian TCU","Effect":0.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.045,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Type-I Duotronic TCU","Effect":0.325,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Type-1 TCU","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-1-A 'Seeker' TCU","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.065,"Pwr O/H":0.8,"Scale Pwr":0.45,"Unit Power":1.8,"O":0.1,"E":0.05,"T":0.05,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type-II Duotronic TCU","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Type-2 TCU","Effect":0.425,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2.05,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] 'Dauntless' Tracking System","Effect":0.575,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.1,"Pwr O/H":1.2,"Scale Pwr":0.6,"Unit Power":2.2,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.9992,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type-III Duotronic TCU","Effect":0.375,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.975,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Type-3 TCU","Effect":0.475,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2.1,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] DI-4 Predictive Targeting Array","Effect":0.675,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.098,"Pwr O/H":1.15,"Scale Pwr":0.575,"Unit Power":2.3,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.9999,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type-IV Duotronic TCU","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.975,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Type-4 TCU","Effect":0.525,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2.1,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] TH-5 Rangemaster Unit","Effect":0.775,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.098,"Pwr O/H":1.15,"Scale Pwr":0.575,"Unit Power":2.3,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.9999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Diplomacy","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Escort Diplomatic Package '24","Effect":0.7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.035,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.015,"E":0,"T":0.015,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Cruiser Diplomatic Package '20","Effect":0.85,"Weight O/H":14,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.07,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.03,"E":0.02,"T":0.03,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Explorer Diplomatic Package '28","Effect":1.1,"Weight O/H":45,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.2,"Scale Pwr":0.4,"Unit Power":2.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Escort Diplomatic Package '41","Effect":0.75,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.035,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.015,"E":0,"T":0.015,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Cruiser Diplomatic Package '39","Effect":0.9,"Weight O/H":14,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.07,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.03,"E":0.02,"T":0.03,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Explorer Diplomatic Package '45","Effect":1.35,"Weight O/H":45,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.2,"Scale Pwr":0.4,"Unit Power":2.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Escort Diplomatic Package '61","Effect":0.8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.035,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.015,"E":0,"T":0.015,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Cruiser Diplomatic Package '61","Effect":1,"Weight O/H":14,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.07,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.03,"E":0.02,"T":0.03,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Explorer Diplomatic Package '67","Effect":1.5,"Weight O/H":45,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.2,"Scale Pwr":0.4,"Unit Power":2.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Escort Diplomatic Package '85","Effect":0.85,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.075,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":3,"O":0.02,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Explorer Diplomatic Package '85","Effect":1.6,"Weight O/H":50,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":3.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Lwaxana '04 Escort Protocol","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.08,"Pwr O/H":2,"Scale Pwr":0.5,"Unit Power":2.75,"O":0.06,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2309,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Lwaxana '04 General Protocol","Effect":1.2,"Weight O/H":16,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.105,"Pwr O/H":2,"Scale Pwr":0.5,"Unit Power":3.25,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2309,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Lwaxana '04 Explorer Protocol","Effect":1.75,"Weight O/H":60,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":0.5,"Unit Power":3.75,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2309,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Lwaxana '12 Escort Protocol","Effect":1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.08,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3,"O":0.06,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Lwaxana '12 General Protocol","Effect":1.3,"Weight O/H":16,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.105,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Lwaxana '12 Explorer Protocol","Effect":2,"Weight O/H":64,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.12,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":4,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Lwaxana '21 Escort Protocol","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.08,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3,"O":0.06,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Lwaxana '21 General Protocol","Effect":1.425,"Weight O/H":16,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.105,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Lwaxana '21 Explorer Protocol","Effect":2.25,"Weight O/H":64,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.12,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":4,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Onboard Recreation","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] 2260s Rec Space","Effect":0.3,"Weight O/H":4,"Scale Weight":0,"Unit Weight":17.5,"SR Cost x":0.03,"Pwr O/H":1,"Scale Pwr":0.4,"Unit Power":2,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] 2280s Rec Space","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":4,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] 2300s Compact Rec Space","Effect":0.2,"Weight O/H":6,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.04,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":4,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] 2300s Rec Space","Effect":0.6,"Weight O/H":8,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":8,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] 2310s Compact Rec Space","Effect":0.275,"Weight O/H":6,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.04,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":4,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] 2310s Rec Space","Effect":0.725,"Weight O/H":8,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":8,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sickbay","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] S-Medical '24 Standard Sickbay","Effect":0.2,"Weight O/H":0,"Scale Weight":0,"Unit Weight":13,"SR Cost x":0.04,"Pwr O/H":0.5,"Scale Pwr":0.27,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] S-Medical '25 Explorer Sickbay","Effect":0.3,"Weight O/H":10,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] S-Medical '42 Standard Sickbay","Effect":0.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":13,"SR Cost x":0.04,"Pwr O/H":0.5,"Scale Pwr":0.27,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] S-Medical '46 Explorer Sickbay","Effect":0.35,"Weight O/H":10,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] S-Medical '61 Standard Sickbay","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":13,"SR Cost x":0.04,"Pwr O/H":0.5,"Scale Pwr":0.27,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] S-Medical '68 Explorer Sickbay","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] S-Medical '84 Pattern Sickbay","Effect":0.5,"Weight O/H":10,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.06,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] S-Medical '04 Pattern Sickbay","Effect":0.6,"Weight O/H":10,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.18,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] T'Koren Pattern Small Sickbay","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.045,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] T'Koren Pattern Large Sickbay","Effect":0.7,"Weight O/H":10,"Scale Weight":0,"Unit Weight":22,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] T'Koren-B Pattern Small Sickbay","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.045,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2319,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] T'Koren-B Pattern Large Sickbay","Effect":0.8,"Weight O/H":10,"Scale Weight":0,"Unit Weight":22,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2319,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] T'Koren-B Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] T'Koren-C Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T5] T'Koren-D Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T6] Pulaski Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Single Alloy-2 Duranium Hull","Effect":0.33,"Weight O/H":0,"Scale Weight":15,"Unit Weight":0,"SR Cost x":0.011,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.25,"T":0.04,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Double Alloy-2 Duranium Hull","Effect":0.62,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.014,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.02,"E":0.4,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Duranium w/ Bartridium Rebar","Effect":0.725,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.0375,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.2,"E":0.5,"T":0.2,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Single Alloy-4 Duranium Hull","Effect":0.34,"Weight O/H":0,"Scale Weight":14,"Unit Weight":0,"SR Cost x":0.011,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.25,"T":0.04,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Double Alloy-4 Duranium Hull","Effect":0.66,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.014,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.02,"E":0.4,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Duranium w/ Bartridium Rebar","Effect":0.775,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.0375,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.2,"E":0.5,"T":0.2,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Single Duranium Hull","Effect":0.35,"Weight O/H":0,"Scale Weight":13,"Unit Weight":0,"SR Cost x":0.011,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.25,"T":0.04,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Double Duranium Hull","Effect":0.7,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.014,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.02,"E":0.4,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Duranium w/ Exotic Rebar","Effect":0.8,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.0375,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.2,"E":0.5,"T":0.2,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Grade","Effect":0.25,"Weight O/H":0,"Scale Weight":11.5,"Unit Weight":0,"SR Cost x":0.001,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Lt. Alloy-1 Duranium Hull","Effect":0.36,"Weight O/H":0,"Scale Weight":12.5,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Duranium-335 Alloy Hull","Effect":0.74,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.05,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Duranium-447 Alloy Hull","Effect":0.85,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.016,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Lt. Alloy-2 Duranium Hull","Effect":0.37,"Weight O/H":0,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Med. Alloy-2 Duranium Hull","Effect":0.78,"Weight O/H":35,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.015,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.075,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Hvy. Alloy-2 Duranium Hull","Effect":0.9,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.018,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Lt. Alloy-3 Duranium Hull","Effect":0.38,"Weight O/H":0,"Scale Weight":11.5,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Med. Alloy-3 Duranium Hull","Effect":0.82,"Weight O/H":35,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.015,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.075,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Hvy. Alloy-3 Duranium Hull","Effect":0.95,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.018,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Lt. Alloy-4 Duranium Hull","Effect":0.4,"Weight O/H":0,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Med. Alloy-4 Duranium Hull","Effect":0.86,"Weight O/H":35,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.015,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.075,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Hvy. Alloy-4 Duranium Hull","Effect":1,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.018,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No SIF","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Type-I-L SIF","Effect":0.215,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Type-I SIF","Effect":0.375,"Weight O/H":10,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.05,"E":0.35,"T":0.05,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mars-III Special SIF","Effect":0.5,"Weight O/H":27,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.22,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.08,"E":0.4,"T":0.075,"Reliability":0.998,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Type-II-L SIF","Effect":0.25,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Type-II SIF","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.05,"E":0.35,"T":0.05,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mars-IV Special SIF","Effect":0.6,"Weight O/H":27,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.22,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.08,"E":0.4,"T":0.075,"Reliability":0.998,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Type-III-L SIF","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Type-III SIF","Effect":0.45,"Weight O/H":10,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.05,"E":0.35,"T":0.05,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mars-V Special SIF","Effect":0.7,"Weight O/H":27,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.22,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.08,"E":0.4,"T":0.075,"Reliability":0.998,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Type-IV-L SIF","Effect":0.6,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Type-IV SIF","Effect":0.75,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-IV-H SIF","Effect":0.9,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type-V-L SIF","Effect":0.65,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Type-V SIF","Effect":0.8,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-V-H SIF","Effect":0.95,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type-VI-L SIF","Effect":0.675,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Type-VI SIF","Effect":0.825,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Type-VI-H SIF","Effect":0.975,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type-VII-L SIF","Effect":0.7,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Type-VII SIF","Effect":0.85,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Type-VII-H SIF","Effect":1,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Type-VIII-L SIF","Effect":0.725,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Type-VIII SIF","Effect":0.9,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Type-VIII-H SIF","Effect":1.1,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Shields","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] AAE-L Monophasic Escort Pattern","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":2,"Unit Power":1.5,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] AAE-M Cyclic Monophasic","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.1,"E":0.005,"T":0.14,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] AAE-H Monophasic Heavy Pattern","Effect":0.8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.175,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] AAE-B-L Monophasic Escort Pattern","Effect":0.7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":2,"Unit Power":1.5,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] AAE-B-M Cyclic Monophasic","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.1,"E":0.005,"T":0.14,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] AAE-B-H Monophasic Heavy Pattern","Effect":1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.175,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Mk1 Monophasic Escort Pattern","Effect":0.8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":2,"Unit Power":1.5,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mk1 Cyclic Monophasic E-Type","Effect":1.05,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.1,"E":0.005,"T":0.14,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mk1 Monophasic Heavy Pattern","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.175,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mk-III-E Shield Gens","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mk-III-H Shield Gens","Effect":1.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":4,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Mk-III-SH Shield Gens","Effect":1.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.135,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":4,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mk-IV-E Shield Gens","Effect":0.95,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mk-IV-H Shield Gens","Effect":1.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":4.5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mk-V-E Shield Gens","Effect":1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mk-V-H Shield Gens","Effect":1.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mk-V-SH Shield Gens","Effect":1.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.135,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mk-VI-E Shield Gens","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mk-VI-H Shield Gens","Effect":1.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mk-VI-SH Shield Gens","Effect":2.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.135,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Monophasic Shields (2260s DS)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Biphasic Shields (DS I)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Detuned Ellipsoidal Shields (DS II)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Polyphasic Shields (DS III)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Self-Integrating Shields (DS IV)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"xNo Nav Deflector","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Saucer-Only Polyphasic Deflector","Effect":0.2,"Weight O/H":2,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.04,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Polyphasic Deflector","Effect":0.25,"Weight O/H":4,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.06,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Advanced Polyphasic Deflector","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.08,"E":0.075,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Saucer-Only Gravitic Deflector","Effect":0.25,"Weight O/H":2,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.04,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Gravitic Deflector","Effect":0.3,"Weight O/H":4,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.06,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Advanced Gravitic Deflector","Effect":0.5,"Weight O/H":4,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.08,"E":0.075,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Saucer-Only Graviton Deflector","Effect":0.3,"Weight O/H":2,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.04,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Graviton Deflector","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.06,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Advanced Graviton Deflector","Effect":0.6,"Weight O/H":4,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.08,"E":0.075,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Graviton Beam Deflector Saucer-Only","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.11,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Advanced Graviton Beam Deflector","Effect":0.65,"Weight O/H":8,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.11,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Modulated Graviton Beam Deflector Saucer-Only","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.11,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Modulated Graviton Beam Deflector","Effect":0.7,"Weight O/H":7.5,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.11,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Graviton Wavefront Deflector Saucer-Only","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.1,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2317,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Graviton Wavefront Deflector","Effect":0.75,"Weight O/H":7.5,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.1,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":2317,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Shaped Wavefront Deflector Saucer-Only","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.1,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Shaped Wavefront Deflector","Effect":0.825,"Weight O/H":7.5,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.1,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Graviton Beam Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Modulated Graviton Beam Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Graviton Wavefront Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Shaped Wavefront Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Astrodynamic Wavefront Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] SDB-26 Std Impulse","Effect":0.18,"Weight O/H":5,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.17,"Unit Power":0.35,"O":0,"E":0.1,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] SDB R-Type Heavy Impulse","Effect":0.45,"Weight O/H":35,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.09,"Pwr O/H":0.1,"Scale Pwr":0.12,"Unit Power":0.25,"O":0.1,"E":0.045,"T":0.045,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] SDB-44 Std Impulse","Effect":0.2,"Weight O/H":5,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.17,"Unit Power":0.35,"O":0,"E":0.1,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] SDB C-Type Heavy Impulse","Effect":0.55,"Weight O/H":35,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.09,"Pwr O/H":0.1,"Scale Pwr":0.12,"Unit Power":0.25,"O":0.1,"E":0.045,"T":0.045,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] SDB-65 Std Impulse","Effect":0.22,"Weight O/H":5,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.17,"Unit Power":0.35,"O":0,"E":0.1,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] SDB E-Type Heavy Impulse","Effect":0.65,"Weight O/H":35,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.09,"Pwr O/H":0.1,"Scale Pwr":0.12,"Unit Power":0.25,"O":0.1,"E":0.045,"T":0.045,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Basic Impulse","Effect":0.2,"Weight O/H":10,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.02,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.2,"O":0,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] SDB-86 Impulse Drive Sys","Effect":0.26,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] SDB-97 High-Power Impulse Drive Sys","Effect":0.3,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] SDB-97 High-Efficiency Impulse Drive Sys","Effect":0.75,"Weight O/H":45,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.025,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] SDB-09 High-Power Impulse Drive Sys","Effect":0.36,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] SDB-09 High-Efficiency Impulse Drive Sys","Effect":0.85,"Weight O/H":45,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.025,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] SDB-09 High-Power Impulse Drive Sys","Effect":0.42,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] SDB-09 High-Efficiency Impulse Drive Sys","Effect":0.95,"Weight O/H":45,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.025,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Warp Drive","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] 2 X Saladin Nacelles","Effect":0.77,"Weight O/H":5,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] 2 X Ranger Heavy Nacelles","Effect":1.1,"Weight O/H":10,"Scale Weight":0,"Unit Weight":85,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] 2 X Soyuz Nacelles","Effect":0.89,"Weight O/H":5,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] 2 X Constitution Heavy Nacelles","Effect":1.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":85,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] 2 X Miranda Nacelles","Effect":1.084,"Weight O/H":5,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] 4 X Constellation Nacelles","Effect":1.088,"Weight O/H":5,"Scale Weight":0,"Unit Weight":55,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] 2 X Constitution-A Heavy Nacelles","Effect":1.626,"Weight O/H":10,"Scale Weight":0,"Unit Weight":85,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] 2 X Centaur Nacelles","Effect":1.174,"Weight O/H":5,"Scale Weight":0,"Unit Weight":65,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] 2 X Excelsior Pattern Nacelles","Effect":2.457,"Weight O/H":20,"Scale Weight":0,"Unit Weight":120,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] 2 X Centaur-A Pattern Nacelle","Effect":1.536,"Weight O/H":5,"Scale Weight":0,"Unit Weight":50,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":4,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] 2 X 2305 Cruiser Nacelle","Effect":2.16,"Weight O/H":10,"Scale Weight":0,"Unit Weight":80,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3.5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] 2 X Excelsior Type-II Pattern Nacelles","Effect":2.52,"Weight O/H":20,"Scale Weight":0,"Unit Weight":135,"SR Cost x":0.16,"Pwr O/H":5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] 2 X New Orleans Pattern Nacelles","Effect":1.85,"Weight O/H":5.25,"Scale Weight":0,"Unit Weight":52,"SR Cost x":0.15,"Pwr O/H":6,"Scale Pwr":6,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] 2 X Ambassador Pattern Nacelles","Effect":2.64,"Weight O/H":20,"Scale Weight":0,"Unit Weight":125,"SR Cost x":0.16,"Pwr O/H":5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T-1] Constitution-A Pattern Nacelles","Effect":1.25,"Weight O/H":10,"Scale Weight":0,"Unit Weight":55,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Dual Layer Field Effect Coils","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Onboard Industry","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] S-Medical Mk I Protein Synth","Effect":0.1,"Weight O/H":7,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] S-Medical Mk I High-Endurance Protein Synth","Effect":0.2,"Weight O/H":7,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] S-Medical Mk II Protein Synth","Effect":0.15,"Weight O/H":7,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] S-Medical Mk II High-Endurance Protein Synth","Effect":0.25,"Weight O/H":7,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] S-Medical Mk III Protein Synth","Effect":0.2,"Weight O/H":7,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] S-Medical Mk III High-Endurance Protein Synth","Effect":0.375,"Weight O/H":7,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] S-Medical Mk IV Protein Synth","Effect":0.3,"Weight O/H":7,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] S-Medical Mk IV High-Endurance Protein Synth","Effect":0.5,"Weight O/H":7,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] S-Medical Mk V Protein Synth","Effect":0.4,"Weight O/H":7,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] S-Medical Mk V High-Endurance Protein Synth","Effect":0.625,"Weight O/H":7,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] S-Medical Mk VI Protein Synth","Effect":0.5,"Weight O/H":7,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] S-Medical Mk VI High-Endurance Protein Synth","Effect":0.75,"Weight O/H":7,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Fuel","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] 2220-Light Pattern Deuterium Tanks","Effect":0.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] 2220-Heavy Pattern Deuterium Tanks","Effect":0.4,"Weight O/H":30,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] 2220-Large Ship Pattern Deuterium Tanks","Effect":0.8,"Weight O/H":80,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.0675,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] 2240-Light Pattern Deuterium Tanks","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] 2240-Heavy Pattern Deuterium Tanks","Effect":0.55,"Weight O/H":30,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] 2240-Large Ship Pattern Deuterium Tanks","Effect":0.9,"Weight O/H":80,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.0675,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] 2260-Light Pattern Deuterium Tanks","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] 2260-Heavy Pattern Deuterium Tanks","Effect":0.7,"Weight O/H":30,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] 2260-Large Ship Pattern Deuterium Tanks","Effect":1,"Weight O/H":80,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.0675,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] 2295-Light Pattern Deuterium Tanks","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] 2285-Super-Heavy Pattern Deuterium","Effect":1.2,"Weight O/H":85,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] 2305-Light Pattern Deuterium Tanks","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2304,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] 2305-Heavy Pattern Deuterium Tanks","Effect":1.1,"Weight O/H":40,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2304,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] 2305-Super-Heavy Pattern Deuterium","Effect":1.4,"Weight O/H":85,"Scale Weight":0,"Unit Weight":3,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2304,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] 2310-Light Pattern Deuterium Tanks","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] 2310-Heavy Pattern Deuterium Tanks","Effect":1.25,"Weight O/H":40,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] 2310-Super-Heavy Pattern Deuterium","Effect":1.6,"Weight O/H":85,"Scale Weight":0,"Unit Weight":3,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] 2310-Light Pattern Deuterium Tanks","Effect":0.7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] 2310-Heavy Pattern Deuterium Tanks","Effect":1.4,"Weight O/H":40,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] 2310-Super-Heavy Pattern Deuterium","Effect":1.8,"Weight O/H":85,"Scale Weight":0,"Unit Weight":3,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Mk1 Antimatter Containment Tank","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Yoyodyne Pulse Fusion (Fusion Only)","Effect":10,"Weight O/H":8,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.05,"T":0.05,"Reliability":1,"Year Available (SF)":2120,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][C+] Delta Vega-12 Warp Core","Effect":26,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][R+C+] Venus-I C-Layout Warp Core","Effect":34,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][C-SR+] YYD-VI Heavy Core","Effect":34,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][C+] Delta Vega-12 Warp Core","Effect":28,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][R+C+] Venus-II C-Layout Warp Core","Effect":36,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][C-SR+] Type-E Block-1 Automated Core","Effect":36,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][C+] Delta Vega-24 Warp Core","Effect":29,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][R+C+] Venus-III C-Layout Warp Core","Effect":38,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][C-SR+] Type-E Block-2 Automated Core","Effect":38,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][R-C-SR+] Delta Vega-28 Automated Core","Effect":30,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.025,"T":0.05,"Reliability":0.995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][C+] Delta Vega-26 Warp Core","Effect":30,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][R+C+] Venus-IV C-Layout Warp Core","Effect":40,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][C-SR+] Type-E Block-3 Automated Core","Effect":40,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R---C+] Type-I Experimental (40E) Warp Core","Effect":40,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.98,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R---C+] Type-II Experimental (Venus) Warp Core","Effect":50,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.13,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.98,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R+C-] Type-E Block-4 Automated Core","Effect":42,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.999,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R--C-SR+] ONA-III-L Experimental","Effect":41,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.16,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.065,"T":0.05,"Reliability":0.99,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][C+] Type-I Block-A (40E) Warp Core","Effect":41,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.997,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R--C-SR+] ONA-III-M Experimental","Effect":51,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.06,"E":0.075,"T":0.06,"Reliability":0.99,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R-C+] Type-III Block-A (YYD) Warp Core","Effect":51,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.11,"E":0.16,"T":0.11,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R--C-SR+] ONA-III-H Experimental","Effect":61,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.085,"T":0.07,"Reliability":0.99,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][C+] Type-II Block-A (Venus) Warp Core","Effect":61,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.12,"E":0.17,"T":0.12,"Reliability":0.997,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R-C-SR+] ONA-IV-L Standard","Effect":42,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.065,"T":0.05,"Reliability":0.995,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R+C+] Type-I Block-B (40E) Warp Core","Effect":42,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.999,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][R-C-SR+] ONA-IV-M Standard","Effect":52,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.16,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.06,"E":0.075,"T":0.06,"Reliability":0.995,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][C+] Type-III Block-B (YYD) Warp Core","Effect":52,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.11,"E":0.16,"T":0.11,"Reliability":0.997,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R-C-SR+] ONA-IV-H Standard","Effect":62,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.16,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.085,"T":0.07,"Reliability":0.995,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R+C+] Type-II Block-B (Venus) Warp Core","Effect":62,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.12,"E":0.17,"T":0.12,"Reliability":0.999,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2][R--]Integrated Injectors","Effect":-4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":0.99,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][C-] Luna-I High-Efficiency M/AM System","Effect":6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M][R+] Mk IV M/AM System","Effect":9,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.5,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][C+SR+] Mk IV High Volume M/AM System","Effect":13.5,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.5,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][C-] Luna-II High-Efficiency M/AM System","Effect":7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M][R+] Mk V M/AM System","Effect":10.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.5,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][C+SR+] Mk V High Volume M/AM System","Effect":15.75,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.5,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][C-] Luna-III High-Efficiency M/AM System","Effect":8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M][R+] Mk VI M/AM System","Effect":12,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.5,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][C+SR+] Mk VI High Volume M/AM System","Effect":18,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.5,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][C-] Luna-IV High-Efficiency M/AM System","Effect":9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.2,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M][R+] Mk VII Sublimator-Compressor","Effect":13.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.77,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][C+SR+] Mk VII Complex Sublimator-Compressor","Effect":20.25,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.81,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R-C-] Luna-V High-Efficiency M/AM System","Effect":10,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mk VIII Sublimator-Compressor","Effect":15,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.04,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R-C+SR+] Mk VIII High Volume Compressor","Effect":22.5,"Weight O/H":12,"Scale Weight":0,"Unit Weight":16.12,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R-C-] Luna-VI High-Efficiency M/AM System","Effect":11,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.6,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mk IX Sublimator-Compressor","Effect":16.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.31,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R-C+SR+] Mk IX High Volume Compressor","Effect":24.75,"Weight O/H":12,"Scale Weight":0,"Unit Weight":16.43,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R-C-] Luna-VII High-Efficiency M/AM System","Effect":12,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.8,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mk X Sublimator-Compressor","Effect":18,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.58,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R-C+SR+] Mk X High Volume Compressor","Effect":27,"Weight O/H":12,"Scale Weight":0,"Unit Weight":16.74,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L][R-C-] Luna-VIII High-Efficiency M/AM System","Effect":13,"Weight O/H":0,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Mk XI Sublimator-Compressor","Effect":19.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.85,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H][R-C+SR+] Mk XI High Volume Compressor","Effect":29.25,"Weight O/H":12,"Scale Weight":0,"Unit Weight":17.05,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2][R-SR-] Integrated Coolant","Effect":-15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][R-] Mk IV Mod L Coolant System","Effect":-14.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Mk IV Yoyodyne Coolant System","Effect":-11,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][R-] Mk V Mod L Coolant System","Effect":-14,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Mk V Yoyodyne Coolant System","Effect":-10.25,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][R-] Mk V Mod L Coolant System","Effect":-13,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mk V Yoyodyne Coolant System","Effect":-10,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][R-SR-] VSA-12-L Efficient Coolant System","Effect":-12.1875,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.03,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mk VI Mod L Yoyodyne Coolant System","Effect":-9.75,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][SR-] SBD-VI Efficient Coolant System","Effect":-4.875,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][R+] Mk VI Mod H Yoyodyne Coolant System","Effect":-3.9,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R-SR-] VSA-13-L Efficient Coolant System","Effect":-11.875,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mk VII Mod L Yoyodyne Coolant System","Effect":-9.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][SR-] SBD-VII Efficient Coolant System","Effect":-4.75,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R+] Mk VII Mod H Yoyodyne Coolant System","Effect":-3.8,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R-SR-] VSA-14-L Efficient Coolant System","Effect":-11.5625,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mk VIII Mod L Yoyodyne Coolant System","Effect":-9.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R+SR+] Mars-8 Experimental Coolant System","Effect":-7.4,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.0125,"E":0.0125,"T":0.0125,"Reliability":1.005,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][SR-] SBD-VIII Efficient Coolant System","Effect":-4.625,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R+] Mk VIII Mod H Yododyne SBD Coolant System","Effect":-3.7,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R-SR-] VSA-15-L Efficient Coolant System","Effect":-11.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mk IX Mod L Yoyodyne Coolant System","Effect":-9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][R+SR+] Mars-9 Experimental Coolant System","Effect":-7.2,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.0125,"E":0.0125,"T":0.0125,"Reliability":1.005,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][SR-] SBD-IX Efficient Coolant System","Effect":-4.5,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R+] Mk IX Mod H Yoyodyne Coolant System","Effect":-3.6,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T-1] Constitution Coolant System","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Basic Plasma Intercooler","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Mk II Plasma Intercooler","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"xNo EPS Manifold","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][R+] Tellar HIG-63 Pulse Injection Manifold","Effect":7,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M][R++E+] VSA-1 Plasma Manifold","Effect":10.25,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][R++O+] YYD-M3 Manifold","Effect":13,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][R+] Tellar HIG-76 Pulse Injection Manifold","Effect":8,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M][R++E+] VSA-2 Plasma Manifold","Effect":11.5,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][R++O+] YYD-M4 Manifold","Effect":14,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][R+] Tellar HIG-84 Pulse Injection Manifold","Effect":9,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M][R++E+] VSA-3 Plasma Manifold","Effect":13,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][R++O+] SBD-1 Manifold","Effect":15.5,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][R+] Tellar HIG-92 Pulse Injection Manifold","Effect":10,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] VSA-4 Pulse Injection Manifold","Effect":14,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][R-] SF-V Performance Manifold","Effect":17,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R+] Tellar HIG-103 Pulse Injection Manifold","Effect":11,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] VSA-5 Pulse Injection Manifold","Effect":15.25,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][SR-] 40EA-I Industrial Injection Manifold","Effect":9,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R+] Tellar HIG-110 Pulse Injection Manifold","Effect":12,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][SR-] SBD-A Efficient Manifold","Effect":12.375,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.997,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R+] VSA-6 Pulse Injection Manifold","Effect":16.5,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R-SR-] YYD-4 Performance Manifold","Effect":15,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.995,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] SF-VII Performance Manifold","Effect":20,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.997,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][SR-] 40EA-II Industrial Injection Manifold","Effect":9.75,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.998,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R+] Tellar HIG-117 Pulse Injection Manifold","Effect":13,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9995,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][SR-] SBD-B Efficient Manifold","Effect":13.3125,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][R+] VSA-7 Pulse Injection Manifold","Effect":17.75,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R-SR-] YYD-5 Performance Manifold","Effect":16.125,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.996,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] SF-VIII Performance Manifold","Effect":21.5,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L][SR-] 40EA-III Industrial Injection Manifold","Effect":10.5,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L][R+] Tellar HIG-122 Pulse Injection Manifold","Effect":14,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M][SR-] SBD-C Efficient Manifold","Effect":14.25,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M][R+] VSA-8 Pulse Injection Manifold","Effect":19,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H][R-SR-] YYD-7 Performance Manifold","Effect":17.25,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.996,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] SF-IX Performance Manifold","Effect":23,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Ion Distributor","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Pulse Injection Manifold","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Phased Injection Manifold","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Eject","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":0.7,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-3,"Size Sort":-99,"Size Class":"N/A","Name":"[T-3] Manual Ejection - Early Mechanical","Effect":0,"Weight O/H":15,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.65,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Manual Ejection - Mechanical","Effect":0,"Weight O/H":15,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.6,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-1,"Size Sort":-99,"Size Class":"N/A","Name":"[T-1] Manual Ejection - Basic EM Rails","Effect":0,"Weight O/H":10,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":1,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.5,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":0,"Size Sort":-99,"Size Class":"N/A","Name":"[T0] EngOS Monitoring - Heavy EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.45,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":1,"Size Sort":-99,"Size Class":"N/A","Name":"[T1] EngOS Monitoring - Super Heavy EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.375,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":2,"Size Sort":-99,"Size Class":"N/A","Name":"[T2] EngOS Monitoring - Anak-Krueger EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.365,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":3,"Size Sort":-99,"Size Class":"N/A","Name":"[T3] EngOS 3.1 Monitoring - YYD-Emergency VI EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.36,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""}]
+
+/***/ }),
 /* 159 */
-/***/ (function(module, exports) {
-
-module.exports = [{"Type":"No Module","Weight Cap":0,"Variant":"-","Tier":-99,"Build Time":0,"C":0,"S":0,"H":0,"L":0,"P":0,"D":0,"Weight":0,"SR Cost":0,"Power Cost":0,"O":0,"E":0,"T":0,"Reliability":"100.000%"},{"Type":"Miranda Rollbar","Weight Cap":0,"Variant":"Combat","Tier":-1,"Build Time":0.25,"C":1,"S":0,"H":0,"L":0,"P":0,"D":0,"Weight":50,"SR Cost":5,"Power Cost":5,"O":0.1,"E":0.25,"T":0.1,"Reliability":"100.000%"},{"Type":"Miranda Rollbar","Weight Cap":0,"Variant":"Science","Tier":-1,"Build Time":0.25,"C":0,"S":1,"H":0,"L":0,"P":0,"D":0,"Weight":50,"SR Cost":5,"Power Cost":5,"O":0.1,"E":0.1,"T":0.25,"Reliability":"100.000%"},{"Type":"300kt Module Placeholder","Weight Cap":300,"Variant":"Combat *","Tier":0,"Build Time":0.5,"C":1,"S":0,"H":0.5,"L":0,"P":0,"D":0,"Weight":100,"SR Cost":10,"Power Cost":10,"O":0.25,"E":0.4,"T":0.2,"Reliability":"100.000%"},{"Type":"300kt Module Placeholder","Weight Cap":300,"Variant":"Diplomacy *","Tier":0,"Build Time":0.5,"C":0,"S":0,"H":0,"L":0,"P":1.5,"D":0,"Weight":100,"SR Cost":10,"Power Cost":10,"O":0.35,"E":0.35,"T":0.25,"Reliability":"100.000%"},{"Type":"300kt Module Placeholder","Weight Cap":300,"Variant":"Science *","Tier":0,"Build Time":0.5,"C":0,"S":1.5,"H":0,"L":0,"P":0,"D":0,"Weight":100,"SR Cost":10,"Power Cost":10,"O":0.2,"E":0.25,"T":0.4,"Reliability":"100.000%"},{"Type":"300kt Module Placeholder","Weight Cap":300,"Variant":"Shields *","Tier":0,"Build Time":0.5,"C":0,"S":0,"H":0,"L":1.5,"P":0,"D":0,"Weight":100,"SR Cost":15,"Power Cost":10,"O":0.35,"E":0.35,"T":0.25,"Reliability":"100.000%"},{"Type":"450kt Module Placeholder","Weight Cap":450,"Variant":"Combat *","Tier":1,"Build Time":0.75,"C":1,"S":0,"H":0.5,"L":0,"P":0,"D":0,"Weight":150,"SR Cost":10,"Power Cost":10,"O":0.25,"E":0.4,"T":0.2,"Reliability":"100.000%"},{"Type":"450kt Module Placeholder","Weight Cap":450,"Variant":"Diplomacy *","Tier":1,"Build Time":0.75,"C":0,"S":0,"H":0,"L":0,"P":1.5,"D":0,"Weight":150,"SR Cost":10,"Power Cost":10,"O":0.35,"E":0.35,"T":0.25,"Reliability":"100.000%"},{"Type":"450kt Module Placeholder","Weight Cap":450,"Variant":"Science *","Tier":1,"Build Time":0.75,"C":0,"S":1.5,"H":0,"L":0,"P":0,"D":0,"Weight":150,"SR Cost":10,"Power Cost":10,"O":0.2,"E":0.25,"T":0.4,"Reliability":"100.000%"},{"Type":"450kt Module Placeholder","Weight Cap":450,"Variant":"Shields *","Tier":1,"Build Time":0.75,"C":0,"S":0,"H":0,"L":1.5,"P":0,"D":0,"Weight":150,"SR Cost":15,"Power Cost":10,"O":0.35,"E":0.35,"T":0.25,"Reliability":"100.000%"}]
-
-/***/ }),
-/* 160 */
-/***/ (function(module, exports) {
-
-module.exports = [{"Type Sort":0,"Type":"Frame","Tier":-3,"Weight Class":1,"Size Class":"","Name":"[T-3] 250kt Frigate Frame","MaxSz":250,"Wt":50,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.08,"T-Mod":1,"SR-Mod":0.925,"Year Available (SF)":2230,"Weight Class List":"Frigate"},{"Type Sort":0,"Type":"Frame","Tier":-3,"Weight Class":1,"Size Class":"","Name":"[T-3] 400kt Frigate Frame","MaxSz":400,"Wt":70,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.09,"T-Mod":1,"SR-Mod":0.925,"Year Available (SF)":2230,"Weight Class List":"Cruiser"},{"Type Sort":0,"Type":"Frame","Tier":-3,"Weight Class":1,"Size Class":"","Name":"[T-3] 600kt Frigate Frame","MaxSz":600,"Wt":100,"Build Time":"11/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.76,"E-Mod":1.11,"T-Mod":1,"SR-Mod":0.925,"Year Available (SF)":2230,"Weight Class List":"Explorer"},{"Type Sort":0,"Type":"Frame","Tier":-2,"Weight Class":1,"Size Class":"","Name":"[T-2] 300kt Frigate Frame","MaxSz":300,"Wt":55,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.08,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-2,"Weight Class":1,"Size Class":"","Name":"[T-2] 450kt Frigate Frame","MaxSz":450,"Wt":75,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.09,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-2,"Weight Class":1,"Size Class":"","Name":"[T-2] 600kt Frigate Frame","MaxSz":600,"Wt":90,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-1,"Weight Class":1,"Size Class":"","Name":"[T-1] 400kt Frigate Frame","MaxSz":400,"Wt":70,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.09,"T-Mod":1,"SR-Mod":0.9675,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-1,"Weight Class":1,"Size Class":"","Name":"[T-1] 700kt Frigate Frame","MaxSz":700,"Wt":100,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.1,"T-Mod":1,"SR-Mod":0.9675,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":0,"Weight Class":1,"Size Class":"","Name":"[T0] 650kt Frigate Frame","MaxSz":650,"Wt":95,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.1,"T-Mod":1,"SR-Mod":0.975,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":0,"Weight Class":1,"Size Class":"","Name":"[T0] 800kt Frigate Frame","MaxSz":800,"Wt":105,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.1,"T-Mod":1,"SR-Mod":0.975,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":1,"Weight Class":1,"Size Class":"","Name":"[T1] 450kt Frigate Frame","MaxSz":450,"Wt":70,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.725,"E-Mod":1.05,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2310,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":1,"Weight Class":1,"Size Class":"","Name":"[T1] 900kt Frigate Frame","MaxSz":900,"Wt":135,"Build Time":"11/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.2,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2310,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":1,"Size Class":"","Name":"[T2] 750kt Frigate Frame","MaxSz":750,"Wt":95,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.2,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":1,"Size Class":"","Name":"[T2] 1050kt Frigate Frame","MaxSz":1050,"Wt":155,"Build Time":"14/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.85,"E-Mod":1.2,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":1,"Size Class":"","Name":"[T3] 450kt Frigate Frame","MaxSz":450,"Wt":67,"Build Time":"7/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.7,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":1,"Size Class":"","Name":"[T3] 600kt Frigate Frame","MaxSz":600,"Wt":85,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.7,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":1,"Size Class":"","Name":"[T3] 1050kt Frigate Frame","MaxSz":1050,"Wt":145,"Build Time":"12/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.825,"E-Mod":1.15,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-3,"Weight Class":2,"Size Class":"","Name":"[T-3] 700kt Cruiser Frame","MaxSz":700,"Wt":115,"Build Time":"13/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.975,"E-Mod":1.25,"T-Mod":0.875,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-2,"Weight Class":2,"Size Class":"","Name":"[T-2] 750kt Cruiser Frame","MaxSz":750,"Wt":110,"Build Time":"13/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-1,"Weight Class":2,"Size Class":"","Name":"[T-1] 1mt Cruiser Frame","MaxSz":1000,"Wt":170,"Build Time":"15/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":0,"Weight Class":2,"Size Class":"","Name":"[T0] 1500kt Cruiser Frame","MaxSz":1500,"Wt":240,"Build Time":"16/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":1,"Weight Class":2,"Size Class":"","Name":"[T1] 1mt Cruiser Frame","MaxSz":1000,"Wt":160,"Build Time":"13/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2310,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":1,"Weight Class":2,"Size Class":"","Name":"[T1] 1800kt Cruiser Frame","MaxSz":1800,"Wt":300,"Build Time":"19/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2310,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":2,"Size Class":"","Name":"[T2] 2100kt Cruiser Frame","MaxSz":2100,"Wt":375,"Build Time":"22/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":2,"Size Class":"","Name":"[T3] 1mt Cruiser Frame","MaxSz":1000,"Wt":150,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":2,"Size Class":"","Name":"[T3] 1500kt Cruiser Frame","MaxSz":1500,"Wt":230,"Build Time":"13/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":2,"Size Class":"","Name":"[T3] 2100kt Cruiser Frame","MaxSz":2100,"Wt":365,"Build Time":"19/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-3,"Weight Class":3,"Size Class":"","Name":"[T-3] 750kt 'Ranger' Frame","MaxSz":750,"Wt":100,"Build Time":"12/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1.1,"E-Mod":1.1,"T-Mod":0.95,"SR-Mod":1.2,"Year Available (SF)":2220,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-2,"Weight Class":3,"Size Class":"","Name":"[T-2] 1mt 'Constitution' Frame","MaxSz":1050,"Wt":115,"Build Time":"15/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1.1,"E-Mod":1.1,"T-Mod":0.95,"SR-Mod":1.2,"Year Available (SF)":2240,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-1,"Weight Class":3,"Size Class":"","Name":"[T-1] 1800kt Explorer Frame","MaxSz":1800,"Wt":300,"Build Time":"18/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":0.875,"SR-Mod":1.1,"Year Available (SF)":2260,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":0,"Weight Class":3,"Size Class":"","Name":"[T0] 2400kt Explorer Frame","MaxSz":2400,"Wt":425,"Build Time":"21/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.85,"SR-Mod":1.1,"Year Available (SF)":2280,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":1,"Weight Class":3,"Size Class":"","Name":"[T1] 3100kt Explorer Frame","MaxSz":3100,"Wt":550,"Build Time":"24/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.825,"E-Mod":0.825,"T-Mod":0.775,"SR-Mod":1.1,"Year Available (SF)":2310,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":3,"Size Class":"","Name":"[T2] 2400kt Explorer Frame","MaxSz":2400,"Wt":410,"Build Time":"18/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.85,"E-Mod":0.85,"T-Mod":0.8,"SR-Mod":1.1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":3,"Size Class":"","Name":"[T2] 3100kt Explorer Frame","MaxSz":3100,"Wt":525,"Build Time":"21/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.8,"E-Mod":0.8,"T-Mod":0.75,"SR-Mod":1.1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":3,"Size Class":"","Name":"[T2] 3400kt Explorer Frame","MaxSz":3400,"Wt":555,"Build Time":"24/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.825,"E-Mod":0.825,"T-Mod":0.775,"SR-Mod":1.1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":3,"Size Class":"","Name":"[T3] 2700kt Explorer Frame","MaxSz":2700,"Wt":450,"Build Time":"18/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.825,"E-Mod":0.825,"T-Mod":0.775,"SR-Mod":1.1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":3,"Size Class":"","Name":"[T3] 3400kt Explorer Frame","MaxSz":3400,"Wt":540,"Build Time":"21/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.8,"E-Mod":0.8,"T-Mod":0.75,"SR-Mod":1.1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":3,"Size Class":"","Name":"[T3] 4000kt Explorer Frame","MaxSz":4000,"Wt":640,"Build Time":"27/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.825,"E-Mod":0.825,"T-Mod":0.775,"SR-Mod":1.1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":1,"Size Class":1,"Name":"[T-3][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.94,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.965,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":1,"Size Class":2,"Name":"[T-3][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":0.965,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.93,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":1,"Size Class":3,"Name":"[T-3][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":0.97,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.88,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":1,"Size Class":1,"Name":"[T-2][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.95,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.96,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":1,"Size Class":2,"Name":"[T-2][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.92,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":1,"Size Class":3,"Name":"[T-2][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.86,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":1,"Size Class":1,"Name":"[T-1][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.96,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.955,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":1,"Size Class":2,"Name":"[T-1][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.91,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":1,"Size Class":3,"Name":"[T-1][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.84,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":1,"Size Class":1,"Name":"[T0][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.97,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":1,"Size Class":2,"Name":"[T0][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":1,"Size Class":3,"Name":"[T0][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1.05,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.82,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":1,"Size Class":1,"Name":"[T1][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.945,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":1,"Size Class":2,"Name":"[T1][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1.04,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.89,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":1,"Size Class":3,"Name":"[T1][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.8,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":1,"Size Class":1,"Name":"[T2][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":1,"Size Class":2,"Name":"[T2][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1.06,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.88,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":1,"Size Class":3,"Name":"[T2][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1.11,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.78,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":1,"Size Class":1,"Name":"[T3][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.935,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":1,"Size Class":2,"Name":"[T3][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.87,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":1,"Size Class":3,"Name":"[T3][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1.14,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.76,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":2,"Size Class":1,"Name":"[T-3] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.94,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":2,"Size Class":2,"Name":"[T-3][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":0.96,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.99,"T-Mod":0.995,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":2,"Size Class":3,"Name":"[T-3][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":0.97,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.99,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":2,"Size Class":1,"Name":"[T-2] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.95,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":2,"Size Class":2,"Name":"[T-2][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.98,"E-Mod":0.98,"T-Mod":0.99,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":2,"Size Class":3,"Name":"[T-2][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":2,"Size Class":1,"Name":"[T-1] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.96,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":2,"Size Class":2,"Name":"[T-1][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.985,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":2,"Size Class":3,"Name":"[T-1][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.97,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":2,"Size Class":1,"Name":"[T0] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.97,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":2,"Size Class":2,"Name":"[T0][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.96,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":2,"Size Class":3,"Name":"[T0][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1.05,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.91,"E-Mod":0.91,"T-Mod":0.96,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":2,"Size Class":1,"Name":"[T1] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":2,"Size Class":2,"Name":"[T1][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1.04,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.975,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":2,"Size Class":3,"Name":"[T1][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":2,"Size Class":1,"Name":"[T2] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":2,"Size Class":2,"Name":"[T2][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1.06,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.97,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":2,"Size Class":3,"Name":"[T2][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1.11,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.89,"E-Mod":0.89,"T-Mod":0.94,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":2,"Size Class":1,"Name":"[T3] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":2,"Size Class":2,"Name":"[T3][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.965,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":2,"Size Class":3,"Name":"[T3][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1.14,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.93,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":3,"Size Class":1,"Name":"[T-3] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.95,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":3,"Size Class":2,"Name":"[T-3][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.965,"E-Mod":0.915,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":3,"Size Class":3,"Name":"[T-3][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.84,"T-Mod":0.94,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":3,"Size Class":1,"Name":"[T-2] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.95,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":3,"Size Class":2,"Name":"[T-2][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.91,"T-Mod":0.97,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":3,"Size Class":3,"Name":"[T-2][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.83,"T-Mod":0.93,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":3,"Size Class":1,"Name":"[T-1] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.96,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":3,"Size Class":2,"Name":"[T-1][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.955,"E-Mod":0.905,"T-Mod":0.96,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":3,"Size Class":3,"Name":"[T-1][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.82,"T-Mod":0.92,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":3,"Size Class":1,"Name":"[T0] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.97,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":3,"Size Class":2,"Name":"[T0][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":3,"Size Class":3,"Name":"[T0][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1.05,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.91,"E-Mod":0.81,"T-Mod":0.91,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":3,"Size Class":1,"Name":"[T1] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":3,"Size Class":2,"Name":"[T1][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1.04,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.945,"E-Mod":0.895,"T-Mod":0.945,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":3,"Size Class":3,"Name":"[T1][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":3,"Size Class":1,"Name":"[T2] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":3,"Size Class":2,"Name":"[T2][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1.06,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.89,"T-Mod":0.94,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":3,"Size Class":3,"Name":"[T2][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1.11,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.89,"E-Mod":0.79,"T-Mod":0.89,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":3,"Size Class":1,"Name":"[T3] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":3,"Size Class":2,"Name":"[T3][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.935,"E-Mod":0.885,"T-Mod":0.935,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":3,"Size Class":3,"Name":"[T3][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1.14,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.88,"E-Mod":0.78,"T-Mod":0.88,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":1,"Size Class":1,"Name":"[T-3][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":0.96,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.98,"SR-Mod":0.96,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":1,"Size Class":2,"Name":"[T-3][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":1.005,"SR-Mod":0.98,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":1,"Size Class":3,"Name":"[T-3][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":0.99,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":1.03,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":1,"Size Class":1,"Name":"[T-2][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.97,"SR-Mod":0.96,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":1,"Size Class":2,"Name":"[T-2][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.995,"SR-Mod":0.98,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":1,"Size Class":3,"Name":"[T-2][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":1.02,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":1,"Size Class":1,"Name":"[T-1][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.96,"SR-Mod":0.96,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":1,"Size Class":2,"Name":"[T-1][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.985,"SR-Mod":0.98,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":1,"Size Class":3,"Name":"[T-1][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":1.01,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":1,"Size Class":1,"Name":"[T0][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":0.99,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.95,"SR-Mod":0.96,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":1,"Size Class":2,"Name":"[T0][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.975,"SR-Mod":0.98,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":1,"Size Class":3,"Name":"[T0][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.07,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":1,"Size Class":1,"Name":"[T1][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.94,"SR-Mod":0.96,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":1,"Size Class":2,"Name":"[T1][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.965,"SR-Mod":0.98,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":1,"Size Class":3,"Name":"[T1][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":0.99,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":1,"Size Class":1,"Name":"[T2][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.93,"SR-Mod":0.96,"Year Available (SF)":2314,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":1,"Size Class":2,"Name":"[T2][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1.06,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.955,"SR-Mod":0.98,"Year Available (SF)":2314,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":1,"Size Class":3,"Name":"[T2][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.13,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2314,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":1,"Size Class":1,"Name":"[T3][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.92,"SR-Mod":0.96,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":1,"Size Class":2,"Name":"[T3][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1.08,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.945,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":1,"Size Class":3,"Name":"[T3][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.16,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":0.97,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":2,"Size Class":1,"Name":"[T-3][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":0.96,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":2,"Size Class":2,"Name":"[T-3][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.995,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":2,"Size Class":3,"Name":"[T-3][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.97,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":2,"Size Class":1,"Name":"[T-2][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":2,"Size Class":2,"Name":"[T-2][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":0.985,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.995,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":2,"Size Class":3,"Name":"[T-2][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.97,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":2,"Size Class":1,"Name":"[T-1][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":2,"Size Class":2,"Name":"[T-1][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.995,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":2,"Size Class":3,"Name":"[T-1][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.97,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":2,"Size Class":1,"Name":"[T0][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":0.99,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.98,"T-Mod":0.955,"SR-Mod":0.9,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":2,"Size Class":2,"Name":"[T0][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.98,"T-Mod":0.955,"SR-Mod":0.95,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":2,"Size Class":3,"Name":"[T0][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.07,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.98,"E-Mod":0.96,"T-Mod":0.97,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":2,"Size Class":1,"Name":"[T1][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.975,"T-Mod":0.94,"SR-Mod":0.9,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":2,"Size Class":2,"Name":"[T1][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.985,"E-Mod":0.975,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":2,"Size Class":3,"Name":"[T1][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.95,"T-Mod":0.96,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":2,"Size Class":1,"Name":"[T2][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.97,"T-Mod":0.925,"SR-Mod":0.9,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":2,"Size Class":2,"Name":"[T2][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1.06,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.98,"E-Mod":0.97,"T-Mod":0.925,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":2,"Size Class":3,"Name":"[T2][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.13,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.94,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":2,"Size Class":1,"Name":"[T3][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.965,"T-Mod":0.91,"SR-Mod":0.9,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":2,"Size Class":2,"Name":"[T3][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1.08,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.975,"E-Mod":0.965,"T-Mod":0.91,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":2,"Size Class":3,"Name":"[T3][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.16,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.93,"T-Mod":0.94,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":3,"Size Class":1,"Name":"[T-3][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":0.96,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":3,"Size Class":2,"Name":"[T-3][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":3,"Size Class":3,"Name":"[T-3][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.91,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":3,"Size Class":1,"Name":"[T-2][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":3,"Size Class":2,"Name":"[T-2][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":3,"Size Class":3,"Name":"[T-2][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.91,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":3,"Size Class":1,"Name":"[T-1][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":3,"Size Class":2,"Name":"[T-1][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":3,"Size Class":3,"Name":"[T-1][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.91,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":3,"Size Class":1,"Name":"[T0][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":0.99,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.96,"SR-Mod":0.9,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":3,"Size Class":2,"Name":"[T0][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.96,"T-Mod":0.92,"SR-Mod":0.95,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":3,"Size Class":3,"Name":"[T0][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.07,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.88,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":3,"Size Class":1,"Name":"[T1][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.95,"SR-Mod":0.9,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":3,"Size Class":2,"Name":"[T1][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.9,"SR-Mod":0.95,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":3,"Size Class":3,"Name":"[T1][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":3,"Size Class":1,"Name":"[T2][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.94,"SR-Mod":0.9,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":3,"Size Class":2,"Name":"[T2][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.06,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.88,"SR-Mod":0.95,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":3,"Size Class":3,"Name":"[T2][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.13,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.82,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":3,"Size Class":1,"Name":"[T3][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.93,"SR-Mod":0.9,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":3,"Size Class":2,"Name":"[T3][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.08,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.86,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":3,"Size Class":3,"Name":"[T3][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.16,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.86,"E-Mod":0.86,"T-Mod":0.79,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":1,"Size Class":1,"Name":"[T-3] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.94,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":1,"Size Class":2,"Name":"[T-3][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":1,"Size Class":3,"Name":"[T-3][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":1,"Size Class":1,"Name":"[T-2] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.95,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":1,"Size Class":2,"Name":"[T-2][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":1,"Size Class":3,"Name":"[T-2][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":1,"Size Class":1,"Name":"[T-1] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":1,"Size Class":2,"Name":"[T-1][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":1,"Size Class":3,"Name":"[T-1][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":1,"Size Class":1,"Name":"[T0] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.97,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":1,"Size Class":2,"Name":"[T0][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":1,"Size Class":3,"Name":"[T0][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.05,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":1,"Size Class":1,"Name":"[T1] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":1,"Size Class":2,"Name":"[T1][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.04,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":1,"Size Class":3,"Name":"[T1][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":1,"Size Class":1,"Name":"[T2] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.99,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":1,"Size Class":2,"Name":"[T2][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.06,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":1,"Size Class":3,"Name":"[T2][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.11,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":1,"Size Class":1,"Name":"[T3] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":1,"Size Class":2,"Name":"[T3][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":1,"Size Class":3,"Name":"[T3][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.14,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":2,"Size Class":1,"Name":"[T-3] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.94,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":2,"Size Class":2,"Name":"[T-3][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":2,"Size Class":3,"Name":"[T-3][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":2,"Size Class":1,"Name":"[T-2] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.95,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":2,"Size Class":2,"Name":"[T-2][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":2,"Size Class":3,"Name":"[T-2][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":2,"Size Class":1,"Name":"[T-1] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":2,"Size Class":2,"Name":"[T-1][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":2,"Size Class":3,"Name":"[T-1][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":2,"Size Class":1,"Name":"[T0] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.97,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":2,"Size Class":2,"Name":"[T0][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":2,"Size Class":3,"Name":"[T0][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.05,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":2,"Size Class":1,"Name":"[T1] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":2,"Size Class":2,"Name":"[T1][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.04,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":2,"Size Class":3,"Name":"[T1][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":2,"Size Class":1,"Name":"[T2] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.99,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":2,"Size Class":2,"Name":"[T2][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.06,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":2,"Size Class":3,"Name":"[T2][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.11,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":2,"Size Class":1,"Name":"[T3] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":2,"Size Class":2,"Name":"[T3][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":2,"Size Class":3,"Name":"[T3][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.14,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":3,"Size Class":1,"Name":"[T-3] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.94,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":3,"Size Class":2,"Name":"[T-3][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":3,"Size Class":3,"Name":"[T-3][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":3,"Size Class":1,"Name":"[T-2] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.95,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":3,"Size Class":2,"Name":"[T-2][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":3,"Size Class":3,"Name":"[T-2][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":3,"Size Class":1,"Name":"[T-1] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":3,"Size Class":2,"Name":"[T-1][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":3,"Size Class":3,"Name":"[T-1][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":3,"Size Class":1,"Name":"[T0] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.97,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":3,"Size Class":2,"Name":"[T0][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":3,"Size Class":3,"Name":"[T0][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.05,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":3,"Size Class":1,"Name":"[T1] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":3,"Size Class":2,"Name":"[T1][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.04,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":3,"Size Class":3,"Name":"[T1][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":3,"Size Class":1,"Name":"[T2] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.99,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":3,"Size Class":2,"Name":"[T2][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.06,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":3,"Size Class":3,"Name":"[T2][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.11,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":3,"Size Class":1,"Name":"[T3] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":3,"Size Class":2,"Name":"[T3][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":3,"Size Class":3,"Name":"[T3][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.14,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":1,"Size Class":1,"Name":"[T-3][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.96,"Core Mod":1,"O-Mod":1,"E-Mod":0.94,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":1,"Size Class":2,"Name":"[T-3][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.975,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":1,"Size Class":3,"Name":"[T-3][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.99,"Core Mod":1,"O-Mod":0.94,"E-Mod":1,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":1,"Size Class":1,"Name":"[T-2][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.97,"Core Mod":1,"O-Mod":1,"E-Mod":0.94,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":1,"Size Class":2,"Name":"[T-2][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.985,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":1,"Size Class":3,"Name":"[T-2][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":0.94,"E-Mod":1,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":1,"Size Class":1,"Name":"[T-1][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.98,"Core Mod":1,"O-Mod":1,"E-Mod":0.94,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":1,"Size Class":2,"Name":"[T-1][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":1,"Size Class":3,"Name":"[T-1][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.94,"E-Mod":1,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":1,"Size Class":1,"Name":"[T0][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.99,"Core Mod":1,"O-Mod":1,"E-Mod":0.92,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":1,"Size Class":2,"Name":"[T0][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.96,"T-Mod":0.96,"SR-Mod":0.975,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":1,"Size Class":3,"Name":"[T0][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.07,"Core Mod":1,"O-Mod":0.92,"E-Mod":1,"T-Mod":0.92,"SR-Mod":0.95,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":1,"Size Class":1,"Name":"[T1][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.9,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":1,"Size Class":2,"Name":"[T1][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":0.975,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":1,"Size Class":3,"Name":"[T1][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.1,"Core Mod":1,"O-Mod":0.9,"E-Mod":1,"T-Mod":0.9,"SR-Mod":0.95,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":1,"Size Class":1,"Name":"[T2][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":1,"E-Mod":0.88,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":1,"Size Class":2,"Name":"[T2][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.06,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.975,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":1,"Size Class":3,"Name":"[T2][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.13,"Core Mod":1,"O-Mod":0.88,"E-Mod":1,"T-Mod":0.88,"SR-Mod":0.95,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":1,"Size Class":1,"Name":"[T3][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":1,"E-Mod":0.86,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":1,"Size Class":2,"Name":"[T3][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.08,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.975,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":1,"Size Class":3,"Name":"[T3][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.16,"Core Mod":1,"O-Mod":0.86,"E-Mod":1,"T-Mod":0.86,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":2,"Size Class":1,"Name":"[T-3][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.96,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":2,"Size Class":2,"Name":"[T-3][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.97,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":2,"Size Class":3,"Name":"[T-3][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.98,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":2,"Size Class":1,"Name":"[T-2][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.97,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":2,"Size Class":2,"Name":"[T-2][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.985,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":2,"Size Class":3,"Name":"[T-2][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":2,"Size Class":1,"Name":"[T-1][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.98,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":2,"Size Class":2,"Name":"[T-1][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":2,"Size Class":3,"Name":"[T-1][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":2,"Size Class":1,"Name":"[T0][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.99,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":2,"Size Class":2,"Name":"[T0][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.96,"T-Mod":0.96,"SR-Mod":0.975,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":2,"Size Class":3,"Name":"[T0][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.07,"Core Mod":1,"O-Mod":0.91,"E-Mod":0.91,"T-Mod":0.91,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":2,"Size Class":1,"Name":"[T1][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":2,"Size Class":2,"Name":"[T1][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":0.975,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":2,"Size Class":3,"Name":"[T1][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":2,"Size Class":1,"Name":"[T2][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":2,"Size Class":2,"Name":"[T2][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.06,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.975,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":2,"Size Class":3,"Name":"[T2][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.13,"Core Mod":1,"O-Mod":0.89,"E-Mod":0.89,"T-Mod":0.89,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":2,"Size Class":1,"Name":"[T3][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":2,"Size Class":2,"Name":"[T3][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.08,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.975,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":2,"Size Class":3,"Name":"[T3][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.16,"Core Mod":1,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.88,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":3,"Size Class":1,"Name":"[T-3][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.96,"Core Mod":1,"O-Mod":1.02,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":3,"Size Class":2,"Name":"[T-3][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.97,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.975,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":3,"Size Class":3,"Name":"[T-3][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.98,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.82,"T-Mod":0.82,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":3,"Size Class":1,"Name":"[T-2][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.97,"Core Mod":1,"O-Mod":1.02,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":3,"Size Class":2,"Name":"[T-2][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.985,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.975,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":3,"Size Class":3,"Name":"[T-2][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.82,"T-Mod":0.82,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":3,"Size Class":1,"Name":"[T-1][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.98,"Core Mod":1,"O-Mod":1.02,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":3,"Size Class":2,"Name":"[T-1][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.975,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":3,"Size Class":3,"Name":"[T-1][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.82,"T-Mod":0.82,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":3,"Size Class":1,"Name":"[T0][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.99,"Core Mod":1,"O-Mod":1.01,"E-Mod":0.96,"T-Mod":0.96,"SR-Mod":0.95,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":3,"Size Class":2,"Name":"[T0][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.91,"T-Mod":0.91,"SR-Mod":0.975,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":3,"Size Class":3,"Name":"[T0][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.07,"Core Mod":1,"O-Mod":0.91,"E-Mod":0.81,"T-Mod":0.81,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":3,"Size Class":1,"Name":"[T1][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":0.95,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":3,"Size Class":2,"Name":"[T1][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":0.975,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":3,"Size Class":3,"Name":"[T1][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":3,"Size Class":1,"Name":"[T2][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":3,"Size Class":2,"Name":"[T2][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.06,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.89,"T-Mod":0.89,"SR-Mod":0.975,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":3,"Size Class":3,"Name":"[T2][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.13,"Core Mod":1,"O-Mod":0.89,"E-Mod":0.79,"T-Mod":0.79,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":3,"Size Class":1,"Name":"[T3][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":0.98,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":3,"Size Class":2,"Name":"[T3][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.08,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.88,"T-Mod":0.88,"SR-Mod":0.975,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":3,"Size Class":3,"Name":"[T3][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.16,"Core Mod":1,"O-Mod":0.88,"E-Mod":0.78,"T-Mod":0.78,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":1,"Size Class":1,"Name":"[T-3][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.04,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.88,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":1,"Size Class":2,"Name":"[T-3] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.92,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":1,"Size Class":3,"Name":"[T-3][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.97,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":1,"Size Class":1,"Name":"[T-2][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.89,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":1,"Size Class":2,"Name":"[T-2] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.94,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":1,"Size Class":3,"Name":"[T-2][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.98,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":1,"Size Class":1,"Name":"[T-1][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.12,"E-Mod":1.12,"T-Mod":1.12,"SR-Mod":0.91,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":1,"Size Class":2,"Name":"[T-1] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.96,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":1,"Size Class":3,"Name":"[T-1][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.99,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":1,"Size Class":1,"Name":"[T0][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":1.11,"E-Mod":1.11,"T-Mod":1.11,"SR-Mod":0.93,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":1,"Size Class":2,"Name":"[T0] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.01,"E-Mod":1.01,"T-Mod":1.01,"SR-Mod":0.98,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":1,"Size Class":3,"Name":"[T0][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.13,"O-Mod":0.91,"E-Mod":0.91,"T-Mod":0.91,"SR-Mod":1.03,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":1,"Size Class":1,"Name":"[T1][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.1,"E-Mod":1.1,"T-Mod":1.1,"SR-Mod":0.95,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":1,"Size Class":2,"Name":"[T1] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.12,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":1,"Size Class":3,"Name":"[T1][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1.05,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":1,"Size Class":1,"Name":"[T2][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.09,"O-Mod":1.09,"E-Mod":1.09,"T-Mod":1.09,"SR-Mod":0.94,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":1,"Size Class":2,"Name":"[T2] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.14,"O-Mod":0.99,"E-Mod":0.99,"T-Mod":0.99,"SR-Mod":0.99,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":1,"Size Class":3,"Name":"[T2][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.19,"O-Mod":0.89,"E-Mod":0.89,"T-Mod":0.89,"SR-Mod":1.04,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":1,"Size Class":1,"Name":"[T3][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.08,"E-Mod":1.08,"T-Mod":1.08,"SR-Mod":0.93,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":1,"Size Class":2,"Name":"[T3] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.98,"E-Mod":0.98,"T-Mod":0.98,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":1,"Size Class":3,"Name":"[T3][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.22,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.88,"SR-Mod":1.03,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":2,"Size Class":1,"Name":"[T-3][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.04,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.88,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":2,"Size Class":2,"Name":"[T-3] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.92,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":2,"Size Class":3,"Name":"[T-3][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.97,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":2,"Size Class":1,"Name":"[T-2][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.89,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":2,"Size Class":2,"Name":"[T-2] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.94,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":2,"Size Class":3,"Name":"[T-2][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.98,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":2,"Size Class":1,"Name":"[T-1][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.12,"E-Mod":1.12,"T-Mod":1.12,"SR-Mod":0.91,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":2,"Size Class":2,"Name":"[T-1] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.96,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":2,"Size Class":3,"Name":"[T-1][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.99,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":2,"Size Class":1,"Name":"[T0][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":1.11,"E-Mod":1.11,"T-Mod":1.11,"SR-Mod":0.93,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":2,"Size Class":2,"Name":"[T0] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.01,"E-Mod":1.01,"T-Mod":1.01,"SR-Mod":0.98,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":2,"Size Class":3,"Name":"[T0][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.13,"O-Mod":0.91,"E-Mod":0.91,"T-Mod":0.91,"SR-Mod":1.03,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":2,"Size Class":1,"Name":"[T1][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.1,"E-Mod":1.1,"T-Mod":1.1,"SR-Mod":0.95,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":2,"Size Class":2,"Name":"[T1] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.12,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":2,"Size Class":3,"Name":"[T1][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1.05,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":2,"Size Class":1,"Name":"[T2][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.09,"O-Mod":1.09,"E-Mod":1.09,"T-Mod":1.09,"SR-Mod":0.94,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":2,"Size Class":2,"Name":"[T2] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.14,"O-Mod":0.99,"E-Mod":0.99,"T-Mod":0.99,"SR-Mod":0.99,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":2,"Size Class":3,"Name":"[T2][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.19,"O-Mod":0.89,"E-Mod":0.89,"T-Mod":0.89,"SR-Mod":1.04,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":2,"Size Class":1,"Name":"[T3][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.08,"E-Mod":1.08,"T-Mod":1.08,"SR-Mod":0.93,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":2,"Size Class":2,"Name":"[T3] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.98,"E-Mod":0.98,"T-Mod":0.98,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":2,"Size Class":3,"Name":"[T3][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.22,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.88,"SR-Mod":1.03,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":3,"Size Class":1,"Name":"[T-3][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.04,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.88,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":3,"Size Class":2,"Name":"[T-3] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.92,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":3,"Size Class":3,"Name":"[T-3][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.97,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":3,"Size Class":1,"Name":"[T-2][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.89,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":3,"Size Class":2,"Name":"[T-2] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.94,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":3,"Size Class":3,"Name":"[T-2][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.98,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":3,"Size Class":1,"Name":"[T-1][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.12,"E-Mod":1.12,"T-Mod":1.12,"SR-Mod":0.91,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":3,"Size Class":2,"Name":"[T-1] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.96,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":3,"Size Class":3,"Name":"[T-1][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.99,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":3,"Size Class":1,"Name":"[T0][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":1.11,"E-Mod":1.11,"T-Mod":1.11,"SR-Mod":0.93,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":3,"Size Class":2,"Name":"[T0] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.01,"E-Mod":1.01,"T-Mod":1.01,"SR-Mod":0.98,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":3,"Size Class":3,"Name":"[T0][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.13,"O-Mod":0.91,"E-Mod":0.91,"T-Mod":0.91,"SR-Mod":1.03,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":3,"Size Class":1,"Name":"[T1][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.1,"E-Mod":1.1,"T-Mod":1.1,"SR-Mod":0.95,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":3,"Size Class":2,"Name":"[T1] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.12,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":3,"Size Class":3,"Name":"[T1][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1.05,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":3,"Size Class":1,"Name":"[T2][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.09,"O-Mod":1.09,"E-Mod":1.09,"T-Mod":1.09,"SR-Mod":0.94,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":3,"Size Class":2,"Name":"[T2] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.14,"O-Mod":0.99,"E-Mod":0.99,"T-Mod":0.99,"SR-Mod":0.99,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":3,"Size Class":3,"Name":"[T2][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.19,"O-Mod":0.89,"E-Mod":0.89,"T-Mod":0.89,"SR-Mod":1.04,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":3,"Size Class":1,"Name":"[T3][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.08,"E-Mod":1.08,"T-Mod":1.08,"SR-Mod":0.93,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":3,"Size Class":2,"Name":"[T3] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.98,"E-Mod":0.98,"T-Mod":0.98,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":3,"Size Class":3,"Name":"[T3][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.22,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.88,"SR-Mod":1.03,"Year Available (SF)":"*","Weight Class List":""}]
-
-/***/ }),
-/* 161 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -44333,75 +44321,19 @@ function pretty(val, n) {
 
 
 /***/ }),
-/* 162 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 160 */
+/***/ (function(module, exports) {
 
-const util = __webpack_require__(99);
-const NamedVector = __webpack_require__(100).NamedVector;
-
-const Papa = __webpack_require__(567);
-const ShipEngine = __webpack_require__(35);
-
-const COMPONENT_MAPPING = [{
-	name: "Warp Core",
-	frame_row: 76,
-	components: [{ name: "Warp Core Type", row: 78 }, { name: "M/AM Injectors", row: 80 }, { name: "Coolant Systems", row: 81 }, { name: "EPS Manifold System", row: 82 }, { name: "Eject System", row: 83 }],
-	settings: [{ name: "Safety/Performance", row: 79 }]
-}, {
-	name: "Engineering",
-	frame_row: 65,
-	components: [{ name: "Structural Integrity Fields", row: 67 }, { name: "Navigational Deflector", row: 68 }, { name: "Nacelle System", row: 69 }, { name: "Replication Package", row: 71 }, { name: "Fuel & Matter Stores", row: 72 }],
-	settings: []
-}, {
-	name: "Hull",
-	frame_row: 59,
-	components: [{ name: "Hull System", row: 61 }],
-	settings: []
-}, {
-	name: "Operations",
-	frame_row: 43,
-	components: [{ name: "Long-Range Sensors", row: 45 }, { name: "Navigational Sensors", row: 46 }, { name: "Survey Sensors", row: 47 }, { name: "Science Labs", row: 48 }, { name: "Computer Core", row: 49 }, { name: "Operating System", row: 50 }, { name: "Secondary Core", row: 51 }, { name: "Diplomatic Package", row: 53 }, { name: "Recreation Package", row: 54 }, { name: "Sickbay", row: 55 }],
-	settings: [{ name: "Isolinear?", row: 52 }]
-}, {
-	name: "Tactical",
-	frame_row: 28,
-	components: [{ name: "Primary Phasers", row: 30 }, { name: "Secondary Phasers", row: 31 }, { name: "Torpedo System", row: 33 }, { name: "Short-Range Sensors", row: 35 }, { name: "Targeting Computer", row: 36 }, { name: "Deflector Shields", row: 37 }, { name: "Backup Deflectors", row: 38 }, { name: "Impulse Engine Pwr", row: 39 }],
-	settings: [{ name: "Phaser Arrays", row: 32 }, { name: "Burst Launchers", row: 34 }]
-}];
-
-function import_design(design_csv) {
-	const result = Papa.parse(design_csv, { dynamicTyping: true });
-	return {
-		"Name": result.data[0][3],
-		"Principal Frame": result.data[17][4],
-		"Module": {
-			"Variant": result.data[87][4],
-			"Type": result.data[87][2]
-		},
-		"Subsystems": COMPONENT_MAPPING.map(function (subsystem) {
-			return {
-				"Name": subsystem.name,
-				"Sub-Frame": result.data[subsystem.frame_row][4],
-				"Settings": subsystem.settings.reduce((acc, value) => {
-					acc[value.name] = result.data[value.row][3];
-					return acc;
-				}, {}),
-				"Components": subsystem.components.map(row => {
-					return {
-						"Name": row.name,
-						"Quantity": result.data[row.row][3],
-						"Part": result.data[row.row][4]
-					};
-				})
-			};
-		})
-	};
-};
-
-module.exports.import_design = import_design;
+module.exports = [{"Type":"No Module","Weight Cap":0,"Variant":"-","Tier":-99,"Build Time":0,"C":0,"S":0,"H":0,"L":0,"P":0,"D":0,"Weight":0,"SR Cost":0,"Power Cost":0,"O":0,"E":0,"T":0,"Reliability":"100.000%"},{"Type":"Miranda Rollbar","Weight Cap":0,"Variant":"Combat","Tier":-1,"Build Time":0.25,"C":1,"S":0,"H":0,"L":0,"P":0,"D":0,"Weight":50,"SR Cost":5,"Power Cost":5,"O":0.1,"E":0.25,"T":0.1,"Reliability":"100.000%"},{"Type":"Miranda Rollbar","Weight Cap":0,"Variant":"Science","Tier":-1,"Build Time":0.25,"C":0,"S":1,"H":0,"L":0,"P":0,"D":0,"Weight":50,"SR Cost":5,"Power Cost":5,"O":0.1,"E":0.1,"T":0.25,"Reliability":"100.000%"},{"Type":"300kt Module Placeholder","Weight Cap":300,"Variant":"Combat *","Tier":0,"Build Time":0.5,"C":1,"S":0,"H":0.5,"L":0,"P":0,"D":0,"Weight":100,"SR Cost":10,"Power Cost":10,"O":0.25,"E":0.4,"T":0.2,"Reliability":"100.000%"},{"Type":"300kt Module Placeholder","Weight Cap":300,"Variant":"Diplomacy *","Tier":0,"Build Time":0.5,"C":0,"S":0,"H":0,"L":0,"P":1.5,"D":0,"Weight":100,"SR Cost":10,"Power Cost":10,"O":0.35,"E":0.35,"T":0.25,"Reliability":"100.000%"},{"Type":"300kt Module Placeholder","Weight Cap":300,"Variant":"Science *","Tier":0,"Build Time":0.5,"C":0,"S":1.5,"H":0,"L":0,"P":0,"D":0,"Weight":100,"SR Cost":10,"Power Cost":10,"O":0.2,"E":0.25,"T":0.4,"Reliability":"100.000%"},{"Type":"300kt Module Placeholder","Weight Cap":300,"Variant":"Shields *","Tier":0,"Build Time":0.5,"C":0,"S":0,"H":0,"L":1.5,"P":0,"D":0,"Weight":100,"SR Cost":15,"Power Cost":10,"O":0.35,"E":0.35,"T":0.25,"Reliability":"100.000%"},{"Type":"450kt Module Placeholder","Weight Cap":450,"Variant":"Combat *","Tier":1,"Build Time":0.75,"C":1,"S":0,"H":0.5,"L":0,"P":0,"D":0,"Weight":150,"SR Cost":10,"Power Cost":10,"O":0.25,"E":0.4,"T":0.2,"Reliability":"100.000%"},{"Type":"450kt Module Placeholder","Weight Cap":450,"Variant":"Diplomacy *","Tier":1,"Build Time":0.75,"C":0,"S":0,"H":0,"L":0,"P":1.5,"D":0,"Weight":150,"SR Cost":10,"Power Cost":10,"O":0.35,"E":0.35,"T":0.25,"Reliability":"100.000%"},{"Type":"450kt Module Placeholder","Weight Cap":450,"Variant":"Science *","Tier":1,"Build Time":0.75,"C":0,"S":1.5,"H":0,"L":0,"P":0,"D":0,"Weight":150,"SR Cost":10,"Power Cost":10,"O":0.2,"E":0.25,"T":0.4,"Reliability":"100.000%"},{"Type":"450kt Module Placeholder","Weight Cap":450,"Variant":"Shields *","Tier":1,"Build Time":0.75,"C":0,"S":0,"H":0,"L":1.5,"P":0,"D":0,"Weight":150,"SR Cost":15,"Power Cost":10,"O":0.35,"E":0.35,"T":0.25,"Reliability":"100.000%"}]
 
 /***/ }),
-/* 163 */
+/* 161 */
+/***/ (function(module, exports) {
+
+module.exports = [{"Type Sort":0,"Type":"Frame","Tier":-3,"Weight Class":1,"Size Class":"","Name":"[T-3] 250kt Frigate Frame","MaxSz":250,"Wt":50,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.08,"T-Mod":1,"SR-Mod":0.925,"Year Available (SF)":2230,"Weight Class List":"Frigate"},{"Type Sort":0,"Type":"Frame","Tier":-3,"Weight Class":1,"Size Class":"","Name":"[T-3] 400kt Frigate Frame","MaxSz":400,"Wt":70,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.09,"T-Mod":1,"SR-Mod":0.925,"Year Available (SF)":2230,"Weight Class List":"Cruiser"},{"Type Sort":0,"Type":"Frame","Tier":-3,"Weight Class":1,"Size Class":"","Name":"[T-3] 600kt Frigate Frame","MaxSz":600,"Wt":100,"Build Time":"11/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.76,"E-Mod":1.11,"T-Mod":1,"SR-Mod":0.925,"Year Available (SF)":2230,"Weight Class List":"Explorer"},{"Type Sort":0,"Type":"Frame","Tier":-2,"Weight Class":1,"Size Class":"","Name":"[T-2] 300kt Frigate Frame","MaxSz":300,"Wt":55,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.08,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-2,"Weight Class":1,"Size Class":"","Name":"[T-2] 450kt Frigate Frame","MaxSz":450,"Wt":75,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.09,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-2,"Weight Class":1,"Size Class":"","Name":"[T-2] 600kt Frigate Frame","MaxSz":600,"Wt":90,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-1,"Weight Class":1,"Size Class":"","Name":"[T-1] 400kt Frigate Frame","MaxSz":400,"Wt":70,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.09,"T-Mod":1,"SR-Mod":0.9675,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-1,"Weight Class":1,"Size Class":"","Name":"[T-1] 700kt Frigate Frame","MaxSz":700,"Wt":100,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.1,"T-Mod":1,"SR-Mod":0.9675,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":0,"Weight Class":1,"Size Class":"","Name":"[T0] 650kt Frigate Frame","MaxSz":650,"Wt":95,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.1,"T-Mod":1,"SR-Mod":0.975,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":0,"Weight Class":1,"Size Class":"","Name":"[T0] 800kt Frigate Frame","MaxSz":800,"Wt":105,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.1,"T-Mod":1,"SR-Mod":0.975,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":1,"Weight Class":1,"Size Class":"","Name":"[T1] 450kt Frigate Frame","MaxSz":450,"Wt":70,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.725,"E-Mod":1.05,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2310,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":1,"Weight Class":1,"Size Class":"","Name":"[T1] 900kt Frigate Frame","MaxSz":900,"Wt":135,"Build Time":"11/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.2,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2310,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":1,"Size Class":"","Name":"[T2] 750kt Frigate Frame","MaxSz":750,"Wt":95,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.2,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":1,"Size Class":"","Name":"[T2] 1050kt Frigate Frame","MaxSz":1050,"Wt":155,"Build Time":"14/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.85,"E-Mod":1.2,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":1,"Size Class":"","Name":"[T3] 450kt Frigate Frame","MaxSz":450,"Wt":67,"Build Time":"7/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.7,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":1,"Size Class":"","Name":"[T3] 600kt Frigate Frame","MaxSz":600,"Wt":85,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.7,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":1,"Size Class":"","Name":"[T3] 1050kt Frigate Frame","MaxSz":1050,"Wt":145,"Build Time":"12/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.825,"E-Mod":1.15,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-3,"Weight Class":2,"Size Class":"","Name":"[T-3] 700kt Cruiser Frame","MaxSz":700,"Wt":115,"Build Time":"13/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.975,"E-Mod":1.25,"T-Mod":0.875,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-2,"Weight Class":2,"Size Class":"","Name":"[T-2] 750kt Cruiser Frame","MaxSz":750,"Wt":110,"Build Time":"13/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-1,"Weight Class":2,"Size Class":"","Name":"[T-1] 1mt Cruiser Frame","MaxSz":1000,"Wt":170,"Build Time":"15/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":0,"Weight Class":2,"Size Class":"","Name":"[T0] 1500kt Cruiser Frame","MaxSz":1500,"Wt":240,"Build Time":"16/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":1,"Weight Class":2,"Size Class":"","Name":"[T1] 1mt Cruiser Frame","MaxSz":1000,"Wt":160,"Build Time":"13/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2310,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":1,"Weight Class":2,"Size Class":"","Name":"[T1] 1800kt Cruiser Frame","MaxSz":1800,"Wt":300,"Build Time":"19/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2310,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":2,"Size Class":"","Name":"[T2] 2100kt Cruiser Frame","MaxSz":2100,"Wt":375,"Build Time":"22/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":2,"Size Class":"","Name":"[T3] 1mt Cruiser Frame","MaxSz":1000,"Wt":150,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":2,"Size Class":"","Name":"[T3] 1500kt Cruiser Frame","MaxSz":1500,"Wt":230,"Build Time":"13/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":2,"Size Class":"","Name":"[T3] 2100kt Cruiser Frame","MaxSz":2100,"Wt":365,"Build Time":"19/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-3,"Weight Class":3,"Size Class":"","Name":"[T-3] 750kt 'Ranger' Frame","MaxSz":750,"Wt":100,"Build Time":"12/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1.1,"E-Mod":1.1,"T-Mod":0.95,"SR-Mod":1.2,"Year Available (SF)":2220,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-2,"Weight Class":3,"Size Class":"","Name":"[T-2] 1mt 'Constitution' Frame","MaxSz":1050,"Wt":115,"Build Time":"15/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1.1,"E-Mod":1.1,"T-Mod":0.95,"SR-Mod":1.2,"Year Available (SF)":2240,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-1,"Weight Class":3,"Size Class":"","Name":"[T-1] 1800kt Explorer Frame","MaxSz":1800,"Wt":300,"Build Time":"18/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":0.875,"SR-Mod":1.1,"Year Available (SF)":2260,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":0,"Weight Class":3,"Size Class":"","Name":"[T0] 2400kt Explorer Frame","MaxSz":2400,"Wt":425,"Build Time":"21/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.85,"SR-Mod":1.1,"Year Available (SF)":2280,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":1,"Weight Class":3,"Size Class":"","Name":"[T1] 3100kt Explorer Frame","MaxSz":3100,"Wt":550,"Build Time":"24/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.825,"E-Mod":0.825,"T-Mod":0.775,"SR-Mod":1.1,"Year Available (SF)":2310,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":3,"Size Class":"","Name":"[T2] 2400kt Explorer Frame","MaxSz":2400,"Wt":410,"Build Time":"18/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.85,"E-Mod":0.85,"T-Mod":0.8,"SR-Mod":1.1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":3,"Size Class":"","Name":"[T2] 3100kt Explorer Frame","MaxSz":3100,"Wt":525,"Build Time":"21/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.8,"E-Mod":0.8,"T-Mod":0.75,"SR-Mod":1.1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":3,"Size Class":"","Name":"[T2] 3400kt Explorer Frame","MaxSz":3400,"Wt":555,"Build Time":"24/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.825,"E-Mod":0.825,"T-Mod":0.775,"SR-Mod":1.1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":3,"Size Class":"","Name":"[T3] 2700kt Explorer Frame","MaxSz":2700,"Wt":450,"Build Time":"18/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.825,"E-Mod":0.825,"T-Mod":0.775,"SR-Mod":1.1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":3,"Size Class":"","Name":"[T3] 3400kt Explorer Frame","MaxSz":3400,"Wt":540,"Build Time":"21/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.8,"E-Mod":0.8,"T-Mod":0.75,"SR-Mod":1.1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":3,"Size Class":"","Name":"[T3] 4000kt Explorer Frame","MaxSz":4000,"Wt":640,"Build Time":"27/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.825,"E-Mod":0.825,"T-Mod":0.775,"SR-Mod":1.1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":1,"Size Class":1,"Name":"[T-3][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.94,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.965,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":1,"Size Class":2,"Name":"[T-3][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":0.965,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.93,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":1,"Size Class":3,"Name":"[T-3][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":0.97,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.88,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":1,"Size Class":1,"Name":"[T-2][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.95,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.96,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":1,"Size Class":2,"Name":"[T-2][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.92,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":1,"Size Class":3,"Name":"[T-2][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.86,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":1,"Size Class":1,"Name":"[T-1][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.96,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.955,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":1,"Size Class":2,"Name":"[T-1][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.91,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":1,"Size Class":3,"Name":"[T-1][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.84,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":1,"Size Class":1,"Name":"[T0][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.97,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":1,"Size Class":2,"Name":"[T0][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":1,"Size Class":3,"Name":"[T0][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1.05,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.82,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":1,"Size Class":1,"Name":"[T1][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.945,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":1,"Size Class":2,"Name":"[T1][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1.04,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.89,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":1,"Size Class":3,"Name":"[T1][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.8,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":1,"Size Class":1,"Name":"[T2][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":1,"Size Class":2,"Name":"[T2][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1.06,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.88,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":1,"Size Class":3,"Name":"[T2][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1.11,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.78,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":1,"Size Class":1,"Name":"[T3][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.935,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":1,"Size Class":2,"Name":"[T3][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.87,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":1,"Size Class":3,"Name":"[T3][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1.14,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.76,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":2,"Size Class":1,"Name":"[T-3] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.94,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":2,"Size Class":2,"Name":"[T-3][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":0.96,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.99,"T-Mod":0.995,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":2,"Size Class":3,"Name":"[T-3][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":0.97,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.99,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":2,"Size Class":1,"Name":"[T-2] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.95,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":2,"Size Class":2,"Name":"[T-2][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.98,"E-Mod":0.98,"T-Mod":0.99,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":2,"Size Class":3,"Name":"[T-2][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":2,"Size Class":1,"Name":"[T-1] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.96,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":2,"Size Class":2,"Name":"[T-1][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.985,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":2,"Size Class":3,"Name":"[T-1][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.97,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":2,"Size Class":1,"Name":"[T0] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.97,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":2,"Size Class":2,"Name":"[T0][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.96,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":2,"Size Class":3,"Name":"[T0][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1.05,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.91,"E-Mod":0.91,"T-Mod":0.96,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":2,"Size Class":1,"Name":"[T1] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":2,"Size Class":2,"Name":"[T1][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1.04,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.975,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":2,"Size Class":3,"Name":"[T1][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":2,"Size Class":1,"Name":"[T2] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":2,"Size Class":2,"Name":"[T2][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1.06,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.97,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":2,"Size Class":3,"Name":"[T2][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1.11,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.89,"E-Mod":0.89,"T-Mod":0.94,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":2,"Size Class":1,"Name":"[T3] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":2,"Size Class":2,"Name":"[T3][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.965,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":2,"Size Class":3,"Name":"[T3][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1.14,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.93,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":3,"Size Class":1,"Name":"[T-3] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.95,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":3,"Size Class":2,"Name":"[T-3][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.965,"E-Mod":0.915,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":3,"Size Class":3,"Name":"[T-3][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.84,"T-Mod":0.94,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":3,"Size Class":1,"Name":"[T-2] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.95,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":3,"Size Class":2,"Name":"[T-2][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.91,"T-Mod":0.97,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":3,"Size Class":3,"Name":"[T-2][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.83,"T-Mod":0.93,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":3,"Size Class":1,"Name":"[T-1] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.96,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":3,"Size Class":2,"Name":"[T-1][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.955,"E-Mod":0.905,"T-Mod":0.96,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":3,"Size Class":3,"Name":"[T-1][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.82,"T-Mod":0.92,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":3,"Size Class":1,"Name":"[T0] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.97,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":3,"Size Class":2,"Name":"[T0][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":3,"Size Class":3,"Name":"[T0][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1.05,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.91,"E-Mod":0.81,"T-Mod":0.91,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":3,"Size Class":1,"Name":"[T1] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":3,"Size Class":2,"Name":"[T1][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1.04,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.945,"E-Mod":0.895,"T-Mod":0.945,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":3,"Size Class":3,"Name":"[T1][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":3,"Size Class":1,"Name":"[T2] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":3,"Size Class":2,"Name":"[T2][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1.06,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.89,"T-Mod":0.94,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":3,"Size Class":3,"Name":"[T2][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1.11,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.89,"E-Mod":0.79,"T-Mod":0.89,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":3,"Size Class":1,"Name":"[T3] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":3,"Size Class":2,"Name":"[T3][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.935,"E-Mod":0.885,"T-Mod":0.935,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":3,"Size Class":3,"Name":"[T3][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1.14,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.88,"E-Mod":0.78,"T-Mod":0.88,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":1,"Size Class":1,"Name":"[T-3][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":0.96,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.98,"SR-Mod":0.96,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":1,"Size Class":2,"Name":"[T-3][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":1.005,"SR-Mod":0.98,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":1,"Size Class":3,"Name":"[T-3][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":0.99,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":1.03,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":1,"Size Class":1,"Name":"[T-2][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.97,"SR-Mod":0.96,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":1,"Size Class":2,"Name":"[T-2][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.995,"SR-Mod":0.98,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":1,"Size Class":3,"Name":"[T-2][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":1.02,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":1,"Size Class":1,"Name":"[T-1][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.96,"SR-Mod":0.96,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":1,"Size Class":2,"Name":"[T-1][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.985,"SR-Mod":0.98,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":1,"Size Class":3,"Name":"[T-1][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":1.01,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":1,"Size Class":1,"Name":"[T0][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":0.99,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.95,"SR-Mod":0.96,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":1,"Size Class":2,"Name":"[T0][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.975,"SR-Mod":0.98,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":1,"Size Class":3,"Name":"[T0][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.07,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":1,"Size Class":1,"Name":"[T1][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.94,"SR-Mod":0.96,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":1,"Size Class":2,"Name":"[T1][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.965,"SR-Mod":0.98,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":1,"Size Class":3,"Name":"[T1][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":0.99,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":1,"Size Class":1,"Name":"[T2][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.93,"SR-Mod":0.96,"Year Available (SF)":2314,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":1,"Size Class":2,"Name":"[T2][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1.06,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.955,"SR-Mod":0.98,"Year Available (SF)":2314,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":1,"Size Class":3,"Name":"[T2][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.13,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2314,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":1,"Size Class":1,"Name":"[T3][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.92,"SR-Mod":0.96,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":1,"Size Class":2,"Name":"[T3][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1.08,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.945,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":1,"Size Class":3,"Name":"[T3][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.16,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":0.97,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":2,"Size Class":1,"Name":"[T-3][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":0.96,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":2,"Size Class":2,"Name":"[T-3][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.995,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":2,"Size Class":3,"Name":"[T-3][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.97,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":2,"Size Class":1,"Name":"[T-2][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":2,"Size Class":2,"Name":"[T-2][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":0.985,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.995,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":2,"Size Class":3,"Name":"[T-2][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.97,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":2,"Size Class":1,"Name":"[T-1][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":2,"Size Class":2,"Name":"[T-1][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.995,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":2,"Size Class":3,"Name":"[T-1][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.97,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":2,"Size Class":1,"Name":"[T0][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":0.99,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.98,"T-Mod":0.955,"SR-Mod":0.9,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":2,"Size Class":2,"Name":"[T0][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.98,"T-Mod":0.955,"SR-Mod":0.95,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":2,"Size Class":3,"Name":"[T0][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.07,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.98,"E-Mod":0.96,"T-Mod":0.97,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":2,"Size Class":1,"Name":"[T1][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.975,"T-Mod":0.94,"SR-Mod":0.9,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":2,"Size Class":2,"Name":"[T1][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.985,"E-Mod":0.975,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":2,"Size Class":3,"Name":"[T1][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.95,"T-Mod":0.96,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":2,"Size Class":1,"Name":"[T2][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.97,"T-Mod":0.925,"SR-Mod":0.9,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":2,"Size Class":2,"Name":"[T2][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1.06,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.98,"E-Mod":0.97,"T-Mod":0.925,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":2,"Size Class":3,"Name":"[T2][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.13,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.94,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":2,"Size Class":1,"Name":"[T3][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.965,"T-Mod":0.91,"SR-Mod":0.9,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":2,"Size Class":2,"Name":"[T3][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1.08,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.975,"E-Mod":0.965,"T-Mod":0.91,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":2,"Size Class":3,"Name":"[T3][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.16,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.93,"T-Mod":0.94,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":3,"Size Class":1,"Name":"[T-3][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":0.96,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":3,"Size Class":2,"Name":"[T-3][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":3,"Size Class":3,"Name":"[T-3][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.91,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":3,"Size Class":1,"Name":"[T-2][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":3,"Size Class":2,"Name":"[T-2][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":3,"Size Class":3,"Name":"[T-2][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.91,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":3,"Size Class":1,"Name":"[T-1][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":3,"Size Class":2,"Name":"[T-1][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":3,"Size Class":3,"Name":"[T-1][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.91,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":3,"Size Class":1,"Name":"[T0][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":0.99,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.96,"SR-Mod":0.9,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":3,"Size Class":2,"Name":"[T0][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.96,"T-Mod":0.92,"SR-Mod":0.95,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":3,"Size Class":3,"Name":"[T0][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.07,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.88,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":3,"Size Class":1,"Name":"[T1][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.95,"SR-Mod":0.9,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":3,"Size Class":2,"Name":"[T1][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.9,"SR-Mod":0.95,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":3,"Size Class":3,"Name":"[T1][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":3,"Size Class":1,"Name":"[T2][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.94,"SR-Mod":0.9,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":3,"Size Class":2,"Name":"[T2][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.06,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.88,"SR-Mod":0.95,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":3,"Size Class":3,"Name":"[T2][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.13,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.82,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":3,"Size Class":1,"Name":"[T3][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.93,"SR-Mod":0.9,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":3,"Size Class":2,"Name":"[T3][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.08,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.86,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":3,"Size Class":3,"Name":"[T3][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.16,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.86,"E-Mod":0.86,"T-Mod":0.79,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":1,"Size Class":1,"Name":"[T-3] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.94,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":1,"Size Class":2,"Name":"[T-3][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":1,"Size Class":3,"Name":"[T-3][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":1,"Size Class":1,"Name":"[T-2] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.95,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":1,"Size Class":2,"Name":"[T-2][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":1,"Size Class":3,"Name":"[T-2][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":1,"Size Class":1,"Name":"[T-1] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":1,"Size Class":2,"Name":"[T-1][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":1,"Size Class":3,"Name":"[T-1][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":1,"Size Class":1,"Name":"[T0] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.97,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":1,"Size Class":2,"Name":"[T0][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":1,"Size Class":3,"Name":"[T0][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.05,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":1,"Size Class":1,"Name":"[T1] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":1,"Size Class":2,"Name":"[T1][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.04,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":1,"Size Class":3,"Name":"[T1][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":1,"Size Class":1,"Name":"[T2] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.99,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":1,"Size Class":2,"Name":"[T2][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.06,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":1,"Size Class":3,"Name":"[T2][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.11,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":1,"Size Class":1,"Name":"[T3] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":1,"Size Class":2,"Name":"[T3][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":1,"Size Class":3,"Name":"[T3][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.14,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":2,"Size Class":1,"Name":"[T-3] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.94,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":2,"Size Class":2,"Name":"[T-3][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":2,"Size Class":3,"Name":"[T-3][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":2,"Size Class":1,"Name":"[T-2] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.95,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":2,"Size Class":2,"Name":"[T-2][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":2,"Size Class":3,"Name":"[T-2][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":2,"Size Class":1,"Name":"[T-1] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":2,"Size Class":2,"Name":"[T-1][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":2,"Size Class":3,"Name":"[T-1][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":2,"Size Class":1,"Name":"[T0] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.97,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":2,"Size Class":2,"Name":"[T0][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":2,"Size Class":3,"Name":"[T0][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.05,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":2,"Size Class":1,"Name":"[T1] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":2,"Size Class":2,"Name":"[T1][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.04,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":2,"Size Class":3,"Name":"[T1][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":2,"Size Class":1,"Name":"[T2] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.99,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":2,"Size Class":2,"Name":"[T2][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.06,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":2,"Size Class":3,"Name":"[T2][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.11,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":2,"Size Class":1,"Name":"[T3] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":2,"Size Class":2,"Name":"[T3][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":2,"Size Class":3,"Name":"[T3][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.14,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":3,"Size Class":1,"Name":"[T-3] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.94,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":3,"Size Class":2,"Name":"[T-3][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":3,"Size Class":3,"Name":"[T-3][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":3,"Size Class":1,"Name":"[T-2] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.95,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":3,"Size Class":2,"Name":"[T-2][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":3,"Size Class":3,"Name":"[T-2][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":3,"Size Class":1,"Name":"[T-1] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":3,"Size Class":2,"Name":"[T-1][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":3,"Size Class":3,"Name":"[T-1][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":3,"Size Class":1,"Name":"[T0] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.97,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":3,"Size Class":2,"Name":"[T0][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":3,"Size Class":3,"Name":"[T0][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.05,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":3,"Size Class":1,"Name":"[T1] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":3,"Size Class":2,"Name":"[T1][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.04,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":3,"Size Class":3,"Name":"[T1][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":3,"Size Class":1,"Name":"[T2] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.99,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":3,"Size Class":2,"Name":"[T2][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.06,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":3,"Size Class":3,"Name":"[T2][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.11,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":3,"Size Class":1,"Name":"[T3] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":3,"Size Class":2,"Name":"[T3][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":3,"Size Class":3,"Name":"[T3][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.14,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":1,"Size Class":1,"Name":"[T-3][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.96,"Core Mod":1,"O-Mod":1,"E-Mod":0.94,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":1,"Size Class":2,"Name":"[T-3][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.975,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":1,"Size Class":3,"Name":"[T-3][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.99,"Core Mod":1,"O-Mod":0.94,"E-Mod":1,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":1,"Size Class":1,"Name":"[T-2][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.97,"Core Mod":1,"O-Mod":1,"E-Mod":0.94,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":1,"Size Class":2,"Name":"[T-2][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.985,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":1,"Size Class":3,"Name":"[T-2][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":0.94,"E-Mod":1,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":1,"Size Class":1,"Name":"[T-1][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.98,"Core Mod":1,"O-Mod":1,"E-Mod":0.94,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":1,"Size Class":2,"Name":"[T-1][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":1,"Size Class":3,"Name":"[T-1][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.94,"E-Mod":1,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":1,"Size Class":1,"Name":"[T0][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.99,"Core Mod":1,"O-Mod":1,"E-Mod":0.92,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":1,"Size Class":2,"Name":"[T0][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.96,"T-Mod":0.96,"SR-Mod":0.975,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":1,"Size Class":3,"Name":"[T0][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.07,"Core Mod":1,"O-Mod":0.92,"E-Mod":1,"T-Mod":0.92,"SR-Mod":0.95,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":1,"Size Class":1,"Name":"[T1][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.9,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":1,"Size Class":2,"Name":"[T1][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":0.975,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":1,"Size Class":3,"Name":"[T1][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.1,"Core Mod":1,"O-Mod":0.9,"E-Mod":1,"T-Mod":0.9,"SR-Mod":0.95,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":1,"Size Class":1,"Name":"[T2][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":1,"E-Mod":0.88,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":1,"Size Class":2,"Name":"[T2][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.06,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.975,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":1,"Size Class":3,"Name":"[T2][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.13,"Core Mod":1,"O-Mod":0.88,"E-Mod":1,"T-Mod":0.88,"SR-Mod":0.95,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":1,"Size Class":1,"Name":"[T3][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":1,"E-Mod":0.86,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":1,"Size Class":2,"Name":"[T3][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.08,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.975,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":1,"Size Class":3,"Name":"[T3][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.16,"Core Mod":1,"O-Mod":0.86,"E-Mod":1,"T-Mod":0.86,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":2,"Size Class":1,"Name":"[T-3][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.96,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":2,"Size Class":2,"Name":"[T-3][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.97,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":2,"Size Class":3,"Name":"[T-3][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.98,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":2,"Size Class":1,"Name":"[T-2][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.97,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":2,"Size Class":2,"Name":"[T-2][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.985,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":2,"Size Class":3,"Name":"[T-2][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":2,"Size Class":1,"Name":"[T-1][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.98,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":2,"Size Class":2,"Name":"[T-1][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":2,"Size Class":3,"Name":"[T-1][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":2,"Size Class":1,"Name":"[T0][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.99,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":2,"Size Class":2,"Name":"[T0][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.96,"T-Mod":0.96,"SR-Mod":0.975,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":2,"Size Class":3,"Name":"[T0][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.07,"Core Mod":1,"O-Mod":0.91,"E-Mod":0.91,"T-Mod":0.91,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":2,"Size Class":1,"Name":"[T1][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":2,"Size Class":2,"Name":"[T1][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":0.975,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":2,"Size Class":3,"Name":"[T1][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":2,"Size Class":1,"Name":"[T2][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":2,"Size Class":2,"Name":"[T2][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.06,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.975,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":2,"Size Class":3,"Name":"[T2][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.13,"Core Mod":1,"O-Mod":0.89,"E-Mod":0.89,"T-Mod":0.89,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":2,"Size Class":1,"Name":"[T3][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":2,"Size Class":2,"Name":"[T3][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.08,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.975,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":2,"Size Class":3,"Name":"[T3][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.16,"Core Mod":1,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.88,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":3,"Size Class":1,"Name":"[T-3][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.96,"Core Mod":1,"O-Mod":1.02,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":3,"Size Class":2,"Name":"[T-3][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.97,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.975,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":3,"Size Class":3,"Name":"[T-3][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.98,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.82,"T-Mod":0.82,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":3,"Size Class":1,"Name":"[T-2][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.97,"Core Mod":1,"O-Mod":1.02,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":3,"Size Class":2,"Name":"[T-2][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.985,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.975,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":3,"Size Class":3,"Name":"[T-2][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.82,"T-Mod":0.82,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":3,"Size Class":1,"Name":"[T-1][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.98,"Core Mod":1,"O-Mod":1.02,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":3,"Size Class":2,"Name":"[T-1][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.975,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":3,"Size Class":3,"Name":"[T-1][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.82,"T-Mod":0.82,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":3,"Size Class":1,"Name":"[T0][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.99,"Core Mod":1,"O-Mod":1.01,"E-Mod":0.96,"T-Mod":0.96,"SR-Mod":0.95,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":3,"Size Class":2,"Name":"[T0][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.91,"T-Mod":0.91,"SR-Mod":0.975,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":3,"Size Class":3,"Name":"[T0][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.07,"Core Mod":1,"O-Mod":0.91,"E-Mod":0.81,"T-Mod":0.81,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":3,"Size Class":1,"Name":"[T1][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":0.95,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":3,"Size Class":2,"Name":"[T1][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":0.975,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":3,"Size Class":3,"Name":"[T1][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":3,"Size Class":1,"Name":"[T2][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":3,"Size Class":2,"Name":"[T2][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.06,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.89,"T-Mod":0.89,"SR-Mod":0.975,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":3,"Size Class":3,"Name":"[T2][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.13,"Core Mod":1,"O-Mod":0.89,"E-Mod":0.79,"T-Mod":0.79,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":3,"Size Class":1,"Name":"[T3][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":0.98,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":3,"Size Class":2,"Name":"[T3][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.08,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.88,"T-Mod":0.88,"SR-Mod":0.975,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":3,"Size Class":3,"Name":"[T3][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.16,"Core Mod":1,"O-Mod":0.88,"E-Mod":0.78,"T-Mod":0.78,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":1,"Size Class":1,"Name":"[T-3][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.04,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.88,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":1,"Size Class":2,"Name":"[T-3] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.92,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":1,"Size Class":3,"Name":"[T-3][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.97,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":1,"Size Class":1,"Name":"[T-2][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.89,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":1,"Size Class":2,"Name":"[T-2] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.94,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":1,"Size Class":3,"Name":"[T-2][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.98,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":1,"Size Class":1,"Name":"[T-1][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.12,"E-Mod":1.12,"T-Mod":1.12,"SR-Mod":0.91,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":1,"Size Class":2,"Name":"[T-1] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.96,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":1,"Size Class":3,"Name":"[T-1][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.99,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":1,"Size Class":1,"Name":"[T0][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":1.11,"E-Mod":1.11,"T-Mod":1.11,"SR-Mod":0.93,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":1,"Size Class":2,"Name":"[T0] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.01,"E-Mod":1.01,"T-Mod":1.01,"SR-Mod":0.98,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":1,"Size Class":3,"Name":"[T0][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.13,"O-Mod":0.91,"E-Mod":0.91,"T-Mod":0.91,"SR-Mod":1.03,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":1,"Size Class":1,"Name":"[T1][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.1,"E-Mod":1.1,"T-Mod":1.1,"SR-Mod":0.95,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":1,"Size Class":2,"Name":"[T1] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.12,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":1,"Size Class":3,"Name":"[T1][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1.05,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":1,"Size Class":1,"Name":"[T2][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.09,"O-Mod":1.09,"E-Mod":1.09,"T-Mod":1.09,"SR-Mod":0.94,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":1,"Size Class":2,"Name":"[T2] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.14,"O-Mod":0.99,"E-Mod":0.99,"T-Mod":0.99,"SR-Mod":0.99,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":1,"Size Class":3,"Name":"[T2][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.19,"O-Mod":0.89,"E-Mod":0.89,"T-Mod":0.89,"SR-Mod":1.04,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":1,"Size Class":1,"Name":"[T3][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.08,"E-Mod":1.08,"T-Mod":1.08,"SR-Mod":0.93,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":1,"Size Class":2,"Name":"[T3] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.98,"E-Mod":0.98,"T-Mod":0.98,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":1,"Size Class":3,"Name":"[T3][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.22,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.88,"SR-Mod":1.03,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":2,"Size Class":1,"Name":"[T-3][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.04,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.88,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":2,"Size Class":2,"Name":"[T-3] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.92,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":2,"Size Class":3,"Name":"[T-3][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.97,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":2,"Size Class":1,"Name":"[T-2][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.89,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":2,"Size Class":2,"Name":"[T-2] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.94,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":2,"Size Class":3,"Name":"[T-2][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.98,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":2,"Size Class":1,"Name":"[T-1][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.12,"E-Mod":1.12,"T-Mod":1.12,"SR-Mod":0.91,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":2,"Size Class":2,"Name":"[T-1] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.96,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":2,"Size Class":3,"Name":"[T-1][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.99,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":2,"Size Class":1,"Name":"[T0][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":1.11,"E-Mod":1.11,"T-Mod":1.11,"SR-Mod":0.93,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":2,"Size Class":2,"Name":"[T0] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.01,"E-Mod":1.01,"T-Mod":1.01,"SR-Mod":0.98,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":2,"Size Class":3,"Name":"[T0][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.13,"O-Mod":0.91,"E-Mod":0.91,"T-Mod":0.91,"SR-Mod":1.03,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":2,"Size Class":1,"Name":"[T1][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.1,"E-Mod":1.1,"T-Mod":1.1,"SR-Mod":0.95,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":2,"Size Class":2,"Name":"[T1] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.12,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":2,"Size Class":3,"Name":"[T1][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1.05,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":2,"Size Class":1,"Name":"[T2][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.09,"O-Mod":1.09,"E-Mod":1.09,"T-Mod":1.09,"SR-Mod":0.94,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":2,"Size Class":2,"Name":"[T2] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.14,"O-Mod":0.99,"E-Mod":0.99,"T-Mod":0.99,"SR-Mod":0.99,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":2,"Size Class":3,"Name":"[T2][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.19,"O-Mod":0.89,"E-Mod":0.89,"T-Mod":0.89,"SR-Mod":1.04,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":2,"Size Class":1,"Name":"[T3][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.08,"E-Mod":1.08,"T-Mod":1.08,"SR-Mod":0.93,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":2,"Size Class":2,"Name":"[T3] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.98,"E-Mod":0.98,"T-Mod":0.98,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":2,"Size Class":3,"Name":"[T3][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.22,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.88,"SR-Mod":1.03,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":3,"Size Class":1,"Name":"[T-3][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.04,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.88,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":3,"Size Class":2,"Name":"[T-3] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.92,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":3,"Size Class":3,"Name":"[T-3][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.97,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":3,"Size Class":1,"Name":"[T-2][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.89,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":3,"Size Class":2,"Name":"[T-2] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.94,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":3,"Size Class":3,"Name":"[T-2][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.98,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":3,"Size Class":1,"Name":"[T-1][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.12,"E-Mod":1.12,"T-Mod":1.12,"SR-Mod":0.91,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":3,"Size Class":2,"Name":"[T-1] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.96,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":3,"Size Class":3,"Name":"[T-1][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.99,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":3,"Size Class":1,"Name":"[T0][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":1.11,"E-Mod":1.11,"T-Mod":1.11,"SR-Mod":0.93,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":3,"Size Class":2,"Name":"[T0] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.01,"E-Mod":1.01,"T-Mod":1.01,"SR-Mod":0.98,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":3,"Size Class":3,"Name":"[T0][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.13,"O-Mod":0.91,"E-Mod":0.91,"T-Mod":0.91,"SR-Mod":1.03,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":3,"Size Class":1,"Name":"[T1][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.1,"E-Mod":1.1,"T-Mod":1.1,"SR-Mod":0.95,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":3,"Size Class":2,"Name":"[T1] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.12,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":3,"Size Class":3,"Name":"[T1][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1.05,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":3,"Size Class":1,"Name":"[T2][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.09,"O-Mod":1.09,"E-Mod":1.09,"T-Mod":1.09,"SR-Mod":0.94,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":3,"Size Class":2,"Name":"[T2] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.14,"O-Mod":0.99,"E-Mod":0.99,"T-Mod":0.99,"SR-Mod":0.99,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":3,"Size Class":3,"Name":"[T2][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.19,"O-Mod":0.89,"E-Mod":0.89,"T-Mod":0.89,"SR-Mod":1.04,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":3,"Size Class":1,"Name":"[T3][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.08,"E-Mod":1.08,"T-Mod":1.08,"SR-Mod":0.93,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":3,"Size Class":2,"Name":"[T3] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.98,"E-Mod":0.98,"T-Mod":0.98,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":3,"Size Class":3,"Name":"[T3][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.22,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.88,"SR-Mod":1.03,"Year Available (SF)":"*","Weight Class List":""}]
+
+/***/ }),
+/* 162 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -51954,7 +51886,7 @@ setTimeout(function () {
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(63), __webpack_require__(47)))
 
 /***/ }),
-/* 164 */
+/* 163 */
 /***/ (function(module, exports) {
 
 /**
@@ -51987,7 +51919,7 @@ module.exports = function listToStyles (parentId, list) {
 
 
 /***/ }),
-/* 165 */
+/* 164 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -51998,7 +51930,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 166 */
+/* 165 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -52027,10 +51959,10 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 167 */
+/* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var core = __webpack_require__(168);
+var core = __webpack_require__(167);
 
 /**
  * math.js factory function. Creates a new instance of math.js
@@ -52061,7 +51993,7 @@ function create (config) {
   math.create = create;
 
   // import data types, functions, constants, expression parser, etc.
-  math['import'](__webpack_require__(175));
+  math['import'](__webpack_require__(174));
 
   return math;
 }
@@ -52071,21 +52003,21 @@ module.exports = create();
 
 
 /***/ }),
+/* 167 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(168);
+
+/***/ }),
 /* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(169);
-
-/***/ }),
-/* 169 */
-/***/ (function(module, exports, __webpack_require__) {
-
 var isFactory = __webpack_require__(5).isFactory;
-var typedFactory = __webpack_require__(170);
-var emitter = __webpack_require__(101);
+var typedFactory = __webpack_require__(169);
+var emitter = __webpack_require__(100);
 
-var importFactory = __webpack_require__(173);
-var configFactory = __webpack_require__(174);
+var importFactory = __webpack_require__(172);
+var configFactory = __webpack_require__(173);
 
 /**
  * Math.js core. Creates a new, empty math.js instance
@@ -52215,10 +52147,10 @@ exports.create = function create (options) {
 
 
 /***/ }),
-/* 170 */
+/* 169 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var typedFunction = __webpack_require__(171);
+var typedFunction = __webpack_require__(170);
 var digits = __webpack_require__(3).digits;
 var isBigNumber = __webpack_require__(77);
 var isMatrix = __webpack_require__(64);
@@ -52512,7 +52444,7 @@ exports.create = function create(type) {
 
 
 /***/ }),
-/* 171 */
+/* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -53909,7 +53841,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 172 */
+/* 171 */
 /***/ (function(module, exports) {
 
 function E () {
@@ -53981,7 +53913,7 @@ module.exports = E;
 
 
 /***/ }),
-/* 173 */
+/* 172 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -54295,7 +54227,7 @@ exports.lazy = true;
 
 
 /***/ }),
-/* 174 */
+/* 173 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -54426,16 +54358,34 @@ exports.factory = factory;
 
 
 /***/ }),
+/* 174 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = [
+  __webpack_require__(175),        // data types (Matrix, Complex, Unit, ...)
+  __webpack_require__(207),   // constants
+  __webpack_require__(209),  // expression parsing
+  __webpack_require__(421),    // functions
+  __webpack_require__(563),        // serialization utility (math.json.reviver)
+  __webpack_require__(565)        // errors
+];
+
+
+/***/ }),
 /* 175 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(176),        // data types (Matrix, Complex, Unit, ...)
-  __webpack_require__(208),   // constants
-  __webpack_require__(210),  // expression parsing
-  __webpack_require__(422),    // functions
-  __webpack_require__(564),        // serialization utility (math.json.reviver)
-  __webpack_require__(566)        // errors
+  __webpack_require__(176),
+  __webpack_require__(180),
+  __webpack_require__(181),
+  __webpack_require__(185),
+  __webpack_require__(188),
+  __webpack_require__(191),
+  __webpack_require__(80),
+  __webpack_require__(199),
+  __webpack_require__(200),
+  __webpack_require__(201)
 ];
 
 
@@ -54444,16 +54394,11 @@ module.exports = [
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
+  // type
   __webpack_require__(177),
-  __webpack_require__(181),
-  __webpack_require__(182),
-  __webpack_require__(186),
-  __webpack_require__(189),
-  __webpack_require__(192),
-  __webpack_require__(80),
-  __webpack_require__(200),
-  __webpack_require__(201),
-  __webpack_require__(202)
+
+  // construction function
+  __webpack_require__(179)
 ];
 
 
@@ -54461,20 +54406,7 @@ module.exports = [
 /* 177 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = [
-  // type
-  __webpack_require__(178),
-
-  // construction function
-  __webpack_require__(180)
-];
-
-
-/***/ }),
-/* 178 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var Decimal = __webpack_require__(179); // make sure to pick the es5 version
+var Decimal = __webpack_require__(178); // make sure to pick the es5 version
 
 function factory (type, config, load, typed, math) {
   var BigNumber = Decimal.clone({precision: config.precision});
@@ -54524,7 +54456,7 @@ exports.factory = factory;
 exports.math = true; // request access to the math namespace
 
 /***/ }),
-/* 179 */
+/* 178 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/*! decimal.js v7.2.3 https://github.com/MikeMcl/decimal.js/LICENCE */
@@ -59344,7 +59276,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*! decimal.js v7.2.3 https://github.com/MikeM
 
 
 /***/ }),
-/* 180 */
+/* 179 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -59419,7 +59351,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 181 */
+/* 180 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -59504,20 +59436,20 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 182 */
+/* 181 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   // type
-  __webpack_require__(183),
+  __webpack_require__(182),
 
   // construction function
-  __webpack_require__(185)
+  __webpack_require__(184)
 ];
 
 
 /***/ }),
-/* 183 */
+/* 182 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -59689,7 +59621,7 @@ exports.lazy = false; // we need to register a listener on the import events, so
 
 
 /***/ }),
-/* 184 */
+/* 183 */
 /***/ (function(module, exports) {
 
 /**
@@ -59878,7 +59810,7 @@ exports.toFixed = function (value, precision) {
 
 
 /***/ }),
-/* 185 */
+/* 184 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -59936,20 +59868,20 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 186 */
+/* 185 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   // type
-  __webpack_require__(102),
+  __webpack_require__(101),
 
   // construction function
-  __webpack_require__(188)
+  __webpack_require__(187)
 ];
 
 
 /***/ }),
-/* 187 */
+/* 186 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -61209,7 +61141,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
-/* 188 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61316,23 +61248,23 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 189 */
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   // type
-  __webpack_require__(190),
+  __webpack_require__(189),
 
   // construction function
-  __webpack_require__(103)
+  __webpack_require__(102)
 ];
 
 
 /***/ }),
-/* 190 */
+/* 189 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Fraction = __webpack_require__(191);
+var Fraction = __webpack_require__(190);
 
 /**
  * Attach type information
@@ -61374,7 +61306,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 191 */
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -62162,29 +62094,29 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
-/* 192 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   // types
   __webpack_require__(78),
   __webpack_require__(48),
+  __webpack_require__(193),
   __webpack_require__(194),
   __webpack_require__(195),
   __webpack_require__(196),
-  __webpack_require__(197),
   __webpack_require__(29),
-  __webpack_require__(104),
+  __webpack_require__(103),
 
   // construction functions
-  __webpack_require__(198),
+  __webpack_require__(197),
   __webpack_require__(0),
-  __webpack_require__(199)
+  __webpack_require__(198)
 ];
 
 
 /***/ }),
-/* 193 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62201,7 +62133,7 @@ exports.isBoolean = function(value) {
 
 
 /***/ }),
-/* 194 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63642,7 +63574,7 @@ exports.lazy = false;  // no lazy loading, as we alter type.Matrix._storage
 
 
 /***/ }),
-/* 195 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63790,7 +63722,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 196 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63799,7 +63731,7 @@ exports.factory = factory;
 function factory (type, config, load, typed) {
   
   var smaller = load(__webpack_require__(49));
-  var larger = load(__webpack_require__(38));
+  var larger = load(__webpack_require__(37));
   
   var oneOverLogPhi = 1.0 / Math.log((1.0 + Math.sqrt(5.0)) / 2.0);
   
@@ -64146,7 +64078,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 197 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64386,7 +64318,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 198 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64457,7 +64389,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 199 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64525,17 +64457,17 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 200 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   // type
-  __webpack_require__(105)
+  __webpack_require__(104)
 ];
 
 
 /***/ }),
-/* 201 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64611,29 +64543,29 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 202 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   // type
-  __webpack_require__(203),
+  __webpack_require__(202),
 
   // construction function
-  __webpack_require__(204),
+  __webpack_require__(203),
 
   // create new units
-  __webpack_require__(205),
+  __webpack_require__(204),
 
   // split units
-  __webpack_require__(206),
+  __webpack_require__(205),
 
   // physical constants
-  __webpack_require__(207)
+  __webpack_require__(206)
 ];
 
 
 /***/ }),
-/* 203 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64641,7 +64573,7 @@ module.exports = [
 
 var endsWith = __webpack_require__(9).endsWith;
 var clone = __webpack_require__(5).clone;
-var constants = __webpack_require__(106);
+var constants = __webpack_require__(105);
 
 function factory (type, config, load, typed, math) {
   var add       = load(__webpack_require__(22));
@@ -64650,14 +64582,14 @@ function factory (type, config, load, typed, math) {
   var divide    = load(__webpack_require__(21));
   var pow       = load(__webpack_require__(50));
   var abs       = load(__webpack_require__(32));
-  var fix       = load(__webpack_require__(107));
-  var round     = load(__webpack_require__(108));
+  var fix       = load(__webpack_require__(106));
+  var round     = load(__webpack_require__(107));
   var equal     = load(__webpack_require__(33));
   var isNumeric = load(__webpack_require__(81));
-  var format    = load(__webpack_require__(109));
+  var format    = load(__webpack_require__(108));
   var getTypeOf = load(__webpack_require__(82));
   var toNumber  = load(__webpack_require__(80));
-  var Complex   = load(__webpack_require__(102));
+  var Complex   = load(__webpack_require__(101));
 
   /**
    * A unit can be constructed in the following ways:
@@ -67924,7 +67856,7 @@ exports.math = true; // request access to the math namespace
 
 
 /***/ }),
-/* 204 */
+/* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -67992,7 +67924,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 205 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -68084,7 +68016,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 206 */
+/* 205 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -68128,7 +68060,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 207 */
+/* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var lazy = __webpack_require__(5).lazy;
@@ -68224,14 +68156,14 @@ exports.math = true;   // request access to the math namespace
 
 
 /***/ }),
-/* 208 */
+/* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var object = __webpack_require__(5);
-var bigConstants = __webpack_require__(106);
+var bigConstants = __webpack_require__(105);
 
 function factory (type, config, load, typed, math) {
   // listen for changed in the configuration, automatically reload
@@ -68290,7 +68222,7 @@ function factory (type, config, load, typed, math) {
   setConstant(math, 'i', type.Complex.I);
 
   // meta information
-  setConstant(math, 'version', __webpack_require__(209));
+  setConstant(math, 'version', __webpack_require__(208));
 }
 
 // create a constant in both math and mathWithTransform
@@ -68310,7 +68242,7 @@ exports.lazy = false;  // no lazy loading of constants, the constants themselves
 exports.math = true;   // request access to the math namespace
 
 /***/ }),
-/* 209 */
+/* 208 */
 /***/ (function(module, exports) {
 
 module.exports = '3.16.3';
@@ -68319,23 +68251,23 @@ module.exports = '3.16.3';
 
 
 /***/ }),
-/* 210 */
+/* 209 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(110),
-  __webpack_require__(402),
-  __webpack_require__(408),
-  __webpack_require__(410),
+  __webpack_require__(109),
+  __webpack_require__(401),
+  __webpack_require__(407),
+  __webpack_require__(409),
 
-  __webpack_require__(421),
+  __webpack_require__(420),
   __webpack_require__(43),
-  __webpack_require__(122)
+  __webpack_require__(121)
 ];
 
 
 /***/ }),
-/* 211 */
+/* 210 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68360,7 +68292,7 @@ module.exports = {
 
 
 /***/ }),
-/* 212 */
+/* 211 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68387,7 +68319,7 @@ module.exports = {
 
 
 /***/ }),
-/* 213 */
+/* 212 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68412,7 +68344,7 @@ module.exports = {
 
 
 /***/ }),
-/* 214 */
+/* 213 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68436,7 +68368,7 @@ module.exports = {
 
 
 /***/ }),
-/* 215 */
+/* 214 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68459,7 +68391,7 @@ module.exports = {
 
 
 /***/ }),
-/* 216 */
+/* 215 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68490,7 +68422,7 @@ module.exports = {
 
 
 /***/ }),
-/* 217 */
+/* 216 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68521,7 +68453,7 @@ module.exports = {
 
 
 /***/ }),
-/* 218 */
+/* 217 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68550,7 +68482,7 @@ module.exports = {
 
 
 /***/ }),
-/* 219 */
+/* 218 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68575,7 +68507,7 @@ module.exports = {
 
 
 /***/ }),
-/* 220 */
+/* 219 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68596,7 +68528,7 @@ module.exports = {
 
 
 /***/ }),
-/* 221 */
+/* 220 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68620,7 +68552,7 @@ module.exports = {
 
 
 /***/ }),
-/* 222 */
+/* 221 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68646,7 +68578,7 @@ module.exports = {
 
 
 /***/ }),
-/* 223 */
+/* 222 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68664,7 +68596,7 @@ module.exports = {
 
 
 /***/ }),
-/* 224 */
+/* 223 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68684,7 +68616,7 @@ module.exports = {
 
 
 /***/ }),
-/* 225 */
+/* 224 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68703,7 +68635,7 @@ module.exports = {
 
 
 /***/ }),
-/* 226 */
+/* 225 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68722,7 +68654,7 @@ module.exports = {
 
 
 /***/ }),
-/* 227 */
+/* 226 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68741,7 +68673,7 @@ module.exports = {
 
 
 /***/ }),
-/* 228 */
+/* 227 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68760,7 +68692,7 @@ module.exports = {
 
 
 /***/ }),
-/* 229 */
+/* 228 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68779,7 +68711,7 @@ module.exports = {
 
 
 /***/ }),
-/* 230 */
+/* 229 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68798,7 +68730,7 @@ module.exports = {
 
 
 /***/ }),
-/* 231 */
+/* 230 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68816,7 +68748,7 @@ module.exports = {
 
 
 /***/ }),
-/* 232 */
+/* 231 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68834,7 +68766,7 @@ module.exports = {
 
 
 /***/ }),
-/* 233 */
+/* 232 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68853,7 +68785,7 @@ module.exports = {
 
 
 /***/ }),
-/* 234 */
+/* 233 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68872,7 +68804,7 @@ module.exports = {
 
 
 /***/ }),
-/* 235 */
+/* 234 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68891,7 +68823,7 @@ module.exports = {
 
 
 /***/ }),
-/* 236 */
+/* 235 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68909,7 +68841,7 @@ module.exports = {
 
 
 /***/ }),
-/* 237 */
+/* 236 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68927,7 +68859,7 @@ module.exports = {
 
 
 /***/ }),
-/* 238 */
+/* 237 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68955,7 +68887,7 @@ module.exports = {
 
 
 /***/ }),
-/* 239 */
+/* 238 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68978,7 +68910,7 @@ module.exports = {
 
 
 /***/ }),
-/* 240 */
+/* 239 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69001,7 +68933,7 @@ module.exports = {
 
 
 /***/ }),
-/* 241 */
+/* 240 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69024,7 +68956,7 @@ module.exports = {
 
 
 /***/ }),
-/* 242 */
+/* 241 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69049,7 +68981,7 @@ module.exports = {
 
 
 /***/ }),
-/* 243 */
+/* 242 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69069,7 +69001,7 @@ module.exports = {
 
 
 /***/ }),
-/* 244 */
+/* 243 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69090,7 +69022,7 @@ module.exports = {
 
 
 /***/ }),
-/* 245 */
+/* 244 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69111,7 +69043,7 @@ module.exports = {
 
 
 /***/ }),
-/* 246 */
+/* 245 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69130,7 +69062,7 @@ module.exports = {
 
 
 /***/ }),
-/* 247 */
+/* 246 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69155,7 +69087,7 @@ module.exports = {
 
 
 /***/ }),
-/* 248 */
+/* 247 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69186,7 +69118,7 @@ module.exports = {
 
 
 /***/ }),
-/* 249 */
+/* 248 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69207,7 +69139,7 @@ module.exports = {
 
 
 /***/ }),
-/* 250 */
+/* 249 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69231,7 +69163,7 @@ module.exports = {
 
 
 /***/ }),
-/* 251 */
+/* 250 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69257,7 +69189,7 @@ module.exports = {
 
 
 /***/ }),
-/* 252 */
+/* 251 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69282,7 +69214,7 @@ module.exports = {
 
 
 /***/ }),
-/* 253 */
+/* 252 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69307,7 +69239,7 @@ module.exports = {
 
 
 /***/ }),
-/* 254 */
+/* 253 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69330,7 +69262,7 @@ module.exports = {
 
 
 /***/ }),
-/* 255 */
+/* 254 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69355,7 +69287,7 @@ module.exports = {
 
 
 /***/ }),
-/* 256 */
+/* 255 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69377,7 +69309,7 @@ module.exports = {
 
 
 /***/ }),
-/* 257 */
+/* 256 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69398,7 +69330,7 @@ module.exports = {
 
 
 /***/ }),
-/* 258 */
+/* 257 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69419,7 +69351,7 @@ module.exports = {
 
 
 /***/ }),
-/* 259 */
+/* 258 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69441,7 +69373,7 @@ module.exports = {
 
 
 /***/ }),
-/* 260 */
+/* 259 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69461,7 +69393,7 @@ module.exports = {
 
 
 /***/ }),
-/* 261 */
+/* 260 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69489,7 +69421,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 262 */
+/* 261 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69514,7 +69446,7 @@ module.exports = {
 
 
 /***/ }),
-/* 263 */
+/* 262 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69540,7 +69472,7 @@ module.exports = {
 
 
 /***/ }),
-/* 264 */
+/* 263 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69565,7 +69497,7 @@ module.exports = {
 
 
 /***/ }),
-/* 265 */
+/* 264 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69591,7 +69523,7 @@ module.exports = {
 
 
 /***/ }),
-/* 266 */
+/* 265 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69617,7 +69549,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 267 */
+/* 266 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69639,7 +69571,7 @@ module.exports = {
 
 
 /***/ }),
-/* 268 */
+/* 267 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69664,7 +69596,7 @@ module.exports = {
 
 
 /***/ }),
-/* 269 */
+/* 268 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69687,7 +69619,7 @@ module.exports = {
 
 
 /***/ }),
-/* 270 */
+/* 269 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69711,7 +69643,7 @@ module.exports = {
 
 
 /***/ }),
-/* 271 */
+/* 270 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69738,7 +69670,7 @@ module.exports = {
 
 
 /***/ }),
-/* 272 */
+/* 271 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69763,7 +69695,7 @@ module.exports = {
 
 
 /***/ }),
-/* 273 */
+/* 272 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69787,7 +69719,7 @@ module.exports = {
 
 
 /***/ }),
-/* 274 */
+/* 273 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69810,7 +69742,7 @@ module.exports = {
 
 
 /***/ }),
-/* 275 */
+/* 274 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69830,7 +69762,7 @@ module.exports = {
 
 
 /***/ }),
-/* 276 */
+/* 275 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69853,7 +69785,7 @@ module.exports = {
 
 
 /***/ }),
-/* 277 */
+/* 276 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69876,7 +69808,7 @@ module.exports = {
 
 
 /***/ }),
-/* 278 */
+/* 277 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69898,7 +69830,7 @@ module.exports = {
 
 
 /***/ }),
-/* 279 */
+/* 278 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69919,7 +69851,7 @@ module.exports = {
 
 
 /***/ }),
-/* 280 */
+/* 279 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69941,7 +69873,7 @@ module.exports = {
 
 
 /***/ }),
-/* 281 */
+/* 280 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69964,7 +69896,7 @@ module.exports = {
 
 
 /***/ }),
-/* 282 */
+/* 281 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69987,7 +69919,7 @@ module.exports = {
 
 
 /***/ }),
-/* 283 */
+/* 282 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70005,7 +69937,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 284 */
+/* 283 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70023,7 +69955,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 285 */
+/* 284 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70040,7 +69972,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 286 */
+/* 285 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70058,7 +69990,7 @@ module.exports = {
 
 
 /***/ }),
-/* 287 */
+/* 286 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70080,7 +70012,7 @@ module.exports = {
 
 
 /***/ }),
-/* 288 */
+/* 287 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70101,7 +70033,7 @@ module.exports = {
 
 
 /***/ }),
-/* 289 */
+/* 288 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70122,7 +70054,7 @@ module.exports = {
 
 
 /***/ }),
-/* 290 */
+/* 289 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70148,7 +70080,7 @@ module.exports = {
 
 
 /***/ }),
-/* 291 */
+/* 290 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70174,7 +70106,7 @@ module.exports = {
 
 
 /***/ }),
-/* 292 */
+/* 291 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70200,7 +70132,7 @@ module.exports = {
 
 
 /***/ }),
-/* 293 */
+/* 292 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70226,7 +70158,7 @@ module.exports = {
 
 
 /***/ }),
-/* 294 */
+/* 293 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70246,7 +70178,7 @@ module.exports = {
 
 
 /***/ }),
-/* 295 */
+/* 294 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70266,7 +70198,7 @@ module.exports = {
 
 
 /***/ }),
-/* 296 */
+/* 295 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70286,7 +70218,7 @@ module.exports = {
 
 
 /***/ }),
-/* 297 */
+/* 296 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70306,7 +70238,7 @@ module.exports = {
 
 
 /***/ }),
-/* 298 */
+/* 297 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70329,7 +70261,7 @@ module.exports = {
 
 
 /***/ }),
-/* 299 */
+/* 298 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70353,7 +70285,7 @@ module.exports = {
 
 
 /***/ }),
-/* 300 */
+/* 299 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70376,7 +70308,7 @@ module.exports = {
 
 
 /***/ }),
-/* 301 */
+/* 300 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70400,7 +70332,7 @@ module.exports = {
 
 
 /***/ }),
-/* 302 */
+/* 301 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70425,7 +70357,7 @@ module.exports = {
 
 
 /***/ }),
-/* 303 */
+/* 302 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70448,7 +70380,7 @@ module.exports = {
 
 
 /***/ }),
-/* 304 */
+/* 303 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70469,7 +70401,7 @@ module.exports = {
 
 
 /***/ }),
-/* 305 */
+/* 304 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70493,7 +70425,7 @@ module.exports = {
 
 
 /***/ }),
-/* 306 */
+/* 305 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70517,7 +70449,7 @@ module.exports = {
 
 
 /***/ }),
-/* 307 */
+/* 306 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70543,7 +70475,7 @@ module.exports = {
 
 
 /***/ }),
-/* 308 */
+/* 307 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70563,7 +70495,7 @@ module.exports = {
 
 
 /***/ }),
-/* 309 */
+/* 308 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70586,7 +70518,7 @@ module.exports = {
 
 
 /***/ }),
-/* 310 */
+/* 309 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70604,7 +70536,7 @@ module.exports = {
 
 
 /***/ }),
-/* 311 */
+/* 310 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70626,7 +70558,7 @@ module.exports = {
 
 
 /***/ }),
-/* 312 */
+/* 311 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70647,7 +70579,7 @@ module.exports = {
 
 
 /***/ }),
-/* 313 */
+/* 312 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70665,7 +70597,7 @@ module.exports = {
 
 
 /***/ }),
-/* 314 */
+/* 313 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70695,7 +70627,7 @@ module.exports = {
 
 
 /***/ }),
-/* 315 */
+/* 314 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70715,7 +70647,7 @@ module.exports = {
 
 
 /***/ }),
-/* 316 */
+/* 315 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70746,7 +70678,7 @@ module.exports = {
 
 
 /***/ }),
-/* 317 */
+/* 316 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70771,7 +70703,7 @@ module.exports = {
 
 
 /***/ }),
-/* 318 */
+/* 317 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70793,7 +70725,7 @@ module.exports = {
 
 
 /***/ }),
-/* 319 */
+/* 318 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70817,7 +70749,7 @@ module.exports = {
 
 
 /***/ }),
-/* 320 */
+/* 319 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70840,7 +70772,7 @@ module.exports = {
 
 
 /***/ }),
-/* 321 */
+/* 320 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70863,7 +70795,7 @@ module.exports = {
 
 
 /***/ }),
-/* 322 */
+/* 321 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70894,7 +70826,7 @@ module.exports = {
 
 
 /***/ }),
-/* 323 */
+/* 322 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70915,7 +70847,7 @@ module.exports = {
 
 
 /***/ }),
-/* 324 */
+/* 323 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70938,7 +70870,7 @@ module.exports = {
 
 
 /***/ }),
-/* 325 */
+/* 324 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70967,7 +70899,7 @@ module.exports = {
 
 
 /***/ }),
-/* 326 */
+/* 325 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70985,7 +70917,7 @@ module.exports = {
 
 
 /***/ }),
-/* 327 */
+/* 326 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71005,7 +70937,7 @@ module.exports = {
 
 
 /***/ }),
-/* 328 */
+/* 327 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71026,7 +70958,7 @@ module.exports = {
 
 
 /***/ }),
-/* 329 */
+/* 328 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71045,7 +70977,7 @@ module.exports = {
 
 
 /***/ }),
-/* 330 */
+/* 329 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71062,7 +70994,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 331 */
+/* 330 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71082,7 +71014,7 @@ module.exports = {
 
 
 /***/ }),
-/* 332 */
+/* 331 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71110,7 +71042,7 @@ module.exports = {
 
 
 /***/ }),
-/* 333 */
+/* 332 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71136,7 +71068,7 @@ module.exports = {
 
 
 /***/ }),
-/* 334 */
+/* 333 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71159,7 +71091,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 335 */
+/* 334 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71184,7 +71116,7 @@ module.exports = {
 
 
 /***/ }),
-/* 336 */
+/* 335 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71213,7 +71145,7 @@ module.exports = {
 
 
 /***/ }),
-/* 337 */
+/* 336 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71235,7 +71167,7 @@ module.exports = {
 
 
 /***/ }),
-/* 338 */
+/* 337 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71262,7 +71194,7 @@ module.exports = {
 
 
 /***/ }),
-/* 339 */
+/* 338 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71290,7 +71222,7 @@ module.exports = {
 
 
 /***/ }),
-/* 340 */
+/* 339 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71316,7 +71248,7 @@ module.exports = {
 
 
 /***/ }),
-/* 341 */
+/* 340 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71343,7 +71275,7 @@ module.exports = {
 
 
 /***/ }),
-/* 342 */
+/* 341 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71369,7 +71301,7 @@ module.exports = {
 
 
 /***/ }),
-/* 343 */
+/* 342 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71397,7 +71329,7 @@ module.exports = {
 
 
 /***/ }),
-/* 344 */
+/* 343 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71418,7 +71350,7 @@ module.exports = {
 
 
 /***/ }),
-/* 345 */
+/* 344 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71440,7 +71372,7 @@ module.exports = {
 
 
 /***/ }),
-/* 346 */
+/* 345 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71461,7 +71393,7 @@ module.exports = {
 
 
 /***/ }),
-/* 347 */
+/* 346 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71483,7 +71415,7 @@ module.exports = {
 
 
 /***/ }),
-/* 348 */
+/* 347 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71505,7 +71437,7 @@ module.exports = {
 
 
 /***/ }),
-/* 349 */
+/* 348 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71527,7 +71459,7 @@ module.exports = {
 
 
 /***/ }),
-/* 350 */
+/* 349 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71548,7 +71480,7 @@ module.exports = {
 
 
 /***/ }),
-/* 351 */
+/* 350 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71571,7 +71503,7 @@ module.exports = {
 
 
 /***/ }),
-/* 352 */
+/* 351 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71593,7 +71525,7 @@ module.exports = {
 
 
 /***/ }),
-/* 353 */
+/* 352 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71615,7 +71547,7 @@ module.exports = {
 
 
 /***/ }),
-/* 354 */
+/* 353 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71635,7 +71567,7 @@ module.exports = {
 
 
 /***/ }),
-/* 355 */
+/* 354 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71661,7 +71593,7 @@ module.exports = {
 
 
 /***/ }),
-/* 356 */
+/* 355 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71695,7 +71627,7 @@ module.exports = {
 
 
 /***/ }),
-/* 357 */
+/* 356 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71728,7 +71660,7 @@ module.exports = {
 
 
 /***/ }),
-/* 358 */
+/* 357 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71757,7 +71689,7 @@ module.exports = {
 
 
 /***/ }),
-/* 359 */
+/* 358 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71791,7 +71723,7 @@ module.exports = {
 
 
 /***/ }),
-/* 360 */
+/* 359 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71821,7 +71753,7 @@ module.exports = {
 
 
 /***/ }),
-/* 361 */
+/* 360 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71851,7 +71783,7 @@ module.exports = {
 
 
 /***/ }),
-/* 362 */
+/* 361 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71882,7 +71814,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 363 */
+/* 362 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71915,7 +71847,7 @@ module.exports = {
 
 
 /***/ }),
-/* 364 */
+/* 363 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71945,7 +71877,7 @@ module.exports = {
 
 
 /***/ }),
-/* 365 */
+/* 364 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71978,7 +71910,7 @@ module.exports = {
 
 
 /***/ }),
-/* 366 */
+/* 365 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72001,7 +71933,7 @@ module.exports = {
 
 
 /***/ }),
-/* 367 */
+/* 366 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72022,7 +71954,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 368 */
+/* 367 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72045,7 +71977,7 @@ module.exports = {
 
 
 /***/ }),
-/* 369 */
+/* 368 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72065,7 +71997,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 370 */
+/* 369 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72089,7 +72021,7 @@ module.exports = {
 
 
 /***/ }),
-/* 371 */
+/* 370 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72110,7 +72042,7 @@ module.exports = {
 
 
 /***/ }),
-/* 372 */
+/* 371 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72134,7 +72066,7 @@ module.exports = {
 
 
 /***/ }),
-/* 373 */
+/* 372 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72155,7 +72087,7 @@ module.exports = {
 
 
 /***/ }),
-/* 374 */
+/* 373 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72178,7 +72110,7 @@ module.exports = {
 
 
 /***/ }),
-/* 375 */
+/* 374 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72199,7 +72131,7 @@ module.exports = {
 
 
 /***/ }),
-/* 376 */
+/* 375 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72222,7 +72154,7 @@ module.exports = {
 
 
 /***/ }),
-/* 377 */
+/* 376 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72243,7 +72175,7 @@ module.exports = {
 
 
 /***/ }),
-/* 378 */
+/* 377 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72270,7 +72202,7 @@ module.exports = {
 
 
 /***/ }),
-/* 379 */
+/* 378 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72296,7 +72228,7 @@ module.exports = {
 
 
 /***/ }),
-/* 380 */
+/* 379 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72318,7 +72250,7 @@ module.exports = {
 
 
 /***/ }),
-/* 381 */
+/* 380 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72341,7 +72273,7 @@ module.exports = {
 
 
 /***/ }),
-/* 382 */
+/* 381 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72364,7 +72296,7 @@ module.exports = {
 
 
 /***/ }),
-/* 383 */
+/* 382 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72387,7 +72319,7 @@ module.exports = {
 
 
 /***/ }),
-/* 384 */
+/* 383 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72410,7 +72342,7 @@ module.exports = {
 
 
 /***/ }),
-/* 385 */
+/* 384 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72433,7 +72365,7 @@ module.exports = {
 
 
 /***/ }),
-/* 386 */
+/* 385 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72456,7 +72388,7 @@ module.exports = {
 
 
 /***/ }),
-/* 387 */
+/* 386 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72482,7 +72414,7 @@ module.exports = {
 
 
 /***/ }),
-/* 388 */
+/* 387 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72503,7 +72435,7 @@ module.exports = {
 
 
 /***/ }),
-/* 389 */
+/* 388 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72528,7 +72460,7 @@ module.exports = {
 
 
 /***/ }),
-/* 390 */
+/* 389 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72550,7 +72482,7 @@ module.exports = {
 
 
 /***/ }),
-/* 391 */
+/* 390 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72571,7 +72503,7 @@ module.exports = {
 
 
 /***/ }),
-/* 392 */
+/* 391 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72593,7 +72525,7 @@ module.exports = {
 
 
 /***/ }),
-/* 393 */
+/* 392 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72615,7 +72547,7 @@ module.exports = {
 
 
 /***/ }),
-/* 394 */
+/* 393 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72636,7 +72568,7 @@ module.exports = {
 
 
 /***/ }),
-/* 395 */
+/* 394 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72656,7 +72588,7 @@ module.exports = {
 
 
 /***/ }),
-/* 396 */
+/* 395 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72677,7 +72609,7 @@ module.exports = {
 
 
 /***/ }),
-/* 397 */
+/* 396 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72702,7 +72634,7 @@ module.exports = {
 
 
 /***/ }),
-/* 398 */
+/* 397 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72723,7 +72655,7 @@ module.exports = {
 
 
 /***/ }),
-/* 399 */
+/* 398 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72742,7 +72674,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 400 */
+/* 399 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72763,7 +72695,7 @@ module.exports = {
 
 
 /***/ }),
-/* 401 */
+/* 400 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72784,20 +72716,20 @@ module.exports = {
 
 
 /***/ }),
-/* 402 */
+/* 401 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(403),
+  __webpack_require__(402),
+  __webpack_require__(404),
   __webpack_require__(405),
   __webpack_require__(406),
-  __webpack_require__(407),
-  __webpack_require__(121)
+  __webpack_require__(120)
 ];
 
 
 /***/ }),
-/* 403 */
+/* 402 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -72860,7 +72792,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 404 */
+/* 403 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -72920,7 +72852,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 405 */
+/* 404 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -72992,7 +72924,7 @@ exports.name = 'eval';
 exports.factory = factory;
 
 /***/ }),
-/* 406 */
+/* 405 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73001,7 +72933,7 @@ exports.factory = factory;
 var getSafeProperty = __webpack_require__(15).getSafeProperty;
 
 function factory (type, config, load, typed, math) {
-  var docs = load(__webpack_require__(110));
+  var docs = load(__webpack_require__(109));
 
   /**
    * Retrieve help on a function or data type.
@@ -73065,7 +72997,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 407 */
+/* 406 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73124,31 +73056,31 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 408 */
+/* 407 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(113),
+  __webpack_require__(112),
   __webpack_require__(86),
+  __webpack_require__(114),
   __webpack_require__(115),
   __webpack_require__(116),
-  __webpack_require__(117),
   __webpack_require__(58),
   __webpack_require__(84),
-  __webpack_require__(118),
+  __webpack_require__(117),
   __webpack_require__(59),
   __webpack_require__(16),
-  __webpack_require__(120),
+  __webpack_require__(119),
   __webpack_require__(68),
   __webpack_require__(69),
   __webpack_require__(85),
   __webpack_require__(44),
-  __webpack_require__(409)
+  __webpack_require__(408)
 ];
 
 
 /***/ }),
-/* 409 */
+/* 408 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73172,10 +73104,11 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 410 */
+/* 409 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
+  __webpack_require__(410),
   __webpack_require__(411),
   __webpack_require__(412),
   __webpack_require__(413),
@@ -73184,13 +73117,12 @@ module.exports = [
   __webpack_require__(416),
   __webpack_require__(417),
   __webpack_require__(418),
-  __webpack_require__(419),
-  __webpack_require__(420)
+  __webpack_require__(419)
 ];
 
 
 /***/ }),
-/* 411 */
+/* 410 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73237,7 +73169,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 412 */
+/* 411 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73245,7 +73177,7 @@ exports.factory = factory;
 
 var filter = __webpack_require__(2).filter;
 var filterRegExp = __webpack_require__(2).filterRegExp;
-var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
 
 /**
  * Attach a transform function to math.filter
@@ -73334,13 +73266,13 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 413 */
+/* 412 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
 var forEach = __webpack_require__(2).forEach;
 
 /**
@@ -73413,7 +73345,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 414 */
+/* 413 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73471,13 +73403,13 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 415 */
+/* 414 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
 var map = __webpack_require__(2).map;
 
 /**
@@ -73568,7 +73500,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 416 */
+/* 415 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73585,7 +73517,7 @@ var isCollection = __webpack_require__(51);
  * from one-based to zero based
  */
 function factory (type, config, load, typed) {
-  var max = load(__webpack_require__(123));
+  var max = load(__webpack_require__(122));
 
   return typed('max', {
     '...any': function (args) {
@@ -73616,7 +73548,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 417 */
+/* 416 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73633,7 +73565,7 @@ var isCollection = __webpack_require__(51);
  * from one-based to zero based
  */
 function factory (type, config, load, typed) {
-  var mean = load(__webpack_require__(124));
+  var mean = load(__webpack_require__(123));
 
   return typed('mean', {
     '...any': function (args) {
@@ -73664,7 +73596,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 418 */
+/* 417 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73681,7 +73613,7 @@ var isCollection = __webpack_require__(51);
  * from one-based to zero based
  */
 function factory (type, config, load, typed) {
-  var min = load(__webpack_require__(127));
+  var min = load(__webpack_require__(126));
 
   return typed('min', {
     '...any': function (args) {
@@ -73712,7 +73644,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 419 */
+/* 418 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73725,7 +73657,7 @@ exports.factory = factory;
  * This transform creates a range which includes the end value
  */
 function factory (type, config, load, typed) {
-  var range = load(__webpack_require__(128));
+  var range = load(__webpack_require__(127));
 
   return typed('range', {
     '...any': function (args) {
@@ -73747,7 +73679,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 420 */
+/* 419 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73782,7 +73714,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 421 */
+/* 420 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73792,7 +73724,7 @@ var object = __webpack_require__(5);
 var string = __webpack_require__(9);
 
 function factory (type, config, load, typed) {
-  var parser = load(__webpack_require__(121))();
+  var parser = load(__webpack_require__(120))();
 
   /**
    * Documentation object
@@ -73906,27 +73838,49 @@ exports.factory = factory;
 
 
 /***/ }),
+/* 421 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = [
+  __webpack_require__(422),
+  __webpack_require__(443),
+  __webpack_require__(462),
+  __webpack_require__(475),
+  __webpack_require__(479),
+  __webpack_require__(483),
+  __webpack_require__(486),
+  __webpack_require__(490),
+  __webpack_require__(503),
+  __webpack_require__(512),
+  __webpack_require__(515),
+  __webpack_require__(523),
+  __webpack_require__(525),
+  __webpack_require__(531),
+  __webpack_require__(533),
+  __webpack_require__(558),
+  __webpack_require__(560)
+];
+
+
+/***/ }),
 /* 422 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   __webpack_require__(423),
-  __webpack_require__(444),
-  __webpack_require__(463),
-  __webpack_require__(476),
-  __webpack_require__(480),
-  __webpack_require__(484),
-  __webpack_require__(487),
-  __webpack_require__(491),
-  __webpack_require__(504),
-  __webpack_require__(513),
-  __webpack_require__(516),
-  __webpack_require__(524),
-  __webpack_require__(526),
-  __webpack_require__(532),
-  __webpack_require__(534),
-  __webpack_require__(559),
-  __webpack_require__(561)
+
+  // simplify
+  __webpack_require__(128),
+
+  // decomposition
+  __webpack_require__(427),
+  __webpack_require__(134),
+  __webpack_require__(135),
+
+  // solver
+  __webpack_require__(140),
+  __webpack_require__(441),
+  __webpack_require__(141)
 ];
 
 
@@ -73934,34 +73888,12 @@ module.exports = [
 /* 423 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = [
-  __webpack_require__(424),
-
-  // simplify
-  __webpack_require__(129),
-
-  // decomposition
-  __webpack_require__(428),
-  __webpack_require__(135),
-  __webpack_require__(136),
-
-  // solver
-  __webpack_require__(141),
-  __webpack_require__(442),
-  __webpack_require__(142)
-];
-
-
-/***/ }),
-/* 424 */
-/***/ (function(module, exports, __webpack_require__) {
-
 "use strict";
 
 
 function factory (type, config, load, typed) {
   var parse = load(__webpack_require__(43));
-  var simplify = load(__webpack_require__(129));
+  var simplify = load(__webpack_require__(128));
   var ConstantNode = load(__webpack_require__(58));
   var FunctionNode = load(__webpack_require__(59));
   var OperatorNode = load(__webpack_require__(68));
@@ -74681,7 +74613,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 425 */
+/* 424 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -74690,7 +74622,7 @@ exports.factory = factory;
 var digits = __webpack_require__(3).digits;
 // TODO this could be improved by simplifying seperated constants under associative and commutative operators
 function factory(type, config, load, typed, math) {
-  var util = load(__webpack_require__(130));
+  var util = load(__webpack_require__(129));
   var isCommutative = util.isCommutative;
   var isAssociative = util.isAssociative;
   var allChildren = util.allChildren;
@@ -74936,7 +74868,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 426 */
+/* 425 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -75097,7 +75029,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 427 */
+/* 426 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -75163,7 +75095,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 428 */
+/* 427 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -75174,16 +75106,16 @@ function factory (type, config, load, typed) {
   var matrix = load(__webpack_require__(0));
   var zeros = load(__webpack_require__(42));
   var eye = load(__webpack_require__(67));
-  var clone = load(__webpack_require__(131));
+  var clone = load(__webpack_require__(130));
   
   var isZero = load(__webpack_require__(88));
   var isPositive = load(__webpack_require__(60));
-  var unequal = load(__webpack_require__(132));
+  var unequal = load(__webpack_require__(131));
     
   var abs = load(__webpack_require__(32));
-  var sign = load(__webpack_require__(133));
+  var sign = load(__webpack_require__(132));
   var sqrt = load(__webpack_require__(61));
-  var conj = load(__webpack_require__(134));
+  var conj = load(__webpack_require__(133));
   
   var unaryMinus = load(__webpack_require__(41)); 
   var addScalar = load(__webpack_require__(22));  
@@ -75429,7 +75361,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 429 */
+/* 428 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -75437,11 +75369,11 @@ exports.factory = factory;
 
 function factory (type, config, load) {
 
-  var cs_amd = load(__webpack_require__(430));
-  var cs_permute = load(__webpack_require__(432));
-  var cs_etree = load(__webpack_require__(433));
-  var cs_post = load(__webpack_require__(434));
-  var cs_counts = load(__webpack_require__(435));
+  var cs_amd = load(__webpack_require__(429));
+  var cs_permute = load(__webpack_require__(431));
+  var cs_etree = load(__webpack_require__(432));
+  var cs_post = load(__webpack_require__(433));
+  var cs_counts = load(__webpack_require__(434));
 
   /**
    * Symbolic ordering and analysis for QR and LU decompositions.
@@ -75599,7 +75531,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 430 */
+/* 429 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -75608,8 +75540,8 @@ exports.factory = factory;
 function factory (type, config, load) {
 
   var cs_flip = load(__webpack_require__(89));
-  var cs_fkeep = load(__webpack_require__(431));
-  var cs_tdfs = load(__webpack_require__(137));
+  var cs_fkeep = load(__webpack_require__(430));
+  var cs_tdfs = load(__webpack_require__(136));
   
   var add       = load(__webpack_require__(20));
   var multiply  = load(__webpack_require__(12));
@@ -76179,7 +76111,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 431 */
+/* 430 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76251,7 +76183,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 432 */
+/* 431 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76329,7 +76261,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 433 */
+/* 432 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76412,7 +76344,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 434 */
+/* 433 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76420,7 +76352,7 @@ exports.factory = factory;
 
 function factory (type, config, load) {
 
-  var cs_tdfs = load(__webpack_require__(137));
+  var cs_tdfs = load(__webpack_require__(136));
 
   /**
    * Post order a tree of forest
@@ -76478,7 +76410,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 435 */
+/* 434 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76488,7 +76420,7 @@ function factory (type, config, load) {
 
   var transpose = load(__webpack_require__(73));
   
-  var cs_leaf = load(__webpack_require__(436));
+  var cs_leaf = load(__webpack_require__(435));
 
   /**
    * Computes the column counts using the upper triangular part of A.
@@ -76606,7 +76538,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 436 */
+/* 435 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76679,7 +76611,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 437 */
+/* 436 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76691,10 +76623,10 @@ function factory (type, config, load) {
   var divideScalar = load(__webpack_require__(21));
   var multiply = load(__webpack_require__(12));
   
-  var larger = load(__webpack_require__(38));
-  var largerEq = load(__webpack_require__(138));
+  var larger = load(__webpack_require__(37));
+  var largerEq = load(__webpack_require__(137));
   
-  var cs_spsolve = load(__webpack_require__(438));
+  var cs_spsolve = load(__webpack_require__(437));
 
   var SparseMatrix = type.SparseMatrix;
 
@@ -76864,7 +76796,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 438 */
+/* 437 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76876,7 +76808,7 @@ function factory (type, config, load) {
   var multiply = load(__webpack_require__(12));
   var subtract = load(__webpack_require__(23));
 
-  var cs_reach = load(__webpack_require__(439));
+  var cs_reach = load(__webpack_require__(438));
 
   /**
    * The function cs_spsolve() computes the solution to G * x = bk, where bk is the
@@ -76957,7 +76889,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 439 */
+/* 438 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76965,9 +76897,9 @@ exports.factory = factory;
 
 function factory (type, config, load) {
 
-  var cs_dfs = load(__webpack_require__(440));
-  var cs_marked = load(__webpack_require__(139));
-  var cs_mark = load(__webpack_require__(140));
+  var cs_dfs = load(__webpack_require__(439));
+  var cs_marked = load(__webpack_require__(138));
+  var cs_mark = load(__webpack_require__(139));
 
   /**
    * The cs_reach function computes X = Reach(B), where B is the nonzero pattern of the n-by-1 
@@ -77025,7 +76957,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 440 */
+/* 439 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77033,9 +76965,9 @@ exports.factory = factory;
 
 function factory (type, config, load) {
 
-  var cs_marked = load(__webpack_require__(139));
-  var cs_mark   = load(__webpack_require__(140));
-  var cs_unflip = load(__webpack_require__(441));
+  var cs_marked = load(__webpack_require__(138));
+  var cs_mark   = load(__webpack_require__(139));
+  var cs_unflip = load(__webpack_require__(440));
 
   /**
    * Depth-first search computes the nonzero pattern xi of the directed graph G (Matrix) starting
@@ -77117,7 +77049,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 441 */
+/* 440 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77148,7 +77080,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 442 */
+/* 441 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77159,14 +77091,14 @@ var isArray = Array.isArray;
 function factory (type, config, load, typed) {
   
   var matrix = load(__webpack_require__(0));
-  var lup = load(__webpack_require__(135));
-  var slu = load(__webpack_require__(136));
-  var cs_ipvec = load(__webpack_require__(443));
+  var lup = load(__webpack_require__(134));
+  var slu = load(__webpack_require__(135));
+  var cs_ipvec = load(__webpack_require__(442));
 
   var solveValidation = load(__webpack_require__(90));
 
-  var usolve = load(__webpack_require__(142));
-  var lsolve = load(__webpack_require__(141));
+  var usolve = load(__webpack_require__(141));
+  var lsolve = load(__webpack_require__(140));
 
   /**
    * Solves the linear system `A * x = b` where `A` is an [n x n] matrix and `b` is a [n] column vector.
@@ -77280,7 +77212,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 443 */
+/* 442 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77328,46 +77260,46 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 444 */
+/* 443 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   __webpack_require__(32),
   __webpack_require__(20),
   __webpack_require__(22),
+  __webpack_require__(444),
   __webpack_require__(445),
   __webpack_require__(446),
-  __webpack_require__(447),
   __webpack_require__(52),
-  __webpack_require__(143),
+  __webpack_require__(142),
+  __webpack_require__(447),
   __webpack_require__(448),
   __webpack_require__(449),
+  __webpack_require__(106),
   __webpack_require__(450),
-  __webpack_require__(107),
   __webpack_require__(451),
   __webpack_require__(452),
   __webpack_require__(453),
-  __webpack_require__(454),
-  __webpack_require__(145),
+  __webpack_require__(144),
+  __webpack_require__(455),
   __webpack_require__(456),
-  __webpack_require__(457),
   __webpack_require__(12),
+  __webpack_require__(457),
   __webpack_require__(458),
-  __webpack_require__(459),
   __webpack_require__(50),
-  __webpack_require__(108),
-  __webpack_require__(133),
+  __webpack_require__(107),
+  __webpack_require__(132),
   __webpack_require__(61),
-  __webpack_require__(460),
+  __webpack_require__(459),
   __webpack_require__(23),
   __webpack_require__(41),
-  __webpack_require__(461),
-  __webpack_require__(462)
+  __webpack_require__(460),
+  __webpack_require__(461)
 ];
 
 
 /***/ }),
-/* 445 */
+/* 444 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77559,7 +77491,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 446 */
+/* 445 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77627,7 +77559,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 447 */
+/* 446 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77698,7 +77630,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 448 */
+/* 447 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77711,7 +77643,7 @@ function factory (type, config, load, typed) {
   var latex = __webpack_require__(4);
 
   var algorithm02 = load(__webpack_require__(26));
-  var algorithm09 = load(__webpack_require__(144));
+  var algorithm09 = load(__webpack_require__(143));
   var algorithm11 = load(__webpack_require__(19));
   var algorithm13 = load(__webpack_require__(8));
   var algorithm14 = load(__webpack_require__(6));
@@ -77848,7 +77780,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 449 */
+/* 448 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77996,7 +77928,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 450 */
+/* 449 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78060,7 +77992,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 451 */
+/* 450 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78127,7 +78059,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 452 */
+/* 451 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78139,7 +78071,7 @@ function factory (type, config, load, typed) {
 
   var matrix = load(__webpack_require__(0));
 
-  var algorithm01 = load(__webpack_require__(37));
+  var algorithm01 = load(__webpack_require__(36));
   var algorithm04 = load(__webpack_require__(79));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm13 = load(__webpack_require__(8));
@@ -78333,7 +78265,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 453 */
+/* 452 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78424,7 +78356,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 454 */
+/* 453 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78645,7 +78577,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 455 */
+/* 454 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78716,7 +78648,7 @@ module.exports = function scatter(a, j, w, x, u, mark, c, f, inverse, update, va
 
 
 /***/ }),
-/* 456 */
+/* 455 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78801,7 +78733,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 457 */
+/* 456 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78992,7 +78924,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 458 */
+/* 457 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79006,10 +78938,10 @@ function factory (type, config, load, typed) {
   var sqrt        = load(__webpack_require__(61));
   var multiply    = load(__webpack_require__(12));
   var equalScalar = load(__webpack_require__(11));
-  var larger      = load(__webpack_require__(38));
+  var larger      = load(__webpack_require__(37));
   var smaller     = load(__webpack_require__(49));
   var matrix      = load(__webpack_require__(0));
-  var trace       = load(__webpack_require__(146));
+  var trace       = load(__webpack_require__(145));
   var transpose   = load(__webpack_require__(73));
 
 
@@ -79214,7 +79146,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 459 */
+/* 458 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79224,7 +79156,7 @@ function factory (type, config, load, typed) {
 
   var matrix = load(__webpack_require__(0));
 
-  var algorithm01 = load(__webpack_require__(37));
+  var algorithm01 = load(__webpack_require__(36));
   var algorithm02 = load(__webpack_require__(26));
   var algorithm06 = load(__webpack_require__(74));
   var algorithm11 = load(__webpack_require__(19));
@@ -79520,7 +79452,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 460 */
+/* 459 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79592,7 +79524,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 461 */
+/* 460 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79671,7 +79603,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 462 */
+/* 461 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79815,29 +79747,29 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 463 */
+/* 462 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(464),
+  __webpack_require__(463),
+  __webpack_require__(465),
   __webpack_require__(466),
-  __webpack_require__(467),
-  __webpack_require__(469),
-  __webpack_require__(471),
-  __webpack_require__(473),
-  __webpack_require__(475)
+  __webpack_require__(468),
+  __webpack_require__(470),
+  __webpack_require__(472),
+  __webpack_require__(474)
 ];
 
 
 /***/ }),
-/* 464 */
+/* 463 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var isInteger = __webpack_require__(3).isInteger;
-var bigBitAnd = __webpack_require__(465);
+var bigBitAnd = __webpack_require__(464);
 
 function factory (type, config, load, typed) {
   var latex = __webpack_require__(4);
@@ -79986,7 +79918,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 465 */
+/* 464 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var bitwise = __webpack_require__(91);
@@ -80060,7 +79992,7 @@ module.exports = function bitAnd(x, y) {
 
 
 /***/ }),
-/* 466 */
+/* 465 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -80123,21 +80055,21 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 467 */
+/* 466 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var isInteger = __webpack_require__(3).isInteger;
-var bigBitOr = __webpack_require__(468);
+var bigBitOr = __webpack_require__(467);
 
 function factory (type, config, load, typed) {
   var latex = __webpack_require__(4);
 
   var matrix = load(__webpack_require__(0));
 
-  var algorithm01 = load(__webpack_require__(37));
+  var algorithm01 = load(__webpack_require__(36));
   var algorithm04 = load(__webpack_require__(79));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm13 = load(__webpack_require__(8));
@@ -80279,7 +80211,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 468 */
+/* 467 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var bitwise = __webpack_require__(91);
@@ -80338,14 +80270,14 @@ module.exports = function bitOr (x, y) {
 
 
 /***/ }),
-/* 469 */
+/* 468 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var isInteger = __webpack_require__(3).isInteger;
-var bigBitXor = __webpack_require__(470);
+var bigBitXor = __webpack_require__(469);
 
 function factory (type, config, load, typed) {
   var latex = __webpack_require__(4);
@@ -80494,7 +80426,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 470 */
+/* 469 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var bitwise = __webpack_require__(91);
@@ -80560,14 +80492,14 @@ module.exports = function bitXor(x, y) {
 
 
 /***/ }),
-/* 471 */
+/* 470 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var isInteger = __webpack_require__(3).isInteger;
-var bigLeftShift = __webpack_require__(472);
+var bigLeftShift = __webpack_require__(471);
 
 function factory (type, config, load, typed) {
   var latex = __webpack_require__(4);
@@ -80576,7 +80508,7 @@ function factory (type, config, load, typed) {
   var equalScalar = load(__webpack_require__(11));
   var zeros = load(__webpack_require__(42));
 
-  var algorithm01 = load(__webpack_require__(37));
+  var algorithm01 = load(__webpack_require__(36));
   var algorithm02 = load(__webpack_require__(26));
   var algorithm08 = load(__webpack_require__(93));
   var algorithm10 = load(__webpack_require__(40));
@@ -80729,7 +80661,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 472 */
+/* 471 */
 /***/ (function(module, exports) {
 
 
@@ -80776,14 +80708,14 @@ module.exports = function leftShift (x, y) {
 
 
 /***/ }),
-/* 473 */
+/* 472 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var isInteger = __webpack_require__(3).isInteger;
-var bigRightArithShift = __webpack_require__(474);
+var bigRightArithShift = __webpack_require__(473);
 
 function factory (type, config, load, typed) {
   var latex = __webpack_require__(4);
@@ -80792,7 +80724,7 @@ function factory (type, config, load, typed) {
   var equalScalar = load(__webpack_require__(11));
   var zeros = load(__webpack_require__(42));
 
-  var algorithm01 = load(__webpack_require__(37));
+  var algorithm01 = load(__webpack_require__(36));
   var algorithm02 = load(__webpack_require__(26));
   var algorithm08 = load(__webpack_require__(93));
   var algorithm10 = load(__webpack_require__(40));
@@ -80945,7 +80877,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 474 */
+/* 473 */
 /***/ (function(module, exports) {
 
 /*
@@ -80998,7 +80930,7 @@ module.exports = function rightArithShift (x, y) {
 
 
 /***/ }),
-/* 475 */
+/* 474 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81013,7 +80945,7 @@ function factory (type, config, load, typed) {
   var equalScalar = load(__webpack_require__(11));
   var zeros = load(__webpack_require__(42));
 
-  var algorithm01 = load(__webpack_require__(37));
+  var algorithm01 = load(__webpack_require__(36));
   var algorithm02 = load(__webpack_require__(26));
   var algorithm08 = load(__webpack_require__(93));
   var algorithm10 = load(__webpack_require__(40));
@@ -81167,19 +81099,19 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 476 */
+/* 475 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
+  __webpack_require__(476),
   __webpack_require__(477),
-  __webpack_require__(478),
-  __webpack_require__(147),
-  __webpack_require__(479)
+  __webpack_require__(146),
+  __webpack_require__(478)
 ];
 
 
 /***/ }),
-/* 477 */
+/* 476 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81187,7 +81119,7 @@ module.exports = [
 
 function factory (type, config, load, typed) {
   var add = load(__webpack_require__(20));
-  var stirlingS2 = load(__webpack_require__(147));
+  var stirlingS2 = load(__webpack_require__(146));
   var isNegative = load(__webpack_require__(62));
   var isInteger = load(__webpack_require__(53));
 
@@ -81239,7 +81171,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 478 */
+/* 477 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81250,7 +81182,7 @@ function factory (type, config, load, typed) {
   var add = load(__webpack_require__(22));
   var isPositive = load(__webpack_require__(60));
   var isInteger = load(__webpack_require__(53));
-  var larger = load(__webpack_require__(38));
+  var larger = load(__webpack_require__(37));
 
   /**
    * The composition counts of n into k parts.
@@ -81297,7 +81229,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 479 */
+/* 478 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81355,19 +81287,19 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 480 */
+/* 479 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
+  __webpack_require__(480),
+  __webpack_require__(133),
   __webpack_require__(481),
-  __webpack_require__(134),
-  __webpack_require__(482),
-  __webpack_require__(483)
+  __webpack_require__(482)
 ];
 
 
 /***/ }),
-/* 481 */
+/* 480 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81433,7 +81365,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 482 */
+/* 481 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81497,7 +81429,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 483 */
+/* 482 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81561,17 +81493,17 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 484 */
+/* 483 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(485),
-  __webpack_require__(486)
+  __webpack_require__(484),
+  __webpack_require__(485)
 ];
 
 
 /***/ }),
-/* 485 */
+/* 484 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81720,7 +81652,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 486 */
+/* 485 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82028,19 +81960,19 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 487 */
+/* 486 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
+  __webpack_require__(487),
+  __webpack_require__(148),
   __webpack_require__(488),
-  __webpack_require__(149),
-  __webpack_require__(489),
-  __webpack_require__(490)
+  __webpack_require__(489)
 ];
 
 
 /***/ }),
-/* 488 */
+/* 487 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82051,7 +81983,7 @@ function factory (type, config, load, typed) {
 
   var matrix = load(__webpack_require__(0));
   var zeros = load(__webpack_require__(42));
-  var not = load(__webpack_require__(149));
+  var not = load(__webpack_require__(148));
   var isZero = load(__webpack_require__(88));
 
   var algorithm02 = load(__webpack_require__(26));
@@ -82218,7 +82150,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 489 */
+/* 488 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82383,7 +82315,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 490 */
+/* 489 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82548,39 +82480,39 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 491 */
+/* 490 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   __webpack_require__(70),
+  __webpack_require__(491),
+  __webpack_require__(125),
   __webpack_require__(492),
-  __webpack_require__(126),
   __webpack_require__(493),
-  __webpack_require__(494),
   __webpack_require__(67),
+  __webpack_require__(494),
   __webpack_require__(495),
   __webpack_require__(496),
+  __webpack_require__(124),
   __webpack_require__(497),
-  __webpack_require__(125),
+  __webpack_require__(149),
   __webpack_require__(498),
-  __webpack_require__(150),
-  __webpack_require__(499),
   __webpack_require__(94),
-  __webpack_require__(128),
+  __webpack_require__(127),
+  __webpack_require__(499),
   __webpack_require__(500),
-  __webpack_require__(501),
   __webpack_require__(30),
-  __webpack_require__(151),
-  __webpack_require__(503),
+  __webpack_require__(150),
+  __webpack_require__(502),
   __webpack_require__(24),
-  __webpack_require__(146),
+  __webpack_require__(145),
   __webpack_require__(73),
   __webpack_require__(42)
 ];
 
 
 /***/ }),
-/* 492 */
+/* 491 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82688,7 +82620,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 493 */
+/* 492 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82865,7 +82797,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 494 */
+/* 493 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82951,7 +82883,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 495 */
+/* 494 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82959,7 +82891,7 @@ exports.factory = factory;
 
 var filter = __webpack_require__(2).filter;
 var filterRegExp = __webpack_require__(2).filterRegExp;
-var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
 
 function factory (type, config, load, typed) {
   var matrix = load(__webpack_require__(0));
@@ -83042,7 +82974,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 496 */
+/* 495 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83094,13 +83026,13 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 497 */
+/* 496 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var maxArgumentCount = __webpack_require__(36).maxArgumentCount;
+var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
 var forEach = __webpack_require__(2).forEach;
 
 function factory (type, config, load, typed) {
@@ -83178,7 +83110,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 498 */
+/* 497 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83275,7 +83207,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 499 */
+/* 498 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83416,7 +83348,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 500 */
+/* 499 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83497,7 +83429,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 501 */
+/* 500 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83642,7 +83574,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 502 */
+/* 501 */
 /***/ (function(module, exports) {
 
 /*
@@ -83693,7 +83625,7 @@ module.exports = function naturalSort (a, b) {
 
 
 /***/ }),
-/* 503 */
+/* 502 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83761,25 +83693,25 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 504 */
+/* 503 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   //require('./distribution'), // TODO: rethink math.distribution
   __webpack_require__(76),
   __webpack_require__(75),
-  __webpack_require__(148),
+  __webpack_require__(147),
+  __webpack_require__(504),
   __webpack_require__(505),
   __webpack_require__(506),
   __webpack_require__(507),
-  __webpack_require__(508),
-  __webpack_require__(511),
-  __webpack_require__(512)
+  __webpack_require__(510),
+  __webpack_require__(511)
 ];
 
 
 /***/ }),
-/* 505 */
+/* 504 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83789,10 +83721,10 @@ module.exports = [
 function factory(type, config, load, typed) {
     var matrix = load(__webpack_require__(0));
     var divide = load(__webpack_require__(52));
-    var sum = load(__webpack_require__(152));
+    var sum = load(__webpack_require__(151));
     var multiply = load(__webpack_require__(12));
-    var dotDivide = load(__webpack_require__(143));
-    var log = load(__webpack_require__(145));
+    var dotDivide = load(__webpack_require__(142));
+    var log = load(__webpack_require__(144));
     var isNumeric = load(__webpack_require__(81));
 
     /**
@@ -83877,7 +83809,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 506 */
+/* 505 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83937,7 +83869,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 507 */
+/* 506 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84038,7 +83970,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 508 */
+/* 507 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84090,13 +84022,13 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 509 */
+/* 508 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var seedrandom = __webpack_require__(510);
+var seedrandom = __webpack_require__(509);
 
 // create a random seed here to prevent an infinite loop from seed-random
 // inside the factory. Reason is that math.random is defined as a getter/setter
@@ -84139,7 +84071,7 @@ exports.math = true;
 
 
 /***/ }),
-/* 510 */
+/* 509 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84320,7 +84252,7 @@ mixkey(Math.random(), pool);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47)))
 
 /***/ }),
-/* 511 */
+/* 510 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84372,7 +84304,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 512 */
+/* 511 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84422,24 +84354,24 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 513 */
+/* 512 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   __webpack_require__(54),
   __webpack_require__(34),
-  __webpack_require__(514),
+  __webpack_require__(513),
   __webpack_require__(33),
-  __webpack_require__(38),
-  __webpack_require__(138),
+  __webpack_require__(37),
+  __webpack_require__(137),
   __webpack_require__(49),
-  __webpack_require__(515),
-  __webpack_require__(132)
+  __webpack_require__(514),
+  __webpack_require__(131)
 ];
 
 
 /***/ }),
-/* 514 */
+/* 513 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84527,7 +84459,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 515 */
+/* 514 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84708,25 +84640,25 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 516 */
+/* 515 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
+  __webpack_require__(516),
+  __webpack_require__(152),
   __webpack_require__(517),
   __webpack_require__(153),
   __webpack_require__(518),
-  __webpack_require__(154),
   __webpack_require__(519),
   __webpack_require__(520),
   __webpack_require__(521),
-  __webpack_require__(522),
-  __webpack_require__(155),
-  __webpack_require__(523)
+  __webpack_require__(154),
+  __webpack_require__(522)
 ];
 
 
 /***/ }),
-/* 517 */
+/* 516 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84793,7 +84725,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 518 */
+/* 517 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84860,7 +84792,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 519 */
+/* 518 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84932,7 +84864,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 520 */
+/* 519 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84991,7 +84923,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 521 */
+/* 520 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85075,7 +85007,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 522 */
+/* 521 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85137,7 +85069,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 523 */
+/* 522 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85150,8 +85082,8 @@ function factory (type, config, load, typed) {
   var concat = load(__webpack_require__(70));
   var size = load(__webpack_require__(30));
   var subset = load(__webpack_require__(24));
-  var setIntersect = load(__webpack_require__(154));
-  var setSymDifference = load(__webpack_require__(155));
+  var setIntersect = load(__webpack_require__(153));
+  var setSymDifference = load(__webpack_require__(154));
   
   /**
    * Create the union of two (multi)sets.
@@ -85196,16 +85128,16 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 524 */
+/* 523 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(525)
+  __webpack_require__(524)
 ];
 
 
 /***/ }),
-/* 525 */
+/* 524 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85409,26 +85341,26 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 526 */
+/* 525 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(527),
+  __webpack_require__(526),
+  __webpack_require__(122),
   __webpack_require__(123),
-  __webpack_require__(124),
-  __webpack_require__(156),
-  __webpack_require__(127),
+  __webpack_require__(155),
+  __webpack_require__(126),
+  __webpack_require__(527),
   __webpack_require__(528),
   __webpack_require__(529),
   __webpack_require__(530),
-  __webpack_require__(531),
-  __webpack_require__(152),
-  __webpack_require__(157)
+  __webpack_require__(151),
+  __webpack_require__(156)
 ];
 
 
 /***/ }),
-/* 527 */
+/* 526 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85438,8 +85370,8 @@ var flatten = __webpack_require__(2).flatten;
 
 function factory (type, config, load, typed) {
   var abs      = load(__webpack_require__(32));
-  var map      = load(__webpack_require__(150));
-  var median   = load(__webpack_require__(156));
+  var map      = load(__webpack_require__(149));
+  var median   = load(__webpack_require__(155));
   var subtract = load(__webpack_require__(23));
 
   /**
@@ -85499,7 +85431,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 528 */
+/* 527 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85582,7 +85514,7 @@ exports.name = 'mode';
 exports.factory = factory;
 
 /***/ }),
-/* 529 */
+/* 528 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85665,7 +85597,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 530 */
+/* 529 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85929,7 +85861,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 531 */
+/* 530 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85937,7 +85869,7 @@ exports.factory = factory;
 
 function factory (type, config, load, typed) {
   var sqrt       = load(__webpack_require__(61));
-  var variance   = load(__webpack_require__(157));
+  var variance   = load(__webpack_require__(156));
 
   /**
    * Compute the standard deviation of a matrix or a  list with values.
@@ -86010,17 +85942,17 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 532 */
+/* 531 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(109),
-  __webpack_require__(533)
+  __webpack_require__(108),
+  __webpack_require__(532)
 ];
 
 
 /***/ }),
-/* 533 */
+/* 532 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86114,12 +86046,13 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 534 */
+/* 533 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
+  __webpack_require__(534),
+  __webpack_require__(157),
   __webpack_require__(535),
-  __webpack_require__(158),
   __webpack_require__(536),
   __webpack_require__(537),
   __webpack_require__(538),
@@ -86141,13 +86074,12 @@ module.exports = [
   __webpack_require__(554),
   __webpack_require__(555),
   __webpack_require__(556),
-  __webpack_require__(557),
-  __webpack_require__(558)
+  __webpack_require__(557)
 ];
 
 
 /***/ }),
-/* 535 */
+/* 534 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86213,7 +86145,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 536 */
+/* 535 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86274,7 +86206,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 537 */
+/* 536 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86336,7 +86268,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 538 */
+/* 537 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86401,7 +86333,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 539 */
+/* 538 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86461,7 +86393,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 540 */
+/* 539 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86525,7 +86457,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 541 */
+/* 540 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86534,7 +86466,7 @@ exports.factory = factory;
 var deepMap = __webpack_require__(1);
 
 function factory (type, config, load, typed) {
-  var acosh = typed.find(load(__webpack_require__(158)), ['Complex']);
+  var acosh = typed.find(load(__webpack_require__(157)), ['Complex']);
 
   /**
    * Calculate the hyperbolic arcsecant of a value,
@@ -86596,7 +86528,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 542 */
+/* 541 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86663,7 +86595,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 543 */
+/* 542 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86723,7 +86655,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 544 */
+/* 543 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86785,7 +86717,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 545 */
+/* 544 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86797,7 +86729,7 @@ function factory (type, config, load, typed) {
 
   var algorithm02 = load(__webpack_require__(26));
   var algorithm03 = load(__webpack_require__(17));
-  var algorithm09 = load(__webpack_require__(144));
+  var algorithm09 = load(__webpack_require__(143));
   var algorithm11 = load(__webpack_require__(19));
   var algorithm12 = load(__webpack_require__(18));
   var algorithm13 = load(__webpack_require__(8));
@@ -86944,7 +86876,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 546 */
+/* 545 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87016,7 +86948,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 547 */
+/* 546 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87085,7 +87017,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 548 */
+/* 547 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87158,7 +87090,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 549 */
+/* 548 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87223,7 +87155,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 550 */
+/* 549 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87299,7 +87231,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 551 */
+/* 550 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87364,7 +87296,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 552 */
+/* 551 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87446,7 +87378,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 553 */
+/* 552 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87511,7 +87443,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 554 */
+/* 553 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87586,7 +87518,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 555 */
+/* 554 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87656,7 +87588,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 556 */
+/* 555 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87730,7 +87662,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 557 */
+/* 556 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87796,7 +87728,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 558 */
+/* 557 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87874,15 +87806,15 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 559 */
+/* 558 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(560)
+  __webpack_require__(559)
 ];
 
 /***/ }),
-/* 560 */
+/* 559 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87979,24 +87911,24 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 561 */
+/* 560 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(131),
+  __webpack_require__(130),
   __webpack_require__(53),
   __webpack_require__(62),
   __webpack_require__(81),
   __webpack_require__(60),
-  __webpack_require__(562),
+  __webpack_require__(561),
   __webpack_require__(88),
-  __webpack_require__(563),
+  __webpack_require__(562),
   __webpack_require__(82)
 ];
 
 
 /***/ }),
-/* 562 */
+/* 561 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -88084,7 +88016,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 563 */
+/* 562 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -88157,16 +88089,16 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 564 */
+/* 563 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(565)
+  __webpack_require__(564)
 ];
 
 
 /***/ }),
-/* 565 */
+/* 564 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -88195,7 +88127,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 566 */
+/* 565 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -88230,6 +88162,74 @@ module.exports = [
 
 // TODO: implement an InvalidValueError?
 
+
+/***/ }),
+/* 566 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const util = __webpack_require__(98);
+const NamedVector = __webpack_require__(99).NamedVector;
+
+const Papa = __webpack_require__(567);
+const ShipEngine = __webpack_require__(38);
+
+const COMPONENT_MAPPING = [{
+	name: "Warp Core",
+	frame_row: 76,
+	components: [{ name: "Warp Core Type", row: 78 }, { name: "M/AM Injectors", row: 80 }, { name: "Coolant Systems", row: 81 }, { name: "EPS Manifold System", row: 82 }, { name: "Eject System", row: 83 }],
+	settings: [{ name: "Safety/Performance", row: 79 }]
+}, {
+	name: "Engineering",
+	frame_row: 65,
+	components: [{ name: "Structural Integrity Fields", row: 67 }, { name: "Navigational Deflector", row: 68 }, { name: "Nacelle System", row: 69 }, { name: "Replication Package", row: 71 }, { name: "Fuel & Matter Stores", row: 72 }],
+	settings: []
+}, {
+	name: "Hull",
+	frame_row: 59,
+	components: [{ name: "Hull System", row: 61 }],
+	settings: []
+}, {
+	name: "Operations",
+	frame_row: 43,
+	components: [{ name: "Long-Range Sensors", row: 45 }, { name: "Navigational Sensors", row: 46 }, { name: "Survey Sensors", row: 47 }, { name: "Science Labs", row: 48 }, { name: "Computer Core", row: 49 }, { name: "Operating System", row: 50 }, { name: "Secondary Core", row: 51 }, { name: "Diplomatic Package", row: 53 }, { name: "Recreation Package", row: 54 }, { name: "Sickbay", row: 55 }],
+	settings: [{ name: "Isolinear?", row: 52 }]
+}, {
+	name: "Tactical",
+	frame_row: 28,
+	components: [{ name: "Primary Phasers", row: 30 }, { name: "Secondary Phasers", row: 31 }, { name: "Torpedo System", row: 33 }, { name: "Short-Range Sensors", row: 35 }, { name: "Targeting Computer", row: 36 }, { name: "Deflector Shields", row: 37 }, { name: "Backup Deflectors", row: 38 }, { name: "Impulse Engine Pwr", row: 39 }],
+	settings: [{ name: "Phaser Arrays", row: 32 }, { name: "Burst Launchers", row: 34 }]
+}];
+
+function import_design(design_csv) {
+	const result = Papa.parse(design_csv, { dynamicTyping: true });
+	return {
+		"Name": result.data[0][3],
+		"Principal Frame": result.data[17][4],
+		"Module": {
+			"Variant": result.data[87][4],
+			"Type": result.data[87][2]
+		},
+		"Subsystems": COMPONENT_MAPPING.map(function (subsystem) {
+			return {
+				"Name": subsystem.name,
+				"Sub-Frame": result.data[subsystem.frame_row][4],
+				"Settings": subsystem.settings.reduce((acc, value) => {
+					acc[value.name] = result.data[value.row][3];
+					return acc;
+				}, {}),
+				"Components": subsystem.components.map(row => {
+					return {
+						"Name": row.name,
+						"Quantity": result.data[row.row][3],
+						"Part": result.data[row.row][4]
+					};
+				})
+			};
+		})
+	};
+};
+
+module.exports.import_design = import_design;
 
 /***/ }),
 /* 567 */
@@ -90677,12 +90677,6 @@ module.exports = closest;
 
 /***/ }),
 /* 577 */
-/***/ (function(module, exports) {
-
-module.exports = {"Subsystems":[{"Components":[{"Part":"[T2][L][C+] Type-I Block-A (40E) Warp Core","Quantity":2,"Name":"Warp Core Type"},{"Part":"[T2][L][R-C-] Luna-VI High-Efficiency M/AM System","Quantity":2,"Name":"M/AM Injectors"},{"Part":"[T2][L] Mk VIII Mod L Yoyodyne Coolant System","Quantity":2,"Name":"Coolant Systems"},{"Part":"[T3][M][R+] VSA-7 Pulse Injection Manifold","Quantity":3,"Name":"EPS Manifold System"},{"Part":"[T2] EngOS Monitoring - Anak-Krueger EM Rails","Quantity":1,"Name":"Eject System"}],"Settings":[{"Name":"Safety/Performance","Value":0}],"Sub-Frame":"[T2] Md Frigate Warp Core Suite","Name":"Warp Core"},{"Components":[{"Part":"[T2][M] Type-VI SIF","Quantity":2,"Name":"Structural Integrity Fields"},{"Part":"[T1][L] Modulated Graviton Beam Deflector Saucer-Only","Quantity":3,"Name":"Navigational Deflector"},{"Part":"[T1][L] 2 X Centaur-A Pattern Nacelle","Quantity":1,"Name":"Nacelle System"},{"Part":"[T2][M] S-Medical Mk VI Protein Synth","Quantity":1,"Name":"Replication Package"},{"Part":"[T2][L] 2310-Light Pattern Deuterium Tanks","Quantity":3,"Name":"Fuel & Matter Stores"}],"Settings":[],"Sub-Frame":"[T2][OET-SR-] Md Frigate Engineering Suite","Name":"Engineering"},{"Components":[{"Part":"[T2][H] Mark-VII-Heavy LR Sensor Array","Quantity":2,"Name":"Long-Range Sensors"},{"Part":"[T2][H] Mark-VII-Heavy Nav Array","Quantity":2,"Name":"Navigational Sensors"},{"Part":"No Survey Sensors","Quantity":0,"Name":"Survey Sensors"},{"Part":"[T2][H] Spock-C Pattern Lab","Quantity":2,"Name":"Science Labs"},{"Part":"[T1][L] Type-III-A Duotronic Core","Quantity":3,"Name":"Computer Core"},{"Part":"[T2] Majel 3.1 OS","Quantity":3,"Name":"Operating System"},{"Part":"No Core","Quantity":0,"Name":"Secondary Core"},{"Part":"[T1][M] Lwaxana '04 General Protocol","Quantity":2,"Name":"Diplomatic Package"},{"Part":"No Onboard Recreation","Quantity":0,"Name":"Recreation Package"},{"Part":"[T2][H] T'Koren Pattern Large Sickbay","Quantity":4,"Name":"Sickbay"}],"Settings":[{"Name":"Isolinear?","Value":false}],"Sub-Frame":"[T2][OE--] Lg Frigate Operations Suite","Name":"Operations"},{"Components":[{"Quantity":1,"Part":"[T2][L] Lt. Alloy-3 Duranium Hull","Name":"Hull System"}],"Settings":[],"Sub-Frame":"[T2] Sm Frigate Hull Suite","Name":"Hull"},{"Components":[{"Quantity":2,"Part":"[T-1][L] Model 68 Phaser Bank","Name":"Primary Phasers"},{"Quantity":0,"Part":"No Phasers","Name":"Secondary Phasers"},{"Quantity":0,"Part":"No Torp","Name":"Torpedo System"},{"Quantity":2,"Part":"[T2][H] Mark-VI-Heavy SR Lateral Sensor Array","Name":"Short-Range Sensors"},{"Quantity":1,"Part":"No TCU","Name":"Targeting Computer"},{"Quantity":5,"Part":"[T2][L] Mk-V-E Shield Gens","Name":"Deflector Shields"},{"Quantity":5,"Part":"[T2][L] Mk-V-E Shield Gens","Name":"Backup Deflectors"},{"Quantity":1,"Part":"[T2][M] SDB-09 High-Power Impulse Drive Sys","Name":"Impulse Engine Pwr"}],"Settings":[{"Name":"Burst Launchers","Value":true},{"Name":"Phaser Arrays","Value":false}],"Sub-Frame":"[T1][SR+] Sm Frigate Tactical Suite","Name":"Tactical"}],"Module":{"Type":"Miranda Rollbar","Variant":"Science"},"Blueprint Date":"2017-09-23T17:31+00:00","Principal Frame":"[T1] 900kt Frigate Frame","Name":"[C8] Aledeth Kepler"}
-
-/***/ }),
-/* 578 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {/* @preserve
@@ -96304,10 +96298,10 @@ module.exports = ret;
 
 },{"./es5":13}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(63), __webpack_require__(47), __webpack_require__(579).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(63), __webpack_require__(47), __webpack_require__(578).setImmediate))
 
 /***/ }),
-/* 579 */
+/* 578 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var apply = Function.prototype.apply;
@@ -96360,13 +96354,13 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(580);
+__webpack_require__(579);
 exports.setImmediate = setImmediate;
 exports.clearImmediate = clearImmediate;
 
 
 /***/ }),
-/* 580 */
+/* 579 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -96559,42 +96553,22 @@ exports.clearImmediate = clearImmediate;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47), __webpack_require__(63)))
 
 /***/ }),
-/* 581 */
+/* 580 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(163);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shipdesigner_vue__ = __webpack_require__(582);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dist_design_json__ = __webpack_require__(577);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dist_design_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__dist_design_json__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dist_parts_C8_csv__ = __webpack_require__(96);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dist_parts_C8_csv___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__dist_parts_C8_csv__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__dist_modules_C8_csv__ = __webpack_require__(159);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__dist_modules_C8_csv___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__dist_modules_C8_csv__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv__ = __webpack_require__(160);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_bluebird__ = __webpack_require__(578);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__lib_shipengine__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__lib_shipengine___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7__lib_shipengine__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__lib_shipimporter__ = __webpack_require__(162);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__lib_shipimporter___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8__lib_shipimporter__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(162);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shipdesigner_vue__ = __webpack_require__(581);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird__ = __webpack_require__(577);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_bluebird__);
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-__WEBPACK_IMPORTED_MODULE_6_bluebird___default.a.longStackTraces();
+__WEBPACK_IMPORTED_MODULE_2_bluebird___default.a.longStackTraces();
 
 // create a root instance
 new __WEBPACK_IMPORTED_MODULE_0_vue__["a" /* default */]({
@@ -96603,16 +96577,16 @@ new __WEBPACK_IMPORTED_MODULE_0_vue__["a" /* default */]({
 });
 
 /***/ }),
-/* 582 */
+/* 581 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__ = __webpack_require__(585);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5ae9c078_hasScoped_false_node_modules_vue_loader_lib_selector_type_template_index_0_shipdesigner_vue__ = __webpack_require__(660);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__ = __webpack_require__(584);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5ae9c078_hasScoped_false_node_modules_vue_loader_lib_selector_type_template_index_0_shipdesigner_vue__ = __webpack_require__(661);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(583)
+  __webpack_require__(582)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -96656,13 +96630,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 583 */
+/* 582 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(584);
+var content = __webpack_require__(583);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -96682,7 +96656,7 @@ if(false) {
 }
 
 /***/ }),
-/* 584 */
+/* 583 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -96690,31 +96664,31 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n}\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/shipdesigner.vue?95a1e1ee"],"names":[],"mappings":";AA2FA;CACA,YAAA;CACA,aAAA;;CAEA,cAAA;CACA,uBAAA;CACA,kBAAA;CACA;AAEA;CACA,eAAA;CACA,yBAAA;CACA;AAEA;CACA,eAAA;CACA,mBAAA,yCAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,sBAAA;CACA","file":"shipdesigner.vue","sourcesContent":["<template>\n  <div class=\"root\">\n\t<div class=\"header\">\n\t  <DesignSummary :se_db=\"se_db\" :se_design=\"se_design\"></DesignSummary>\n\t</div>\n\t<div class=\"design\">\n\t  <Design :se_db=\"se_db\" :se_design=\"se_design\"></Design>\n\t</div>\n\t<div class=\"footer\">\n\t  <DesignImportExport :se_db=\"se_db\" :design_info=\"design_info\"></DesignImportExport>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\nimport ShipImporter from '../lib/shipimporter';\n\nimport design_json_init from '../dist/swb_kepler_recreation.json';\nimport canon_parts from '../dist/parts_C8.csv';\nimport canon_modules from '../dist/modules_C8.csv';\nimport canon_frames from '../dist/frames_C8.csv';\n\nimport DesignSummary from './design-summary.vue';\nimport Design from './design.vue';\nimport DesignImportExport from './design-import-export.vue';\n\nconst PARTS_KEY = 'working_parts_list';\nconst MODULES_KEY = 'working_modules_list';\nconst FRAMES_KEY = 'working_frames_list';\n\nconst se_db = new ShipEngine.DB({\n\tparts: canon_parts,\n\tframes: canon_frames,\n\tmodules: canon_modules,\n});\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tDesignSummary,\n\t\tDesign,\n\t\tDesignImportExport,\n\t},\n\tdata () {\n\t\treturn {\n\t\t\tdesign_info: {\n\t\t\t\tdata: design_json_init,\n\t\t\t},\n\t\t\tparts_info: {\n\t\t\t\tparts: canon_parts,\n\t\t\t\tmodules: canon_modules,\n\t\t\t\tframes: canon_frames,\n\t\t\t},\n\t\t};\n\t},\n\tmounted () {\n\t\tthis.load_parts_from_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === PARTS_KEY) {\n\t\t\t\tthis.load_parts_from_storage();\n\t\t\t};\n\t\t}.bind(this));\n\t},\n\tcomputed: {\n\t\tse_design () {\n\t\t\treturn new ShipEngine.Design(this.se_db, this.design_info.data);\n\t\t},\n\t\tse_db () {\n\t\t\treturn new ShipEngine.DB(this.parts_info);\n\t\t},\n\t},\n\tmethods: {\n\t\tload_parts_from_storage () {\n\t\t\tconst saved_parts = localStorage.getItem(PARTS_KEY);\n\t\t\tif (saved_parts) {\n\t\t\t\tthis.parts_info.parts = JSON.parse(saved_parts);\n\t\t\t} else {\n\t\t\t\tlocalStorage.setItem(PARTS_KEY, JSON.stringify(this.parts_info.parts));\n\t\t\t};\n\t\t},\n\t},\n};\n\n</script>\n\n\n<style>\n\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n}\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/shipdesigner.vue?83d4f11e"],"names":[],"mappings":";AAmGA;CACA,YAAA;CACA,aAAA;;CAEA,cAAA;CACA,uBAAA;CACA,kBAAA;CACA;AAEA;CACA,eAAA;CACA,yBAAA;CACA;AAEA;CACA,eAAA;CACA,mBAAA,yCAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,sBAAA;CACA","file":"shipdesigner.vue","sourcesContent":["<template>\n  <div class=\"root\">\n\t<div class=\"header\">\n\t  <DesignSummary :se_db=\"se_db\" :se_design=\"se_design\"></DesignSummary>\n\t</div>\n\t<div class=\"design\">\n\t  <Design :se_db=\"se_db\" :se_design=\"se_design\"></Design>\n\t</div>\n\t<div class=\"footer\">\n\t  <DesignImportExport :se_db=\"se_db\" :design_info=\"design_info\"></DesignImportExport>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\nimport ShipImporter from '../lib/shipimporter';\n\nimport design_json_init from '../dist/swb_kepler_recreation.json';\nimport canon_parts from '../dist/parts_C8.csv';\nimport canon_modules from '../dist/modules_C8.csv';\nimport canon_frames from '../dist/frames_C8.csv';\n\nimport DesignSummary from './design-summary.vue';\nimport Design from './design.vue';\nimport DesignImportExport from './design-import-export.vue';\n\nconst PARTS_KEY = 'working_parts_list';\nconst MODULES_KEY = 'working_modules_list';\nconst FRAMES_KEY = 'working_frames_list';\n\nconst se_db = new ShipEngine.DB({\n\tparts: canon_parts,\n\tframes: canon_frames,\n\tmodules: canon_modules,\n});\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tDesignSummary,\n\t\tDesign,\n\t\tDesignImportExport,\n\t},\n\tdata () {\n\t\tlet design_json;\n\t\tlet hash = new URL(location).hash;\n\t\tif (hash) {\n\t\t\tdesign_json = JSON.parse(decodeURI(hash.substring(1)));\n\t\t} else {\n\t\t\tdesign_json = design_json_init;\n\t\t};\n\n\t\treturn {\n\t\t\tdesign_info: {\n\t\t\t\tdata: design_json,\n\t\t\t},\n\t\t\tparts_info: {\n\t\t\t\tparts: canon_parts,\n\t\t\t\tmodules: canon_modules,\n\t\t\t\tframes: canon_frames,\n\t\t\t},\n\t\t};\n\t},\n\tmounted () {\n\t\tthis.load_parts_from_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === PARTS_KEY) {\n\t\t\t\tthis.load_parts_from_storage();\n\t\t\t};\n\t\t}.bind(this));\n\t},\n\tcomputed: {\n\t\tse_design () {\n\t\t\treturn new ShipEngine.Design(this.se_db, this.design_info.data);\n\t\t},\n\t\tse_db () {\n\t\t\treturn new ShipEngine.DB(this.parts_info);\n\t\t},\n\t},\n\tmethods: {\n\t\tload_parts_from_storage () {\n\t\t\tconst saved_parts = localStorage.getItem(PARTS_KEY);\n\t\t\tif (saved_parts) {\n\t\t\t\tthis.parts_info.parts = JSON.parse(saved_parts);\n\t\t\t} else {\n\t\t\t\tlocalStorage.setItem(PARTS_KEY, JSON.stringify(this.parts_info.parts));\n\t\t\t};\n\t\t},\n\t},\n};\n\n</script>\n\n\n<style>\n\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 585 */
+/* 584 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_shipimporter__ = __webpack_require__(162);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_shipimporter__ = __webpack_require__(566);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_shipimporter___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__lib_shipimporter__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dist_swb_kepler_recreation_json__ = __webpack_require__(586);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dist_swb_kepler_recreation_json__ = __webpack_require__(585);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dist_swb_kepler_recreation_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__dist_swb_kepler_recreation_json__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dist_parts_C8_csv__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dist_parts_C8_csv__ = __webpack_require__(158);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dist_parts_C8_csv___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__dist_parts_C8_csv__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__dist_modules_C8_csv__ = __webpack_require__(159);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__dist_modules_C8_csv__ = __webpack_require__(160);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__dist_modules_C8_csv___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__dist_modules_C8_csv__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv__ = __webpack_require__(160);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv__ = __webpack_require__(161);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__design_summary_vue__ = __webpack_require__(587);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__design_vue__ = __webpack_require__(592);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__design_import_export_vue__ = __webpack_require__(655);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__design_summary_vue__ = __webpack_require__(586);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__design_vue__ = __webpack_require__(591);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__design_import_export_vue__ = __webpack_require__(656);
 //
 //
 //
@@ -96762,9 +96736,17 @@ const se_db = new __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default.a.DB(
 		DesignImportExport: __WEBPACK_IMPORTED_MODULE_8__design_import_export_vue__["a" /* default */]
 	},
 	data() {
+		let design_json;
+		let hash = new URL(location).hash;
+		if (hash) {
+			design_json = JSON.parse(decodeURI(hash.substring(1)));
+		} else {
+			design_json = __WEBPACK_IMPORTED_MODULE_2__dist_swb_kepler_recreation_json___default.a;
+		};
+
 		return {
 			design_info: {
-				data: __WEBPACK_IMPORTED_MODULE_2__dist_swb_kepler_recreation_json___default.a
+				data: design_json
 			},
 			parts_info: {
 				parts: __WEBPACK_IMPORTED_MODULE_3__dist_parts_C8_csv___default.a,
@@ -96802,22 +96784,22 @@ const se_db = new __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default.a.DB(
 });
 
 /***/ }),
-/* 586 */
+/* 585 */
 /***/ (function(module, exports) {
 
 module.exports = {"Subsystems":[{"Components":[{"Part":"[T2][L][C+] Type-I Block-A (40E) Warp Core","Quantity":2,"Name":"Warp Core Type"},{"Part":"[T2][L][R-C-] Luna-VI High-Efficiency M/AM System","Quantity":2,"Name":"M/AM Injectors"},{"Part":"[T2][L] Mk VIII Mod L Yoyodyne Coolant System","Quantity":2,"Name":"Coolant Systems"},{"Part":"[T3][M][R+] VSA-7 Pulse Injection Manifold","Quantity":3,"Name":"EPS Manifold System"},{"Part":"[T2] EngOS Monitoring - Anak-Krueger EM Rails","Quantity":1,"Name":"Eject System"}],"Settings":[{"Name":"Safety/Performance","Value":0}],"Sub-Frame":"[T2] Md Frigate Warp Core Suite","Name":"Warp Core"},{"Components":[{"Part":"[T2][M] Type-VI SIF","Quantity":2,"Name":"Structural Integrity Fields"},{"Part":"[T1][L] Modulated Graviton Beam Deflector Saucer-Only","Quantity":3,"Name":"Navigational Deflector"},{"Part":"[T1][L] 2 X Centaur-A Pattern Nacelle","Quantity":1,"Name":"Nacelle System"},{"Part":"[T2][M] S-Medical Mk VI Protein Synth","Quantity":1,"Name":"Replication Package"},{"Part":"[T2][L] 2310-Light Pattern Deuterium Tanks","Quantity":3,"Name":"Fuel & Matter Stores"}],"Settings":[],"Sub-Frame":"[T2][OET-SR-] Md Frigate Engineering Suite","Name":"Engineering"},{"Components":[{"Part":"[T2][L] Lt. Alloy-3 Duranium Hull","Quantity":1,"Name":"Hull System"}],"Settings":[],"Sub-Frame":"[T2] Sm Frigate Hull Suite","Name":"Hull"},{"Components":[{"Part":"[T2][H] Mark-VII-Heavy LR Sensor Array","Quantity":2,"Name":"Long-Range Sensors"},{"Part":"[T2][H] Mark-VII-Heavy Nav Array","Quantity":2,"Name":"Navigational Sensors"},{"Part":"No Survey Sensors","Quantity":0,"Name":"Survey Sensors"},{"Part":"[T2][H] Spock-C Pattern Lab","Quantity":2,"Name":"Science Labs"},{"Part":"[T1][L] Type-III-A Duotronic Core","Quantity":3,"Name":"Computer Core"},{"Part":"[T2] Majel 3.1 OS","Quantity":3,"Name":"Operating System"},{"Part":"No Core","Quantity":0,"Name":"Secondary Core"},{"Part":"[T1][M] Lwaxana '04 General Protocol","Quantity":2,"Name":"Diplomatic Package"},{"Part":"[T-1][M] 2260s Rec Space","Quantity":1,"Name":"Recreation Package"},{"Part":"[T2][H] T'Koren Pattern Large Sickbay","Quantity":3,"Name":"Sickbay"}],"Settings":[{"Name":"Isolinear?","Value":false}],"Sub-Frame":"[T2][OE--] Lg Frigate Operations Suite","Name":"Operations"},{"Components":[{"Part":"[T-1][L] Model 68 Phaser Bank","Quantity":2,"Name":"Primary Phasers"},{"Part":"No Phasers","Quantity":0,"Name":"Secondary Phasers"},{"Part":"No Torp","Quantity":0,"Name":"Torpedo System"},{"Part":"[T2][H] Mark-VI-Heavy SR Lateral Sensor Array","Quantity":2,"Name":"Short-Range Sensors"},{"Part":"No TCU","Quantity":1,"Name":"Targeting Computer"},{"Part":"[T2][L] Mk-V-E Shield Gens","Quantity":5,"Name":"Deflector Shields"},{"Part":"[T2][L] Mk-V-E Shield Gens","Quantity":5,"Name":"Backup Deflectors"},{"Part":"[T2][M] SDB-09 High-Power Impulse Drive Sys","Quantity":1,"Name":"Impulse Engine Pwr"}],"Settings":[{"Name":"Burst Launchers","Value":true},{"Name":"Phaser Arrays","Value":false}],"Sub-Frame":"[T1][SR+] Sm Frigate Tactical Suite","Name":"Tactical"}],"Module":{"Type":"No Module","Variant":"-"},"Principal Frame":"[T1] 900kt Frigate Frame","Blueprint Date":"2017-09-23T17:31+00:00","Name":"SWB Cheapish Kepler"}
 
 /***/ }),
-/* 587 */
+/* 586 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_summary_vue__ = __webpack_require__(590);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_12e2d818_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_design_summary_vue__ = __webpack_require__(591);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_summary_vue__ = __webpack_require__(589);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_12e2d818_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_design_summary_vue__ = __webpack_require__(590);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(588)
+  __webpack_require__(587)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -96861,13 +96843,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 588 */
+/* 587 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(589);
+var content = __webpack_require__(588);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -96887,7 +96869,7 @@ if(false) {
 }
 
 /***/ }),
-/* 589 */
+/* 588 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -96895,18 +96877,32 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.design-summary[data-v-12e2d818] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/design-summary.vue?11495418"],"names":[],"mappings":";AA0BA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA","file":"design-summary.vue","sourcesContent":["<template>\n  <div class=\"design-summary\">\n\t<div>{{se_design.name}} | {{se_design.pretty_miscstats}}</div>\n\t<div>{{se_design.stats_raw.toFixed(2)}} | [{{se_design.cost_BR_raw.toFixed(2)}}]br [{{se_design.cost_SR_raw.toFixed(2)}}]sr | {{se_design.cost_crew_raw.toFixed(2)}}</div>\n\t<div>{{se_design.pretty_buildinfo}}</div>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nexport default {\n\tname: 'DesignSummary',\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.design-summary {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.design-summary[data-v-12e2d818] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.has-error[data-v-12e2d818] {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n.design-weight-summary[data-v-12e2d818] {\n\tmargin-left: 5px;\n}\n.design-power-summary[data-v-12e2d818] {\n}\n.subsystem-weight-summary[data-v-12e2d818] {\n\tmargin-left: 5px;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/design-summary.vue?6ba6b1ca"],"names":[],"mappings":";AAwCA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA,YAAA;CACA,kBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA;AAEA;CACA,iBAAA;CACA","file":"design-summary.vue","sourcesContent":["<template>\n  <div class=\"design-summary\">\n\t<div>{{se_design.name}} | {{se_design.pretty_miscstats}}</div>\n\t<div>{{se_design.stats_raw.toFixed(2)}} | [{{se_design.cost_BR_raw.toFixed(2)}}]br [{{se_design.cost_SR_raw.toFixed(2)}}]sr | {{se_design.cost_crew_raw.toFixed(2)}}</div>\n\t<div>\n\t  <span\n\t\tclass=\"design-power-summary\"\n\t\tv-bind:class=\"{['has-error']: se_design.cost_power > se_design.power_generation}\"\n\t\t>Power[{{se_design.cost_power_raw.toFixed(2)}}/{{se_design.power_generation_raw.toFixed(2)}}]</span>\n\t  <span\n\t\tclass=\"design-weight-summary\"\n\t\tv-bind:class=\"{['has-error']: se_design.weight_internal > se_design.frame_max_size_raw}\"\n\t\t>Internal[{{se_design.weight_internal.toFixed(2)}}/{{se_design.frame_max_size_raw.toFixed(2)}}]</span>\n\t  <span\n\t\tclass=\"subsystem-weight-summary\"\n\t\tv-for=\"ss in se_design.subsystems\"\n\t\tv-bind:class=\"{['has-error']: ss.weight_internal > ss.weight_cap}\"\n\t\t>{{ss.name}}[{{ss.weight_internal.toFixed(2)}}/{{ss.weight_cap.toFixed(2)}}] </span>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nexport default {\n\tname: 'DesignSummary',\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.design-summary {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.has-error {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n\n.design-weight-summary {\n\tmargin-left: 5px;\n}\n\n.design-power-summary {\n}\n\n.subsystem-weight-summary {\n\tmargin-left: 5px;\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 590 */
+/* 589 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -96930,7 +96926,7 @@ exports.push([module.i, "\n.design-summary[data-v-12e2d818] {\n\tbackground-colo
 });
 
 /***/ }),
-/* 591 */
+/* 590 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -96959,8 +96955,77 @@ var render = function() {
       )
     ]),
     _vm._v(" "),
-    _c("div", [_vm._v(_vm._s(_vm.se_design.pretty_buildinfo))])
+    _c(
+      "div",
+      [
+        _c(
+          "span",
+          {
+            staticClass: "design-power-summary",
+            class: ((_obj = {}),
+            (_obj["has-error"] =
+              _vm.se_design.cost_power > _vm.se_design.power_generation),
+            _obj)
+          },
+          [
+            _vm._v(
+              "Power[" +
+                _vm._s(_vm.se_design.cost_power_raw.toFixed(2)) +
+                "/" +
+                _vm._s(_vm.se_design.power_generation_raw.toFixed(2)) +
+                "]"
+            )
+          ]
+        ),
+        _vm._v(" "),
+        _c(
+          "span",
+          {
+            staticClass: "design-weight-summary",
+            class: ((_obj$1 = {}),
+            (_obj$1["has-error"] =
+              _vm.se_design.weight_internal > _vm.se_design.frame_max_size_raw),
+            _obj$1)
+          },
+          [
+            _vm._v(
+              "Internal[" +
+                _vm._s(_vm.se_design.weight_internal.toFixed(2)) +
+                "/" +
+                _vm._s(_vm.se_design.frame_max_size_raw.toFixed(2)) +
+                "]"
+            )
+          ]
+        ),
+        _vm._v(" "),
+        _vm._l(_vm.se_design.subsystems, function(ss) {
+          return _c(
+            "span",
+            {
+              staticClass: "subsystem-weight-summary",
+              class: ((_obj = {}),
+              (_obj["has-error"] = ss.weight_internal > ss.weight_cap),
+              _obj)
+            },
+            [
+              _vm._v(
+                _vm._s(ss.name) +
+                  "[" +
+                  _vm._s(ss.weight_internal.toFixed(2)) +
+                  "/" +
+                  _vm._s(ss.weight_cap.toFixed(2)) +
+                  "] "
+              )
+            ]
+          )
+          var _obj
+        })
+      ],
+      2
+    )
   ])
+  var _obj
+  var _obj$1
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -96974,16 +97039,16 @@ if (false) {
 }
 
 /***/ }),
-/* 592 */
+/* 591 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_vue__ = __webpack_require__(595);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5c725eca_hasScoped_false_node_modules_vue_loader_lib_selector_type_template_index_0_design_vue__ = __webpack_require__(654);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_vue__ = __webpack_require__(594);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5c725eca_hasScoped_false_node_modules_vue_loader_lib_selector_type_template_index_0_design_vue__ = __webpack_require__(655);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(593)
+  __webpack_require__(592)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -97027,13 +97092,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 593 */
+/* 592 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(594);
+var content = __webpack_require__(593);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97053,7 +97118,7 @@ if(false) {
 }
 
 /***/ }),
-/* 594 */
+/* 593 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97067,19 +97132,19 @@ exports.push([module.i, "\n.design-table {\n\tborder-style: none;\n\n\twidth: 10
 
 
 /***/ }),
-/* 595 */
+/* 594 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__principal_frame_raw_vue__ = __webpack_require__(596);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__principal_frame_final_vue__ = __webpack_require__(609);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__subsystem_summary_vue__ = __webpack_require__(614);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__subsystem_frame_vue__ = __webpack_require__(619);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__subsystem_settings_vue__ = __webpack_require__(626);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__component_vue__ = __webpack_require__(640);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__module_vue__ = __webpack_require__(647);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__principal_frame_raw_vue__ = __webpack_require__(595);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__principal_frame_final_vue__ = __webpack_require__(608);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__subsystem_summary_vue__ = __webpack_require__(613);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__subsystem_frame_vue__ = __webpack_require__(620);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__subsystem_settings_vue__ = __webpack_require__(627);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__component_vue__ = __webpack_require__(641);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__module_vue__ = __webpack_require__(648);
 //
 //
 //
@@ -97162,17 +97227,17 @@ exports.push([module.i, "\n.design-table {\n\tborder-style: none;\n\n\twidth: 10
 });
 
 /***/ }),
-/* 596 */
+/* 595 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_raw_vue__ = __webpack_require__(601);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_d00ca848_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_raw_vue__ = __webpack_require__(608);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_raw_vue__ = __webpack_require__(600);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_d00ca848_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_raw_vue__ = __webpack_require__(607);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(597)
-  __webpack_require__(599)
+  __webpack_require__(596)
+  __webpack_require__(598)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -97216,13 +97281,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 597 */
+/* 596 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(598);
+var content = __webpack_require__(597);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97242,7 +97307,7 @@ if(false) {
 }
 
 /***/ }),
-/* 598 */
+/* 597 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97250,19 +97315,19 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"principal-frame-raw.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"principal-frame-raw.vue","sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 599 */
+/* 598 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(600);
+var content = __webpack_require__(599);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97282,7 +97347,7 @@ if(false) {
 }
 
 /***/ }),
-/* 600 */
+/* 599 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97290,20 +97355,22 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.principal-frame-raw[data-v-d00ca848] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n.name-column[data-v-d00ca848] {\n\ttext-align: right;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/principal-frame-raw.vue?73c75443"],"names":[],"mappings":";AA+EA;CACA,iBAAA;CACA,YAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,yBAAA;CACA,gBAAA;CACA,eAAA;CACA;AAEA;CACA,kBAAA;CACA","file":"principal-frame-raw.vue","sourcesContent":["<template>\n  <tr class=\"principal-frame-raw\">\n\t<td class=\"name-column\" colspan=\"2\">Size: {{frame_size.toFixed(2)}}</td>\n\n\t<td class=\"part-column\"><select v-model=\"principal_frame\" class=\"part-column-select\">\n\t  <option v-for=\"princ_frame_value in se_design.valid_frames\">{{princ_frame_value['Name']}}</option>\n\t</select></td>\n\n\t<template v-for=\"name in stats_raw.names\">\n\t  <StatlineCell :stats=\"stats_raw\" :name=\"name\"></StatlineCell>\n\t</template>\n\t\n\t<td class=\"weight-internal-column\">{{se_design.weight_internal.toFixed(2)}}</td>\n\t<td class=\"weight-external-column\">{{se_design.weight_external.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_design.cost_BR_raw.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_design.cost_SR_raw.toFixed(2)}}</td>\n\n\t<td class=\"power-cost-column\">{{se_design.cost_power_raw.toFixed(2)}}</td>\n\t<td class=\"power-gen-column\">{{se_design.power_generation_raw.toFixed(2)}}</td>\n\n\t<template v-for=\"name in crew_raw.names\">\n\t  <StatlineCell :stats=\"crew_raw\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time_frame}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrameRaw',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tprincipal_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.se_design.json['Principal Frame'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_design.json['Principal Frame'] = value;\n\t\t\t},\n\t\t},\n\t\tstats_raw () {\n\t\t\treturn this.se_design.stats_raw;\n\t\t},\n\t\tcrew_raw () {\n\t\t\treturn this.se_design.cost_crew_raw;\n\t\t},\n\t\tbuild_time_frame () {\n\t\t\treturn frac(this.se_design.build_time_frame, 12);\n\t\t},\n\t\tframe_size () {\n\t\t\treturn this.se_design.frame_size;\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n</style>\n\n<style scoped>\n.principal-frame-raw {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n\n.name-column {\n\ttext-align: right;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.principal-frame-raw[data-v-d00ca848] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n.name-column[data-v-d00ca848] {\n\ttext-align: right;\n}\n.has-error[data-v-d00ca848] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/principal-frame-raw.vue?c5e7e534"],"names":[],"mappings":";AAyFA;CACA,iBAAA;CACA,YAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,yBAAA;CACA,gBAAA;CACA,eAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-raw.vue","sourcesContent":["<template>\n  <tr class=\"principal-frame-raw\">\n\t<td class=\"name-column\" colspan=\"2\">Size: {{frame_size.toFixed(2)}}</td>\n\n\t<td class=\"part-column\">\n\t  <select v-model=\"principal_frame\" class=\"part-column-select\">\n\t\t<option v-for=\"princ_frame_value in se_design.valid_frames\">{{princ_frame_value['Name']}}</option>\n\t  </select>\n\t</td>\n\n\t<template v-for=\"name in stats_raw.names\">\n\t  <StatlineCell :stats=\"stats_raw\" :name=\"name\"></StatlineCell>\n\t</template>\n\t\n\t<td class=\"weight-internal-column\" v-bind:class=\"weight_summary_class\">{{se_design.weight_internal.toFixed(2)}}</td>\n\t<td class=\"weight-external-column\">{{se_design.weight_external.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_design.cost_BR_raw.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_design.cost_SR_raw.toFixed(2)}}</td>\n\n\t<td class=\"power-cost-column\">{{se_design.cost_power_raw.toFixed(2)}}</td>\n\t<td class=\"power-gen-column\">{{se_design.power_generation_raw.toFixed(2)}}</td>\n\n\t<template v-for=\"name in crew_raw.names\">\n\t  <StatlineCell :stats=\"crew_raw\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time_frame}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrameRaw',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tweight_summary_class () {\n\t\t\treturn {\n\t\t\t\t['has-error']: this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error () {\n\t\t\treturn this.se_design.weight_internal > this.se_design.frame_max_size_raw;\n\t\t},\n\t\tprincipal_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.se_design.json['Principal Frame'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_design.json['Principal Frame'] = value;\n\t\t\t},\n\t\t},\n\t\tstats_raw () {\n\t\t\treturn this.se_design.stats_raw;\n\t\t},\n\t\tcrew_raw () {\n\t\t\treturn this.se_design.cost_crew_raw;\n\t\t},\n\t\tbuild_time_frame () {\n\t\t\treturn frac(this.se_design.build_time_frame, 12);\n\t\t},\n\t\tframe_size () {\n\t\t\treturn this.se_design.frame_size;\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n</style>\n\n<style scoped>\n.principal-frame-raw {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n\n.name-column {\n\ttext-align: right;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 601 */
+/* 600 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(97);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_functions_js__ = __webpack_require__(161);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_functions_js__ = __webpack_require__(159);
+//
+//
 //
 //
 //
@@ -97352,6 +97419,14 @@ exports.push([module.i, "\n.principal-frame-raw[data-v-d00ca848] {\n\tbackground
 		se_design: Object
 	},
 	computed: {
+		weight_summary_class() {
+			return {
+				['has-error']: this.has_weight_error
+			};
+		},
+		has_weight_error() {
+			return this.se_design.weight_internal > this.se_design.frame_max_size_raw;
+		},
 		principal_frame: {
 			get() {
 				return this.se_design.json['Principal Frame'];
@@ -97377,13 +97452,13 @@ exports.push([module.i, "\n.principal-frame-raw[data-v-d00ca848] {\n\tbackground
 });
 
 /***/ }),
-/* 602 */
+/* 601 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(603);
+var content = __webpack_require__(602);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97403,7 +97478,7 @@ if(false) {
 }
 
 /***/ }),
-/* 603 */
+/* 602 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97417,13 +97492,13 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 
 /***/ }),
-/* 604 */
+/* 603 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(605);
+var content = __webpack_require__(604);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97443,7 +97518,7 @@ if(false) {
 }
 
 /***/ }),
-/* 605 */
+/* 604 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97457,7 +97532,7 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 
 /***/ }),
-/* 606 */
+/* 605 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -97507,7 +97582,7 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 });
 
 /***/ }),
-/* 607 */
+/* 606 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -97529,7 +97604,7 @@ if (false) {
 }
 
 /***/ }),
-/* 608 */
+/* 607 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -97586,9 +97661,14 @@ var render = function() {
         ]
       }),
       _vm._v(" "),
-      _c("td", { staticClass: "weight-internal-column" }, [
-        _vm._v(_vm._s(_vm.se_design.weight_internal.toFixed(2)))
-      ]),
+      _c(
+        "td",
+        {
+          staticClass: "weight-internal-column",
+          class: _vm.weight_summary_class
+        },
+        [_vm._v(_vm._s(_vm.se_design.weight_internal.toFixed(2)))]
+      ),
       _vm._v(" "),
       _c("td", { staticClass: "weight-external-column" }, [
         _vm._v(_vm._s(_vm.se_design.weight_external.toFixed(2)))
@@ -97635,16 +97715,16 @@ if (false) {
 }
 
 /***/ }),
-/* 609 */
+/* 608 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_final_vue__ = __webpack_require__(612);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_4654872a_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_final_vue__ = __webpack_require__(613);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_final_vue__ = __webpack_require__(611);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_4654872a_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_final_vue__ = __webpack_require__(612);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(610)
+  __webpack_require__(609)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -97688,13 +97768,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 610 */
+/* 609 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(611);
+var content = __webpack_require__(610);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -97714,7 +97794,7 @@ if(false) {
 }
 
 /***/ }),
-/* 611 */
+/* 610 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97722,20 +97802,24 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.principal-frame-final[data-v-4654872a] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n.name-column-input[data-v-4654872a] {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.build-time-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.stat-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.br-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.sr-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-4654872a] {\n\ttext-align: center;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/principal-frame-final.vue?1b01337a"],"names":[],"mappings":";AA2EA;CACA,iBAAA;CACA,YAAA;;CAEA,kBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,mBAAA;CACA;AAEA;CACA,aAAA;CACA,kBAAA;CACA,kBAAA;CACA,YAAA;CACA,mBAAA;CACA,mBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA","file":"principal-frame-final.vue","sourcesContent":["<template>\n  <tr class=\"principal-frame-final\">\n\t<td class=\"name-column\" colspan=\"2\">\n\t  <input v-model=\"ship_name\" placeholder=\"Ship Name\" class=\"name-column-input\">\n\t</td>\n\n\t<td class=\"part-column\">{{principal_frame}}</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t</template>\n\t\n\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_design.weight_total}}</td>\n\n\t<td class=\"br-column\">{{se_design.cost_BR}}</td>\n\t<td class=\"sr-column\">{{se_design.cost_SR}}</td>\n\n\t<td class=\"power-cost-column\">{{se_design.cost_power}}</td>\n\t<td class=\"power-gen-column\">{{se_design.power_generation}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tprincipal_frame () {\n\t\t\treturn this.se_design.json['Principal Frame'];\n\t\t},\n\t\tstats () {\n\t\t\treturn this.se_design.stats;\n\t\t},\n\t\tcrew () {\n\t\t\treturn this.se_design.cost_crew;\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.se_design.build_time, 12, true);\n\t\t},\n\t\tship_name: {\n\t\t\tget () {\n\t\t\t\treturn this.se_design.json['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_design.json['Name'] = value;\n\t\t\t}\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.principal-frame-final {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n\n.name-column-input {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.build-time-column {\n\ttext-align: center;\n}\n\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.principal-frame-final[data-v-4654872a] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n.name-column-input[data-v-4654872a] {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.build-time-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.stat-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.br-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.sr-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.has-error[data-v-4654872a] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/principal-frame-final.vue?6bb34203"],"names":[],"mappings":";AA8FA;CACA,iBAAA;CACA,YAAA;;CAEA,kBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,mBAAA;CACA;AAEA;CACA,aAAA;CACA,kBAAA;CACA,kBAAA;CACA,YAAA;CACA,mBAAA;CACA,mBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-final.vue","sourcesContent":["<template>\n  <tr class=\"principal-frame-final\">\n\t<td class=\"name-column\" colspan=\"2\">\n\t  <input v-model=\"ship_name\" placeholder=\"Ship Name\" class=\"name-column-input\">\n\t</td>\n\n\t<td class=\"part-column\">{{principal_frame}}</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t</template>\n\t\n\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_design.weight_total}}</td>\n\n\t<td class=\"br-column\">{{se_design.cost_BR}}</td>\n\t<td class=\"sr-column\">{{se_design.cost_SR}}</td>\n\n\t<td class=\"power-cost-column\"\n\t\tv-bind:title=\"power_final_title\"\n\t\tv-bind:class=\"power_final_class\">{{se_design.cost_power}}</td>\n\t<td class=\"power-gen-column\"\n\t\tv-bind:title=\"power_final_title\"\n\t\tv-bind:class=\"power_final_class\">{{se_design.power_generation}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tpower_final_title () {\n\t\t\tif (this.has_power_error) {\n\t\t\t\treturn 'Error: Power cost greater than power generation.';\n\t\t\t} else {\n\t\t\t\treturn '';\n\t\t\t};\n\t\t},\n\t\tpower_final_class () {\n\t\t\treturn {\n\t\t\t\t['has-error']: this.has_power_error,\n\t\t\t};\n\t\t},\n\t\thas_power_error () {\n\t\t\treturn this.se_design.cost_power > this.se_design.power_generation;\n\t\t},\n\t\tprincipal_frame () {\n\t\t\treturn this.se_design.json['Principal Frame'];\n\t\t},\n\t\tstats () {\n\t\t\treturn this.se_design.stats;\n\t\t},\n\t\tcrew () {\n\t\t\treturn this.se_design.cost_crew;\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.se_design.build_time, 12, true);\n\t\t},\n\t\tship_name: {\n\t\t\tget () {\n\t\t\t\treturn this.se_design.json['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_design.json['Name'] = value;\n\t\t\t}\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.principal-frame-final {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n\n.name-column-input {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.build-time-column {\n\ttext-align: center;\n}\n\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 612 */
+/* 611 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(97);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_functions_js__ = __webpack_require__(161);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_functions_js__ = __webpack_require__(159);
+//
+//
+//
+//
 //
 //
 //
@@ -97783,6 +97867,21 @@ exports.push([module.i, "\n.principal-frame-final[data-v-4654872a] {\n\tbackgrou
 		se_design: Object
 	},
 	computed: {
+		power_final_title() {
+			if (this.has_power_error) {
+				return 'Error: Power cost greater than power generation.';
+			} else {
+				return '';
+			};
+		},
+		power_final_class() {
+			return {
+				['has-error']: this.has_power_error
+			};
+		},
+		has_power_error() {
+			return this.se_design.cost_power > this.se_design.power_generation;
+		},
 		principal_frame() {
 			return this.se_design.json['Principal Frame'];
 		},
@@ -97808,7 +97907,7 @@ exports.push([module.i, "\n.principal-frame-final[data-v-4654872a] {\n\tbackgrou
 });
 
 /***/ }),
-/* 613 */
+/* 612 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -97870,13 +97969,25 @@ var render = function() {
         _vm._v(_vm._s(_vm.se_design.cost_SR))
       ]),
       _vm._v(" "),
-      _c("td", { staticClass: "power-cost-column" }, [
-        _vm._v(_vm._s(_vm.se_design.cost_power))
-      ]),
+      _c(
+        "td",
+        {
+          staticClass: "power-cost-column",
+          class: _vm.power_final_class,
+          attrs: { title: _vm.power_final_title }
+        },
+        [_vm._v(_vm._s(_vm.se_design.cost_power))]
+      ),
       _vm._v(" "),
-      _c("td", { staticClass: "power-gen-column" }, [
-        _vm._v(_vm._s(_vm.se_design.power_generation))
-      ]),
+      _c(
+        "td",
+        {
+          staticClass: "power-gen-column",
+          class: _vm.power_final_class,
+          attrs: { title: _vm.power_final_title }
+        },
+        [_vm._v(_vm._s(_vm.se_design.power_generation))]
+      ),
       _vm._v(" "),
       _vm._l(_vm.crew.names, function(name) {
         return [
@@ -97905,16 +98016,17 @@ if (false) {
 }
 
 /***/ }),
-/* 614 */
+/* 613 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__ = __webpack_require__(617);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_24667b0a_hasScoped_false_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_summary_vue__ = __webpack_require__(618);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__ = __webpack_require__(618);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_24667b0a_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_summary_vue__ = __webpack_require__(619);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(615)
+  __webpack_require__(614)
+  __webpack_require__(616)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -97924,12 +98036,12 @@ var normalizeComponent = __webpack_require__(31)
 /* styles */
 var __vue_styles__ = injectStyle
 /* scopeId */
-var __vue_scopeId__ = null
+var __vue_scopeId__ = "data-v-24667b0a"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
   __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_24667b0a_hasScoped_false_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_summary_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_24667b0a_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_summary_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
@@ -97958,23 +98070,23 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 615 */
+/* 614 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(616);
+var content = __webpack_require__(615);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(14)("5b52a37c", content, false);
+var update = __webpack_require__(14)("16349901", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
  if(!content.locals) {
-   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-24667b0a\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./subsystem-summary.vue", function() {
-     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-24667b0a\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./subsystem-summary.vue");
+   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-24667b0a\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./subsystem-summary.vue", function() {
+     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-24667b0a\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./subsystem-summary.vue");
      if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
      update(newContent);
    });
@@ -97984,7 +98096,7 @@ if(false) {
 }
 
 /***/ }),
-/* 616 */
+/* 615 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -97992,19 +98104,61 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n.name-cell {\n\tborder-style: none;\n}\n.part-cell {\n\tborder-style: none;\n}\n.part-select {\n\twidth: 100%;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/subsystem-summary.vue?5f7a0206"],"names":[],"mappings":";AA+DA;CACA,iBAAA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA","file":"subsystem-summary.vue","sourcesContent":["<template>\n\n  <tr class=\"subsystem-summary\">\n\t<td class=\"name-column\" colspan=\"2\">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t<td class=\"part-column\"></td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\">{{se_subsystem.weight_internal.toFixed(2)}}</td>\n\t<td class=\"weight-external-column\">{{se_subsystem.weight_external.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_subsystem.cost_BR.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_subsystem.cost_SR.toFixed(2)}}</td>\n\n\t<td class=\"power-cost-column\">{{se_subsystem.cost_power.toFixed(2)}}</td>\n\t<td class=\"power-gen-column\">{{se_subsystem.power_generation.toFixed(2)}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-cost-column\"></td>\n  </tr>\n\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'SubsystemSummary',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n\n.name-cell {\n\tborder-style: none;\n}\n\n.part-cell {\n\tborder-style: none;\n}\n\n.part-select {\n\twidth: 100%;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.subsystem-summary[data-v-24667b0a] {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n.name-cell[data-v-24667b0a] {\n\tborder-style: none;\n}\n.part-cell[data-v-24667b0a] {\n\tborder-style: none;\n}\n.part-select[data-v-24667b0a] {\n\twidth: 100%;\n}\n.has-error[data-v-24667b0a] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/subsystem-summary.vue?6be8bcf8"],"names":[],"mappings":";AAyEA;CACA,iBAAA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-summary.vue","sourcesContent":["<template>\n\n  <tr class=\"subsystem-summary\">\n\t<td class=\"name-column\"\n\t\tv-bind:class=\"weight_summary_class\"\n\t\tcolspan=\"2\">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t<td class=\"part-column\"></td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\" v-bind:class=\"weight_summary_class\">{{se_subsystem.weight_internal.toFixed(2)}}</td>\n\t<td class=\"weight-external-column\">{{se_subsystem.weight_external.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_subsystem.cost_BR.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_subsystem.cost_SR.toFixed(2)}}</td>\n\n\t<td class=\"power-cost-column\">{{se_subsystem.cost_power.toFixed(2)}}</td>\n\t<td class=\"power-gen-column\">{{se_subsystem.power_generation.toFixed(2)}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-cost-column\"></td>\n  </tr>\n\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'SubsystemSummary',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tweight_summary_class () {\n\t\t\treturn {\n\t\t\t\t['has-error']: this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error () {\n\t\t\treturn this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;\n\t\t},\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n\n.name-cell {\n\tborder-style: none;\n}\n\n.part-cell {\n\tborder-style: none;\n}\n\n.part-select {\n\twidth: 100%;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
+/* 616 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(617);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(14)("579ffd3e", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-24667b0a\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./subsystem-summary.vue", function() {
+     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-24667b0a\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./subsystem-summary.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
 /* 617 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(13)(true);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-summary.vue","sourceRoot":""}]);
+
+// exports
+
+
+/***/ }),
+/* 618 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(96);
+//
+//
 //
 //
 //
@@ -98051,6 +98205,14 @@ exports.push([module.i, "\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-s
 		se_subsystem: Object
 	},
 	computed: {
+		weight_summary_class() {
+			return {
+				['has-error']: this.has_weight_error
+			};
+		},
+		has_weight_error() {
+			return this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;
+		},
 		se_components() {
 			return this.se_subsystem.components;
 		},
@@ -98065,7 +98227,7 @@ exports.push([module.i, "\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-s
 });
 
 /***/ }),
-/* 618 */
+/* 619 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -98077,13 +98239,21 @@ var render = function() {
     "tr",
     { staticClass: "subsystem-summary" },
     [
-      _c("td", { staticClass: "name-column", attrs: { colspan: "2" } }, [
-        _vm._v(
-          _vm._s(_vm.se_subsystem.weight_internal.toFixed(2)) +
-            "/" +
-            _vm._s(_vm.se_subsystem.weight_cap.toFixed(2))
-        )
-      ]),
+      _c(
+        "td",
+        {
+          staticClass: "name-column",
+          class: _vm.weight_summary_class,
+          attrs: { colspan: "2" }
+        },
+        [
+          _vm._v(
+            _vm._s(_vm.se_subsystem.weight_internal.toFixed(2)) +
+              "/" +
+              _vm._s(_vm.se_subsystem.weight_cap.toFixed(2))
+          )
+        ]
+      ),
       _vm._v(" "),
       _c("td", { staticClass: "part-column" }),
       _vm._v(" "),
@@ -98091,9 +98261,14 @@ var render = function() {
         return [_c("StatlineCell", { attrs: { stats: _vm.stats, name: name } })]
       }),
       _vm._v(" "),
-      _c("td", { staticClass: "weight-internal-column" }, [
-        _vm._v(_vm._s(_vm.se_subsystem.weight_internal.toFixed(2)))
-      ]),
+      _c(
+        "td",
+        {
+          staticClass: "weight-internal-column",
+          class: _vm.weight_summary_class
+        },
+        [_vm._v(_vm._s(_vm.se_subsystem.weight_internal.toFixed(2)))]
+      ),
       _vm._v(" "),
       _c("td", { staticClass: "weight-external-column" }, [
         _vm._v(_vm._s(_vm.se_subsystem.weight_external.toFixed(2)))
@@ -98136,17 +98311,17 @@ if (false) {
 }
 
 /***/ }),
-/* 619 */
+/* 620 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__ = __webpack_require__(624);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_b63f97fc_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_frame_vue__ = __webpack_require__(625);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__ = __webpack_require__(625);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_b63f97fc_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_frame_vue__ = __webpack_require__(626);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(620)
-  __webpack_require__(622)
+  __webpack_require__(621)
+  __webpack_require__(623)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -98190,13 +98365,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 620 */
+/* 621 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(621);
+var content = __webpack_require__(622);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -98216,7 +98391,7 @@ if(false) {
 }
 
 /***/ }),
-/* 621 */
+/* 622 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -98224,19 +98399,19 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.subsystem-frame {\n\tbackground: #ccc;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/subsystem-frame.vue?0439046a"],"names":[],"mappings":";AAoFA;CACA,iBAAA;CACA","file":"subsystem-frame.vue","sourcesContent":["<template>\n\n  <tr class=\"subsystem-frame\">\n\t<td class=\"name-column\" colspan=\"2\">{{se_subsystem.name}}</td>\n\n\t<td class=\"part-column\"><select v-model=\"sub_frame\" class=\"part-column-select\">\n\t\t<option v-for=\"sub_frame_value in se_subsystem.valid_frames\">{{sub_frame_value['Name']}}</option>\n\t</select></td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <td>{{stats_multiplier_pretty}}</td>\n\t</template>\n\n\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>\n\n\t<td class=\"power-cost-column\"></td>\n\t<td class=\"power-gen-column\"></td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew_mult_pretty\" :name=\"name\" :ispretty=\"false\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n\n\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'SubsystemFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tstats_multiplier_pretty() {\n\t\t\treturn this.se_subsystem.stats_multiplier.toFixed(2) + 'x';\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tcrew_mult_pretty() {\n\t\t\treturn this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\tsub_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.se_subsystem.sub_frame;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_subsystem.sub_frame = value;\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.subsystem-frame {\n\tbackground: #ccc;\n}\n\n</style>\n\n\n<style scoped>\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-frame.vue","sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 622 */
+/* 623 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(623);
+var content = __webpack_require__(624);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -98256,7 +98431,7 @@ if(false) {
 }
 
 /***/ }),
-/* 623 */
+/* 624 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -98264,20 +98439,23 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-frame.vue","sourceRoot":""}]);
+exports.push([module.i, "\n.subsystem-frame[data-v-b63f97fc] {\n\tbackground: #ccc;\n}\n.has-error[data-v-b63f97fc] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/subsystem-frame.vue?f5fba08a"],"names":[],"mappings":";AAyGA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-frame.vue","sourcesContent":["<template>\n\n  <tr class=\"subsystem-frame\">\n\t<td class=\"name-column\" colspan=\"2\">{{se_subsystem.name}}</td>\n\n\t<td class=\"part-column\">\n\t  <select v-model=\"sub_frame\" class=\"part-column-select\" v-bind:class=\"part_column_select_computed\">\n\t\t<option v-for=\"sub_frame_value in se_subsystem.valid_frames\">{{sub_frame_value['Name']}}</option>\n\t\t<option v-if=\"!is_valid_frame\">{{sub_frame}}</option>\n\t  </select>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <td>{{stats_multiplier_pretty}}</td>\n\t</template>\n\n\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>\n\n\t<td class=\"power-cost-column\"></td>\n\t<td class=\"power-gen-column\"></td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew_mult_pretty\" :name=\"name\" :ispretty=\"false\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n\n\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'SubsystemFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tpart_column_select_computed () {\n\t\t\treturn {\n\t\t\t\t['has-error']: !this.is_valid_frame,\n\t\t\t};\n\t\t},\n\t\tis_valid_frame () {\n\t\t\treturn this.valid_frames\n\t\t\t\t.map((frame) => frame['Name'])\n\t\t\t\t.includes(this.sub_frame);\n\t\t},\n\t\tvalid_frames () {\n\t\t\treturn this.se_subsystem.valid_frames;\n\t\t},\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tstats_multiplier_pretty() {\n\t\t\treturn this.se_subsystem.stats_multiplier.toFixed(2) + 'x';\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tcrew_mult_pretty() {\n\t\t\treturn this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\tsub_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.se_subsystem.sub_frame;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_subsystem.sub_frame = value;\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n\n</style>\n\n\n<style scoped>\n.subsystem-frame {\n\tbackground: #ccc;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 624 */
+/* 625 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(97);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_functions_js__ = __webpack_require__(161);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_functions_js__ = __webpack_require__(159);
+//
+//
+//
 //
 //
 //
@@ -98328,6 +98506,17 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 		se_subsystem: Object
 	},
 	computed: {
+		part_column_select_computed() {
+			return {
+				['has-error']: !this.is_valid_frame
+			};
+		},
+		is_valid_frame() {
+			return this.valid_frames.map(frame => frame['Name']).includes(this.sub_frame);
+		},
+		valid_frames() {
+			return this.se_subsystem.valid_frames;
+		},
 		se_components() {
 			return this.se_subsystem.components;
 		},
@@ -98359,7 +98548,7 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 });
 
 /***/ }),
-/* 625 */
+/* 626 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -98388,6 +98577,7 @@ var render = function() {
               }
             ],
             staticClass: "part-column-select",
+            class: _vm.part_column_select_computed,
             on: {
               change: function($event) {
                 var $$selectedVal = Array.prototype.filter
@@ -98404,9 +98594,16 @@ var render = function() {
               }
             }
           },
-          _vm._l(_vm.se_subsystem.valid_frames, function(sub_frame_value) {
-            return _c("option", [_vm._v(_vm._s(sub_frame_value["Name"]))])
-          })
+          [
+            _vm._l(_vm.se_subsystem.valid_frames, function(sub_frame_value) {
+              return _c("option", [_vm._v(_vm._s(sub_frame_value["Name"]))])
+            }),
+            _vm._v(" "),
+            !_vm.is_valid_frame
+              ? _c("option", [_vm._v(_vm._s(_vm.sub_frame))])
+              : _vm._e()
+          ],
+          2
         )
       ]),
       _vm._v(" "),
@@ -98459,17 +98656,17 @@ if (false) {
 }
 
 /***/ }),
-/* 626 */
+/* 627 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__ = __webpack_require__(631);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_ec733cc4_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_settings_vue__ = __webpack_require__(639);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__ = __webpack_require__(632);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_ec733cc4_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_settings_vue__ = __webpack_require__(640);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(627)
-  __webpack_require__(629)
+  __webpack_require__(628)
+  __webpack_require__(630)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -98513,13 +98710,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 627 */
+/* 628 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(628);
+var content = __webpack_require__(629);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -98539,7 +98736,7 @@ if(false) {
 }
 
 /***/ }),
-/* 628 */
+/* 629 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -98553,13 +98750,13 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 
 /***/ }),
-/* 629 */
+/* 630 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(630);
+var content = __webpack_require__(631);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -98579,7 +98776,7 @@ if(false) {
 }
 
 /***/ }),
-/* 630 */
+/* 631 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -98593,13 +98790,13 @@ exports.push([module.i, "\n.setting-tr[data-v-ec733cc4] {\n\tbackground: #ccc;\n
 
 
 /***/ }),
-/* 631 */
+/* 632 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__setting_cell_vue__ = __webpack_require__(632);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__setting_cell_vue__ = __webpack_require__(633);
 //
 //
 //
@@ -98634,17 +98831,17 @@ exports.push([module.i, "\n.setting-tr[data-v-ec733cc4] {\n\tbackground: #ccc;\n
 });
 
 /***/ }),
-/* 632 */
+/* 633 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_setting_cell_vue__ = __webpack_require__(637);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_1ad72548_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_setting_cell_vue__ = __webpack_require__(638);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_setting_cell_vue__ = __webpack_require__(638);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_1ad72548_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_setting_cell_vue__ = __webpack_require__(639);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(633)
-  __webpack_require__(635)
+  __webpack_require__(634)
+  __webpack_require__(636)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -98688,13 +98885,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 633 */
+/* 634 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(634);
+var content = __webpack_require__(635);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -98714,7 +98911,7 @@ if(false) {
 }
 
 /***/ }),
-/* 634 */
+/* 635 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -98728,13 +98925,13 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 
 /***/ }),
-/* 635 */
+/* 636 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(636);
+var content = __webpack_require__(637);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -98754,7 +98951,7 @@ if(false) {
 }
 
 /***/ }),
-/* 636 */
+/* 637 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -98768,11 +98965,11 @@ exports.push([module.i, "\n.setting-cell[data-v-1ad72548] {\n\tflex: 1 1 0;\n\tm
 
 
 /***/ }),
-/* 637 */
+/* 638 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
 //
 //
@@ -98838,7 +99035,7 @@ exports.push([module.i, "\n.setting-cell[data-v-1ad72548] {\n\tflex: 1 1 0;\n\tm
 });
 
 /***/ }),
-/* 638 */
+/* 639 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -98941,7 +99138,7 @@ if (false) {
 }
 
 /***/ }),
-/* 639 */
+/* 640 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -98976,17 +99173,17 @@ if (false) {
 }
 
 /***/ }),
-/* 640 */
+/* 641 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_component_vue__ = __webpack_require__(645);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_702f1bb0_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_component_vue__ = __webpack_require__(646);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_component_vue__ = __webpack_require__(646);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_702f1bb0_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_component_vue__ = __webpack_require__(647);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(641)
-  __webpack_require__(643)
+  __webpack_require__(642)
+  __webpack_require__(644)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -99030,13 +99227,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 641 */
+/* 642 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(642);
+var content = __webpack_require__(643);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -99056,7 +99253,7 @@ if(false) {
 }
 
 /***/ }),
-/* 642 */
+/* 643 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -99070,13 +99267,13 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 
 /***/ }),
-/* 643 */
+/* 644 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(644);
+var content = __webpack_require__(645);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -99096,7 +99293,7 @@ if(false) {
 }
 
 /***/ }),
-/* 644 */
+/* 645 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -99110,14 +99307,14 @@ exports.push([module.i, "\n.component-tr[data-v-702f1bb0] {\n\twidth: 100%;\n\tm
 
 
 /***/ }),
-/* 645 */
+/* 646 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ui_functions_js__ = __webpack_require__(161);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__statline_cell_vue__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ui_functions_js__ = __webpack_require__(159);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__statline_cell_vue__ = __webpack_require__(96);
 //
 //
 //
@@ -99283,7 +99480,7 @@ exports.push([module.i, "\n.component-tr[data-v-702f1bb0] {\n\twidth: 100%;\n\tm
 });
 
 /***/ }),
-/* 646 */
+/* 647 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -99436,17 +99633,17 @@ if (false) {
 }
 
 /***/ }),
-/* 647 */
+/* 648 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_module_vue__ = __webpack_require__(652);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_c0aaa36e_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_module_vue__ = __webpack_require__(653);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_module_vue__ = __webpack_require__(653);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_c0aaa36e_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_module_vue__ = __webpack_require__(654);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(648)
-  __webpack_require__(650)
+  __webpack_require__(649)
+  __webpack_require__(651)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -99490,13 +99687,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 648 */
+/* 649 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(649);
+var content = __webpack_require__(650);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -99516,7 +99713,7 @@ if(false) {
 }
 
 /***/ }),
-/* 649 */
+/* 650 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -99530,13 +99727,13 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 
 /***/ }),
-/* 650 */
+/* 651 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(651);
+var content = __webpack_require__(652);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -99556,7 +99753,7 @@ if(false) {
 }
 
 /***/ }),
-/* 651 */
+/* 652 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -99570,14 +99767,14 @@ exports.push([module.i, "\n.module-tr[data-v-c0aaa36e] {\n\tbackground: #ccc;\n\
 
 
 /***/ }),
-/* 652 */
+/* 653 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ui_functions_js__ = __webpack_require__(161);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__statline_cell_vue__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ui_functions_js__ = __webpack_require__(159);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__statline_cell_vue__ = __webpack_require__(96);
 //
 //
 //
@@ -99699,7 +99896,7 @@ exports.push([module.i, "\n.module-tr[data-v-c0aaa36e] {\n\tbackground: #ccc;\n\
 });
 
 /***/ }),
-/* 653 */
+/* 654 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -99838,7 +100035,7 @@ if (false) {
 }
 
 /***/ }),
-/* 654 */
+/* 655 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -99954,16 +100151,16 @@ if (false) {
 }
 
 /***/ }),
-/* 655 */
+/* 656 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_import_export_vue__ = __webpack_require__(658);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_8a85d0ac_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_design_import_export_vue__ = __webpack_require__(659);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_import_export_vue__ = __webpack_require__(659);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_8a85d0ac_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_design_import_export_vue__ = __webpack_require__(660);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(656)
+  __webpack_require__(657)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -100007,13 +100204,13 @@ if (false) {(function () {
 
 
 /***/ }),
-/* 656 */
+/* 657 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(657);
+var content = __webpack_require__(658);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -100033,7 +100230,7 @@ if(false) {
 }
 
 /***/ }),
-/* 657 */
+/* 658 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -100041,22 +100238,24 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.design-import-export[data-v-8a85d0ac] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.design-import-export-status-message[data-v-8a85d0ac] {\n}\n.fade[data-v-8a85d0ac] {\n\tanimation: fadeanim-data-v-8a85d0ac 3s forwards;\n}\n@keyframes fadeanim-data-v-8a85d0ac {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/design-import-export.vue?7b0f528a"],"names":[],"mappings":";AA2JA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n  <div class=\"design-import-export\">\n    <input id=\"design-import-export-blueprint-string\" v-model=\"design_json_string\">\n    <input type=\"button\"\n\t\t   class=\"clipboard-copy-button\"\n\t\t   data-clipboard-target=\"#design-import-export-blueprint-string\"\n\t\t   value=\"Copy\"></input>\n\n    <select v-model=\"selected_save_bp\">\n      <option v-for=\"blueprint in local_saves\">\n\t\t{{blueprint_save_name(blueprint)}}\n      </option>\n    </select>\n\n    <input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"></input>\n    <input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"></input>\n\n    <input type=\"button\" @click=\"local_saves_save_design\" value=\"Save current design\"></input>\n    <input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"></input>\n\n    <span\n\t  ref=\"status_message\"\n\t  class=\"design-import-export-status-message\"\n\t  @animationend=\"clear_status_message()\">{{ status_message }}</span>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\nimport Clipboard from 'clipboard';\nimport ShipEngine from '../lib/shipengine';\n\nnew Clipboard('.clipboard-copy-button');\n\nconst LOCAL_SAVES_KEY = 'local_saves';\nconst STATUS_DEFAULT_DURATION = 2000;\n\nconst comparison_slice = _.partial(_.pick, _, ['Name', 'Blueprint Date']);\n\nexport default {\n    name: 'DesignImportExport',\n    components: {\n    },\n    data () {\n\t\treturn {\n\t\t\t// local_saves is a straight array of blueprint objects,\n\t\t\t// exactly the same as the design_info.data object.\n\t\t\tlocal_saves: [],\n\t\t\t// the currently selected element of the local_saves\n\t\t\t// array. *not* the same as design_info.data! this is so\n\t\t\t// the user can work with the list of locally saved\n\t\t\t// blueprints without clobbering their current work.\n\t\t\tselected_save: null,\n\n\t\t\tstatus_message: \"\",\n\n\t\t\tstatus_message_timeout_id: null,\n\t\t};\n    },\n    props: {\n\t\tdesign_info: Object,\n\t\tse_db: Object,\n    },\n    computed: {\n\t\tselected_save_bp: {\n\t\t\tget () {\n\t\t\t\tif (this.selected_save) {\n\t\t\t\t\treturn this.blueprint_save_name(this.selected_save);\n\t\t\t\t} else {\n\t\t\t\t\t''\n\t\t\t\t};\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.selected_save = _.chain(this.local_saves).find(bp => this.blueprint_save_name(bp) === value).value();\n\t\t\t},\n\t\t},\n\t\tdesign_json_string: {\n\t\t\tget () {\n\t\t\t\treturn JSON.stringify(this.design_info.data);\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.design_info.data = JSON.parse(value);\n\t\t\t},\n\t\t},\n    },\n    mounted () {\n\t\tthis.local_saves_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_SAVES_KEY) {\n\t\t\t\tthis.local_saves_load_from_local_storage;\n\t\t\t};\n\t\t});\n    },\n    methods: {\n\t\tblueprint_save_name (bp) {\n\t\t\t// return bp['Name'] + ' @' + new Date(bp['Blueprint Date']).toLocaleString();\n\t\t\treturn bp['Name'] +\n\t\t\t\t' (' + (new Date(bp['Blueprint Date']).toLocaleString()) + ')' +\n\t\t\t\t' [' + (new ShipEngine.Design(this.se_db, bp).stats.toString()) + ']';\n\t\t},\n\t\tlocal_saves_delete_selected () {\n\t\t\tthis.local_saves = _.chain(this.local_saves).filter(bp => {\n\t\t\t\treturn _.isEqual(comparison_slice(bp), comparison_slice(this.selected_save));\n\t\t\t}).value();\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message(\"Blueprint deleted.\");\n\t\t},\n\t\tlocal_saves_load_selected () {\n\t\t\tthis.design_info.data = this.selected_save;\n\t\t\tthis.display_status_message(\"Blueprint loaded.\");\n\t\t},\n\t\tlocal_saves_save_design () {\n\t\t\tlet timestamp = new Date();\n\t\t\ttimestamp.setMilliseconds(0);\n\t\t\tthis.design_info.data['Blueprint Date'] = timestamp.toISOString();\n\t\t\tthis.local_saves.push(_.clone(this.design_info.data));\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message(\"Blueprint saved.\");\n\t\t},\n\n\t\tlocal_saves_load_from_local_storage () {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_SAVES_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_saves = [];\n\t\t\t\tthis.display_status_message(\"No Blueprints to load\");\n\t\t\t} else {\n\t\t\t\tthis.local_saves = JSON.parse(loaded);\n\t\t\t\tthis.display_status_message(\"Blueprints loaded.\");\n\t\t\t};\n\t\t},\n\t\tlocal_saves_save_to_local_storage () {\n\t\t\tlocalStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(this.local_saves))\n\t\t},\n\n\t\tdisplay_status_message (status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'design-import-export-status-message';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = \"design-import-export-status-message fade\";\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message () {\n\t\t\tthis.status_message = null;\n\t\t}\n\t\t\n    },\n}\n</script>\n\n\n<style scoped>\n.design-import-export {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.design-import-export-status-message {\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.design-import-export[data-v-8a85d0ac] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.design-import-export-status-message[data-v-8a85d0ac] {\n}\n.fade[data-v-8a85d0ac] {\n\tanimation: fadeanim-data-v-8a85d0ac 3s forwards;\n}\n@keyframes fadeanim-data-v-8a85d0ac {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/design-import-export.vue?3d573c9a"],"names":[],"mappings":";AAgKA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n  <div class=\"design-import-export\">\n    <input id=\"design-import-export-blueprint-string\" v-model=\"design_json_string\">\n    <input type=\"button\"\n\t\t   class=\"clipboard-copy-button\"\n\t\t   data-clipboard-target=\"#design-import-export-blueprint-string\"\n\t\t   value=\"Copy\"></input>\n\n\t<span><a v-bind:href=\"'shipdesigner.html#' + design_json_url_encoded_string\">Link to this design</a></span>\n\n    <select v-model=\"selected_save_bp\">\n      <option v-for=\"blueprint in local_saves\">\n\t\t{{blueprint_save_name(blueprint)}}\n      </option>\n    </select>\n\n    <input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"></input>\n    <input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"></input>\n\n    <input type=\"button\" @click=\"local_saves_save_design\" value=\"Save current design\"></input>\n    <input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"></input>\n\n    <span\n\t  ref=\"status_message\"\n\t  class=\"design-import-export-status-message\"\n\t  @animationend=\"clear_status_message()\">{{ status_message }}</span>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\nimport Clipboard from 'clipboard';\nimport ShipEngine from '../lib/shipengine';\n\nnew Clipboard('.clipboard-copy-button');\n\nconst LOCAL_SAVES_KEY = 'local_saves';\nconst STATUS_DEFAULT_DURATION = 2000;\n\nconst comparison_slice = _.partial(_.pick, _, ['Name', 'Blueprint Date']);\n\nexport default {\n    name: 'DesignImportExport',\n    components: {\n    },\n    data () {\n\t\treturn {\n\t\t\t// local_saves is a straight array of blueprint objects,\n\t\t\t// exactly the same as the design_info.data object.\n\t\t\tlocal_saves: [],\n\t\t\t// the currently selected element of the local_saves\n\t\t\t// array. *not* the same as design_info.data! this is so\n\t\t\t// the user can work with the list of locally saved\n\t\t\t// blueprints without clobbering their current work.\n\t\t\tselected_save: null,\n\n\t\t\tstatus_message: \"\",\n\n\t\t\tstatus_message_timeout_id: null,\n\t\t};\n    },\n    props: {\n\t\tdesign_info: Object,\n\t\tse_db: Object,\n    },\n    computed: {\n\t\tselected_save_bp: {\n\t\t\tget () {\n\t\t\t\tif (this.selected_save) {\n\t\t\t\t\treturn this.blueprint_save_name(this.selected_save);\n\t\t\t\t} else {\n\t\t\t\t\t''\n\t\t\t\t};\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.selected_save = _.chain(this.local_saves).find(bp => this.blueprint_save_name(bp) === value).value();\n\t\t\t},\n\t\t},\n\t\tdesign_json_string: {\n\t\t\tget () {\n\t\t\t\treturn JSON.stringify(this.design_info.data);\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.design_info.data = JSON.parse(value);\n\t\t\t},\n\t\t},\n\t\tdesign_json_url_encoded_string () {\n\t\t\treturn encodeURI(this.design_json_string);\n\t\t},\n    },\n    mounted () {\n\t\tthis.local_saves_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_SAVES_KEY) {\n\t\t\t\tthis.local_saves_load_from_local_storage;\n\t\t\t};\n\t\t});\n    },\n    methods: {\n\t\tblueprint_save_name (bp) {\n\t\t\t// return bp['Name'] + ' @' + new Date(bp['Blueprint Date']).toLocaleString();\n\t\t\treturn bp['Name'] +\n\t\t\t\t' (' + (new Date(bp['Blueprint Date']).toLocaleString()) + ')' +\n\t\t\t\t' [' + (new ShipEngine.Design(this.se_db, bp).stats.toString()) + ']';\n\t\t},\n\t\tlocal_saves_delete_selected () {\n\t\t\tthis.local_saves = _.chain(this.local_saves).filter(bp => {\n\t\t\t\treturn _.isEqual(comparison_slice(bp), comparison_slice(this.selected_save));\n\t\t\t}).value();\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message(\"Blueprint deleted.\");\n\t\t},\n\t\tlocal_saves_load_selected () {\n\t\t\tthis.design_info.data = this.selected_save;\n\t\t\tthis.display_status_message(\"Blueprint loaded.\");\n\t\t},\n\t\tlocal_saves_save_design () {\n\t\t\tlet timestamp = new Date();\n\t\t\ttimestamp.setMilliseconds(0);\n\t\t\tthis.design_info.data['Blueprint Date'] = timestamp.toISOString();\n\t\t\tthis.local_saves.push(_.clone(this.design_info.data));\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message(\"Blueprint saved.\");\n\t\t},\n\n\t\tlocal_saves_load_from_local_storage () {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_SAVES_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_saves = [];\n\t\t\t\tthis.display_status_message(\"No Blueprints to load\");\n\t\t\t} else {\n\t\t\t\tthis.local_saves = JSON.parse(loaded);\n\t\t\t\tthis.display_status_message(\"Blueprints loaded.\");\n\t\t\t};\n\t\t},\n\t\tlocal_saves_save_to_local_storage () {\n\t\t\tlocalStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(this.local_saves))\n\t\t},\n\n\t\tdisplay_status_message (status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'design-import-export-status-message';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = \"design-import-export-status-message fade\";\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message () {\n\t\t\tthis.status_message = null;\n\t\t}\n\t\t\n    },\n}\n</script>\n\n\n<style scoped>\n.design-import-export {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.design-import-export-status-message {\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 658 */
+/* 659 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(98);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(97);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_clipboard__ = __webpack_require__(569);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_clipboard___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_clipboard__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_shipengine__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_shipengine__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_shipengine___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__lib_shipengine__);
+//
+//
 //
 //
 //
@@ -100141,6 +100340,9 @@ const comparison_slice = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.partial(
 			set(value) {
 				this.design_info.data = JSON.parse(value);
 			}
+		},
+		design_json_url_encoded_string() {
+			return encodeURI(this.design_json_string);
 		}
 	},
 	mounted() {
@@ -100207,7 +100409,7 @@ const comparison_slice = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.partial(
 });
 
 /***/ }),
-/* 659 */
+/* 660 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -100245,6 +100447,18 @@ var render = function() {
         value: "Copy"
       }
     }),
+    _vm._v(" "),
+    _c("span", [
+      _c(
+        "a",
+        {
+          attrs: {
+            href: "shipdesigner.html#" + _vm.design_json_url_encoded_string
+          }
+        },
+        [_vm._v("Link to this design")]
+      )
+    ]),
     _vm._v(" "),
     _c(
       "select",
@@ -100329,7 +100543,7 @@ if (false) {
 }
 
 /***/ }),
-/* 660 */
+/* 661 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
