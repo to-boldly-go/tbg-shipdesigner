@@ -120,7 +120,7 @@ export default {
 			let timestamp = new Date();
 			timestamp.setMilliseconds(0);
 			this.design_info.data['Blueprint Date'] = timestamp.toISOString();
-			this.local_saves.push(_.clone(this.design_info.data));
+			this.local_saves.push(_.cloneDeep(this.design_info.data));
 			this.local_saves_save_to_local_storage();
 			this.display_status_message("Blueprint saved.");
 		},
