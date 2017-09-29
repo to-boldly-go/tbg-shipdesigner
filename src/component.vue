@@ -141,9 +141,6 @@ export default {
 				if (!this.quantity && !this.se_component.is_no_part) {
 					this.quantity = 1;
 				};
-				if (this.se_component.is_no_part) {
-					this.quantity = 0;
-				};
 			},
 		},
 	},
