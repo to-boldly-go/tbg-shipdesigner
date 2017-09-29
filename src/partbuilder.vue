@@ -1,13 +1,13 @@
 <template>
   <div class="root">
 	<div class="header">
-	  <PartsListHeader :partslist="partslist_info.data" :schema="schema" :display="display"></PartsListHeader>
+	  <PartsListHeader :partslist="selected_parts" :schema="selected_schema" :display="display"></PartsListHeader>
 	</div>
 	<div class="editor">
-	  <PartsListEditor v-on:partupdate="save_parts_to_storage()" :partslist="partslist_info.data" :schema="schema" :display="display"></PartsListEditor>
+	  <PartsListEditor v-on:partupdate="save_parts_to_storage()" :partslist="selected_parts" :schema="selected_schema" :display="display"></PartsListEditor>
 	</div>
 	<div class="footer">
-	  <PartsListFooter :partslist_info="partslist_info"></PartsListFooter>
+	  <PartsListFooter @reset="reset_to_canon" :data_wrapper="data_wrapper"></PartsListFooter>
 	</div>
   </div>
 </template>
@@ -25,7 +25,7 @@ import PartsListHeader from './parts-list-header.vue';
 import PartsListFooter from './parts-list-footer.vue';
 import PartsListEditor from './parts-list-editor.vue';
 
-const SCHEMA = [
+const PARTS_SCHEMA = [
 	{
 		name: 'Type Sort',
 		id: 'type-sort',
@@ -176,6 +176,303 @@ const SCHEMA = [
 	},
 ];
 
+const MODULES_SCHEMA = [
+	{
+		name: "Type",
+		id: 'type',
+		edit_type: 'string',
+		width: 151,
+		align: 'right',
+	},
+	{
+		name: "Weight Cap",
+		id: 'weightcap',
+		edit_type: 'number',
+		fixed: 0,
+		width: 72,
+		align: 'right',
+	},
+	{
+		name: "Variant",
+		id: 'variant',
+		edit_type: 'string',
+		width: 70,
+		align: 'right',
+	},
+	{
+		name: "Tier",
+		id: 'tier',
+		edit_type: 'number',
+		fixed: 0,
+		width: 24,
+		align: 'right',
+	},
+	{
+		name: "Build Time",
+		id: 'buildtime',
+		edit_type: 'number',
+		fixed: 2,
+		width: 70,
+		align: 'right',
+	},
+	{
+		name: "C",
+		id: 'combat',
+		edit_type: 'number',
+		fixed: 1,
+		width: 19,
+		align: 'right',
+	},
+	{
+		name: "S",
+		id: 'science',
+		edit_type: 'number',
+		fixed: 1,
+		width: 19,
+		align: 'right',
+	},
+	{
+		name: "H",
+		id: 'hull',
+		edit_type: 'number',
+		fixed: 1,
+		width: 19,
+		align: 'right',
+	},
+	{
+		name: "L",
+		id: 'shields',
+		edit_type: 'number',
+		fixed: 1,
+		width: 19,
+		align: 'right',
+	},
+	{
+		name: "P",
+		id: 'presence',
+		edit_type: 'number',
+		fixed: 1,
+		width: 19,
+		align: 'right',
+	},
+	{
+		name: "D",
+		id: 'defense',
+		edit_type: 'number',
+		fixed: 1,
+		width: 19,
+		align: 'right',
+	},
+	{
+		name: "Weight",
+		id: 'weight',
+		edit_type: 'number',
+		fixed: 0,
+		width: 47,
+		align: 'right',
+	},
+	{
+		name: "SR Cost",
+		id: 'srcost',
+		edit_type: 'number',
+		fixed: 0,
+		width: 54,
+		align: 'right',
+	},
+	{
+		name: "Power Cost",
+		id: 'powercost',
+		edit_type: 'number',
+		fixed: 0,
+		width: 75,
+		align: 'right',
+	},
+	{
+		name: "O",
+		id: 'ocost',
+		edit_type: 'number',
+		fixed: 2,
+		width: 30,
+		align: 'right',
+	},
+	{
+		name: "E",
+		id: 'ecost',
+		edit_type: 'number',
+		fixed: 2,
+		width: 30,
+		align: 'right',
+	},
+	{
+		name: "T",
+		id: 'tcost',
+		edit_type: 'number',
+		fixed: 2,
+		width: 30,
+		align: 'right',
+	},
+	{
+		name: "Reliability",
+		id: 'reliability',
+		edit_type: 'number',
+		fixed: 7,
+		width: 62,
+		align: 'right',
+	},
+];
+
+const FRAMES_SCHEMA = [
+	{
+		name: 'Type Sort',
+		id: 'type-sort',
+		edit_type: 'number',
+		fixed: 0,
+		width: 59,
+		align: 'right',
+	},
+	{
+		name: 'Type',
+		id: 'type',
+		edit_type: 'string',
+		width: 73,
+		align: 'right',
+	},
+	{
+		name: 'Tier',
+		id: 'tier',
+		edit_type: 'number',
+		width: 27,
+		align: 'right',
+	},
+	{
+		name: 'Weight Class',
+		id: 'weightclass',
+		edit_type: 'number',
+		width: 85,
+		align: 'right',
+	},
+	{
+		name: 'Size Class',
+		id: 'sizeclass',
+		edit_type: 'number',
+		width: 68,
+		align: 'right',
+	},
+	{
+		name: 'Name',
+		id: 'name',
+		edit_type: 'string',
+		width: 261,
+		align: 'right',
+	},
+	{
+		name: 'MaxSz',
+		id: 'maxsz',
+		edit_type: 'number',
+		width: 44,
+		align: 'right',
+	},
+	{
+		name: 'Wt',
+		id: 'wt',
+		edit_type: 'number',
+		width: 25,
+		align: 'right',
+	},
+	{
+		name: 'Build Time',
+		id: 'buildtime',
+		edit_type: 'string',
+		width: 70,
+		align: 'right',
+	},
+	{
+		name: 'Tac Mod',
+		id: 'tacmod',
+		edit_type: 'number',
+		width: 55,
+		align: 'right',
+	},
+	{
+		name: 'Ops Mod',
+		id: 'opsmod',
+		edit_type: 'number',
+		width: 59,
+		align: 'right',
+	},
+	{
+		name: 'Hull Mod',
+		id: 'hullmod',
+		edit_type: 'number',
+		width: 58,
+		align: 'right',
+	},
+	{
+		name: 'Eng. Mod',
+		id: 'engmod',
+		edit_type: 'number',
+		width: 62,
+		align: 'right',
+	},
+	{
+		name: 'Core Mod',
+		id: 'coremod',
+		edit_type: 'number',
+		width: 63,
+		align: 'right',
+	},
+	{
+		name: 'O-Mod',
+		id: 'omod',
+		edit_type: 'number',
+		width: 45,
+		align: 'right',
+	},
+	{
+		name: 'E-Mod',
+		id: 'emod',
+		edit_type: 'number',
+		width: 45,
+		align: 'right',
+	},
+	{
+		name: 'T-Mod',
+		id: 'tmod',
+		edit_type: 'number',
+		width: 42,
+		align: 'right',
+	},
+	{
+		name: 'SR-Mod',
+		id: 'srmod',
+		edit_type: 'number',
+		width: 53,
+		align: 'right',
+	},
+	{
+		name: 'Year Available (SF)',
+		id: 'year',
+		edit_type: 'string',
+		width: 120,
+		align: 'right',
+	},
+];
+
+const canon_data = {
+	parts: {
+		records: canon_parts,
+		schema: PARTS_SCHEMA,
+	},
+	modules: {
+		records: canon_modules,
+		schema: MODULES_SCHEMA,
+	},
+	frames: {
+		records: canon_frames,
+		schema: FRAMES_SCHEMA,
+	},
+};
+
 const PARTS_KEY = 'working_parts_list';
 
 export default {
@@ -187,9 +484,17 @@ export default {
 	},
 	data () {
 		return {
-			partslist_info: { data: canon_parts },
-			schema: SCHEMA,
-			display: { types: [_(canon_parts).minBy((part) => part['Type Sort'])['Type']] },
+			data: canon_data,
+			display: {
+				filter: {
+					types: [
+						..._(canon_modules).map((part) => part['Type']).uniq(),
+						_(canon_parts).minBy((part) => part['Type Sort'])['Type'],
+						_(canon_frames).minBy((part) => part['Type Sort'])['Type'],
+					]
+				},
+				selected: 'parts',
+			},
 		};
 	},
 	mounted () {
@@ -199,18 +504,30 @@ export default {
 		this.save_parts_to_storage();
 	},
 	computed: {
+		data_wrapper () {
+			return { data: this.data };
+		},
+		selected_parts () {
+			return this.data[this.display.selected].records;
+		},
+		selected_schema () {
+			return this.data[this.display.selected].schema;
+		},
 	},
 	methods: {
+		reset_to_canon () {
+			this.data = canon_data;
+		},
 		load_parts_from_storage () {
 			const saved_parts = localStorage.getItem(PARTS_KEY);
 			if (saved_parts) {
-				this.partslist_info.data = JSON.parse(saved_parts);
+				this.data = JSON.parse(saved_parts);
 			} else {
-				localStorage.setItem(PARTS_KEY, JSON.stringify(this.partslist_info.data));
+				localStorage.setItem(PARTS_KEY, JSON.stringify(this.data));
 			};
 		},
 		save_parts_to_storage () {
-			localStorage.setItem(PARTS_KEY, JSON.stringify(this.partslist_info.data));
+			localStorage.setItem(PARTS_KEY, JSON.stringify(this.data));
 		},
 	},
 };

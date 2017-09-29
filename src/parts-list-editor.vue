@@ -61,7 +61,7 @@ export default {
 			return this.schema;
 		},
 		displayed_parts () {
-			return _(this.partslist).filter((part) => this.display.types.includes(part['Type'])).value();
+			return _(this.partslist).filter((part) => this.display.filter.types.includes(part['Type'])).value();
 		},
 	},
 	methods: {

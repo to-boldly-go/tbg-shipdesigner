@@ -1,14 +1,30 @@
 <template>
   <div class="header">
-	<div class="type-tab"
-		 v-for="type in types"
-		 @click="set_filter(type)"
-		 v-bind:class="tab_class(type)">
-	  <div class="type-tab-text">{{type}}</div>
-	  <div class="indicator-lamp-wrapper">
-		<div class="indicator-lamp-spacer"></div>
-		<div class="indicator-lamp" v-bind:class="lamp_class(type)"></div>
-		<div class="indicator-lamp-spacer"></div>
+	<div class="select-tab-column">
+	  <div class="select-tab"
+		   v-for="select in ['parts','modules','frames']"
+		   @click="set_selection(select)"
+		   v-bind:class="tab_class_select(select)">
+		<div class="select-tab-text">{{select}}</div>
+		<div class="indicator-lamp-wrapper">
+		  <div class="indicator-lamp-spacer"></div>
+		  <div class="indicator-lamp" v-bind:class="lamp_class_select(select)"></div>
+		  <div class="indicator-lamp-spacer"></div>
+		</div>
+	  </div>
+	</div>
+
+	<div class="type-tab-column">
+	  <div class="type-tab"
+		   v-for="type in types"
+		   @click="set_filter(type)"
+		   v-bind:class="tab_class_type(type)">
+		<div class="type-tab-text">{{type}}</div>
+		<div class="indicator-lamp-wrapper">
+		  <div class="indicator-lamp-spacer"></div>
+		  <div class="indicator-lamp" v-bind:class="lamp_class_type(type)"></div>
+		  <div class="indicator-lamp-spacer"></div>
+		</div>
 	  </div>
 	</div>
   </div>
@@ -49,24 +65,34 @@ export default {
 		},
 	},
 	methods: {
+		set_selection(select) {
+			this.display.selected = select;
+		},
 		set_filter(type) {
-			if (this.display.types.includes(type)) {
-				this.display.types = _.filter(this.display.types, (elem) => !(elem === type));
+			if (this.display.filter.types.includes(type)) {
+				this.display.filter.types = _.filter(this.display.filter.types, (elem) => !(elem === type));
 			} else {
-				this.display.types.push(type);
+				this.display.filter.types.push(type);
 			};
 		},
-		displaying_type(type) {
-			return 
-		},
-		tab_class(type) {
+		tab_class_type(type) {
 			return {
-				'type-tab-selected': this.display.types.includes(type),
+				'type-tab-selected': this.display.filter.types.includes(type),
 			};
 		},
-		lamp_class(type) {
+		tab_class_select(select) {
 			return {
-				'indicator-lamp-selected': this.display.types.includes(type),
+				'select-tab-selected': this.display.selected === select,
+			};
+		},
+		lamp_class_type(type) {
+			return {
+				'indicator-lamp-selected': this.display.filter.types.includes(type),
+			};
+		},
+		lamp_class_select(select) {
+			return {
+				'indicator-lamp-selected': this.display.selected === select,
 			};
 		},
 	},
@@ -80,10 +106,61 @@ export default {
 	flex-direction: row;
 	flex-wrap: wrap;
 	justify-content: flex-start;
+}
+
+.select-tab-column {
+	flex: 0 0 auto;
+	display: flex;
+	flex-direction: column;
+}
+
+.select-tab {
 	cursor: pointer;
+	flex: 0 0 auto;
+	padding: 4px;
+	border: 1px outset #eee;
+	background: #33a;
+	color: #fff;
+
+	/* display: flex; */
+	/* flex-direction: row; */
+	/* justify-content: flex-start; */
+	/* flex-wrap: nowrap; */
+}
+
+.select-tab:active {
+	background: #66e;
+	border-style: inset;
+}
+
+.select-tab-selected {
+	border: 1px solid #eee;
+	background: #44c;
+}
+
+.select-tab-text {
+	/* flex: 5 0 auto; */
+	float: left;
+}
+
+.spacer-tab {
+	flex: 0 0 30px;
+	padding: 4px;
+	border: 1 px outset #eee;
+	background: #666;
+}
+
+.type-tab-column {
+	flex: 1 0 0;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	align-items: flex-start;
 }
 
 .type-tab {
+	cursor: pointer;
 	flex: 0 0 auto;
 	padding: 4px;
 	border: 1px outset #eee;

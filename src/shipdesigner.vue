@@ -84,9 +84,10 @@ export default {
 		load_parts_from_storage () {
 			const saved_parts = localStorage.getItem(PARTS_KEY);
 			if (saved_parts) {
-				this.parts_info.parts = JSON.parse(saved_parts);
-			} else {
-				localStorage.setItem(PARTS_KEY, JSON.stringify(this.parts_info.parts));
+				const saved_parts_object = JSON.parse(saved_parts);
+				this.parts_info.parts = saved_parts_object.parts.records;
+				this.parts_info.modules = saved_parts_object.modules.records;
+				this.parts_info.frames = saved_parts_object.frames.records;
 			};
 		},
 	},

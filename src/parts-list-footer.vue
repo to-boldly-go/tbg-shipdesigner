@@ -1,6 +1,6 @@
 <template>
   <div class="footer">
-	<input id="partslist-import-export-string" v-model="partslist_json_string">
+	<input id="partslist-import-export-string" v-model="data_json_string">
 	<input type="button" class="clipboard-copy-button" data-clipboard-target="#partslist-import-export-string" value="Copy"></input>
 	<input type="button" @click="reset_to_canon()" value="Reset to canon"></input>
   </div>
@@ -18,23 +18,23 @@ export default {
 	components: {
 	},
 	props: {
-		partslist_info: {
+		data_wrapper: {
 			type: Object,
 		},
 	},
 	computed: {
-		partslist_json_string: {
+		data_json_string: {
 			get () {
-				return JSON.stringify(this.partslist_info.data);
+				return JSON.stringify(this.data_wrapper.data);
 			},
 			set (value) {
-				this.partslist_info.data = JSON.parse(value);
+				this.data_wrapper.data = JSON.parse(value);
 			},
 		},
 	},
 	methods: {
 		reset_to_canon () {
-			this.partslist_info.data = canon_parts;
+			this.$emit('reset');
 		},
 	},
 };
