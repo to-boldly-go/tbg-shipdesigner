@@ -7180,10 +7180,13 @@ class DesignComponent {
 
 	set part(value) {
 		this.json['Part'] = value;
+		if (this.is_no_part) {
+			this.quantity_calcs.set(parseInt(0));
+		};
 	}
 
 	get is_no_part() {
-		return this.json['Part'].match(/No .+/);
+		return this.json['Part'].match(/No .+/) !== null;
 	}
 
 	// BK column
@@ -7194,7 +7197,7 @@ class DesignComponent {
 
 	set quantity(value) {
 		if (this.is_quantity_configurable) {
-			return this.quantity_calcs.set(parseInt(value));
+			this.quantity_calcs.set(parseInt(value));
 		};
 	}
 
@@ -98146,7 +98149,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.part[data-v-0da6ff88] {\n}\n.delete-cell[data-v-0da6ff88] {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n.delete-button[data-v-0da6ff88] {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/parts-list-part.vue?d2992fc0"],"names":[],"mappings":";AAmDA;CACA;AAEA;CACA,YAAA;CACA,uBAAA;CACA;AAEA;CACA,WAAA;CACA,gBAAA;;CAEA,YAAA;IACA,uBAAA;CACA","file":"parts-list-part.vue","sourcesContent":["<template>\n  <tr class=\"part\">\n\t<PartsListCell v-on:partupdate=\"partupdate()\" v-for=\"field in fields\" :key=\"field.name\" :part=\"part\" :field=\"field\"></PartsListCell>\n\t<td class=\"delete-cell\"><input type=\"button\" class=\"delete-button\" value=\"X\" @click=\"delete_this_part\"></td>\n  </tr>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nimport PartsListCell from './parts-list-cell.vue';\n\nexport default {\n\tname: 'PartsListPart',\n\tcomponents: {\n\t\tPartsListCell,\n\t},\n\tprops: {\n\t\tpartslist: {\n\t\t\ttype: Array,\n\t\t},\n\t\tpart: {\n\t\t\ttype: Object,\n\t\t},\n\t\tschema: {\n\t\t\ttype: Array,\n\t\t},\n\t},\n\tcomputed: {\n\t\tfields () {\n\t\t\treturn this.schema;\n\t\t},\n\t},\n\tmethods: {\n\t\tpartupdate () {\n\t\t\tthis.$emit('partupdate');\n\t\t},\n\t\tdelete_this_part () {\n\t\t\tconst idx = this.partslist.findIndex((part) => part['Name'] === this.part['Name']);\n\t\t\tconsole.log(idx);\n\t\t\tif (idx >= 0) {\n\t\t\t\tthis.partslist.splice(idx, 1);\n\t\t\t};\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.part {\n}\n\n.delete-cell {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n\n.delete-button {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.part[data-v-0da6ff88] {\n}\n.has-error[data-v-0da6ff88] {\n\tbackground: #faa;\n}\n.delete-cell[data-v-0da6ff88] {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n.delete-button[data-v-0da6ff88] {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n.copy-cell[data-v-0da6ff88] {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n.copy-button[data-v-0da6ff88] {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/parts-list-part.vue?12508d22"],"names":[],"mappings":";AAyEA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,YAAA;CACA,uBAAA;CACA;AAEA;CACA,WAAA;CACA,gBAAA;;CAEA,YAAA;IACA,uBAAA;CACA;AAEA;CACA,YAAA;CACA,uBAAA;CACA;AAEA;CACA,WAAA;CACA,gBAAA;;CAEA,YAAA;IACA,uBAAA;CACA","file":"parts-list-part.vue","sourcesContent":["<template>\n  <tr class=\"part\">\n\t<PartsListCell\n\t  v-on:partupdate=\"partupdate()\"\n\t  v-for=\"field in fields\"\n\t  v-bind:class=\"list_class(field)\"\n\t  :key=\"field.name\"\n\t  :part=\"part\"\n\t  :field=\"field\">\n\t</PartsListCell>\n\t<td class=\"delete-cell\"><input type=\"button\" class=\"delete-button\" value=\"X\" @click=\"delete_this_part\"></td>\n\t<td class=\"copy-cell\"><input type=\"button\" class=\"copy-button\" value=\"+\" @click=\"copy_this_part\"></td>\n  </tr>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nimport PartsListCell from './parts-list-cell.vue';\n\nexport default {\n\tname: 'PartsListPart',\n\tcomponents: {\n\t\tPartsListCell,\n\t},\n\tprops: {\n\t\tpartslist: {\n\t\t\ttype: Array,\n\t\t},\n\t\tpart: {\n\t\t\ttype: Object,\n\t\t},\n\t\tschema: {\n\t\t\ttype: Array,\n\t\t},\n\t},\n\tcomputed: {\n\t\tfields () {\n\t\t\treturn this.schema;\n\t\t},\n\t\thas_duplicate_name_error () {\n\t\t\treturn this.partslist.filter((part) => part['Name'] === this.part['Name']).length > 1;\n\t\t},\n\t},\n\tmethods: {\n\t\tlist_class (field) {\n\t\t\treturn {\n\t\t\t\t['has-error']: (field.id === 'name') && (this.has_duplicate_name_error),\n\t\t\t};\n\t\t},\n\t\tpartupdate () {\n\t\t\tthis.$emit('partupdate');\n\t\t},\n\t\tdelete_this_part () {\n\t\t\tconst idx = this.partslist.findIndex((part) => part['Name'] === this.part['Name']);\n\t\t\tif (idx >= 0) {\n\t\t\t\tthis.partslist.splice(idx, 1);\n\t\t\t};\n\t\t},\n\t\tcopy_this_part () {\n\t\t\tconst idx = this.partslist.findIndex((part) => part['Name'] === this.part['Name']);\n\t\t\tif (idx >= 0) {\n\t\t\t\tlet clone = _.cloneDeep(this.part);\n\t\t\t\tthis.partslist.splice(idx, 0, clone);\n\t\t\t};\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.part {\n}\n\n.has-error {\n\tbackground: #faa;\n}\n\n.delete-cell {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n\n.delete-button {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n.copy-cell {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n\n.copy-button {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -98186,7 +98189,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-part.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-part.vue","sourceRoot":""}]);
 
 // exports
 
@@ -98199,6 +98202,14 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(98);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__parts_list_cell_vue__ = __webpack_require__(695);
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -98231,17 +98242,31 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 	computed: {
 		fields() {
 			return this.schema;
+		},
+		has_duplicate_name_error() {
+			return this.partslist.filter(part => part['Name'] === this.part['Name']).length > 1;
 		}
 	},
 	methods: {
+		list_class(field) {
+			return {
+				['has-error']: field.id === 'name' && this.has_duplicate_name_error
+			};
+		},
 		partupdate() {
 			this.$emit('partupdate');
 		},
 		delete_this_part() {
 			const idx = this.partslist.findIndex(part => part['Name'] === this.part['Name']);
-			console.log(idx);
 			if (idx >= 0) {
 				this.partslist.splice(idx, 1);
+			};
+		},
+		copy_this_part() {
+			const idx = this.partslist.findIndex(part => part['Name'] === this.part['Name']);
+			if (idx >= 0) {
+				let clone = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.cloneDeep(this.part);
+				this.partslist.splice(idx, 0, clone);
 			};
 		}
 	}
@@ -98607,6 +98632,7 @@ var render = function() {
       _vm._l(_vm.fields, function(field) {
         return _c("PartsListCell", {
           key: field.name,
+          class: _vm.list_class(field),
           attrs: { part: _vm.part, field: field },
           on: {
             partupdate: function($event) {
@@ -98621,6 +98647,14 @@ var render = function() {
           staticClass: "delete-button",
           attrs: { type: "button", value: "X" },
           on: { click: _vm.delete_this_part }
+        })
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "copy-cell" }, [
+        _c("input", {
+          staticClass: "copy-button",
+          attrs: { type: "button", value: "+" },
+          on: { click: _vm.copy_this_part }
         })
       ])
     ],
