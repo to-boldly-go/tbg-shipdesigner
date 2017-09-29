@@ -1,14 +1,14 @@
 <template>
-  <tr class="component-tr" v-bind:class="{ hasloaderror: !isloaded }">
+  <tr class="component-tr" v-bind:class="{ ['has-error']: !isloaded }">
 	<td class="name-column">{{se_component.name}}</td>
 
-	<td class="quantity-column" v-bind:class="{ hasquantityerror: has_quantity_error }">
+	<td class="quantity-column" v-bind:class="{ ['has-error']: has_quantity_error }">
 	  <select
 		v-if="quantity_configurable"
 		class="quantity-column-select"
 		v-model="quantity"
 		v-on:wheel="quantity_select_wheel_event"
-		v-bind:class="{ hasquantityerror: has_quantity_error }">
+		v-bind:class="{ ['has-error']: has_quantity_error }">
 
 		<option v-if="!valid_quantities.includes(quantity)">{{quantity}}</option>
 		<option v-for="valid_quantity in valid_quantities">{{valid_quantity}}</option>
@@ -16,11 +16,13 @@
 	  <span v-if="!quantity_configurable">{{quantity_pretty}}</span>
 	</td>
 
-	<td class="part-column">
+	<td class="part-column" v-bind:class="part_column_select_computed">
 	  <select
 		v-model="part"
+		v-bind:class="part_column_select_computed"
 		class="part-column-select">
 		<option v-for="part_value in valid_parts">{{part_value['Name']}}</option>
+		<option v-if="!is_valid_part">{{part}}</option>
 	  </select>
 	</td>
 
@@ -66,6 +68,16 @@ export default {
 		se_component: Object,
 	},
 	computed: {
+		part_column_select_computed () {
+			return {
+				['has-error']: !this.is_valid_part,
+			};
+		},
+		is_valid_part () {
+			return this.valid_parts
+				.map((part) => part['Name'])
+				.includes(this.part);
+		},
 		has_quantity_error () {
 			return this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));
 		},
@@ -91,7 +103,7 @@ export default {
 			return (!!this.se_component.part_def)
 		},
 		valid_parts () {
-			return this.se_component.valid_parts;
+			return this.isloaded ? this.se_component.valid_parts : [];
 		},
 		quantity_configurable () {
 			return this.se_component.is_quantity_configurable;
@@ -179,11 +191,7 @@ export default {
 	margin: 0px;
 }
 
-.hasloaderror {
-	background: #faa;
-}
-
-.hasquantityerror {
+.has-error {
 	background: #faa;
 }
 
