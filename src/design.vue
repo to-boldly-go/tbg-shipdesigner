@@ -28,6 +28,7 @@
 		<PrincipalFrameFinal :se_db="se_db" :se_design="se_design"></PrincipalFrameFinal>
 		<PrincipalFrameRaw :se_db="se_db" :se_design="se_design"></PrincipalFrameRaw>
 		<template v-for="se_subsystem in se_subsystems">
+		  <tr class="subsystem-spacer-row"><td colspan="100" height="30px"></td></tr>	<!-- empty line for spacing -->
 		  <SubsystemFrame :se_db="se_db" :se_subsystem="se_subsystem"></SubsystemFrame>
 		  <SubsystemSummary :se_db="se_db" :se_subsystem="se_subsystem"></SubsystemSummary>
 		  <SubsystemSettings :se_db="se_db" :se_subsystem="se_subsystem"></SubsystemSettings>
