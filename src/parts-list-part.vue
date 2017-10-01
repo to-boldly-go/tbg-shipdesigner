@@ -40,7 +40,9 @@ export default {
 			return this.schema;
 		},
 		has_duplicate_name_error () {
-			return this.partslist.filter((part) => part['Name'] === this.part['Name']).length > 1;
+			const f = (part) => _.pick(part, ['Name', 'Variant', 'Type']);
+			const comp = (part) => _.isEqual(f(part), f(this.part))
+			return this.partslist.filter(comp).length > 1;
 		},
 	},
 	methods: {
