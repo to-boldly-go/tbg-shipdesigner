@@ -100,13 +100,13 @@ export default {
     },
     methods: {
 		blueprint_save_name (bp) {
-			// return bp['Name'] + ' @' + new Date(bp['Blueprint Date']).toLocaleString();
 			return bp['Name'] +
 				' (' + (new Date(bp['Blueprint Date']).toLocaleString()) + ')' +
 				' [' + (new ShipEngine.Design(this.se_db, bp).stats.toString()) + ']';
 		},
 		local_saves_delete_selected () {
-			this.local_saves = _.chain(this.local_saves).filter(bp => {
+			// remove the selected item
+			this.local_saves = _.chain(this.local_saves).reject(bp => {
 				return _.isEqual(comparison_slice(bp), comparison_slice(this.selected_save));
 			}).value();
 			this.local_saves_save_to_local_storage();
