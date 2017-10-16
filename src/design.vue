@@ -115,30 +115,44 @@ export default {
 
 .stat-column {
 	text-align: right;
+	font-family: 'Roboto Mono', monospace;
+	font-size: 13px;
 }
 
 .weight-internal-column {
 	text-align: right;
+	font-family: 'Roboto Mono', monospace;
+	font-size: 13px;
 }
 
 .weight-external-column {
 	text-align: right;
+	font-family: 'Roboto Mono', monospace;
+	font-size: 13px;
 }
 
 .br-column {
 	text-align: right;
+	font-family: 'Roboto Mono', monospace;
+	font-size: 13px;
 }
 
 .sr-column {
 	text-align: right;
+	font-family: 'Roboto Mono', monospace;
+	font-size: 13px;
 }
 
 .power-gen-column {
 	text-align: right;
+	font-family: 'Roboto Mono', monospace;
+	font-size: 13px;
 }
 
 .power-cost-column {
 	text-align: right;
+	font-family: 'Roboto Mono', monospace;
+	font-size: 13px;
 }
 
 .build-time-column {

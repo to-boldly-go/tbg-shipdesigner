@@ -105,6 +105,7 @@ export default {
 	display: flex;
 	flex-direction: column;
 	flex-wrap: nowrap;
+	font-size: 15px;
 }
 
 .header {

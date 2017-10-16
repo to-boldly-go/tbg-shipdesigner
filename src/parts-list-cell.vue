@@ -50,13 +50,41 @@ export default {
 	},
 	computed: {
 		computed_style () {
-			return {
+			return Object.assign({
 				'width': this.field.width.toString() + 'px',
 				'text-align': this.field.align,
+			}, this.computed_font);
+		},
+		computed_font () {
+			switch (this.field.style) {
+			case 'fixed':
+				return {
+					['font-family']: "'Roboto Mono', monospace",
+					['font-size']: '12px',
+				};
+				break;
+			case 'variable':
+			default:
+				return {};
+				break;
 			};
 		},
 		display_value () {
-			return this.value;
+			switch (this.field.edit_type) {
+			case 'number':
+				// return this.part[this.field.name];
+				const v = this.part[this.field.name];
+				if (typeof(v) == 'number') {
+					const f = v.toFixed(this.field.fixed);
+					return f.replace(/(\..*?)(0+)$/, (match, p1, p2) => p1 + ' '.repeat(p2.length));
+				} else {
+					return v;
+				};
+				break;
+			case 'string':
+				return this.part[this.field.name];
+				break;
+			};
 		},
 		value: {
 			get () {
@@ -83,10 +111,10 @@ export default {
 		},
 		value_number: {
 			get () {
-				return this.part[this.field.name];
+				return Number(this.part[this.field.name]);
 			},
 			set (value) {
-				this.part[this.field.name] = parseFloat(value);
+				this.part[this.field.name] = Number(value.trim());
 			},
 		},
 		value_string: {
@@ -147,6 +175,7 @@ input[type="number"] {
 
 .display-span {
 	width: 100%;
+	white-space: pre;
 }
 
 .edit-input {

@@ -11,7 +11,7 @@
 	</td>
 
 	<template v-for="name in stats.names">
-	  <td>{{stats_multiplier_pretty}}</td>
+	  <td class="stat-column">{{stats_multiplier_pretty}}</td>
 	</template>
 
 	<td class="weight-internal-column" colspan="2">{{se_subsystem.weight_cap.toFixed(2)}}</td>
