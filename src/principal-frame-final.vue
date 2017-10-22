@@ -33,6 +33,8 @@
 
 <script>
 
+import { mapState, mapGetters } from 'vuex';
+
 import ShipEngine from '../lib/shipengine.js';
 
 import StatlineCell from './statline-cell.vue';
@@ -43,10 +45,6 @@ export default {
 	name: 'PrincipalFrame',
 	components: {
 		StatlineCell,
-	},
-	props: {
-		se_db: Object,
-		se_design: Object,
 	},
 	computed: {
 		power_final_title () {
@@ -62,28 +60,33 @@ export default {
 			};
 		},
 		has_power_error () {
-			return this.se_design.cost_power > this.se_design.power_generation;
+			return this.$store.getters.se_design.cost_power > this.$store.getters.se_design.power_generation;
 		},
 		principal_frame () {
-			return this.se_design.json['Principal Frame'];
+			return this.$store.getters.se_design.json['Principal Frame'];
 		},
 		stats () {
-			return this.se_design.stats;
+			return this.$store.getters.se_design.stats;
 		},
 		crew () {
-			return this.se_design.cost_crew;
+			return this.$store.getters.se_design.cost_crew;
 		},
 		build_time () {
-			return frac(this.se_design.build_time, 12, true);
+			return frac(this.$store.getters.se_design.build_time, 12, true);
 		},
 		ship_name: {
 			get () {
-				return this.se_design.json['Name'];
+				return this.$store.getters.se_design.json['Name'];
 			},
 			set (value) {
-				this.se_design.json['Name'] = value;
+				this.$store.getters.se_design.json['Name'] = value;
 			}
 		},
+		...mapGetters([
+			'se_design',
+			'se_db',
+			'design_info',
+		]),
 	},
 	methods: {
 	},

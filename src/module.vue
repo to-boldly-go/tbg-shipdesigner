@@ -52,7 +52,6 @@ export default {
 		StatlineCell,
 	},
 	props: {
-		se_db: Object,
 		se_module: Object,
 	},
 	computed: {
@@ -88,18 +87,21 @@ export default {
 		},
 
 		valid_types () {
-			return this.se_db.valid_module_types();
+			return this.$store.getters.se_db.valid_module_types();
 		},
 		valid_variants () {
-			return this.se_db.find_modules(this.se_module.module_type);
+			return this.$store.getters.se_db.find_modules(this.se_module.module_type);
 		},
 		module_type: {
 			get () {
 				return this.se_module.module_type;
 			},
 			set (value) {
-				this.se_module.module_type = value;
-				this.se_module.module_variant = this.valid_variants[0]['Variant'];
+				this.$store.commit('set_module_type', {
+					se_db: this.$store.getters.se_db,
+					module: this.se_module,
+					value: value,
+				});
 			},
 		},
 		module_variant: {
@@ -107,7 +109,10 @@ export default {
 				return this.se_module.module_variant;
 			},
 			set (value) {
-				this.se_module.module_variant = value;
+				this.$store.commit('set_module_variant', {
+					module: this.se_module,
+					value: value,
+				});
 			},
 		},
 	},
@@ -115,7 +120,7 @@ export default {
 		log_parts() {
 			console.log('"' + this.part + '"');
 			console.log(this.valid_parts.map((part) => part['Name']))
-			console.log(this.se_db.find_part(this.part));
+			console.log(this.$store.getters.se_db.find_part(this.part));
 			this.part = this.part;
 		},
 	},

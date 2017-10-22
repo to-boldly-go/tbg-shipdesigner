@@ -32,6 +32,8 @@
 
 <script>
 
+import { mapState, mapGetters } from 'vuex';
+
 import ShipEngine from '../lib/shipengine.js';
 
 import StatlineCell from './statline-cell.vue';
@@ -43,10 +45,6 @@ export default {
 	components: {
 		StatlineCell,
 	},
-	props: {
-		se_db: Object,
-		se_design: Object,
-	},
 	computed: {
 		weight_summary_class () {
 			return {
@@ -54,28 +52,33 @@ export default {
 			};
 		},
 		has_weight_error () {
-			return this.se_design.weight_internal > this.se_design.frame_max_size_raw;
+			return this.$store.getters.se_design.weight_internal > this.$store.getters.se_design.frame_max_size_raw;
 		},
 		principal_frame: {
 			get () {
-				return this.se_design.json['Principal Frame'];
+				return this.$store.getters.se_design.json['Principal Frame'];
 			},
 			set (value) {
-				this.se_design.json['Principal Frame'] = value;
+				this.$store.getters.se_design.json['Principal Frame'] = value;
 			},
 		},
 		stats_raw () {
-			return this.se_design.stats_raw;
+			return this.$store.getters.se_design.stats_raw;
 		},
 		crew_raw () {
-			return this.se_design.cost_crew_raw;
+			return this.$store.getters.se_design.cost_crew_raw;
 		},
 		build_time_frame () {
-			return frac(this.se_design.build_time_frame, 12);
+			return frac(this.$store.getters.se_design.build_time_frame, 12);
 		},
 		frame_size () {
-			return this.se_design.frame_size;
+			return this.$store.getters.se_design.frame_size;
 		},
+		...mapGetters([
+			'se_design',
+			'se_db',
+			'design_info',
+		]),
 	},
 	methods: {
 	},

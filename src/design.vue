@@ -25,20 +25,21 @@
 		</tr>
 	  </thead>
 	  <tbody class="design-table-body">
-		<PrincipalFrameFinal :se_db="se_db" :se_design="se_design"></PrincipalFrameFinal>
-		<PrincipalFrameRaw :se_db="se_db" :se_design="se_design"></PrincipalFrameRaw>
+		<PrincipalFrameFinal></PrincipalFrameFinal>
+		<PrincipalFrameRaw></PrincipalFrameRaw>
 		<template v-for="se_subsystem in se_subsystems">
 		  <tr class="subsystem-spacer-row"><td colspan="100" height="30px"></td></tr>	<!-- empty line for spacing -->
-		  <SubsystemFrame :se_db="se_db" :se_subsystem="se_subsystem"></SubsystemFrame>
-		  <SubsystemSummary :se_db="se_db" :se_subsystem="se_subsystem"></SubsystemSummary>
-		  <SubsystemSettings :se_db="se_db" :se_subsystem="se_subsystem"></SubsystemSettings>
+		  <SubsystemFrame :se_subsystem="se_subsystem"></SubsystemFrame>
+		  <SubsystemSummary :se_subsystem="se_subsystem"></SubsystemSummary>
+		  <SubsystemSettings :se_subsystem="se_subsystem"></SubsystemSettings>
 
 		  <template v-for="se_component in se_subsystem.components">
-			<ComponentTr :se_db="se_db" :se_component="se_component"></ComponentTr>
+			<ComponentTr :se_component="se_component"></ComponentTr>
 		  </template>
 		</template>
 
-		<ModuleTr :se_db="se_db" :se_module="se_design.module"></ModuleTr>
+		<tr class="subsystem-spacer-row"><td colspan="100" height="30px"></td></tr>	<!-- empty line for spacing -->
+		<ModuleTr :se_module="se_design.module"></ModuleTr>
 	  </tbody>
 	</table>
   </div>
@@ -46,6 +47,8 @@
 
 
 <script>
+
+import { mapState, mapGetters } from 'vuex';
 
 import ShipEngine from '../lib/shipengine.js';
 
@@ -68,14 +71,15 @@ export default {
 		ComponentTr,
 		ModuleTr,
 	},
-	props: {
-		se_db: Object,
-		se_design: Object,
-	},
 	computed: {
 		se_subsystems () {
-			return this.se_design.subsystems;
+			return this.$store.getters.se_design.subsystems;
 		},
+		...mapGetters([
+			'se_design',
+			'se_db',
+			'design_info',
+		]),
 	},
 	methods: {
 	},

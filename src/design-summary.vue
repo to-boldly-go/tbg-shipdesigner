@@ -23,20 +23,23 @@
 
 <script>
 
+import { mapState, mapGetters } from 'vuex';
+
 import ShipEngine from '../lib/shipengine.js';
 
 import { frac } from './ui-functions.js';
 
 export default {
 	name: 'DesignSummary',
-	props: {
-		se_db: Object,
-		se_design: Object,
-	},
 	computed: {
 		build_time () {
-			return frac(this.se_design.build_time, 12);
+			return frac(this.$store.getters.se_design.build_time, 12);
 		},
+		...mapGetters([
+			'se_design',
+			'se_db',
+			'design_info',
+		]),
 	},
 	methods: {
 	},

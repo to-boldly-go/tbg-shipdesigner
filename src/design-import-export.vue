@@ -61,10 +61,6 @@ export default {
 			status_message_timeout_id: null,
 		};
     },
-    props: {
-		design_info: Object,
-		se_db: Object,
-    },
     computed: {
 		selected_save_bp: {
 			get () {
@@ -80,10 +76,10 @@ export default {
 		},
 		design_json_string: {
 			get () {
-				return JSON.stringify(this.design_info.data);
+				return JSON.stringify(this.$store.state.design_info.data);
 			},
 			set (value) {
-				this.design_info.data = JSON.parse(value);
+				this.$store.commit('set_design_json', JSON.parse(value));
 			},
 		},
 		design_json_url_encoded_string () {
@@ -94,15 +90,15 @@ export default {
 		this.local_saves_load_from_local_storage();
 		window.addEventListener('storage', function(ev) {
 			if (ev.key === LOCAL_SAVES_KEY) {
-				this.local_saves_load_from_local_storage;
+				this.local_saves_load_from_local_storage();
 			};
-		});
+		}.bind(this));
     },
     methods: {
 		blueprint_save_name (bp) {
 			return bp['Name'] +
 				' (' + (new Date(bp['Blueprint Date']).toLocaleString()) + ')' +
-				' [' + (new ShipEngine.Design(this.se_db, bp).stats.toString()) + ']';
+				' [' + (new ShipEngine.Design(this.$store.getters.se_db, bp).stats.toString()) + ']';
 		},
 		local_saves_delete_selected () {
 			// remove the selected item
@@ -113,14 +109,12 @@ export default {
 			this.display_status_message("Blueprint deleted.");
 		},
 		local_saves_load_selected () {
-			this.design_info.data = this.selected_save;
+			this.$store.commit('set_design_json', _.cloneDeep(this.selected_save));
 			this.display_status_message("Blueprint loaded.");
 		},
 		local_saves_save_design () {
-			let timestamp = new Date();
-			timestamp.setMilliseconds(0);
-			this.design_info.data['Blueprint Date'] = timestamp.toISOString();
-			this.local_saves.push(_.cloneDeep(this.design_info.data));
+			this.$store.commit('timestamp_design');
+			this.local_saves.push(_.cloneDeep(this.$store.state.design_info.data));
 			this.local_saves_save_to_local_storage();
 			this.display_status_message("Blueprint saved.");
 		},

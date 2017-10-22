@@ -64,7 +64,6 @@ export default {
 		StatlineCell,
 	},
 	props: {
-		se_db: Object,
 		se_component: Object,
 	},
 	computed: {
@@ -120,7 +119,10 @@ export default {
 				return this.se_component.quantity;
 			},
 			set (value) {
-				this.se_component.quantity = value;
+				this.$store.commit('set_component_quantity', {
+					component: this.se_component,
+					value: value,
+				});
 			},
 		},
 		valid_quantities () {
@@ -137,20 +139,22 @@ export default {
 				return this.se_component.part;
 			},
 			set (value) {
-				this.se_component.part = value;
-				if (!this.quantity && !this.se_component.is_no_part) {
-					this.quantity = 1;
-				};
+				this.$store.commit('set_component_part', {
+					component: this.se_component,
+					value: value,
+				});
 			},
+		},
+		is_quantity_valid () {
+			return function (hypothesis) {
+				return this
+					.valid_quantities
+					.map((elem) => (elem === hypothesis))
+					.reduce((acc, elem) => acc || elem);
+			}
 		},
 	},
 	methods: {
-		is_quantity_valid (hypothesis) {
-			return this
-				.valid_quantities
-				.map((elem) => (elem === hypothesis))
-				.reduce((acc, elem) => acc || elem);
-		},
 		increment_quantity () {
 			let hypothesis = this.quantity + 1;
 			if (this.is_quantity_valid(hypothesis)) {
@@ -163,7 +167,6 @@ export default {
 				this.quantity = hypothesis;
 			};
 		},
-
 		quantity_select_wheel_event (ev) {
 			if (ev.deltaY > 0) {
 				this.decrement_quantity();

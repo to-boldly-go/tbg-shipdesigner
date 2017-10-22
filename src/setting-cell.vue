@@ -42,21 +42,17 @@ export default {
 			},
 		},
 		setting_type () {
-			return typeof(this.setting_value);
+			return ;
 		},
 		setting_value: {
 			get () {
 				return this.setting['Value'];
 			},
 			set (value) {
-				switch (this.setting_type) {
-				case 'number':
-					this.setting['Value'] = parseInt(value);
-					break;
-				case 'boolean':
-					this.setting['Value'] = value;
-					break;
-				};
+				this.$store.commit('set_setting', {
+					setting: this.setting,
+					value: value,
+				});
 			},
 		}
 	},

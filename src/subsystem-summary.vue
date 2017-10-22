@@ -32,6 +32,8 @@
 
 <script>
 
+import { mapState, mapGetters } from 'vuex';
+
 import ShipEngine from '../lib/shipengine.js';
 
 import StatlineCell from './statline-cell.vue';
@@ -42,7 +44,6 @@ export default {
 		StatlineCell,
 	},
 	props: {
-		se_db: Object,
 		se_subsystem: Object,
 	},
 	computed: {
@@ -63,6 +64,11 @@ export default {
 		crew() {
 			return this.se_subsystem.cost_crew;
 		},
+		...mapGetters([
+			'se_design',
+			'se_db',
+			'design_info',
+		]),
 	},
 	methods: {
 	},
