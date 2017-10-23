@@ -1,5 +1,14 @@
 <template>
   <div class="design-import-export">
+	<input type="button"
+		   class="undo-button"
+		   @click="dispatch_undo"
+		   value="<"></input>
+	<input type="button"
+		   class="redo-button"
+		   @click="dispatch_redo"
+		   value=">"></input>
+
     <input id="design-import-export-blueprint-string" v-model="design_json_string">
     <input type="button"
 		   class="clipboard-copy-button"
@@ -95,6 +104,12 @@ export default {
 		}.bind(this));
     },
     methods: {
+		dispatch_undo () {
+			this.$store.dispatch('undo');
+		},
+		dispatch_redo () {
+			this.$store.dispatch('redo');
+		},
 		blueprint_save_name (bp) {
 			return bp['Name'] +
 				' (' + (new Date(bp['Blueprint Date']).toLocaleString()) + ')' +
