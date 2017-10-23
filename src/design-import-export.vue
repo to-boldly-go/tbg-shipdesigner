@@ -57,10 +57,10 @@ export default {
     data () {
 		return {
 			// local_saves is a straight array of blueprint objects,
-			// exactly the same as the design_info.data object.
+			// exactly the same as the design_json object.
 			local_saves: [],
 			// the currently selected element of the local_saves
-			// array. *not* the same as design_info.data! this is so
+			// array. *not* the same as design_json! this is so
 			// the user can work with the list of locally saved
 			// blueprints without clobbering their current work.
 			selected_save: null,
@@ -85,7 +85,7 @@ export default {
 		},
 		design_json_string: {
 			get () {
-				return JSON.stringify(this.$store.state.design_info.data);
+				return JSON.stringify(this.$store.state.design_json);
 			},
 			set (value) {
 				this.$store.commit('set_design_json', JSON.parse(value));
@@ -129,7 +129,7 @@ export default {
 		},
 		local_saves_save_design () {
 			this.$store.commit('timestamp_design');
-			this.local_saves.push(_.cloneDeep(this.$store.state.design_info.data));
+			this.local_saves.push(_.cloneDeep(this.$store.state.design_json));
 			this.local_saves_save_to_local_storage();
 			this.display_status_message("Blueprint saved.");
 		},

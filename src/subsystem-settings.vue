@@ -29,11 +29,6 @@ export default {
 		settings () {
 			return this.se_subsystem.settings;
 		},
-		...mapGetters([
-			'se_design',
-			'se_db',
-			'design_info',
-		]),
 	},
 }
 

@@ -28,9 +28,7 @@ const PARTS_KEY = 'working_parts_list';
 
 const store = new Vuex.Store({
 	state: {
-		design_info: {
-			data: design_json,
-		},
+		design_json,
 		parts_info: {
 			parts: canon_parts,
 			modules: canon_modules,
@@ -43,13 +41,10 @@ const store = new Vuex.Store({
 	},
 	getters: {
 		se_design: (state, getters) => {
-			return new ShipEngine.Design(getters.se_db, state.design_info.data);
+			return new ShipEngine.Design(getters.se_db, state.design_json);
 		},
 		se_db: (state, getters) => {
 			return new ShipEngine.DB(state.parts_info);
-		},
-		design_info: (state, getters) => {
-			return state.design_info;
 		},
 	},
 	actions: {
@@ -76,7 +71,7 @@ const store = new Vuex.Store({
 		timestamp_design (state, payload) {
 			let timestamp = new Date();
 			timestamp.setMilliseconds(0);
-			state.design_info.data['Blueprint Date'] = timestamp.toISOString();
+			state.design_json['Blueprint Date'] = timestamp.toISOString();
 		},
 		load_parts_from_storage (state, payload) {
 			const saved_parts = localStorage.getItem(PARTS_KEY);
@@ -273,8 +268,8 @@ const store = new Vuex.Store({
 
 
 		set_design_json (state, payload) {
-			const old_data = state.design_info.data;
-			state.design_info.data = payload;
+			const old_data = state.design_json;
+			state.design_json = payload;
 			state.undo.current += 1;
 			state.undo.history.splice(state.undo.current);
 			state.undo.history[state.undo.current] = {
@@ -284,15 +279,15 @@ const store = new Vuex.Store({
 				},
 				redo: {
 					type: 'set_design_json_redo',
-					new_data: state.design_info.data,
+					new_data: state.design_json,
 				},
 			};
 		},
 		set_design_json_undo (state, payload) {
-			state.design_info.data = payload.old_data;
+			state.design_json = payload.old_data;
 		},
 		set_design_json_redo (state, payload) {
-			state.design_info.data = payload.new_data;
+			state.design_json = payload.new_data;
 		},
 	},
 });

@@ -7,7 +7,7 @@
 	  <Design></Design>
 	</div>
 	<div class="footer">
-	  <DesignImportExport :se_db="se_db" :design_info="design_info"></DesignImportExport>
+	  <DesignImportExport></DesignImportExport>
 	</div>
   </div>
 </template>
@@ -31,11 +31,6 @@ export default {
 		DesignImportExport,
 	},
 	computed: {
-		...mapGetters([
-			'se_design',
-			'se_db',
-			'design_info',
-		]),
 	},
 };
 

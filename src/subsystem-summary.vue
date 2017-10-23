@@ -64,11 +64,6 @@ export default {
 		crew() {
 			return this.se_subsystem.cost_crew;
 		},
-		...mapGetters([
-			'se_design',
-			'se_db',
-			'design_info',
-		]),
 	},
 	methods: {
 	},

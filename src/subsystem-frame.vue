@@ -94,11 +94,6 @@ export default {
 				});
 			},
 		},
-		...mapGetters([
-			'se_design',
-			'se_db',
-			'design_info',
-		]),
 	},
 	methods: {
 	},
