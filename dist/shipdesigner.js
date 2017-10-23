@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 580);
+/******/ 	return __webpack_require__(__webpack_require__.s = 581);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -200,7 +200,7 @@ module.exports = function deepMap(array, callback, skipZeros) {
 var number = __webpack_require__(3);
 var string = __webpack_require__(9);
 var object = __webpack_require__(5);
-var types = __webpack_require__(65);
+var types = __webpack_require__(66);
 
 var DimensionError = __webpack_require__(10);
 var IndexError = __webpack_require__(56);
@@ -1361,7 +1361,7 @@ exports.toSymbol = function (name, isUnit) {
 "use strict";
 
 
-var isBigNumber = __webpack_require__(77);
+var isBigNumber = __webpack_require__(78);
 
 /**
  * Clone an object
@@ -1901,8 +1901,8 @@ exports.factory = factory;
 
 
 var formatNumber = __webpack_require__(3).format;
-var formatBigNumber = __webpack_require__(183).format;
-var isBigNumber = __webpack_require__(77);
+var formatBigNumber = __webpack_require__(186).format;
+var isBigNumber = __webpack_require__(78);
 
 /**
  * Test whether value is a string
@@ -3291,7 +3291,7 @@ if (typeof DEBUG !== 'undefined' && DEBUG) {
   ) }
 }
 
-var listToStyles = __webpack_require__(163)
+var listToStyles = __webpack_require__(164)
 
 /*
 type StyleObject = {
@@ -3660,7 +3660,7 @@ exports.isPlainObject = isPlainObject;
 "use strict";
 
 
-var keywords = __webpack_require__(83);
+var keywords = __webpack_require__(84);
 var deepEqual= __webpack_require__(5).deepEqual;
 var hasOwnProperty = __webpack_require__(5).hasOwnProperty;
 
@@ -4445,7 +4445,7 @@ function factory (type, config, load, typed) {
   var latex = __webpack_require__(4);
   
   var algorithm01 = load(__webpack_require__(36));
-  var algorithm04 = load(__webpack_require__(79));
+  var algorithm04 = load(__webpack_require__(80));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm13 = load(__webpack_require__(8));
   var algorithm14 = load(__webpack_require__(6));
@@ -4742,7 +4742,7 @@ function factory (type, config, load, typed) {
 
   var algorithm01 = load(__webpack_require__(36));
   var algorithm03 = load(__webpack_require__(17));
-  var algorithm05 = load(__webpack_require__(66));
+  var algorithm05 = load(__webpack_require__(67));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm13 = load(__webpack_require__(8));
   var algorithm14 = load(__webpack_require__(6));
@@ -5368,13 +5368,13 @@ exports.factory = factory;
 
 
 exports.array = __webpack_require__(2);
-exports['boolean'] = __webpack_require__(192);
+exports['boolean'] = __webpack_require__(195);
 exports['function'] = __webpack_require__(35);
 exports.number = __webpack_require__(3);
 exports.object = __webpack_require__(5);
 exports.string = __webpack_require__(9);
-exports.types = __webpack_require__(65);
-exports.emitter = __webpack_require__(101);
+exports.types = __webpack_require__(66);
+exports.emitter = __webpack_require__(102);
 
 
 /***/ }),
@@ -6208,10 +6208,10 @@ exports.factory = factory;
 "use strict";
 
 
-var naturalSort = __webpack_require__(501);
+var naturalSort = __webpack_require__(504);
 
 function factory (type, config, load, typed) {
-  var getTypeOf = load(__webpack_require__(82));
+  var getTypeOf = load(__webpack_require__(83));
   var matrix = load(__webpack_require__(0));
   var compare = load(__webpack_require__(54));
 
@@ -6850,17 +6850,32 @@ exports.factory = factory;
 /* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const util = __webpack_require__(99);
-const NamedVector = __webpack_require__(100).NamedVector;
-const math = __webpack_require__(166);
+"use strict";
+
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var util = __webpack_require__(100);
+var NamedVector = __webpack_require__(101).NamedVector;
+var math = __webpack_require__(169);
 
 // AL6, $AL$6
-const SIZE_TO_WEIGHT_CAP_MULTIPLIER = 300;
+var SIZE_TO_WEIGHT_CAP_MULTIPLIER = 300;
 
 // AL7
-const BR_TO_WEIGHT_MULTIPLIER = 10;
+var BR_TO_WEIGHT_MULTIPLIER = 10;
 
-const SUBSYSTEM_SORT_ORDER = {
+var SUBSYSTEM_SORT_ORDER = {
 	"Tactical": 1,
 	"Operations": 2,
 	"Hull": 3,
@@ -6868,26 +6883,26 @@ const SUBSYSTEM_SORT_ORDER = {
 	"Warp Core": 5
 };
 
-const SR_COST_ROUND_MAP = {
+var SR_COST_ROUND_MAP = {
 	'Frigate': 5,
 	'Cruiser': 10,
 	'Explorer': 10
 };
 
-const BR_COST_ROUND_MAP = {
+var BR_COST_ROUND_MAP = {
 	'Frigate': 5,
 	'Cruiser': 10,
 	'Explorer': 10
 };
 
 // =IF(DK$18 = 1, "Frigate", IF(DK$18 = 2, "Cruiser", "Explorer"))
-const WEIGHT_CLASS_MAP = {
+var WEIGHT_CLASS_MAP = {
 	1: 'Frigate',
 	2: 'Cruiser',
 	3: 'Explorer'
 };
 
-const SUBSYSTEM_NAME_MAP = {
+var SUBSYSTEM_NAME_MAP = {
 	"Tactical": "Tac Mod",
 	"Engineering": "Eng. Mod",
 	"Hull": "Hull Mod",
@@ -6896,7 +6911,7 @@ const SUBSYSTEM_NAME_MAP = {
 
 	// REFACTOR: change the names of these to be less abbreviated
 	// (effectiveness instead of effect, for example)
-};let COMPONENT_MODIFIERS = {
+};var COMPONENT_MODIFIERS = {
 	"Primary Phasers": {
 		"Effect Qty?": true,
 		"combat": 1,
@@ -7094,7 +7109,7 @@ const SUBSYSTEM_NAME_MAP = {
 
 // AI, AJ, AK block
 // GL column onward
-const COMPONENT_PART_CLASSIFICATIONS = {
+var COMPONENT_PART_CLASSIFICATIONS = {
 	"Primary Phasers": "Phasers",
 	"Secondary Phasers": "Phasers",
 	"Torpedo System": "Torpedoes",
@@ -7126,37 +7141,63 @@ const COMPONENT_PART_CLASSIFICATIONS = {
 	"Eject System": "Eject System"
 };
 
-class Crewline extends NamedVector {
-	static get shortnames() {
-		return {
-			'officer': 'O',
-			'enlisted': 'E',
-			'technician': 'T'
-		};
-	}
-	constructor(val) {
-		super(val, Crewline.shortnames);
-	}
-};
+var Crewline = function (_NamedVector) {
+	_inherits(Crewline, _NamedVector);
 
-class Statline extends NamedVector {
-	static get shortnames() {
-		return {
-			'combat': 'C',
-			'science': 'S',
-			'hull': 'H',
-			'shields': 'L',
-			'presence': 'P',
-			'defense': 'D'
-		};
-	}
-	constructor(val) {
-		super(val, Statline.shortnames);
-	}
-};
+	_createClass(Crewline, null, [{
+		key: 'shortnames',
+		get: function get() {
+			return {
+				'officer': 'O',
+				'enlisted': 'E',
+				'technician': 'T'
+			};
+		}
+	}]);
 
-class DesignComponent {
-	constructor(db, subsystem, design_component_json) {
+	function Crewline(val) {
+		_classCallCheck(this, Crewline);
+
+		return _possibleConstructorReturn(this, (Crewline.__proto__ || Object.getPrototypeOf(Crewline)).call(this, val, Crewline.shortnames));
+	}
+
+	return Crewline;
+}(NamedVector);
+
+;
+
+var Statline = function (_NamedVector2) {
+	_inherits(Statline, _NamedVector2);
+
+	_createClass(Statline, null, [{
+		key: 'shortnames',
+		get: function get() {
+			return {
+				'combat': 'C',
+				'science': 'S',
+				'hull': 'H',
+				'shields': 'L',
+				'presence': 'P',
+				'defense': 'D'
+			};
+		}
+	}]);
+
+	function Statline(val) {
+		_classCallCheck(this, Statline);
+
+		return _possibleConstructorReturn(this, (Statline.__proto__ || Object.getPrototypeOf(Statline)).call(this, val, Statline.shortnames));
+	}
+
+	return Statline;
+}(NamedVector);
+
+;
+
+var DesignComponent = function () {
+	function DesignComponent(db, subsystem, design_component_json) {
+		_classCallCheck(this, DesignComponent);
+
 		this.json = design_component_json;
 
 		this.db = db;
@@ -7174,1204 +7215,1759 @@ class DesignComponent {
 		this.part_def = this.db.find_part(this.json['Part']);
 	}
 
-	get part() {
-		return this.json['Part'];
-	}
-
-	set part(value) {
-		this.json['Part'] = value;
-		if (this.is_no_part) {
-			this.quantity_calcs.set(parseInt(0));
-		};
-	}
-
-	get is_no_part() {
-		return this.json['Part'].match(/No .+/) !== null;
-	}
-
-	// BK column
-	// scalar
-	get quantity() {
-		return this.quantity_calcs.get();
-	}
-
-	set quantity(value) {
-		if (this.is_quantity_configurable) {
-			this.quantity_calcs.set(parseInt(value));
-		};
-	}
-
-	get is_quantity_configurable() {
-		return this.quantity_calcs.is_configurable() && !this.is_no_part;
-	}
-
-	get valid_quantities() {
-		if (this.is_quantity_configurable) {
-			return this.quantity_calcs.options();
-		} else {
-			return [];
-		};
-	}
-
-	get quantity_calcs() {
-		switch (this.name) {
-			case 'Computer Core':
-			case 'Operating System':
-			case 'Navigational Deflector':
-			case 'Fuel & Matter Stores':
-			case 'EPS Manifold System':
-				return {
-					is_configurable: () => false,
-					get: () => {
-						return this.subsystem.design.size_round;
-					}
-				};
-				break;
-			case 'M/AM Injectors':
-			case 'Coolant Systems':
-				return {
-					is_configurable: () => false,
-					get: () => {
-						return this.subsystem.component('Warp Core Type').quantity;
-					}
-				};
-				break;
-			case 'Targeting Computer':
-			case 'Nacelle System':
-			case 'Eject System':
-				return {
-					is_configurable: () => false,
-					get: () => {
-						if (this.is_no_part) {
-							return 0;
-						} else {
-							return 1;
-						};
-					}
-				};
-				break;
-			default:
-				return {
-					is_configurable: () => true,
-					get: () => {
-						return this.json['Quantity'];
-					},
-					set: value => {
-						this.json['Quantity'] = value;
-					},
-					options: () => {
-						switch (this.name) {
-							case 'Replication Package':
-								return [...Array(this.subsystem.design.size_round + 1).keys()];
-								break;
-							case 'Secondary Core':
-								return [0, 1, 2];
-								break;
-							case 'Structural Integrity Fields':
-								let hull_count = this.subsystem.design.subsystem('Hull').component('Hull System').quantity;
-								let hull_grade_civilian = this.part.match(/Civilian Grade$/);
-								let sif_max_count = hull_count * (hull_grade_civilian ? 1 : 2);
-								return [...Array(sif_max_count + 1).keys()];
-								break;
-							default:
-								return [...Array(26).keys()];
-						};
-					}
-				};
-				break;
+	_createClass(DesignComponent, [{
+		key: 'part',
+		get: function get() {
+			return this.json['Part'];
+			if (this.is_no_part) {
+				this.quantity_calcs.set(0);
+			};
+		},
+		set: function set(value) {
+			this.json['Part'] = value;
+			if (this.is_no_part) {
+				this.quantity_calcs.set(parseInt(0));
+			};
 		}
-	}
+	}, {
+		key: 'is_no_part',
+		get: function get() {
+			return this.json['Part'].match(/No .+/) !== null;
+		}
+	}, {
+		key: 'quantity',
 
-	// Requires H navigational deflector:
-	// * Large Frigate Engineering Subframe
-	// * Large or Medium Cruiser Engineering Subframe
-	// * All Explorer
-	get requires_heavy_navigational_deflector() {
-		return this.subsystem.design.weight_class === 'Explorer' || this.subsystem.design.weight_class === 'Cruiser' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Lg | Md /) || this.subsystem.design.weight_class === 'Frigate' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Lg /);
-	}
 
-	// Requires L navigational deflector:
-	// * Small or Medium Frigate Engineering Subframe
-	// * Small Cruiser Engineering Subframe
-	get requires_light_navigational_deflector() {
-		return this.subsystem.design.weight_class === 'Cruiser' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Sm /) || this.subsystem.design.weight_class === 'Frigate' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Md | Sm /);
-	}
-
-	get valid_parts() {
-		let parts_of_type = this.db.find_parts(COMPONENT_PART_CLASSIFICATIONS[this.name]).filter(part => !part['Name'].match(/^x/));
-
-		switch (this.name) {
-			case 'Navigational Deflector':
-				if (this.requires_heavy_navigational_deflector) {
-					parts_of_type = parts_of_type.filter(part => part['Name'].match(/\[H\]/));
+		// BK column
+		// scalar
+		get: function get() {
+			return this.quantity_calcs.get();
+		},
+		set: function set(value) {
+			if (this.is_quantity_configurable) {
+				this.quantity_calcs.set(parseInt(value));
+				if (value === 0) {
+					var no_part = this.valid_parts.find(function (part) {
+						return part['Name'].match(/No .+/) !== null;
+					});
+					if (no_part) {
+						this.json['Part'] = no_part['Name'];
+					};
 				};
-				if (this.requires_light_navigational_deflector) {
-					parts_of_type = parts_of_type.filter(part => part['Name'].match(/\[L\]/));
-				};
-				break;
-			default:
-				break;
-		};
-		return parts_of_type;
-	}
+			};
+		}
+	}, {
+		key: 'is_quantity_configurable',
+		get: function get() {
+			return this.quantity_calcs.is_configurable() && !this.is_no_part;
+		}
+	}, {
+		key: 'valid_quantities',
+		get: function get() {
+			if (this.is_quantity_configurable) {
+				return this.quantity_calcs.options();
+			} else {
+				return [];
+			};
+		}
+	}, {
+		key: 'quantity_calcs',
+		get: function get() {
+			var _this3 = this;
 
-	get evasion() {
-		if (this.name === 'Impulse Engine Pwr') {
-			// (1+((CJ$40/DD$40*10)/100))
-			//
-			// that's the effect with the component modifer divided
-			// out and some junk to convert it to a probability
-			//
-			const evasion_effect = this.effect * this.subsystem.stats_multiplier;
-			return 1 + evasion_effect / 10;
-		} else {
-			return false;
-		};
-	}
+			switch (this.name) {
+				case 'Computer Core':
+				case 'Operating System':
+				case 'Navigational Deflector':
+				case 'Fuel & Matter Stores':
+				case 'EPS Manifold System':
+					return {
+						is_configurable: function is_configurable() {
+							return false;
+						},
+						get: function get() {
+							return _this3.subsystem.design.size_round;
+						}
+					};
+					break;
+				case 'M/AM Injectors':
+				case 'Coolant Systems':
+					return {
+						is_configurable: function is_configurable() {
+							return false;
+						},
+						get: function get() {
+							return _this3.subsystem.component('Warp Core Type').quantity;
+						}
+					};
+					break;
+				case 'Targeting Computer':
+				case 'Nacelle System':
+				case 'Eject System':
+					return {
+						is_configurable: function is_configurable() {
+							return false;
+						},
+						get: function get() {
+							if (_this3.is_no_part) {
+								return 0;
+							} else {
+								return 1;
+							};
+						}
+					};
+					break;
+				default:
+					return {
+						is_configurable: function is_configurable() {
+							return true;
+						},
+						get: function get() {
+							return _this3.json['Quantity'];
+						},
+						set: function set(value) {
+							_this3.json['Quantity'] = value;
+						},
+						options: function options() {
+							switch (_this3.name) {
+								case 'Replication Package':
+									return [].concat(_toConsumableArray(Array(_this3.subsystem.design.size_round + 1).keys()));
+									break;
+								case 'Secondary Core':
+									return [0, 1, 2];
+									break;
+								case 'Structural Integrity Fields':
+									var hull_count = _this3.subsystem.design.subsystem('Hull').component('Hull System').quantity;
+									var hull_grade_civilian = _this3.part.match(/Civilian Grade$/);
+									var sif_max_count = hull_count * (hull_grade_civilian ? 1 : 2);
+									return [].concat(_toConsumableArray(Array(sif_max_count + 1).keys()));
+									break;
+								default:
+									return [].concat(_toConsumableArray(Array(26).keys()));
+							};
+						}
+					};
+					break;
+			}
+		}
+	}, {
+		key: 'requires_heavy_navigational_deflector',
 
-	get warp_core_breach() {
-		if (this.name === 'Eject System') {
-			return this.part_def['Reliability'];
-		} else {
-			return false;
-		};
-	}
 
-	// CP-CR block
-	// crewline
-	get cost_crew() {
-		// =DS31 * IF(VALUE($BK31)=0,1,(1+(LOG($BK31))*2)) * ($BK$26^0.7 / 2) * CP$29 * $DH31
-		//
-		// DS31 is officer cost off sheet
-		// $BK31 is quantity
-		//
-		// $BK$26 is design size
-		//
-		// CP$29 is subsystem officer multiplier
-		// $DH31 is component crew modifier
-		return [this.cost_crew_raw, this.subsystem.cost_crew_frame_mult, this.crew_mod, this.cost_crew_quantity_mod, this.subsystem.design.cost_crew_size_mod].reduce((sum, value) => sum.mult(value), new Crewline(1));
-		return;
-	}
+		// Requires H navigational deflector:
+		// * Large Frigate Engineering Subframe
+		// * Large or Medium Cruiser Engineering Subframe
+		// * All Explorer
+		get: function get() {
+			return this.subsystem.design.weight_class === 'Explorer' || this.subsystem.design.weight_class === 'Cruiser' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Lg | Md /) || this.subsystem.design.weight_class === 'Frigate' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Lg /);
+		}
+	}, {
+		key: 'requires_light_navigational_deflector',
 
-	// IF(VALUE($BK31)=0,
-	// 1,
-	// (1+(LOG($BK31))*2))
-	// crewline
-	get cost_crew_quantity_mod() {
-		if (this.quantity) {
-			return 1 + 2 * Math.log(this.quantity) / Math.log(10);
-		} else {
-			return 1;
-		};
-	}
 
-	get cost_crew_raw() {
-		const map = [['officer', 'O'], ['enlisted', 'E'], ['technician', 'T']];
-		let crew_block = map.reduce((res, [longname, shortname]) => {
-			res[longname] = this.part_def[shortname];return res;
-		}, {});
-		return new Crewline(crew_block);
-	}
+		// Requires L navigational deflector:
+		// * Small or Medium Frigate Engineering Subframe
+		// * Small Cruiser Engineering Subframe
+		get: function get() {
+			return this.subsystem.design.weight_class === 'Cruiser' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Sm /) || this.subsystem.design.weight_class === 'Frigate' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Md | Sm /);
+		}
+	}, {
+		key: 'valid_parts',
+		get: function get() {
+			var parts_of_type = this.db.find_parts(COMPONENT_PART_CLASSIFICATIONS[this.name]).filter(function (part) {
+				return !part['Name'].match(/^x/);
+			});
 
-	get crew_mod() {
-		return new Crewline(this.component_modifier['Crew Mod'] || 1);
-	}
-
-	get power_generation() {
-		switch (this.name) {
-			case "Warp Core Type":
-				// CD79
-				// CD is effect
-				return this.effect;
-			case "M/AM Injectors":
-				// =1 + (CD81 / 100 * CO$79)
-				// CD is effect
-				// CD$79 is the effect for the "Warp Core Type" component
-				return 1 + this.effect * this.subsystem.component('Warp Core Type').effect / 100.0;
-			case "Coolant Systems":
-				// =1 + (CD82 / 100 * CO$79)
-				return 1 + this.effect * this.subsystem.component('Warp Core Type').effect / 100.0;
-			case "EPS Manifold System":
-				// =1 + (CD83 / 100 * CO$79)
-				return 1 + this.effect * this.subsystem.component('Warp Core Type').effect / 100.0;
-			default:
-				return 0;
-		};
-	}
-
-	// CN column
-	get cost_power() {
-		// =(DP31 + DQ31*BK$26 + DR31*BK31) * DG31
-		// DP is 'Pwr O/H' column off parts sheet
-
-		// DQ is 'Scale Pwr' column off parts sheet
-		// BK$26 is design size
-
-		// DR is 'Unit Power' column off parts sheet
-		// BK is part quantity
-
-		// DG is 'Cost Mod' column off COMPONENT_MODIFIERS
-
-		// the two Nacelle lines look like this:
-		// =(DP70 + DR70*BK70) * DG70
-		// =DQ70 * BK$26 * DG70
-		// these sum together to the same as the normal case, so need
-		// not be special-cased!
-
-		return (this.cost_power_overhead + this.cost_power_scale * this.subsystem.design.size + this.cost_power_unit * this.quantity) * this.cost_mod;
-	}
-
-	// DP column
-	get cost_power_overhead() {
-		return this.part_def['Pwr O/H'];
-	}
-
-	// DQ
-	get cost_power_scale() {
-		return this.part_def['Scale Pwr'];
-	}
-
-	// DR
-	get cost_power_unit() {
-		return this.part_def['Unit Power'];
-	}
-
-	// CM column
-	get cost_SR() {
-		// =CK31 * DO31 * CM$29
-		// CM29 is subsystem frame 'SR Cost x'
-		// CK31 is weight
-		// DO31 is SR Cost x off the part list
-		return (this.weight_internal + this.weight_external) * this.cost_SR_mult * this.subsystem.cost_SR_mult;
-	}
-
-	// DO31
-	get cost_SR_mult() {
-		// SR Cost x off the part list
-		return this.part_def['SR Cost x'];
-	}
-
-	// CL column
-	get cost_BR() {
-		// total weight divided by br to weight mult
-		return (this.weight_internal + this.weight_external) / BR_TO_WEIGHT_MULTIPLIER;
-	}
-
-	// CK column
-	// scalar
-	get weight_internal() {
-		// =(DL31 + IF(DF31,DM31*BK$26,DN31)*BK31) * DE31 * DG31
-		// DL31 is "Weight O/H", weight overhead, off parts list
-		// DF31 is "Scale Wt?" component configuration
-		// DM31 is "Scale Weight" off parts list
-		// BK$26 is frame size?, BK18+BK25
-		// DN31 is "Unit Weight" off parts list
-		// BK31 is part quantity
-		// DE31 is "Wt Custom" component configuration
-		// DG31 is "Cost Mod" component configuration
-		switch (this.name) {
-			case 'Nacelle System':
-				// "Nacelle Distribution" line in spreadsheet
-				return this.weight_overhead_raw * this.weight_custom * this.cost_mod;
-			default:
-				return this.weight_raw * this.weight_custom * this.cost_mod;
-		};
-	}
-
-	// CK column
-	// scalar
-	get weight_external() {
-		// =(DL31 + IF(DF31,DM31*BK$26,DN31)*BK31) * DE31 * DG31
-		// DL31 is "Weight O/H", weight overhead, off parts list
-		// DF31 is "Scale Wt?" component configuration
-		// DM31 is "Scale Weight" off parts list
-		// BK$26 is frame size?, BK18+BK25
-		// DN31 is "Unit Weight" off parts list
-		// BK31 is part quantity
-		// DE31 is "Wt Custom" component configuration
-		// DG31 is "Cost Mod" component configuration
-		switch (this.name) {
-			case 'Nacelle System':
-				// "Nacelle System" line in spreadsheet
-				// DN70 * BK70 * DE70 * DG70
-				return this.weight_unit_raw * this.quantity * this.weight_custom * this.cost_mod;
-			default:
-				return 0;
-		};
-	}
-
-	// (DL31 + IF(DF31,DM31*BK$26,DN31)*BK31)
-	// scalar
-	//
-	// the weight of the component before component and size modifiers
-	// are applied
-	get weight_raw() {
-		return this.weight_overhead_raw + this.weight_per_unit * this.quantity;
-	}
-
-	get cost_mod() {
-		return this.component_modifier['Cost Mod'] || 1;
-	}
-
-	// IF(DF31,
-	// DM31*BK$26,
-	// DN31)
-	get weight_per_unit() {
-		if (this.component_modifier['Scale Wt?']) {
-			return this.weight_scale_raw * this.subsystem.design.size;
-		} else {
-			return this.weight_unit_raw;
-		};
-	}
-
-	// DL31
-	get weight_overhead_raw() {
-		return this.part_def['Weight O/H'];
-	}
-
-	// DM31
-	get weight_scale_raw() {
-		return this.part_def['Scale Weight'];
-	}
-
-	// DN31
-	get weight_unit_raw() {
-		return this.part_def['Unit Weight'];
-	}
-
-	// DK column
-	// scalar
-	get raw_effect() {
-		return this.part_def['Effect'];
-	}
-
-	// CE block
-	// statline
-	get stats() {
-		// CD column * CY block * CE$29 row
-		//
-		// effect for this part * frame effect multiplier * the
-		// component's statline modifier
-		return new Statline(this.component_modifier).mult(this.effect * this.subsystem.stats_multiplier);
-	}
-
-	// CD column
-	// scalar
-	get effect() {
-		switch (this.subsystem.name) {
-			case 'Warp Core':
-				// =DK79 * IF(CX79,1+3.5*log10(0.7*BK79+0.3),1) * CW79 * CD$77
+			switch (this.name) {
+				case 'Navigational Deflector':
+					if (this.requires_heavy_navigational_deflector) {
+						parts_of_type = parts_of_type.filter(function (part) {
+							return part['Name'].match(/\[H\]/);
+						});
+					};
+					if (this.requires_light_navigational_deflector) {
+						parts_of_type = parts_of_type.filter(function (part) {
+							return part['Name'].match(/\[L\]/);
+						});
+					};
+					break;
+				default:
+					break;
+			};
+			return parts_of_type;
+		}
+	}, {
+		key: 'evasion',
+		get: function get() {
+			if (this.name === 'Impulse Engine Pwr') {
+				// (1+((CJ$40/DD$40*10)/100))
 				//
-				// raw effect * quantity mult * custom effect * frame effect modifier
-				return this.raw_effect * this.effect_custom * this.qty_mult * this.subsystem.stats_multiplier;
-			default:
-				// =DK31 * IF(CX31,1+3.5*log10(0.7*BK31+0.3),1) * CW31
+				// that's the effect with the component modifer divided
+				// out and some junk to convert it to a probability
 				//
-				// raw effect from parts list * quantity multiplier * custom effect
-				return this.raw_effect * this.effect_custom * this.qty_mult;
-		};
-	}
+				var evasion_effect = this.effect * this.subsystem.stats_multiplier;
+				return 1 + evasion_effect / 10;
+			} else {
+				return false;
+			};
+		}
+	}, {
+		key: 'warp_core_breach',
+		get: function get() {
+			if (this.name === 'Eject System') {
+				return this.part_def['Reliability'];
+			} else {
+				return false;
+			};
+		}
+	}, {
+		key: 'cost_crew',
 
-	// IF(CX31,
-	// 1 + 3.5 * log10(0.7 * BK31 + 0.3)
-	// ,1)
-	//
-	// scalar
-	get qty_mult() {
-		if (this.uses_effect_qty) {
-			return 1 + 3.5 * Math.log(0.7 * this.quantity + 0.3) / Math.log(10);
-		} else {
+
+		// CP-CR block
+		// crewline
+		get: function get() {
+			// =DS31 * IF(VALUE($BK31)=0,1,(1+(LOG($BK31))*2)) * ($BK$26^0.7 / 2) * CP$29 * $DH31
+			//
+			// DS31 is officer cost off sheet
+			// $BK31 is quantity
+			//
+			// $BK$26 is design size
+			//
+			// CP$29 is subsystem officer multiplier
+			// $DH31 is component crew modifier
+			return [this.cost_crew_raw, this.subsystem.cost_crew_frame_mult, this.crew_mod, this.cost_crew_quantity_mod, this.subsystem.design.cost_crew_size_mod].reduce(function (sum, value) {
+				return sum.mult(value);
+			}, new Crewline(1));
+			return;
+		}
+	}, {
+		key: 'cost_crew_quantity_mod',
+
+
+		// IF(VALUE($BK31)=0,
+		// 1,
+		// (1+(LOG($BK31))*2))
+		// crewline
+		get: function get() {
+			if (this.quantity) {
+				return 1 + 2 * Math.log(this.quantity) / Math.log(10);
+			} else {
+				return 1;
+			};
+		}
+	}, {
+		key: 'cost_crew_raw',
+		get: function get() {
+			var _this4 = this;
+
+			var map = [['officer', 'O'], ['enlisted', 'E'], ['technician', 'T']];
+			var crew_block = map.reduce(function (res, _ref) {
+				var _ref2 = _slicedToArray(_ref, 2),
+				    longname = _ref2[0],
+				    shortname = _ref2[1];
+
+				res[longname] = _this4.part_def[shortname];return res;
+			}, {});
+			return new Crewline(crew_block);
+		}
+	}, {
+		key: 'crew_mod',
+		get: function get() {
+			return new Crewline(this.component_modifier['Crew Mod'] || 1);
+		}
+	}, {
+		key: 'power_generation',
+		get: function get() {
+			switch (this.name) {
+				case "Warp Core Type":
+					// CD79
+					// CD is effect
+					return this.effect;
+				case "M/AM Injectors":
+					// =1 + (CD81 / 100 * CO$79)
+					// CD is effect
+					// CD$79 is the effect for the "Warp Core Type" component
+					return 1 + this.effect * this.subsystem.component('Warp Core Type').effect / 100.0;
+				case "Coolant Systems":
+					// =1 + (CD82 / 100 * CO$79)
+					return 1 + this.effect * this.subsystem.component('Warp Core Type').effect / 100.0;
+				case "EPS Manifold System":
+					// =1 + (CD83 / 100 * CO$79)
+					return 1 + this.effect * this.subsystem.component('Warp Core Type').effect / 100.0;
+				default:
+					return 0;
+			};
+		}
+	}, {
+		key: 'cost_power',
+
+
+		// CN column
+		get: function get() {
+			// =(DP31 + DQ31*BK$26 + DR31*BK31) * DG31
+			// DP is 'Pwr O/H' column off parts sheet
+
+			// DQ is 'Scale Pwr' column off parts sheet
+			// BK$26 is design size
+
+			// DR is 'Unit Power' column off parts sheet
+			// BK is part quantity
+
+			// DG is 'Cost Mod' column off COMPONENT_MODIFIERS
+
+			// the two Nacelle lines look like this:
+			// =(DP70 + DR70*BK70) * DG70
+			// =DQ70 * BK$26 * DG70
+			// these sum together to the same as the normal case, so need
+			// not be special-cased!
+
+			return (this.cost_power_overhead + this.cost_power_scale * this.subsystem.design.size + this.cost_power_unit * this.quantity) * this.cost_mod;
+		}
+	}, {
+		key: 'cost_power_overhead',
+
+
+		// DP column
+		get: function get() {
+			return this.part_def['Pwr O/H'];
+		}
+	}, {
+		key: 'cost_power_scale',
+
+
+		// DQ
+		get: function get() {
+			return this.part_def['Scale Pwr'];
+		}
+	}, {
+		key: 'cost_power_unit',
+
+
+		// DR
+		get: function get() {
+			return this.part_def['Unit Power'];
+		}
+	}, {
+		key: 'cost_SR',
+
+
+		// CM column
+		get: function get() {
+			// =CK31 * DO31 * CM$29
+			// CM29 is subsystem frame 'SR Cost x'
+			// CK31 is weight
+			// DO31 is SR Cost x off the part list
+			return (this.weight_internal + this.weight_external) * this.cost_SR_mult * this.subsystem.cost_SR_mult;
+		}
+	}, {
+		key: 'cost_SR_mult',
+
+
+		// DO31
+		get: function get() {
+			// SR Cost x off the part list
+			return this.part_def['SR Cost x'];
+		}
+	}, {
+		key: 'cost_BR',
+
+
+		// CL column
+		get: function get() {
+			// total weight divided by br to weight mult
+			return (this.weight_internal + this.weight_external) / BR_TO_WEIGHT_MULTIPLIER;
+		}
+	}, {
+		key: 'weight_internal',
+
+
+		// CK column
+		// scalar
+		get: function get() {
+			// =(DL31 + IF(DF31,DM31*BK$26,DN31)*BK31) * DE31 * DG31
+			// DL31 is "Weight O/H", weight overhead, off parts list
+			// DF31 is "Scale Wt?" component configuration
+			// DM31 is "Scale Weight" off parts list
+			// BK$26 is frame size?, BK18+BK25
+			// DN31 is "Unit Weight" off parts list
+			// BK31 is part quantity
+			// DE31 is "Wt Custom" component configuration
+			// DG31 is "Cost Mod" component configuration
+			switch (this.name) {
+				case 'Nacelle System':
+					// "Nacelle Distribution" line in spreadsheet
+					return this.weight_overhead_raw * this.weight_custom * this.cost_mod;
+				default:
+					return this.weight_raw * this.weight_custom * this.cost_mod;
+			};
+		}
+	}, {
+		key: 'weight_external',
+
+
+		// CK column
+		// scalar
+		get: function get() {
+			// =(DL31 + IF(DF31,DM31*BK$26,DN31)*BK31) * DE31 * DG31
+			// DL31 is "Weight O/H", weight overhead, off parts list
+			// DF31 is "Scale Wt?" component configuration
+			// DM31 is "Scale Weight" off parts list
+			// BK$26 is frame size?, BK18+BK25
+			// DN31 is "Unit Weight" off parts list
+			// BK31 is part quantity
+			// DE31 is "Wt Custom" component configuration
+			// DG31 is "Cost Mod" component configuration
+			switch (this.name) {
+				case 'Nacelle System':
+					// "Nacelle System" line in spreadsheet
+					// DN70 * BK70 * DE70 * DG70
+					return this.weight_unit_raw * this.quantity * this.weight_custom * this.cost_mod;
+				default:
+					return 0;
+			};
+		}
+	}, {
+		key: 'weight_raw',
+
+
+		// (DL31 + IF(DF31,DM31*BK$26,DN31)*BK31)
+		// scalar
+		//
+		// the weight of the component before component and size modifiers
+		// are applied
+		get: function get() {
+			return this.weight_overhead_raw + this.weight_per_unit * this.quantity;
+		}
+	}, {
+		key: 'cost_mod',
+		get: function get() {
+			return this.component_modifier['Cost Mod'] || 1;
+		}
+	}, {
+		key: 'weight_per_unit',
+
+
+		// IF(DF31,
+		// DM31*BK$26,
+		// DN31)
+		get: function get() {
+			if (this.component_modifier['Scale Wt?']) {
+				return this.weight_scale_raw * this.subsystem.design.size;
+			} else {
+				return this.weight_unit_raw;
+			};
+		}
+
+		// DL31
+
+	}, {
+		key: 'weight_overhead_raw',
+		get: function get() {
+			return this.part_def['Weight O/H'];
+		}
+	}, {
+		key: 'weight_scale_raw',
+
+
+		// DM31
+		get: function get() {
+			return this.part_def['Scale Weight'];
+		}
+	}, {
+		key: 'weight_unit_raw',
+
+
+		// DN31
+		get: function get() {
+			return this.part_def['Unit Weight'];
+		}
+	}, {
+		key: 'raw_effect',
+
+
+		// DK column
+		// scalar
+		get: function get() {
+			return this.part_def['Effect'];
+		}
+	}, {
+		key: 'stats',
+
+
+		// CE block
+		// statline
+		get: function get() {
+			// CD column * CY block * CE$29 row
+			//
+			// effect for this part * frame effect multiplier * the
+			// component's statline modifier
+			return new Statline(this.component_modifier).mult(this.effect * this.subsystem.stats_multiplier);
+		}
+	}, {
+		key: 'effect',
+
+
+		// CD column
+		// scalar
+		get: function get() {
+			switch (this.subsystem.name) {
+				case 'Warp Core':
+					// =DK79 * IF(CX79,1+3.5*log10(0.7*BK79+0.3),1) * CW79 * CD$77
+					//
+					// raw effect * quantity mult * custom effect * frame effect modifier
+					return this.raw_effect * this.effect_custom * this.qty_mult * this.subsystem.stats_multiplier;
+				default:
+					// =DK31 * IF(CX31,1+3.5*log10(0.7*BK31+0.3),1) * CW31
+					//
+					// raw effect from parts list * quantity multiplier * custom effect
+					return this.raw_effect * this.effect_custom * this.qty_mult;
+			};
+		}
+	}, {
+		key: 'qty_mult',
+
+
+		// IF(CX31,
+		// 1 + 3.5 * log10(0.7 * BK31 + 0.3)
+		// ,1)
+		//
+		// scalar
+		get: function get() {
+			if (this.uses_effect_qty) {
+				return 1 + 3.5 * Math.log(0.7 * this.quantity + 0.3) / Math.log(10);
+			} else {
+				return 1;
+			};
+		}
+	}, {
+		key: 'uses_effect_qty',
+
+
+		// boolean
+		get: function get() {
+			return this.component_modifier['Effect Qty?'];
+		}
+	}, {
+		key: 'weight_custom',
+
+
+		// DE column
+		// scalar
+		//
+		// Additional custom multiplier on weight (and thus also BR/SR) -
+		// can be formula as long as it doesn't reference any cell on this
+		// row
+		get: function get() {
+			if (this.name === 'Primary Phasers') {
+				return this.setting_phaser_array_weight_multiplier;
+			}
+			if (this.name === 'Secondary Phasers') {
+				return this.setting_phaser_array_weight_multiplier;
+			}
+			if (this.name === 'Torpedo System') {
+				return this.setting_burst_launcher_weight_multiplier;
+			}
 			return 1;
-		};
-	}
-
-	// boolean
-	get uses_effect_qty() {
-		return this.component_modifier['Effect Qty?'];
-	}
-
-	// DE column
-	// scalar
-	//
-	// Additional custom multiplier on weight (and thus also BR/SR) -
-	// can be formula as long as it doesn't reference any cell on this
-	// row
-	get weight_custom() {
-		if (this.name === 'Primary Phasers') {
-			return this.setting_phaser_array_weight_multiplier;
 		}
-		if (this.name === 'Secondary Phasers') {
-			return this.setting_phaser_array_weight_multiplier;
+	}, {
+		key: 'effect_custom',
+
+
+		// CW column
+		//
+		// scalar
+		// 
+		// comment on sheet: Additional custom multiplier on effect - can
+		// be formula as long as it doesn't reference any cell on this row
+		get: function get() {
+			if (this.name === 'Primary Phasers') {
+				// =(1-(BK$26/100)) * IF($D$33,2,1)
+				// BK$26 = BK18 + BK25
+				// BK18 is design size
+
+				// $D$33 is "phaser arrays Y/N"
+
+				// AL6 is size to weight multiplier
+
+				// return (0.97 / 2) * ;
+
+				return this.phaser_size_mult * this.setting_phaser_array_combat_multiplier;
+			}
+			if (this.name === 'Secondary Phasers') {
+				return this.phaser_size_mult * this.setting_phaser_array_combat_multiplier;
+			}
+			if (this.name === 'Torpedo System') {
+				// =IF($D$35, 1.5, 1)
+				// $D$35 is burst launchers Y/N
+				return this.setting_burst_launcher_combat_multiplier;
+			}
+			// if nothing else, no change
+			return 1;
 		}
-		if (this.name === 'Torpedo System') {
-			return this.setting_burst_launcher_weight_multiplier;
+	}, {
+		key: 'phaser_size_mult',
+		get: function get() {
+			return 1 - this.subsystem.design.size / 100.0;
 		}
-		return 1;
-	}
-
-	// CW column
-	//
-	// scalar
-	// 
-	// comment on sheet: Additional custom multiplier on effect - can
-	// be formula as long as it doesn't reference any cell on this row
-	get effect_custom() {
-		if (this.name === 'Primary Phasers') {
-			// =(1-(BK$26/100)) * IF($D$33,2,1)
-			// BK$26 = BK18 + BK25
-			// BK18 is design size
-
-			// $D$33 is "phaser arrays Y/N"
-
-			// AL6 is size to weight multiplier
-
-			// return (0.97 / 2) * ;
-
-			return this.phaser_size_mult * this.setting_phaser_array_combat_multiplier;
+	}, {
+		key: 'setting_phaser_array_weight_multiplier',
+		get: function get() {
+			if (this.subsystem.get_setting('Phaser Arrays')) {
+				return 1.5;
+			} else {
+				return 1.0;
+			};
 		}
-		if (this.name === 'Secondary Phasers') {
-			return this.phaser_size_mult * this.setting_phaser_array_combat_multiplier;
+	}, {
+		key: 'setting_phaser_array_combat_multiplier',
+		get: function get() {
+			if (this.subsystem.get_setting('Phaser Arrays')) {
+				return 2.0;
+			} else {
+				return 1.0;
+			};
 		}
-		if (this.name === 'Torpedo System') {
-			// =IF($D$35, 1.5, 1)
-			// $D$35 is burst launchers Y/N
-			return this.setting_burst_launcher_combat_multiplier;
+	}, {
+		key: 'setting_burst_launcher_combat_multiplier',
+		get: function get() {
+			if (this.subsystem.get_setting('Burst Launchers')) {
+				return 1.5;
+			} else {
+				return 1.0;
+			};
 		}
-		// if nothing else, no change
-		return 1;
-	}
+	}, {
+		key: 'setting_burst_launcher_weight_multiplier',
+		get: function get() {
+			if (this.subsystem.get_setting('Burst Launchers')) {
+				return 1.5;
+			} else {
+				return 1.0;
+			};
+		}
+	}]);
 
-	get phaser_size_mult() {
-		return 1 - this.subsystem.design.size / 100.0;
-	}
+	return DesignComponent;
+}();
 
-	get setting_phaser_array_weight_multiplier() {
-		if (this.subsystem.get_setting('Phaser Arrays')) {
-			return 1.5;
-		} else {
-			return 1.0;
-		};
-	}
+;
 
-	get setting_phaser_array_combat_multiplier() {
-		if (this.subsystem.get_setting('Phaser Arrays')) {
-			return 2.0;
-		} else {
-			return 1.0;
-		};
-	}
+var DesignSubsystem = function () {
+	function DesignSubsystem(db, design, design_subsystem_json) {
+		var _this5 = this;
 
-	get setting_burst_launcher_combat_multiplier() {
-		if (this.subsystem.get_setting('Burst Launchers')) {
-			return 1.5;
-		} else {
-			return 1.0;
-		};
-	}
+		_classCallCheck(this, DesignSubsystem);
 
-	get setting_burst_launcher_weight_multiplier() {
-		if (this.subsystem.get_setting('Burst Launchers')) {
-			return 1.5;
-		} else {
-			return 1.0;
-		};
-	}
-};
-
-class DesignSubsystem {
-	constructor(db, design, design_subsystem_json) {
 		this.json = design_subsystem_json;
 		this.db = db;
 		this.name = this.json['Name'];
 		this.design = design;
 		this.settings = this.json['Settings'];
 		this.sub_frame_def = this.db.find_frame(this.json['Sub-Frame']);
-		this.components = this.json['Components'].map(comp_json => new DesignComponent(this.db, this, comp_json));
+		this.components = this.json['Components'].map(function (comp_json) {
+			return new DesignComponent(_this5.db, _this5, comp_json);
+		});
 	}
 
-	get_setting(key) {
-		return this.settings.find(elem => elem['Name'] === key)['Value'];
-	}
+	_createClass(DesignSubsystem, [{
+		key: 'get_setting',
+		value: function get_setting(key) {
+			return this.settings.find(function (elem) {
+				return elem['Name'] === key;
+			})['Value'];
+		}
+	}, {
+		key: 'component',
+		value: function component(component_name) {
+			return this.components.find(function (comp) {
+				return comp.name === component_name;
+			});
+		}
+	}, {
+		key: 'sub_frame',
+		get: function get() {
+			return this.json['Sub-Frame'];
+		},
+		set: function set(value) {
+			this.json['Sub-Frame'] = value;
+		}
+	}, {
+		key: 'valid_frames',
+		get: function get() {
+			var _this6 = this;
 
-	get sub_frame() {
-		return this.json['Sub-Frame'];
-	}
+			return this.db.find_frames(this.name).filter(function (frame) {
+				return frame['Weight Class'] == _this6.design.weight_class_raw;
+			}).filter(function (frame) {
+				return !frame['Name'].match(/^x/);
+			});
+		}
+	}, {
+		key: 'weight_cap',
 
-	set sub_frame(value) {
-		this.json['Sub-Frame'] = value;
-	}
 
-	get valid_frames() {
-		return this.db.find_frames(this.name).filter(frame => frame['Weight Class'] == this.design.weight_class_raw).filter(frame => !frame['Name'].match(/^x/));
-	}
+		// CV20, CV41
+		get: function get() {
+			// sum of CV31-40 plus CV29
+			return this.weight_cap_components + this.weight_cap_frame;
+		}
+	}, {
+		key: 'weight_cap_components',
 
-	// CV20, CV41
-	get weight_cap() {
-		// sum of CV31-40 plus CV29
-		return this.weight_cap_components + this.weight_cap_frame;
-	}
 
-	// CV column
-	get weight_cap_components() {
-		// these can't be filled in the C8 sheet
-		return 0;
-	}
-
-	// CV29
-	get weight_cap_frame() {
-		// =(DL29/100) * CV$18
-		return this.max_size_frame * this.design.frame_max_size_raw / 100;
-	}
-
-	get max_size_frame() {
-		// "MaxSz" off frame def
-		return this.sub_frame_def['MaxSz'];
-	}
-
-	get warp_core_breach() {
-		return this.components.map(comp => comp.warp_core_breach).filter(val => val !== false).reduce((sum, value) => 1 - (1 - sum) * (1 - value), 0);
-	}
-
-	get evasion() {
-		// CJ40 is D value for Impulse Engine Pwr
-		// DD40 D mod for Impulse Engine Pwr
-		return this.components.map(comp => comp.evasion).filter(val => val !== false).reduce((sum, value) => 1 - (1 - sum) * (1 - value), 0);
-	}
-
-	// CT column, subsystems
-	get build_time() {
-		// =SUM(CT31:CT40)+CT29
-		//
-		// but the component values are all blank - no way for them to
-		// be filled, and parts don't have build times - so this is
-		// just CT29
-		//
-		// CT29 is DN29 is the build time value straight off the
-		// frames list
-		return math.number(math.fraction(this.sub_frame_def['Build Time']));
-	}
-
-	// DS31-DSU31 row
-	// crewline
-	get cost_crew_frame_mult() {
-		// CP$18 * DR29
-		// CP$18 is DR18 is design principal frame 'O-Mod' off parts list
-		// DR29 is subframe 'O-Mod' off parts list
-		return this.cost_crew_frame_mult_raw.mult(this.design.cost_crew_frame_mult);
-	}
-
-	// DR29 is subframe 'O-Mod' off parts list
-	// crewline
-	get cost_crew_frame_mult_raw() {
-		const map = [['officer', 'O-Mod'], ['enlisted', 'E-Mod'], ['technician', 'T-Mod']];
-		let crew_block = map.reduce((res, [longname, shortname]) => {
-			res[longname] = this.sub_frame_def[shortname];return res;
-		}, {});
-		return new Crewline(crew_block);
-	}
-
-	// CP, CQ, CR block
-	// crewline
-	get cost_crew() {
-		// straight sum of components
-		return this.components.map(comp => comp.cost_crew).reduce((sum, value) => sum.add(value), new Crewline({}));
-	}
-
-	// CO column
-	// scalar
-	get power_generation() {
-		switch (this.name) {
-			case 'Warp Core':
-				return this.power_generation_components + this.setting_safety_performance;
-			default:
-				return this.power_generation_components;
-		};
-	}
-
-	get power_generation_components() {
-		return this.components.map(comp => comp.power_generation).reduce((sum, value) => sum + value, 0);
-	}
-
-	get setting_safety_performance() {
-		// =-BK80 * POWER(2,(ABS(BK80)/2)) / 100 * CO$79
-		// BK80 is D80 is Safety/Performance slider value
-		// CD$79 is warp core effect
-		return -this.get_setting('Safety/Performance') * this.component('Warp Core Type').effect * Math.pow(2.0, Math.abs(this.get_setting('Safety/Performance')) / 2.0) / 100.0;
-	}
-
-	component(component_name) {
-		return this.components.find(comp => comp.name === component_name);
-	}
-
-	// CN column, 29 etc
-	get cost_power() {
-		return this.cost_power_components;
-	}
-
-	get cost_power_components() {
-		return this.components.map(comp => comp.cost_power).reduce((sum, value) => sum + value, 0);
-	}
-
-	// CM column, 29 etc
-	get cost_SR_mult() {
-		// =CM18 * DU29
-		// CM18 is principal frame SR cost
-		// DU29 is 'SR-Mod' straight off part list
-		return this.cost_SR_mult_raw * this.design.cost_SR_frame_mult;
-	}
-
-	get cost_SR_mult_raw() {
-		return this.sub_frame_def['SR-Mod'];
-	}
-
-	// CM column, 20:24, 41 etc
-	get cost_SR() {
-		// straight sum of component costs
-		return this.components.map(comp => comp.cost_SR).reduce((sum, value) => sum + value, 0);
-	}
-
-	// sum of component costs plus the frame cost
-	get cost_BR() {
-		return this.cost_BR_components + this.cost_BR_frame;
-	}
-
-	// CL column
-	// CK column / br to weight mult
-	get cost_BR_frame() {
-		return this.weight_frame / BR_TO_WEIGHT_MULTIPLIER;
-	}
-
-	get cost_BR_components() {
-		return this.components.map(comp => comp.cost_BR).reduce((sum, value) => sum + value, 0);
-	}
-
-	// CK20:CK25 column, [CK41, CK57, CK63, ...]
-	// scalar
-	get weight_external() {
-		// =SUM(CK31:CK40)+CK29
-		return this.weight_components_external;
-	}
-
-	// CK20:CK25 column, [CK41, CK57, CK63, ...]
-	// scalar
-	get weight_internal() {
-		// =SUM(CK31:CK40)+CK29
-		return this.weight_frame + this.weight_components_internal;
-	}
-
-	// CK29, DM29 if populated, DM29 is weight straight off frames list
-	// scalar
-	get weight_frame() {
-		return this.sub_frame_def['Wt'] || 0;
-	}
-
-	// =SUM(CK31:CK40)
-	// scalar
-	get weight_components_external() {
-		return this.components.map(comp => comp.weight_external).reduce((sum, value) => sum + value, 0);
-	}
-
-	// =SUM(CK31:CK40)
-	// scalar
-	get weight_components_internal() {
-		return this.components.map(comp => comp.weight_internal).reduce((sum, value) => sum + value, 0);
-	}
-
-	// get weight_multiplier() {
-	// 	return this.sub_frame_def[''] || 0;
-	// };
-
-	// [CE41 row;CE57 row;CE63 row] block
-	get stats() {
-		return this.components.map(comp => comp.stats).reduce((sum, value) => sum.add(value), new Statline({}));
-	}
-
-	// CE29, CD29, DO29
-	get stats_multiplier() {
-		// =IF(BI29="",0,DGET('[C8] Frames'!$A:$R,DO$28,{"Type","Name";"="&$AJ29,"="&BI29}))
-		// BI29 is frame name
-		// if no frame, then 0
-		// if frame, then look up "tac mod" field in frames list
-		if (this.sub_frame_def) {
-			return this.sub_frame_def[SUBSYSTEM_NAME_MAP[this.name]];
-		} else {
+		// CV column
+		get: function get() {
+			// these can't be filled in the C8 sheet
 			return 0;
-		};
-	}
-};
+		}
+	}, {
+		key: 'weight_cap_frame',
 
-class Module {
-	constructor(db, design, design_module_json) {
+
+		// CV29
+		get: function get() {
+			// =(DL29/100) * CV$18
+			return this.max_size_frame * this.design.frame_max_size_raw / 100;
+		}
+	}, {
+		key: 'max_size_frame',
+		get: function get() {
+			// "MaxSz" off frame def
+			return this.sub_frame_def['MaxSz'];
+		}
+	}, {
+		key: 'warp_core_breach',
+		get: function get() {
+			return this.components.map(function (comp) {
+				return comp.warp_core_breach;
+			}).filter(function (val) {
+				return val !== false;
+			}).reduce(function (sum, value) {
+				return 1 - (1 - sum) * (1 - value);
+			}, 0);
+		}
+	}, {
+		key: 'evasion',
+		get: function get() {
+			// CJ40 is D value for Impulse Engine Pwr
+			// DD40 D mod for Impulse Engine Pwr
+			return this.components.map(function (comp) {
+				return comp.evasion;
+			}).filter(function (val) {
+				return val !== false;
+			}).reduce(function (sum, value) {
+				return 1 - (1 - sum) * (1 - value);
+			}, 0);
+		}
+	}, {
+		key: 'build_time',
+
+
+		// CT column, subsystems
+		get: function get() {
+			// =SUM(CT31:CT40)+CT29
+			//
+			// but the component values are all blank - no way for them to
+			// be filled, and parts don't have build times - so this is
+			// just CT29
+			//
+			// CT29 is DN29 is the build time value straight off the
+			// frames list
+			return math.number(math.fraction(this.sub_frame_def['Build Time']));
+		}
+	}, {
+		key: 'cost_crew_frame_mult',
+
+
+		// DS31-DSU31 row
+		// crewline
+		get: function get() {
+			// CP$18 * DR29
+			// CP$18 is DR18 is design principal frame 'O-Mod' off parts list
+			// DR29 is subframe 'O-Mod' off parts list
+			return this.cost_crew_frame_mult_raw.mult(this.design.cost_crew_frame_mult);
+		}
+	}, {
+		key: 'cost_crew_frame_mult_raw',
+
+
+		// DR29 is subframe 'O-Mod' off parts list
+		// crewline
+		get: function get() {
+			var _this7 = this;
+
+			var map = [['officer', 'O-Mod'], ['enlisted', 'E-Mod'], ['technician', 'T-Mod']];
+			var crew_block = map.reduce(function (res, _ref3) {
+				var _ref4 = _slicedToArray(_ref3, 2),
+				    longname = _ref4[0],
+				    shortname = _ref4[1];
+
+				res[longname] = _this7.sub_frame_def[shortname];return res;
+			}, {});
+			return new Crewline(crew_block);
+		}
+	}, {
+		key: 'cost_crew',
+
+
+		// CP, CQ, CR block
+		// crewline
+		get: function get() {
+			// straight sum of components
+			return this.components.map(function (comp) {
+				return comp.cost_crew;
+			}).reduce(function (sum, value) {
+				return sum.add(value);
+			}, new Crewline({}));
+		}
+	}, {
+		key: 'power_generation',
+
+
+		// CO column
+		// scalar
+		get: function get() {
+			switch (this.name) {
+				case 'Warp Core':
+					return this.power_generation_components + this.setting_safety_performance;
+				default:
+					return this.power_generation_components;
+			};
+		}
+	}, {
+		key: 'power_generation_components',
+		get: function get() {
+			return this.components.map(function (comp) {
+				return comp.power_generation;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'setting_safety_performance',
+		get: function get() {
+			// =-BK80 * POWER(2,(ABS(BK80)/2)) / 100 * CO$79
+			// BK80 is D80 is Safety/Performance slider value
+			// CD$79 is warp core effect
+			return -this.get_setting('Safety/Performance') * this.component('Warp Core Type').effect * Math.pow(2.0, Math.abs(this.get_setting('Safety/Performance')) / 2.0) / 100.0;
+		}
+	}, {
+		key: 'cost_power',
+
+
+		// CN column, 29 etc
+		get: function get() {
+			return this.cost_power_components;
+		}
+	}, {
+		key: 'cost_power_components',
+		get: function get() {
+			return this.components.map(function (comp) {
+				return comp.cost_power;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'cost_SR_mult',
+
+
+		// CM column, 29 etc
+		get: function get() {
+			// =CM18 * DU29
+			// CM18 is principal frame SR cost
+			// DU29 is 'SR-Mod' straight off part list
+			return this.cost_SR_mult_raw * this.design.cost_SR_frame_mult;
+		}
+	}, {
+		key: 'cost_SR_mult_raw',
+		get: function get() {
+			return this.sub_frame_def['SR-Mod'];
+		}
+	}, {
+		key: 'cost_SR',
+
+
+		// CM column, 20:24, 41 etc
+		get: function get() {
+			// straight sum of component costs
+			return this.components.map(function (comp) {
+				return comp.cost_SR;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'cost_BR',
+
+
+		// sum of component costs plus the frame cost
+		get: function get() {
+			return this.cost_BR_components + this.cost_BR_frame;
+		}
+	}, {
+		key: 'cost_BR_frame',
+
+
+		// CL column
+		// CK column / br to weight mult
+		get: function get() {
+			return this.weight_frame / BR_TO_WEIGHT_MULTIPLIER;
+		}
+	}, {
+		key: 'cost_BR_components',
+		get: function get() {
+			return this.components.map(function (comp) {
+				return comp.cost_BR;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'weight_external',
+
+
+		// CK20:CK25 column, [CK41, CK57, CK63, ...]
+		// scalar
+		get: function get() {
+			// =SUM(CK31:CK40)+CK29
+			return this.weight_components_external;
+		}
+	}, {
+		key: 'weight_internal',
+
+
+		// CK20:CK25 column, [CK41, CK57, CK63, ...]
+		// scalar
+		get: function get() {
+			// =SUM(CK31:CK40)+CK29
+			return this.weight_frame + this.weight_components_internal;
+		}
+	}, {
+		key: 'weight_frame',
+
+
+		// CK29, DM29 if populated, DM29 is weight straight off frames list
+		// scalar
+		get: function get() {
+			return this.sub_frame_def['Wt'] || 0;
+		}
+	}, {
+		key: 'weight_components_external',
+
+
+		// =SUM(CK31:CK40)
+		// scalar
+		get: function get() {
+			return this.components.map(function (comp) {
+				return comp.weight_external;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'weight_components_internal',
+
+
+		// =SUM(CK31:CK40)
+		// scalar
+		get: function get() {
+			return this.components.map(function (comp) {
+				return comp.weight_internal;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'stats',
+
+
+		// get weight_multiplier() {
+		// 	return this.sub_frame_def[''] || 0;
+		// };
+
+		// [CE41 row;CE57 row;CE63 row] block
+		get: function get() {
+			return this.components.map(function (comp) {
+				return comp.stats;
+			}).reduce(function (sum, value) {
+				return sum.add(value);
+			}, new Statline({}));
+		}
+	}, {
+		key: 'stats_multiplier',
+
+
+		// CE29, CD29, DO29
+		get: function get() {
+			// =IF(BI29="",0,DGET('[C8] Frames'!$A:$R,DO$28,{"Type","Name";"="&$AJ29,"="&BI29}))
+			// BI29 is frame name
+			// if no frame, then 0
+			// if frame, then look up "tac mod" field in frames list
+			if (this.sub_frame_def) {
+				return this.sub_frame_def[SUBSYSTEM_NAME_MAP[this.name]];
+			} else {
+				return 0;
+			};
+		}
+	}]);
+
+	return DesignSubsystem;
+}();
+
+;
+
+var Module = function () {
+	function Module(db, design, design_module_json) {
+		_classCallCheck(this, Module);
+
 		this.json = design_module_json;
 		this.db = db;
 		this.design = design;
 		this.module_def = this.db.find_module(this.json['Type'], this.json['Variant']);
 	}
 
-	get module_variant() {
-		return this.json['Variant'];
-	}
+	_createClass(Module, [{
+		key: 'module_variant',
+		get: function get() {
+			return this.json['Variant'];
+		},
+		set: function set(value) {
+			this.json['Variant'] = value;
+		}
+	}, {
+		key: 'valid_variants',
+		get: function get() {
+			return this.db.find_modules(this.module_def['Type']);
+		}
+	}, {
+		key: 'module_type',
+		get: function get() {
+			return this.json['Type'];
+		},
+		set: function set(value) {
+			this.json['Type'] = value;
+		}
+	}, {
+		key: 'build_time',
 
-	set module_variant(value) {
-		this.json['Variant'] = value;
-	}
 
-	get valid_variants() {
-		return this.db.find_modules(this.module_def['Type']);
-	}
+		// CT88, DN88
+		get: function get() {
+			// straight off modules list
+			return math.number(math.fraction(this.module_def['Build Time']));
+		}
+	}, {
+		key: 'cost_crew',
 
-	get module_type() {
-		return this.json['Type'];
-	}
 
-	set module_type(value) {
-		this.json['Type'] = value;
-	}
+		// CP-CR 88, DS-DU88
+		// crewline
+		get: function get() {
+			var _this8 = this;
 
-	// CT88, DN88
-	get build_time() {
-		// straight off modules list
-		return math.number(math.fraction(this.module_def['Build Time']));
-	}
+			// straight off parts list
+			var map = [['officer', 'O'], ['enlisted', 'E'], ['technician', 'T']];
+			var stat_block = map.reduce(function (res, _ref5) {
+				var _ref6 = _slicedToArray(_ref5, 2),
+				    longname = _ref6[0],
+				    shortname = _ref6[1];
 
-	// CP-CR 88, DS-DU88
-	// crewline
-	get cost_crew() {
+				res[longname] = _this8.module_def[shortname];return res;
+			}, {});
+			return new Crewline(stat_block);
+		}
+	}, {
+		key: 'cost_power',
+
+
+		// CN25, CN88, DP88, straight from parts list
+		get: function get() {
+			return this.module_def['Power Cost'];
+		}
+	}, {
+		key: 'cost_SR',
+
+
+		// CM25, CM88, DO88
 		// straight off parts list
-		const map = [['officer', 'O'], ['enlisted', 'E'], ['technician', 'T']];
-		let stat_block = map.reduce((res, [longname, shortname]) => {
-			res[longname] = this.module_def[shortname];return res;
-		}, {});
-		return new Crewline(stat_block);
-	}
+		get: function get() {
+			return this.module_def['SR Cost'];
+		}
+	}, {
+		key: 'cost_BR',
 
-	// CN25, CN88, DP88, straight from parts list
-	get cost_power() {
-		return this.module_def['Power Cost'];
-	}
 
-	// CM25, CM88, DO88
-	// straight off parts list
-	get cost_SR() {
-		return this.module_def['SR Cost'];
-	}
+		// CL25, CL88
+		get: function get() {
+			// CK88 / AL7
+			// CK88 is weight
+			// AL7 is the br to weight constant
+			return this.weight_total / BR_TO_WEIGHT_MULTIPLIER;
+		}
+	}, {
+		key: 'stats',
 
-	// CL25, CL88
-	get cost_BR() {
-		// CK88 / AL7
-		// CK88 is weight
-		// AL7 is the br to weight constant
-		return this.weight_total / BR_TO_WEIGHT_MULTIPLIER;
-	}
 
-	// CE88 row, CY88 row
-	// statline
-	get stats() {
-		// pulled straight out of module definition
-		const map = [['combat', 'C'], ['science', 'S'], ['hull', 'H'], ['shields', 'L'], ['presence', 'P'], ['defense', 'D']];
-		let stat_block = map.reduce((res, [longname, shortname]) => {
-			res[longname] = this.module_def[shortname];return res;
-		}, {});
-		return new Statline(stat_block);
-	}
+		// CE88 row, CY88 row
+		// statline
+		get: function get() {
+			var _this9 = this;
 
-	// CK25, CK88, DM88
-	// scalar
-	// "Weight" value off module definition
-	get weight_total() {
-		return this.weight_internal + this.weight_external;
-	}
+			// pulled straight out of module definition
+			var map = [['combat', 'C'], ['science', 'S'], ['hull', 'H'], ['shields', 'L'], ['presence', 'P'], ['defense', 'D']];
+			var stat_block = map.reduce(function (res, _ref7) {
+				var _ref8 = _slicedToArray(_ref7, 2),
+				    longname = _ref8[0],
+				    shortname = _ref8[1];
 
-	get weight_internal() {
-		return 0;
-	}
+				res[longname] = _this9.module_def[shortname];return res;
+			}, {});
+			return new Statline(stat_block);
+		}
+	}, {
+		key: 'weight_total',
 
-	get weight_external() {
-		return this.module_def['Weight'];
-	}
 
-	// BK25, BK88
-	// scalar
-	get size() {
-		// BK25 = rollbar size?, BK88
-		// BK88 = rollbar size? = $CV88 / $AL$6
-		return this.size_raw / SIZE_TO_WEIGHT_CAP_MULTIPLIER;
-	}
+		// CK25, CK88, DM88
+		// scalar
+		// "Weight" value off module definition
+		get: function get() {
+			return this.weight_internal + this.weight_external;
+		}
+	}, {
+		key: 'weight_internal',
+		get: function get() {
+			return 0;
+		}
+	}, {
+		key: 'weight_external',
+		get: function get() {
+			return this.module_def['Weight'];
+		}
+	}, {
+		key: 'size',
 
-	// CV88, DL88
-	// scalar
-	get size_raw() {
-		// $CV88 = DL88 = module weight cap? = module weight cap from "Weight Cap" element of module
-		return this.module_def['Weight Cap'];
-	}
-};
 
-class Design {
-	constructor(db, design_json) {
+		// BK25, BK88
+		// scalar
+		get: function get() {
+			// BK25 = rollbar size?, BK88
+			// BK88 = rollbar size? = $CV88 / $AL$6
+			return this.size_raw / SIZE_TO_WEIGHT_CAP_MULTIPLIER;
+		}
+	}, {
+		key: 'size_raw',
+
+
+		// CV88, DL88
+		// scalar
+		get: function get() {
+			// $CV88 = DL88 = module weight cap? = module weight cap from "Weight Cap" element of module
+			return this.module_def['Weight Cap'];
+		}
+	}]);
+
+	return Module;
+}();
+
+;
+
+var Design = function () {
+	function Design(db, design_json) {
+		var _this10 = this;
+
+		_classCallCheck(this, Design);
+
 		this.json = design_json;
 		this.db = db;
 		this.name = this.json['Name'];
 		this.princ_frame_def = this.db.find_frame(this.json['Principal Frame']);
-		this.subsystems = this.json['Subsystems'].map(ss_json => new DesignSubsystem(this.db, this, ss_json)).sort((ssa, ssb) => SUBSYSTEM_SORT_ORDER[ssa.name] > SUBSYSTEM_SORT_ORDER[ssb.name]);
+		this.subsystems = this.json['Subsystems'].map(function (ss_json) {
+			return new DesignSubsystem(_this10.db, _this10, ss_json);
+		}).sort(function (ssa, ssb) {
+			return SUBSYSTEM_SORT_ORDER[ssa.name] > SUBSYSTEM_SORT_ORDER[ssb.name];
+		});
 		this.module = new Module(db, this, this.json['Module']);
 	}
 
-	subsystem(subsystem_name) {
-		return this.subsystems.find(ss => ss.name === subsystem_name);
-	}
+	_createClass(Design, [{
+		key: 'subsystem',
+		value: function subsystem(subsystem_name) {
+			return this.subsystems.find(function (ss) {
+				return ss.name === subsystem_name;
+			});
+		}
+	}, {
+		key: 'valid_frames',
+		get: function get() {
+			return this.db.find_frames('Frame');
+		}
+	}, {
+		key: 'build_time',
 
-	get valid_frames() {
-		return this.db.find_frames('Frame');
-	}
 
-	// CT27, CT26
-	get build_time() {
-		return Math.ceil(this.build_time_raw * 12) / 12;
-	}
+		// CT27, CT26
+		get: function get() {
+			return Math.ceil(this.build_time_raw * 12) / 12;
+		}
+	}, {
+		key: 'build_time_raw',
 
-	// CT26
-	get build_time_raw() {
-		// =SUM(CT20:CT25)+CT$18
-		return this.build_time_frame + this.build_time_subsystems + this.module.build_time;
-	}
 
-	// CT18, DN18
-	get build_time_frame() {
-		// "Build Time" off frames list
-		return eval(this.princ_frame_def['Build Time']);
-	}
+		// CT26
+		get: function get() {
+			// =SUM(CT20:CT25)+CT$18
+			return this.build_time_frame + this.build_time_subsystems + this.module.build_time;
+		}
+	}, {
+		key: 'build_time_frame',
 
-	// sum of CT column on subsystems
-	get build_time_subsystems() {
-		return this.subsystems.map(ss => ss.build_time).reduce((sum, value) => sum + value, 0);
-	}
 
-	get evasion() {
-		return Math.round(this.evasion_raw * 1e4) / 1e4;
-	}
+		// CT18, DN18
+		get: function get() {
+			// "Build Time" off frames list
+			return eval(this.princ_frame_def['Build Time']);
+		}
+	}, {
+		key: 'build_time_subsystems',
 
-	// CD11
-	get evasion_raw() {
-		// =(MAX(0, 30 - (BK$26*3)) / 100) * (1+((CJ$40/DD$40*10)/100))
-		// BK26 is size
-		// CJ40 is D value for Impulse Engine Pwr
-		// DD40 D mod for Impulse Engine Pwr
-		return this.evasion_size_mult * this.evasion_subsystems;
-	}
 
-	get evasion_size_mult() {
-		// =(MAX(0, 30 - (BK$26*3)) / 100)
-		// for ease of programming: probability of all failing
-		return Math.max(0, 30 - this.size * 3) / 100;
-	}
+		// sum of CT column on subsystems
+		get: function get() {
+			return this.subsystems.map(function (ss) {
+				return ss.build_time;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'evasion',
+		get: function get() {
+			return Math.round(this.evasion_raw * 1e4) / 1e4;
+		}
+	}, {
+		key: 'evasion_raw',
 
-	get evasion_subsystems() {
-		return this.subsystems.map(ss => ss.evasion).filter(wcb => wcb).reduce((sum, value) => 1 - (1 - sum) * (1 - value), 0);
-	}
 
-	// CD13, DV84
-	get warp_core_breach() {
-		return this.warp_core_breach_subsystems;
-	}
+		// CD11
+		get: function get() {
+			// =(MAX(0, 30 - (BK$26*3)) / 100) * (1+((CJ$40/DD$40*10)/100))
+			// BK26 is size
+			// CJ40 is D value for Impulse Engine Pwr
+			// DD40 D mod for Impulse Engine Pwr
+			return this.evasion_size_mult * this.evasion_subsystems;
+		}
+	}, {
+		key: 'evasion_size_mult',
+		get: function get() {
+			// =(MAX(0, 30 - (BK$26*3)) / 100)
+			// for ease of programming: probability of all failing
+			return Math.max(0, 30 - this.size * 3) / 100;
+		}
+	}, {
+		key: 'evasion_subsystems',
+		get: function get() {
+			return this.subsystems.map(function (ss) {
+				return ss.evasion;
+			}).filter(function (wcb) {
+				return wcb;
+			}).reduce(function (sum, value) {
+				return 1 - (1 - sum) * (1 - value);
+			}, 0);
+		}
+	}, {
+		key: 'warp_core_breach',
 
-	get warp_core_breach_subsystems() {
-		// for ease of programming: probability of all failing
-		return this.subsystems.map(ss => ss.warp_core_breach).filter(wcb => wcb).reduce((sum, value) => 1 - (1 - sum) * (1 - value), 0);
-	}
 
-	// ($BK$26^0.7 / 2)
-	// crewline
-	get cost_crew_size_mod() {
-		// BK26 is design size
-		return Math.pow(this.size, 0.7) / 2;
-		// return 1/2;
-	}
+		// CD13, DV84
+		get: function get() {
+			return this.warp_core_breach_subsystems;
+		}
+	}, {
+		key: 'warp_core_breach_subsystems',
+		get: function get() {
+			// for ease of programming: probability of all failing
+			return this.subsystems.map(function (ss) {
+				return ss.warp_core_breach;
+			}).filter(function (wcb) {
+				return wcb;
+			}).reduce(function (sum, value) {
+				return 1 - (1 - sum) * (1 - value);
+			}, 0);
+		}
+	}, {
+		key: 'cost_crew_size_mod',
 
-	// CP$18 is DR18 is design principal frame 'O-Mod' off parts list
-	// crewline
-	get cost_crew_frame_mult() {
-		const map = [['officer', 'O-Mod'], ['enlisted', 'E-Mod'], ['technician', 'T-Mod']];
-		let crew_block = map.reduce((res, [longname, shortname]) => {
-			res[longname] = this.princ_frame_def[shortname];return res;
-		}, {});
-		return new Crewline(crew_block);
-	}
 
-	// T,U,V 3; CP,CQ,CR 27
-	// crewline
-	get cost_crew() {
-		// ceiling of CP,CQ,CR 26
-		return this.cost_crew_raw.ceil;
-	}
+		// ($BK$26^0.7 / 2)
+		// crewline
+		get: function get() {
+			// BK26 is design size
+			return Math.pow(this.size, 0.7) / 2;
+			// return 1/2;
+		}
+	}, {
+		key: 'cost_crew_frame_mult',
 
-	// T,U,V 2
-	// crewline
-	get cost_crew_raw() {
-		// CP,CQ,CR 26
-		// sum of subsystem crew costs plus module crew cost
-		return this.cost_crew_subsystems.add(this.module.cost_crew);
-	}
 
-	get cost_crew_subsystems() {
-		return this.subsystems.map(ss => ss.cost_crew).reduce((sum, value) => sum.add(value), new Crewline({}));
-	}
+		// CP$18 is DR18 is design principal frame 'O-Mod' off parts list
+		// crewline
+		get: function get() {
+			var _this11 = this;
 
-	get power_generation() {
-		return Math.round(this.power_generation_raw);
-	}
+			var map = [['officer', 'O-Mod'], ['enlisted', 'E-Mod'], ['technician', 'T-Mod']];
+			var crew_block = map.reduce(function (res, _ref9) {
+				var _ref10 = _slicedToArray(_ref9, 2),
+				    longname = _ref10[0],
+				    shortname = _ref10[1];
 
-	get power_generation_raw() {
-		return this.subsystems.map(ss => ss.power_generation).reduce((sum, value) => sum + value, 0);
-	}
+				res[longname] = _this11.princ_frame_def[shortname];return res;
+			}, {});
+			return new Crewline(crew_block);
+		}
+	}, {
+		key: 'cost_crew',
 
-	// CE27 row
-	get stats() {
-		return this.stats_raw.floor;
-	}
 
-	// BL26, CE26 row
-	get stats_raw() {
-		return this.stats_subsystems.add(this.stats_module);
-	}
+		// T,U,V 3; CP,CQ,CR 27
+		// crewline
+		get: function get() {
+			// ceiling of CP,CQ,CR 26
+			return this.cost_crew_raw.ceil;
+		}
+	}, {
+		key: 'cost_crew_raw',
 
-	get stats_subsystems() {
-		return this.subsystems.map(ss => ss.stats).reduce((sum, value) => sum.add(value), new Statline({}));
-	}
 
-	get stats_module() {
-		return this.module.stats;
-	}
+		// T,U,V 2
+		// crewline
+		get: function get() {
+			// CP,CQ,CR 26
+			// sum of subsystem crew costs plus module crew cost
+			return this.cost_crew_subsystems.add(this.module.cost_crew);
+		}
+	}, {
+		key: 'cost_crew_subsystems',
+		get: function get() {
+			return this.subsystems.map(function (ss) {
+				return ss.cost_crew;
+			}).reduce(function (sum, value) {
+				return sum.add(value);
+			}, new Crewline({}));
+		}
+	}, {
+		key: 'power_generation',
+		get: function get() {
+			return Math.round(this.power_generation_raw);
+		}
+	}, {
+		key: 'power_generation_raw',
+		get: function get() {
+			return this.subsystems.map(function (ss) {
+				return ss.power_generation;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'stats',
 
-	// O3, CK27
-	// scalar
-	get weight_total() {
-		return Math.floor(this.weight_total_raw);
-	}
 
-	// O2, CK26
-	// scalar
-	get weight_external() {
-		// =SUM(CK20:CK25)+CK$18
-		return this.weight_subsystems_external + this.module.weight_external;
-	}
+		// CE27 row
+		get: function get() {
+			return this.stats_raw.floor;
+		}
+	}, {
+		key: 'stats_raw',
 
-	// O2, CK26
-	// scalar
-	get weight_internal() {
-		// =SUM(CK20:CK25)+CK$18
-		return this.weight_frame + this.weight_subsystems_internal + this.module.weight_internal;
-	}
 
-	// O2, CK26
-	// scalar
-	get weight_total_raw() {
-		// =SUM(CK20:CK25)+CK$18
-		return this.weight_external + this.weight_internal;
-	}
+		// BL26, CE26 row
+		get: function get() {
+			return this.stats_subsystems.add(this.stats_module);
+		}
+	}, {
+		key: 'stats_subsystems',
+		get: function get() {
+			return this.subsystems.map(function (ss) {
+				return ss.stats;
+			}).reduce(function (sum, value) {
+				return sum.add(value);
+			}, new Statline({}));
+		}
+	}, {
+		key: 'stats_module',
+		get: function get() {
+			return this.module.stats;
+		}
+	}, {
+		key: 'weight_total',
 
-	// CK26
-	get weight_subsystems_internal() {
-		// =SUM(CK20:CK25)
-		// CK20:24 is subsystem weights
-		// CK25 is module weight
-		return this.subsystems.map(ss => ss.weight_internal).reduce((sum, value) => sum + value, 0);
-	}
 
-	// CK26
-	get weight_subsystems_external() {
-		// =SUM(CK20:CK25)
-		// CK20:24 is subsystem weights
-		// CK25 is module weight
-		return this.subsystems.map(ss => ss.weight_external).reduce((sum, value) => sum + value, 0);
-	}
+		// O3, CK27
+		// scalar
+		get: function get() {
+			return Math.floor(this.weight_total_raw);
+		}
+	}, {
+		key: 'weight_external',
 
-	// CK$18, DM18
-	// part frame weight
-	get weight_frame() {
-		return this.princ_frame_def['Wt'];
-	}
 
-	// P3, CL27
-	get cost_BR() {
-		// =CEILING(CL26,INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0)))
-		// ceiling(CL16, cost_BR_round)
-		// round raw BR cost to next integer multiple of the rounding interval
-		return Math.ceil(this.cost_BR_raw / this.cost_BR_round) * this.cost_BR_round;
-	}
+		// O2, CK26
+		// scalar
+		get: function get() {
+			// =SUM(CK20:CK25)+CK$18
+			return this.weight_subsystems_external + this.module.weight_external;
+		}
+	}, {
+		key: 'weight_internal',
 
-	get cost_BR_round() {
-		// selects the appropriate interval to round BR to based on the class of the ship
-		// INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0))
-		//
-		// from the list of constants in AL, select the one in the row
-		// that has concat("BR cost round", CD9) in AJ
-		//
-		// CD9 is weight class
-		return BR_COST_ROUND_MAP[this.weight_class];
-	}
 
-	// CD9
-	get weight_class() {
-		// =IF(DK$18 = 1, "Frigate", IF(DK$18 = 2, "Cruiser", "Explorer"))
-		return WEIGHT_CLASS_MAP[this.weight_class_raw];
-	}
+		// O2, CK26
+		// scalar
+		get: function get() {
+			// =SUM(CK20:CK25)+CK$18
+			return this.weight_frame + this.weight_subsystems_internal + this.module.weight_internal;
+		}
+	}, {
+		key: 'weight_total_raw',
 
-	// DK18
-	get weight_class_raw() {
-		// "Weight Class" value off of principal frame definition
-		// integer in [1, 3]
-		return this.princ_frame_def['Weight Class'];
-	}
 
-	// P2, CL26
-	get cost_BR_raw() {
-		// sum(subsystem BR costs) + module cost + frame cost
-		return this.cost_BR_components + this.module.cost_BR + this.cost_BR_frame;
-	}
+		// O2, CK26
+		// scalar
+		get: function get() {
+			// =SUM(CK20:CK25)+CK$18
+			return this.weight_external + this.weight_internal;
+		}
+	}, {
+		key: 'weight_subsystems_internal',
 
-	get cost_BR_components() {
-		return this.subsystems.map(ss => ss.cost_BR).reduce((sum, value) => sum + value, 0);
-	}
 
-	// CL18
-	// scalar
-	get cost_BR_frame() {
-		// CK18 / $AL$7
-		// CK18 = DM18
-		// DM18 is frame "Wt" value
-		return this.weight_frame / BR_TO_WEIGHT_MULTIPLIER;
-	}
+		// CK26
+		get: function get() {
+			// =SUM(CK20:CK25)
+			// CK20:24 is subsystem weights
+			// CK25 is module weight
+			return this.subsystems.map(function (ss) {
+				return ss.weight_internal;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'weight_subsystems_external',
 
-	// CM18, DU18
-	get cost_SR_frame_mult() {
-		return this.princ_frame_def['SR-Mod'];
-	}
 
-	// Q2, CM27
-	get cost_SR() {
-		// =CEILING(CL26,INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0)))
-		// ceiling(CL16, cost_BR_round)
-		// round raw BR cost to next integer multiple of the rounding interval
-		return Math.ceil(this.cost_SR_raw / this.cost_SR_round) * this.cost_SR_round;
-	}
+		// CK26
+		get: function get() {
+			// =SUM(CK20:CK25)
+			// CK20:24 is subsystem weights
+			// CK25 is module weight
+			return this.subsystems.map(function (ss) {
+				return ss.weight_external;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'weight_frame',
 
-	// Q3, CM26
-	get cost_SR_raw() {
-		// sum of subsystems plus module
-		return this.cost_SR_subsystems + this.module.cost_SR;
-	}
 
-	get cost_SR_subsystems() {
-		return this.subsystems.map(ss => ss.cost_SR).reduce((sum, value) => sum + value, 0);
-	}
+		// CK$18, DM18
+		// part frame weight
+		get: function get() {
+			return this.princ_frame_def['Wt'];
+		}
+	}, {
+		key: 'cost_BR',
 
-	get cost_SR_round() {
-		// same as BR, basically
-		return BR_COST_ROUND_MAP[this.weight_class];
-	}
 
-	// R2, CN27
-	get cost_power() {
-		// round, not floor or ceil!
-		return Math.round(this.cost_power_raw);
-	}
+		// P3, CL27
+		get: function get() {
+			// =CEILING(CL26,INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0)))
+			// ceiling(CL16, cost_BR_round)
+			// round raw BR cost to next integer multiple of the rounding interval
+			return Math.ceil(this.cost_BR_raw / this.cost_BR_round) * this.cost_BR_round;
+		}
+	}, {
+		key: 'cost_BR_round',
+		get: function get() {
+			// selects the appropriate interval to round BR to based on the class of the ship
+			// INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0))
+			//
+			// from the list of constants in AL, select the one in the row
+			// that has concat("BR cost round", CD9) in AJ
+			//
+			// CD9 is weight class
+			return BR_COST_ROUND_MAP[this.weight_class];
+		}
+	}, {
+		key: 'weight_class',
 
-	// R3, CN26
-	get cost_power_raw() {
-		return this.cost_power_subsystems + this.module.cost_power;
-	}
 
-	get cost_power_subsystems() {
-		return this.subsystems.map(ss => ss.cost_power).reduce((sum, value) => sum + value, 0);
-	}
+		// CD9
+		get: function get() {
+			// =IF(DK$18 = 1, "Frigate", IF(DK$18 = 2, "Cruiser", "Explorer"))
+			return WEIGHT_CLASS_MAP[this.weight_class_raw];
+		}
+	}, {
+		key: 'weight_class_raw',
 
-	// BK27
-	get size_round() {
-		return Math.ceil(this.size);
-	}
 
-	// BK26
-	get size() {
-		// BK18 + BK88
-		return this.frame_size + this.module.size;
-	}
+		// DK18
+		get: function get() {
+			// "Weight Class" value off of principal frame definition
+			// integer in [1, 3]
+			return this.princ_frame_def['Weight Class'];
+		}
+	}, {
+		key: 'cost_BR_raw',
 
-	// BK18, "Size"
-	get frame_size() {
-		// BK18 = $CV18 / $AL$6
-		// $CV18 = weight cap, DL18, equal principal frame MaxSz
-		// $AL$6 = "Size-To-Weight-Cap Multiplier", constant 300
-		return this.frame_max_size_raw / SIZE_TO_WEIGHT_CAP_MULTIPLIER;
-	}
 
-	// CV18, DL18
-	get frame_max_size_raw() {
-		// 'MaxSz' item off principal frame definition
-		return this.princ_frame_def['MaxSz'];
-	}
+		// P2, CL26
+		get: function get() {
+			// sum(subsystem BR costs) + module cost + frame cost
+			return this.cost_BR_components + this.module.cost_BR + this.cost_BR_frame;
+		}
+	}, {
+		key: 'cost_BR_components',
+		get: function get() {
+			return this.subsystems.map(function (ss) {
+				return ss.cost_BR;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'cost_BR_frame',
 
-	get pretty_statline() {
-		return this.stats.toString() + ' - ' + this.cost_BR.toString() + 'br ' + this.cost_SR.toString() + 'sr ' + ' - ' + this.weight_total.toString() + 'kt ' + '[' + this.build_time.toFixed(2) + ']yr' + ' - ' + this.cost_crew.toString();
-	}
 
-	get pretty_miscstats() {
-		return 'Evasion Chance: ' + (this.evasion * 100).toFixed(2) + "%\t" + 'Warp Core Breach Chance: ' + (this.warp_core_breach * 100).toFixed(2) + '%';
-	}
+		// CL18
+		// scalar
+		get: function get() {
+			// CK18 / $AL$7
+			// CK18 = DM18
+			// DM18 is frame "Wt" value
+			return this.weight_frame / BR_TO_WEIGHT_MULTIPLIER;
+		}
+	}, {
+		key: 'cost_SR_frame_mult',
 
-	get pretty_summary() {
-		const ID = 'Class: ' + this.name;
-		return [ID, this.pretty_statline, this.pretty_miscstats].join("\n");
-	}
 
-	get pretty_statline_raw() {
-		return this.stats_raw.toFixed(2) + ' - ' + '[' + this.cost_BR_raw.toFixed(2) + ']br [' + this.cost_SR_raw.toFixed(2) + ']sr ' + ' - ' + '[' + this.weight_total_raw.toFixed(2) + ']kt ' + '[' + this.build_time.toFixed(2) + ']yr' + ' - ' + this.cost_crew_raw.toFixed(2);
-	}
-	get pretty_buildinfo() {
-		return 'Power[' + this.cost_power_raw.toFixed(2) + '/' + this.power_generation_raw.toFixed(2) + '] - ' + 'Internal[' + this.weight_internal.toFixed(1) + '/' + this.frame_max_size_raw + '] ' + this.subsystems.map(ss => ss.name + '[' + ss.weight_internal.toFixed(1) + '/' + ss.weight_cap.toFixed(0) + ']').join(' ');
-	}
+		// CM18, DU18
+		get: function get() {
+			return this.princ_frame_def['SR-Mod'];
+		}
+	}, {
+		key: 'cost_SR',
 
-	get pretty_sdb_info() {
-		return [this.pretty_statline_raw, this.pretty_buildinfo].join("\n");
-	}
 
-	get pretty_dump() {}
-};
+		// Q2, CM27
+		get: function get() {
+			// =CEILING(CL26,INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0)))
+			// ceiling(CL16, cost_BR_round)
+			// round raw BR cost to next integer multiple of the rounding interval
+			return Math.ceil(this.cost_SR_raw / this.cost_SR_round) * this.cost_SR_round;
+		}
+	}, {
+		key: 'cost_SR_raw',
 
-class DB {
-	constructor({ parts, frames, modules }) {
+
+		// Q3, CM26
+		get: function get() {
+			// sum of subsystems plus module
+			return this.cost_SR_subsystems + this.module.cost_SR;
+		}
+	}, {
+		key: 'cost_SR_subsystems',
+		get: function get() {
+			return this.subsystems.map(function (ss) {
+				return ss.cost_SR;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'cost_SR_round',
+		get: function get() {
+			// same as BR, basically
+			return BR_COST_ROUND_MAP[this.weight_class];
+		}
+	}, {
+		key: 'cost_power',
+
+
+		// R2, CN27
+		get: function get() {
+			// round, not floor or ceil!
+			return Math.round(this.cost_power_raw);
+		}
+	}, {
+		key: 'cost_power_raw',
+
+
+		// R3, CN26
+		get: function get() {
+			return this.cost_power_subsystems + this.module.cost_power;
+		}
+	}, {
+		key: 'cost_power_subsystems',
+		get: function get() {
+			return this.subsystems.map(function (ss) {
+				return ss.cost_power;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'size_round',
+
+
+		// BK27
+		get: function get() {
+			return Math.ceil(this.size);
+		}
+	}, {
+		key: 'size',
+
+
+		// BK26
+		get: function get() {
+			// BK18 + BK88
+			return this.frame_size + this.module.size;
+		}
+	}, {
+		key: 'frame_size',
+
+
+		// BK18, "Size"
+		get: function get() {
+			// BK18 = $CV18 / $AL$6
+			// $CV18 = weight cap, DL18, equal principal frame MaxSz
+			// $AL$6 = "Size-To-Weight-Cap Multiplier", constant 300
+			return this.frame_max_size_raw / SIZE_TO_WEIGHT_CAP_MULTIPLIER;
+		}
+	}, {
+		key: 'frame_max_size_raw',
+
+
+		// CV18, DL18
+		get: function get() {
+			// 'MaxSz' item off principal frame definition
+			return this.princ_frame_def['MaxSz'];
+		}
+	}, {
+		key: 'pretty_statline',
+		get: function get() {
+			return this.stats.toString() + ' - ' + this.cost_BR.toString() + 'br ' + this.cost_SR.toString() + 'sr ' + ' - ' + this.weight_total.toString() + 'kt ' + '[' + this.build_time.toFixed(2) + ']yr' + ' - ' + this.cost_crew.toString();
+		}
+	}, {
+		key: 'pretty_miscstats',
+		get: function get() {
+			return 'Evasion Chance: ' + (this.evasion * 100).toFixed(2) + "%\t" + 'Warp Core Breach Chance: ' + (this.warp_core_breach * 100).toFixed(2) + '%';
+		}
+	}, {
+		key: 'pretty_summary',
+		get: function get() {
+			var ID = 'Class: ' + this.name;
+			return [ID, this.pretty_statline, this.pretty_miscstats].join("\n");
+		}
+	}, {
+		key: 'pretty_statline_raw',
+		get: function get() {
+			return this.stats_raw.toFixed(2) + ' - ' + '[' + this.cost_BR_raw.toFixed(2) + ']br [' + this.cost_SR_raw.toFixed(2) + ']sr ' + ' - ' + '[' + this.weight_total_raw.toFixed(2) + ']kt ' + '[' + this.build_time.toFixed(2) + ']yr' + ' - ' + this.cost_crew_raw.toFixed(2);
+		}
+	}, {
+		key: 'pretty_buildinfo',
+		get: function get() {
+			return 'Power[' + this.cost_power_raw.toFixed(2) + '/' + this.power_generation_raw.toFixed(2) + '] - ' + 'Internal[' + this.weight_internal.toFixed(1) + '/' + this.frame_max_size_raw + '] ' + this.subsystems.map(function (ss) {
+				return ss.name + '[' + ss.weight_internal.toFixed(1) + '/' + ss.weight_cap.toFixed(0) + ']';
+			}).join(' ');
+		}
+	}, {
+		key: 'pretty_sdb_info',
+		get: function get() {
+			return [this.pretty_statline_raw, this.pretty_buildinfo].join("\n");
+		}
+	}, {
+		key: 'pretty_dump',
+		get: function get() {}
+	}]);
+
+	return Design;
+}();
+
+;
+
+var DB = function () {
+	function DB(_ref11) {
+		var parts = _ref11.parts,
+		    frames = _ref11.frames,
+		    modules = _ref11.modules;
+
+		_classCallCheck(this, DB);
+
 		this.parts = parts;
 		this.frames = frames;
 		this.modules = modules;
 	}
 
-	find_module(type, variant) {
-		return this.modules.find(elem => elem['Type'] === type && elem['Variant'] === variant);
-	}
+	_createClass(DB, [{
+		key: 'find_module',
+		value: function find_module(type, variant) {
+			return this.modules.find(function (elem) {
+				return elem['Type'] === type && elem['Variant'] === variant;
+			});
+		}
+	}, {
+		key: 'find_part',
+		value: function find_part(name) {
+			return this.parts.find(function (elem) {
+				return elem['Name'] === name;
+			});
+		}
+	}, {
+		key: 'find_frame',
+		value: function find_frame(name) {
+			return this.frames.find(function (elem) {
+				return elem['Name'] === name;
+			});
+		}
+	}, {
+		key: 'find_frames',
+		value: function find_frames(type) {
+			return this.frames.filter(function (elem) {
+				return elem['Type'] === type;
+			});
+		}
+	}, {
+		key: 'find_parts',
+		value: function find_parts(type) {
+			return this.parts.filter(function (elem) {
+				return elem['Type'] === type;
+			});
+		}
+	}, {
+		key: 'find_modules',
+		value: function find_modules(type) {
+			return this.modules.filter(function (elem) {
+				return elem['Type'] === type;
+			});
+		}
+	}, {
+		key: 'valid_module_types',
+		value: function valid_module_types() {
+			return [].concat(_toConsumableArray(new Set(this.modules.map(function (elem) {
+				return elem['Type'];
+			}))));
+		}
+	}]);
 
-	find_part(name) {
-		return this.parts.find(elem => elem['Name'] === name);
-	}
+	return DB;
+}();
 
-	find_frame(name) {
-		return this.frames.find(elem => elem['Name'] === name);
-	}
-
-	find_frames(type) {
-		return this.frames.filter(elem => elem['Type'] === type);
-	}
-
-	find_parts(type) {
-		return this.parts.filter(elem => elem['Type'] === type);
-	}
-
-	find_modules(type) {
-		return this.modules.filter(elem => elem['Type'] === type);
-	}
-
-	valid_module_types() {
-		return [...new Set(this.modules.map(elem => elem['Type']))];
-	}
-};
+;
 
 module.exports.Design = Design;
 module.exports.DB = DB;
@@ -8776,19 +9372,19 @@ var ArgumentsError = __webpack_require__(55);
 var deepMap = __webpack_require__(1);
 
 function factory (type, config, load, typed) {
-  var AccessorNode            = load(__webpack_require__(113));
-  var ArrayNode               = load(__webpack_require__(86));
-  var AssignmentNode          = load(__webpack_require__(115));
-  var BlockNode               = load(__webpack_require__(116));
-  var ConditionalNode         = load(__webpack_require__(117));
+  var AccessorNode            = load(__webpack_require__(114));
+  var ArrayNode               = load(__webpack_require__(87));
+  var AssignmentNode          = load(__webpack_require__(116));
+  var BlockNode               = load(__webpack_require__(117));
+  var ConditionalNode         = load(__webpack_require__(118));
   var ConstantNode            = load(__webpack_require__(58));
-  var FunctionAssignmentNode  = load(__webpack_require__(118));
-  var IndexNode               = load(__webpack_require__(84));
-  var ObjectNode              = load(__webpack_require__(120));
-  var OperatorNode            = load(__webpack_require__(68));
-  var ParenthesisNode         = load(__webpack_require__(69));
+  var FunctionAssignmentNode  = load(__webpack_require__(119));
+  var IndexNode               = load(__webpack_require__(85));
+  var ObjectNode              = load(__webpack_require__(121));
+  var OperatorNode            = load(__webpack_require__(69));
+  var ParenthesisNode         = load(__webpack_require__(70));
   var FunctionNode            = load(__webpack_require__(59));
-  var RangeNode               = load(__webpack_require__(85));
+  var RangeNode               = load(__webpack_require__(86));
   var SymbolNode              = load(__webpack_require__(44));
 
 
@@ -10560,7 +11156,7 @@ exports.transform = function (err) {
 "use strict";
 
 
-var isMatrix = __webpack_require__(64);
+var isMatrix = __webpack_require__(65);
 
 /**
  * Recursively loop over all elements in a given multi dimensional array
@@ -10639,7 +11235,7 @@ var isString = string.isString;
 var validateIndex = array.validateIndex;
 
 function factory (type, config, load, typed) {
-  var Matrix = load(__webpack_require__(78)); // force loading Matrix (do not use via type.Matrix)
+  var Matrix = load(__webpack_require__(79)); // force loading Matrix (do not use via type.Matrix)
 
   /**
    * Dense Matrix implementation. A regular, dense matrix, supporting multi-dimensional matrices. This is the default matrix type.
@@ -11703,11 +12299,11 @@ var size = __webpack_require__(2).size;
 
 function factory (type, config, load, typed) {
   var latex = __webpack_require__(4);
-  var eye = load(__webpack_require__(67));
+  var eye = load(__webpack_require__(68));
   var multiply = load(__webpack_require__(12));
   var matrix = load(__webpack_require__(0));
-  var fraction = load(__webpack_require__(103));
-  var number = load(__webpack_require__(80));
+  var fraction = load(__webpack_require__(104));
+  var number = load(__webpack_require__(81));
 
   /**
    * Calculates the power of x to y, `x ^ y`.
@@ -11906,7 +12502,7 @@ exports.factory = factory;
 "use strict";
 
 
-var isMatrix = __webpack_require__(64);
+var isMatrix = __webpack_require__(65);
 
 /**
  * Test whether a value is a collection: an Array or Matrix
@@ -11931,7 +12527,7 @@ function factory (type, config, load, typed) {
 
   var divideScalar = load(__webpack_require__(21));
   var multiply     = load(__webpack_require__(12));
-  var inv          = load(__webpack_require__(125));
+  var inv          = load(__webpack_require__(126));
   var matrix       = load(__webpack_require__(0));
 
   var algorithm11 = load(__webpack_require__(19));
@@ -12092,7 +12688,7 @@ function factory (type, config, load, typed) {
   var matrix = load(__webpack_require__(0));
 
   var algorithm03 = load(__webpack_require__(17));
-  var algorithm05 = load(__webpack_require__(66));
+  var algorithm05 = load(__webpack_require__(67));
   var algorithm12 = load(__webpack_require__(18));
   var algorithm13 = load(__webpack_require__(8));
   var algorithm14 = load(__webpack_require__(6));
@@ -12690,7 +13286,7 @@ module.exports.isAssociativeWith = isAssociativeWith;
 "use strict";
 
 
-var getType = __webpack_require__(65).type;
+var getType = __webpack_require__(66).type;
 var stringify = __webpack_require__(9).stringify;
 var escape = __webpack_require__(9).escape;
 
@@ -12954,7 +13550,7 @@ var hasOwnProperty = __webpack_require__(5).hasOwnProperty;
 var map = __webpack_require__(2).map;
 var join = __webpack_require__(2).join;
 var validateSafeMethod = __webpack_require__(15).validateSafeMethod;
-var getUniqueArgumentName = __webpack_require__(119);
+var getUniqueArgumentName = __webpack_require__(120);
 
 function factory (type, config, load, typed, math) {
   var register = load(__webpack_require__(7)).register;
@@ -13803,6 +14399,953 @@ process.umask = function() { return 0; };
 
 /***/ }),
 /* 64 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* WEBPACK VAR INJECTION */(function(process) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Store", function() { return Store; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "install", function() { return install; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapState", function() { return mapState; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapMutations", function() { return mapMutations; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapGetters", function() { return mapGetters; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapActions", function() { return mapActions; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createNamespacedHelpers", function() { return createNamespacedHelpers; });
+/**
+ * vuex v3.0.0
+ * (c) 2017 Evan You
+ * @license MIT
+ */
+var applyMixin = function (Vue) {
+  var version = Number(Vue.version.split('.')[0]);
+
+  if (version >= 2) {
+    Vue.mixin({ beforeCreate: vuexInit });
+  } else {
+    // override init and inject vuex init procedure
+    // for 1.x backwards compatibility.
+    var _init = Vue.prototype._init;
+    Vue.prototype._init = function (options) {
+      if ( options === void 0 ) options = {};
+
+      options.init = options.init
+        ? [vuexInit].concat(options.init)
+        : vuexInit;
+      _init.call(this, options);
+    };
+  }
+
+  /**
+   * Vuex init hook, injected into each instances init hooks list.
+   */
+
+  function vuexInit () {
+    var options = this.$options;
+    // store injection
+    if (options.store) {
+      this.$store = typeof options.store === 'function'
+        ? options.store()
+        : options.store;
+    } else if (options.parent && options.parent.$store) {
+      this.$store = options.parent.$store;
+    }
+  }
+};
+
+var devtoolHook =
+  typeof window !== 'undefined' &&
+  window.__VUE_DEVTOOLS_GLOBAL_HOOK__;
+
+function devtoolPlugin (store) {
+  if (!devtoolHook) { return }
+
+  store._devtoolHook = devtoolHook;
+
+  devtoolHook.emit('vuex:init', store);
+
+  devtoolHook.on('vuex:travel-to-state', function (targetState) {
+    store.replaceState(targetState);
+  });
+
+  store.subscribe(function (mutation, state) {
+    devtoolHook.emit('vuex:mutation', mutation, state);
+  });
+}
+
+/**
+ * Get the first item that pass the test
+ * by second argument function
+ *
+ * @param {Array} list
+ * @param {Function} f
+ * @return {*}
+ */
+/**
+ * Deep copy the given object considering circular structure.
+ * This function caches all nested objects and its copies.
+ * If it detects circular structure, use cached copy to avoid infinite loop.
+ *
+ * @param {*} obj
+ * @param {Array<Object>} cache
+ * @return {*}
+ */
+
+
+/**
+ * forEach for object
+ */
+function forEachValue (obj, fn) {
+  Object.keys(obj).forEach(function (key) { return fn(obj[key], key); });
+}
+
+function isObject (obj) {
+  return obj !== null && typeof obj === 'object'
+}
+
+function isPromise (val) {
+  return val && typeof val.then === 'function'
+}
+
+function assert (condition, msg) {
+  if (!condition) { throw new Error(("[vuex] " + msg)) }
+}
+
+var Module = function Module (rawModule, runtime) {
+  this.runtime = runtime;
+  this._children = Object.create(null);
+  this._rawModule = rawModule;
+  var rawState = rawModule.state;
+  this.state = (typeof rawState === 'function' ? rawState() : rawState) || {};
+};
+
+var prototypeAccessors$1 = { namespaced: { configurable: true } };
+
+prototypeAccessors$1.namespaced.get = function () {
+  return !!this._rawModule.namespaced
+};
+
+Module.prototype.addChild = function addChild (key, module) {
+  this._children[key] = module;
+};
+
+Module.prototype.removeChild = function removeChild (key) {
+  delete this._children[key];
+};
+
+Module.prototype.getChild = function getChild (key) {
+  return this._children[key]
+};
+
+Module.prototype.update = function update (rawModule) {
+  this._rawModule.namespaced = rawModule.namespaced;
+  if (rawModule.actions) {
+    this._rawModule.actions = rawModule.actions;
+  }
+  if (rawModule.mutations) {
+    this._rawModule.mutations = rawModule.mutations;
+  }
+  if (rawModule.getters) {
+    this._rawModule.getters = rawModule.getters;
+  }
+};
+
+Module.prototype.forEachChild = function forEachChild (fn) {
+  forEachValue(this._children, fn);
+};
+
+Module.prototype.forEachGetter = function forEachGetter (fn) {
+  if (this._rawModule.getters) {
+    forEachValue(this._rawModule.getters, fn);
+  }
+};
+
+Module.prototype.forEachAction = function forEachAction (fn) {
+  if (this._rawModule.actions) {
+    forEachValue(this._rawModule.actions, fn);
+  }
+};
+
+Module.prototype.forEachMutation = function forEachMutation (fn) {
+  if (this._rawModule.mutations) {
+    forEachValue(this._rawModule.mutations, fn);
+  }
+};
+
+Object.defineProperties( Module.prototype, prototypeAccessors$1 );
+
+var ModuleCollection = function ModuleCollection (rawRootModule) {
+  // register root module (Vuex.Store options)
+  this.register([], rawRootModule, false);
+};
+
+ModuleCollection.prototype.get = function get (path) {
+  return path.reduce(function (module, key) {
+    return module.getChild(key)
+  }, this.root)
+};
+
+ModuleCollection.prototype.getNamespace = function getNamespace (path) {
+  var module = this.root;
+  return path.reduce(function (namespace, key) {
+    module = module.getChild(key);
+    return namespace + (module.namespaced ? key + '/' : '')
+  }, '')
+};
+
+ModuleCollection.prototype.update = function update$1 (rawRootModule) {
+  update([], this.root, rawRootModule);
+};
+
+ModuleCollection.prototype.register = function register (path, rawModule, runtime) {
+    var this$1 = this;
+    if ( runtime === void 0 ) runtime = true;
+
+  if (process.env.NODE_ENV !== 'production') {
+    assertRawModule(path, rawModule);
+  }
+
+  var newModule = new Module(rawModule, runtime);
+  if (path.length === 0) {
+    this.root = newModule;
+  } else {
+    var parent = this.get(path.slice(0, -1));
+    parent.addChild(path[path.length - 1], newModule);
+  }
+
+  // register nested modules
+  if (rawModule.modules) {
+    forEachValue(rawModule.modules, function (rawChildModule, key) {
+      this$1.register(path.concat(key), rawChildModule, runtime);
+    });
+  }
+};
+
+ModuleCollection.prototype.unregister = function unregister (path) {
+  var parent = this.get(path.slice(0, -1));
+  var key = path[path.length - 1];
+  if (!parent.getChild(key).runtime) { return }
+
+  parent.removeChild(key);
+};
+
+function update (path, targetModule, newModule) {
+  if (process.env.NODE_ENV !== 'production') {
+    assertRawModule(path, newModule);
+  }
+
+  // update target module
+  targetModule.update(newModule);
+
+  // update nested modules
+  if (newModule.modules) {
+    for (var key in newModule.modules) {
+      if (!targetModule.getChild(key)) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn(
+            "[vuex] trying to add a new module '" + key + "' on hot reloading, " +
+            'manual reload is needed'
+          );
+        }
+        return
+      }
+      update(
+        path.concat(key),
+        targetModule.getChild(key),
+        newModule.modules[key]
+      );
+    }
+  }
+}
+
+var functionAssert = {
+  assert: function (value) { return typeof value === 'function'; },
+  expected: 'function'
+};
+
+var objectAssert = {
+  assert: function (value) { return typeof value === 'function' ||
+    (typeof value === 'object' && typeof value.handler === 'function'); },
+  expected: 'function or object with "handler" function'
+};
+
+var assertTypes = {
+  getters: functionAssert,
+  mutations: functionAssert,
+  actions: objectAssert
+};
+
+function assertRawModule (path, rawModule) {
+  Object.keys(assertTypes).forEach(function (key) {
+    if (!rawModule[key]) { return }
+
+    var assertOptions = assertTypes[key];
+
+    forEachValue(rawModule[key], function (value, type) {
+      assert(
+        assertOptions.assert(value),
+        makeAssertionMessage(path, key, type, value, assertOptions.expected)
+      );
+    });
+  });
+}
+
+function makeAssertionMessage (path, key, type, value, expected) {
+  var buf = key + " should be " + expected + " but \"" + key + "." + type + "\"";
+  if (path.length > 0) {
+    buf += " in module \"" + (path.join('.')) + "\"";
+  }
+  buf += " is " + (JSON.stringify(value)) + ".";
+  return buf
+}
+
+var Vue; // bind on install
+
+var Store = function Store (options) {
+  var this$1 = this;
+  if ( options === void 0 ) options = {};
+
+  // Auto install if it is not done yet and `window` has `Vue`.
+  // To allow users to avoid auto-installation in some cases,
+  // this code should be placed here. See #731
+  if (!Vue && typeof window !== 'undefined' && window.Vue) {
+    install(window.Vue);
+  }
+
+  if (process.env.NODE_ENV !== 'production') {
+    assert(Vue, "must call Vue.use(Vuex) before creating a store instance.");
+    assert(typeof Promise !== 'undefined', "vuex requires a Promise polyfill in this browser.");
+    assert(this instanceof Store, "Store must be called with the new operator.");
+  }
+
+  var plugins = options.plugins; if ( plugins === void 0 ) plugins = [];
+  var strict = options.strict; if ( strict === void 0 ) strict = false;
+
+  var state = options.state; if ( state === void 0 ) state = {};
+  if (typeof state === 'function') {
+    state = state() || {};
+  }
+
+  // store internal state
+  this._committing = false;
+  this._actions = Object.create(null);
+  this._actionSubscribers = [];
+  this._mutations = Object.create(null);
+  this._wrappedGetters = Object.create(null);
+  this._modules = new ModuleCollection(options);
+  this._modulesNamespaceMap = Object.create(null);
+  this._subscribers = [];
+  this._watcherVM = new Vue();
+
+  // bind commit and dispatch to self
+  var store = this;
+  var ref = this;
+  var dispatch = ref.dispatch;
+  var commit = ref.commit;
+  this.dispatch = function boundDispatch (type, payload) {
+    return dispatch.call(store, type, payload)
+  };
+  this.commit = function boundCommit (type, payload, options) {
+    return commit.call(store, type, payload, options)
+  };
+
+  // strict mode
+  this.strict = strict;
+
+  // init root module.
+  // this also recursively registers all sub-modules
+  // and collects all module getters inside this._wrappedGetters
+  installModule(this, state, [], this._modules.root);
+
+  // initialize the store vm, which is responsible for the reactivity
+  // (also registers _wrappedGetters as computed properties)
+  resetStoreVM(this, state);
+
+  // apply plugins
+  plugins.forEach(function (plugin) { return plugin(this$1); });
+
+  if (Vue.config.devtools) {
+    devtoolPlugin(this);
+  }
+};
+
+var prototypeAccessors = { state: { configurable: true } };
+
+prototypeAccessors.state.get = function () {
+  return this._vm._data.$$state
+};
+
+prototypeAccessors.state.set = function (v) {
+  if (process.env.NODE_ENV !== 'production') {
+    assert(false, "Use store.replaceState() to explicit replace store state.");
+  }
+};
+
+Store.prototype.commit = function commit (_type, _payload, _options) {
+    var this$1 = this;
+
+  // check object-style commit
+  var ref = unifyObjectStyle(_type, _payload, _options);
+    var type = ref.type;
+    var payload = ref.payload;
+    var options = ref.options;
+
+  var mutation = { type: type, payload: payload };
+  var entry = this._mutations[type];
+  if (!entry) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(("[vuex] unknown mutation type: " + type));
+    }
+    return
+  }
+  this._withCommit(function () {
+    entry.forEach(function commitIterator (handler) {
+      handler(payload);
+    });
+  });
+  this._subscribers.forEach(function (sub) { return sub(mutation, this$1.state); });
+
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    options && options.silent
+  ) {
+    console.warn(
+      "[vuex] mutation type: " + type + ". Silent option has been removed. " +
+      'Use the filter functionality in the vue-devtools'
+    );
+  }
+};
+
+Store.prototype.dispatch = function dispatch (_type, _payload) {
+    var this$1 = this;
+
+  // check object-style dispatch
+  var ref = unifyObjectStyle(_type, _payload);
+    var type = ref.type;
+    var payload = ref.payload;
+
+  var action = { type: type, payload: payload };
+  var entry = this._actions[type];
+  if (!entry) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(("[vuex] unknown action type: " + type));
+    }
+    return
+  }
+
+  this._actionSubscribers.forEach(function (sub) { return sub(action, this$1.state); });
+
+  return entry.length > 1
+    ? Promise.all(entry.map(function (handler) { return handler(payload); }))
+    : entry[0](payload)
+};
+
+Store.prototype.subscribe = function subscribe (fn) {
+  return genericSubscribe(fn, this._subscribers)
+};
+
+Store.prototype.subscribeAction = function subscribeAction (fn) {
+  return genericSubscribe(fn, this._actionSubscribers)
+};
+
+Store.prototype.watch = function watch (getter, cb, options) {
+    var this$1 = this;
+
+  if (process.env.NODE_ENV !== 'production') {
+    assert(typeof getter === 'function', "store.watch only accepts a function.");
+  }
+  return this._watcherVM.$watch(function () { return getter(this$1.state, this$1.getters); }, cb, options)
+};
+
+Store.prototype.replaceState = function replaceState (state) {
+    var this$1 = this;
+
+  this._withCommit(function () {
+    this$1._vm._data.$$state = state;
+  });
+};
+
+Store.prototype.registerModule = function registerModule (path, rawModule, options) {
+    if ( options === void 0 ) options = {};
+
+  if (typeof path === 'string') { path = [path]; }
+
+  if (process.env.NODE_ENV !== 'production') {
+    assert(Array.isArray(path), "module path must be a string or an Array.");
+    assert(path.length > 0, 'cannot register the root module by using registerModule.');
+  }
+
+  this._modules.register(path, rawModule);
+  installModule(this, this.state, path, this._modules.get(path), options.preserveState);
+  // reset store to update getters...
+  resetStoreVM(this, this.state);
+};
+
+Store.prototype.unregisterModule = function unregisterModule (path) {
+    var this$1 = this;
+
+  if (typeof path === 'string') { path = [path]; }
+
+  if (process.env.NODE_ENV !== 'production') {
+    assert(Array.isArray(path), "module path must be a string or an Array.");
+  }
+
+  this._modules.unregister(path);
+  this._withCommit(function () {
+    var parentState = getNestedState(this$1.state, path.slice(0, -1));
+    Vue.delete(parentState, path[path.length - 1]);
+  });
+  resetStore(this);
+};
+
+Store.prototype.hotUpdate = function hotUpdate (newOptions) {
+  this._modules.update(newOptions);
+  resetStore(this, true);
+};
+
+Store.prototype._withCommit = function _withCommit (fn) {
+  var committing = this._committing;
+  this._committing = true;
+  fn();
+  this._committing = committing;
+};
+
+Object.defineProperties( Store.prototype, prototypeAccessors );
+
+function genericSubscribe (fn, subs) {
+  if (subs.indexOf(fn) < 0) {
+    subs.push(fn);
+  }
+  return function () {
+    var i = subs.indexOf(fn);
+    if (i > -1) {
+      subs.splice(i, 1);
+    }
+  }
+}
+
+function resetStore (store, hot) {
+  store._actions = Object.create(null);
+  store._mutations = Object.create(null);
+  store._wrappedGetters = Object.create(null);
+  store._modulesNamespaceMap = Object.create(null);
+  var state = store.state;
+  // init all modules
+  installModule(store, state, [], store._modules.root, true);
+  // reset vm
+  resetStoreVM(store, state, hot);
+}
+
+function resetStoreVM (store, state, hot) {
+  var oldVm = store._vm;
+
+  // bind store public getters
+  store.getters = {};
+  var wrappedGetters = store._wrappedGetters;
+  var computed = {};
+  forEachValue(wrappedGetters, function (fn, key) {
+    // use computed to leverage its lazy-caching mechanism
+    computed[key] = function () { return fn(store); };
+    Object.defineProperty(store.getters, key, {
+      get: function () { return store._vm[key]; },
+      enumerable: true // for local getters
+    });
+  });
+
+  // use a Vue instance to store the state tree
+  // suppress warnings just in case the user has added
+  // some funky global mixins
+  var silent = Vue.config.silent;
+  Vue.config.silent = true;
+  store._vm = new Vue({
+    data: {
+      $$state: state
+    },
+    computed: computed
+  });
+  Vue.config.silent = silent;
+
+  // enable strict mode for new vm
+  if (store.strict) {
+    enableStrictMode(store);
+  }
+
+  if (oldVm) {
+    if (hot) {
+      // dispatch changes in all subscribed watchers
+      // to force getter re-evaluation for hot reloading.
+      store._withCommit(function () {
+        oldVm._data.$$state = null;
+      });
+    }
+    Vue.nextTick(function () { return oldVm.$destroy(); });
+  }
+}
+
+function installModule (store, rootState, path, module, hot) {
+  var isRoot = !path.length;
+  var namespace = store._modules.getNamespace(path);
+
+  // register in namespace map
+  if (module.namespaced) {
+    store._modulesNamespaceMap[namespace] = module;
+  }
+
+  // set state
+  if (!isRoot && !hot) {
+    var parentState = getNestedState(rootState, path.slice(0, -1));
+    var moduleName = path[path.length - 1];
+    store._withCommit(function () {
+      Vue.set(parentState, moduleName, module.state);
+    });
+  }
+
+  var local = module.context = makeLocalContext(store, namespace, path);
+
+  module.forEachMutation(function (mutation, key) {
+    var namespacedType = namespace + key;
+    registerMutation(store, namespacedType, mutation, local);
+  });
+
+  module.forEachAction(function (action, key) {
+    var type = action.root ? key : namespace + key;
+    var handler = action.handler || action;
+    registerAction(store, type, handler, local);
+  });
+
+  module.forEachGetter(function (getter, key) {
+    var namespacedType = namespace + key;
+    registerGetter(store, namespacedType, getter, local);
+  });
+
+  module.forEachChild(function (child, key) {
+    installModule(store, rootState, path.concat(key), child, hot);
+  });
+}
+
+/**
+ * make localized dispatch, commit, getters and state
+ * if there is no namespace, just use root ones
+ */
+function makeLocalContext (store, namespace, path) {
+  var noNamespace = namespace === '';
+
+  var local = {
+    dispatch: noNamespace ? store.dispatch : function (_type, _payload, _options) {
+      var args = unifyObjectStyle(_type, _payload, _options);
+      var payload = args.payload;
+      var options = args.options;
+      var type = args.type;
+
+      if (!options || !options.root) {
+        type = namespace + type;
+        if (process.env.NODE_ENV !== 'production' && !store._actions[type]) {
+          console.error(("[vuex] unknown local action type: " + (args.type) + ", global type: " + type));
+          return
+        }
+      }
+
+      return store.dispatch(type, payload)
+    },
+
+    commit: noNamespace ? store.commit : function (_type, _payload, _options) {
+      var args = unifyObjectStyle(_type, _payload, _options);
+      var payload = args.payload;
+      var options = args.options;
+      var type = args.type;
+
+      if (!options || !options.root) {
+        type = namespace + type;
+        if (process.env.NODE_ENV !== 'production' && !store._mutations[type]) {
+          console.error(("[vuex] unknown local mutation type: " + (args.type) + ", global type: " + type));
+          return
+        }
+      }
+
+      store.commit(type, payload, options);
+    }
+  };
+
+  // getters and state object must be gotten lazily
+  // because they will be changed by vm update
+  Object.defineProperties(local, {
+    getters: {
+      get: noNamespace
+        ? function () { return store.getters; }
+        : function () { return makeLocalGetters(store, namespace); }
+    },
+    state: {
+      get: function () { return getNestedState(store.state, path); }
+    }
+  });
+
+  return local
+}
+
+function makeLocalGetters (store, namespace) {
+  var gettersProxy = {};
+
+  var splitPos = namespace.length;
+  Object.keys(store.getters).forEach(function (type) {
+    // skip if the target getter is not match this namespace
+    if (type.slice(0, splitPos) !== namespace) { return }
+
+    // extract local getter type
+    var localType = type.slice(splitPos);
+
+    // Add a port to the getters proxy.
+    // Define as getter property because
+    // we do not want to evaluate the getters in this time.
+    Object.defineProperty(gettersProxy, localType, {
+      get: function () { return store.getters[type]; },
+      enumerable: true
+    });
+  });
+
+  return gettersProxy
+}
+
+function registerMutation (store, type, handler, local) {
+  var entry = store._mutations[type] || (store._mutations[type] = []);
+  entry.push(function wrappedMutationHandler (payload) {
+    handler.call(store, local.state, payload);
+  });
+}
+
+function registerAction (store, type, handler, local) {
+  var entry = store._actions[type] || (store._actions[type] = []);
+  entry.push(function wrappedActionHandler (payload, cb) {
+    var res = handler.call(store, {
+      dispatch: local.dispatch,
+      commit: local.commit,
+      getters: local.getters,
+      state: local.state,
+      rootGetters: store.getters,
+      rootState: store.state
+    }, payload, cb);
+    if (!isPromise(res)) {
+      res = Promise.resolve(res);
+    }
+    if (store._devtoolHook) {
+      return res.catch(function (err) {
+        store._devtoolHook.emit('vuex:error', err);
+        throw err
+      })
+    } else {
+      return res
+    }
+  });
+}
+
+function registerGetter (store, type, rawGetter, local) {
+  if (store._wrappedGetters[type]) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(("[vuex] duplicate getter key: " + type));
+    }
+    return
+  }
+  store._wrappedGetters[type] = function wrappedGetter (store) {
+    return rawGetter(
+      local.state, // local state
+      local.getters, // local getters
+      store.state, // root state
+      store.getters // root getters
+    )
+  };
+}
+
+function enableStrictMode (store) {
+  store._vm.$watch(function () { return this._data.$$state }, function () {
+    if (process.env.NODE_ENV !== 'production') {
+      assert(store._committing, "Do not mutate vuex store state outside mutation handlers.");
+    }
+  }, { deep: true, sync: true });
+}
+
+function getNestedState (state, path) {
+  return path.length
+    ? path.reduce(function (state, key) { return state[key]; }, state)
+    : state
+}
+
+function unifyObjectStyle (type, payload, options) {
+  if (isObject(type) && type.type) {
+    options = payload;
+    payload = type;
+    type = type.type;
+  }
+
+  if (process.env.NODE_ENV !== 'production') {
+    assert(typeof type === 'string', ("Expects string as the type, but found " + (typeof type) + "."));
+  }
+
+  return { type: type, payload: payload, options: options }
+}
+
+function install (_Vue) {
+  if (Vue && _Vue === Vue) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(
+        '[vuex] already installed. Vue.use(Vuex) should be called only once.'
+      );
+    }
+    return
+  }
+  Vue = _Vue;
+  applyMixin(Vue);
+}
+
+var mapState = normalizeNamespace(function (namespace, states) {
+  var res = {};
+  normalizeMap(states).forEach(function (ref) {
+    var key = ref.key;
+    var val = ref.val;
+
+    res[key] = function mappedState () {
+      var state = this.$store.state;
+      var getters = this.$store.getters;
+      if (namespace) {
+        var module = getModuleByNamespace(this.$store, 'mapState', namespace);
+        if (!module) {
+          return
+        }
+        state = module.context.state;
+        getters = module.context.getters;
+      }
+      return typeof val === 'function'
+        ? val.call(this, state, getters)
+        : state[val]
+    };
+    // mark vuex getter for devtools
+    res[key].vuex = true;
+  });
+  return res
+});
+
+var mapMutations = normalizeNamespace(function (namespace, mutations) {
+  var res = {};
+  normalizeMap(mutations).forEach(function (ref) {
+    var key = ref.key;
+    var val = ref.val;
+
+    res[key] = function mappedMutation () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      var commit = this.$store.commit;
+      if (namespace) {
+        var module = getModuleByNamespace(this.$store, 'mapMutations', namespace);
+        if (!module) {
+          return
+        }
+        commit = module.context.commit;
+      }
+      return typeof val === 'function'
+        ? val.apply(this, [commit].concat(args))
+        : commit.apply(this.$store, [val].concat(args))
+    };
+  });
+  return res
+});
+
+var mapGetters = normalizeNamespace(function (namespace, getters) {
+  var res = {};
+  normalizeMap(getters).forEach(function (ref) {
+    var key = ref.key;
+    var val = ref.val;
+
+    val = namespace + val;
+    res[key] = function mappedGetter () {
+      if (namespace && !getModuleByNamespace(this.$store, 'mapGetters', namespace)) {
+        return
+      }
+      if (process.env.NODE_ENV !== 'production' && !(val in this.$store.getters)) {
+        console.error(("[vuex] unknown getter: " + val));
+        return
+      }
+      return this.$store.getters[val]
+    };
+    // mark vuex getter for devtools
+    res[key].vuex = true;
+  });
+  return res
+});
+
+var mapActions = normalizeNamespace(function (namespace, actions) {
+  var res = {};
+  normalizeMap(actions).forEach(function (ref) {
+    var key = ref.key;
+    var val = ref.val;
+
+    res[key] = function mappedAction () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      var dispatch = this.$store.dispatch;
+      if (namespace) {
+        var module = getModuleByNamespace(this.$store, 'mapActions', namespace);
+        if (!module) {
+          return
+        }
+        dispatch = module.context.dispatch;
+      }
+      return typeof val === 'function'
+        ? val.apply(this, [dispatch].concat(args))
+        : dispatch.apply(this.$store, [val].concat(args))
+    };
+  });
+  return res
+});
+
+var createNamespacedHelpers = function (namespace) { return ({
+  mapState: mapState.bind(null, namespace),
+  mapGetters: mapGetters.bind(null, namespace),
+  mapMutations: mapMutations.bind(null, namespace),
+  mapActions: mapActions.bind(null, namespace)
+}); };
+
+function normalizeMap (map) {
+  return Array.isArray(map)
+    ? map.map(function (key) { return ({ key: key, val: key }); })
+    : Object.keys(map).map(function (key) { return ({ key: key, val: map[key] }); })
+}
+
+function normalizeNamespace (fn) {
+  return function (namespace, map) {
+    if (typeof namespace !== 'string') {
+      map = namespace;
+      namespace = '';
+    } else if (namespace.charAt(namespace.length - 1) !== '/') {
+      namespace += '/';
+    }
+    return fn(namespace, map)
+  }
+}
+
+function getModuleByNamespace (store, helper, namespace) {
+  var module = store._modulesNamespaceMap[namespace];
+  if (process.env.NODE_ENV !== 'production' && !module) {
+    console.error(("[vuex] module namespace not found in " + helper + "(): " + namespace));
+  }
+  return module
+}
+
+var index_esm = {
+  Store: Store,
+  install: install,
+  version: '3.0.0',
+  mapState: mapState,
+  mapMutations: mapMutations,
+  mapGetters: mapGetters,
+  mapActions: mapActions,
+  createNamespacedHelpers: createNamespacedHelpers
+};
+
+
+/* harmony default export */ __webpack_exports__["default"] = (index_esm);
+
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(63)))
+
+/***/ }),
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13820,7 +15363,7 @@ module.exports = function isMatrix (x) {
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13871,7 +15414,7 @@ exports.type = function(x) {
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14054,7 +15597,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14205,7 +15748,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14791,7 +16334,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14936,7 +16479,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15087,14 +16630,14 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var arraySize = __webpack_require__(2).size;
-var isMatrix = __webpack_require__(64);
+var isMatrix = __webpack_require__(65);
 var IndexError = __webpack_require__(56);
 
 /**
@@ -15178,7 +16721,7 @@ function _switch(mat){
 
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15203,7 +16746,7 @@ module.exports = function containsCollections (array) {
 
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15388,13 +16931,13 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var scatter = __webpack_require__(454);
+var scatter = __webpack_require__(457);
 var DimensionError = __webpack_require__(10);
 
 function factory (type, config, load, typed) {
@@ -15558,7 +17101,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15567,7 +17110,7 @@ exports.factory = factory;
 var deepMap = __webpack_require__(1);
 
 function factory (type, config, load, typed) {
-  var gamma = load(__webpack_require__(148));
+  var gamma = load(__webpack_require__(149));
   var latex = __webpack_require__(4);
 
   /**
@@ -15626,7 +17169,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15724,7 +17267,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports) {
 
 /**
@@ -15738,7 +17281,7 @@ module.exports = function isBigNumber(x) {
 
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16011,7 +17554,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 79 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16205,7 +17748,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 80 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16291,7 +17834,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 81 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16351,13 +17894,13 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 82 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var types = __webpack_require__(65);
+var types = __webpack_require__(66);
 
 function factory (type, config, load, typed) {
   /**
@@ -16435,7 +17978,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 83 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16448,7 +17991,7 @@ module.exports = {
 
 
 /***/ }),
-/* 84 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16462,10 +18005,10 @@ function factory (type, config, load, typed) {
   var register = load(__webpack_require__(7)).register;
   var compile = load(__webpack_require__(7)).compile;
   var Node = load(__webpack_require__(16));
-  var RangeNode = load(__webpack_require__(85));
+  var RangeNode = load(__webpack_require__(86));
   var SymbolNode = load(__webpack_require__(44));
 
-  var Range = load(__webpack_require__(104));
+  var Range = load(__webpack_require__(105));
 
   var isArray = Array.isArray;
 
@@ -16715,7 +18258,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 85 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16979,7 +18522,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 86 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17148,7 +18691,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 87 */
+/* 88 */
 /***/ (function(module, exports) {
 
 function factory (type, config, load, typed) {
@@ -17187,7 +18730,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 88 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17264,7 +18807,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 89 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17293,7 +18836,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 90 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17461,10 +19004,10 @@ function factory (type) {
 exports.factory = factory;
 
 /***/ }),
-/* 91 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var bitNot = __webpack_require__(92);
+var bitNot = __webpack_require__(93);
 
 /**
  * Applies bitwise function to numbers
@@ -17591,7 +19134,7 @@ function decCoefficientToBinaryString (x) {
 
 
 /***/ }),
-/* 92 */
+/* 93 */
 /***/ (function(module, exports) {
 
 /**
@@ -17618,7 +19161,7 @@ module.exports = function bitNot (x) {
 
 
 /***/ }),
-/* 93 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17785,7 +19328,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 94 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17928,7 +19471,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 95 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17945,7 +19488,7 @@ function factory (type, config, load, typed, math) {
   var array = __webpack_require__(2);
 
   // seeded pseudo random number generator
-  var rng = load(__webpack_require__(508));
+  var rng = load(__webpack_require__(511));
 
   /**
    * Create a distribution object with a set of random functions for given
@@ -18234,25 +19777,28 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 96 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/* 97 */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return pretty; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return frac; });
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
 function frac(val, base, mixed) {
 	if (mixed === undefined || mixed) {
-		let integral = Math.floor(val);
-		let fractional = Math.ceil((val - integral) * base);
+		var integral = Math.floor(val);
+		var fractional = Math.ceil((val - integral) * base);
 		while (fractional >= base) {
 			integral += 1;
 			fractional -= base;
 		};
-		let integral_print = '';
+		var integral_print = '';
 		if (integral) {
 			integral_print = integral.toString();
 		};
-		let fractional_print = '';
+		var fractional_print = '';
 		if (fractional) {
 			fractional_print = fractional.toString() + '/' + base.toString();
 		};
@@ -18270,14 +19816,17 @@ function pretty(val, n) {
 	}
 };
 
-
+exports.pretty = pretty;
+exports.frac = frac;
 
 /***/ }),
-/* 97 */
+/* 98 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__ = __webpack_require__(605);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_e32b200c_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_statline_cell_vue__ = __webpack_require__(606);
 var disposed = false
 function injectStyle (ssrContext) {
@@ -18297,7 +19846,7 @@ var __vue_scopeId__ = "data-v-e32b200c"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue___default.a,
   __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_e32b200c_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_statline_cell_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
@@ -18323,11 +19872,11 @@ if (false) {(function () {
   })
 })()}
 
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
 
 
 /***/ }),
-/* 98 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -35416,10 +36965,10 @@ if (false) {(function () {
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47), __webpack_require__(568)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47), __webpack_require__(569)(module)))
 
 /***/ }),
-/* 99 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -35947,7 +37496,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(164);
+exports.isBuffer = __webpack_require__(166);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -35991,7 +37540,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(165);
+exports.inherits = __webpack_require__(167);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -36012,94 +37561,138 @@ function hasOwnProperty(obj, prop) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47), __webpack_require__(63)))
 
 /***/ }),
-/* 100 */
-/***/ (function(module, exports) {
+/* 101 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 
 
-class NamedVector {
-	constructor(val, shortnames) {
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var NamedVector = function () {
+	function NamedVector(val, shortnames) {
+		var _this = this;
+
+		_classCallCheck(this, NamedVector);
+
 		this.shortnames = shortnames;
 		if (typeof val === 'number') {
-			this.names.forEach(name => {
-				this[name] = val;
+			this.names.forEach(function (name) {
+				_this[name] = val;
 			});
 		} else {
-			this.names.forEach(name => {
-				this[name] = val[name] || 0;
+			this.names.forEach(function (name) {
+				_this[name] = val[name] || 0;
 			});
 		}
 	}
 
-	get names() {
-		return Object.keys(this.shortnames);
-	}
+	_createClass(NamedVector, [{
+		key: 'toFixed',
+		value: function toFixed(n) {
+			var _this2 = this;
 
-	toFixed(n) {
-		return this.names.map(name => {
-			return this.shortnames[name].toUpperCase() + '[' + this[name].toFixed(n) + ']';
-		}).join(' ');
-	}
+			return this.names.map(function (name) {
+				return _this2.shortnames[name].toUpperCase() + '[' + _this2[name].toFixed(n) + ']';
+			}).join(' ');
+		}
+	}, {
+		key: 'toString',
+		value: function toString() {
+			var _this3 = this;
 
-	toString() {
-		return this.names.map(name => {
-			return this.shortnames[name].toUpperCase() + this[name].toString();
-		}).join(' ');
-	}
-	static op_add(a, b) {
-		return a + b;
-	}
-	static op_mult(a, b) {
-		return a * b;
-	}
-	static op_div(a, b) {
-		return a / b;
-	}
+			return this.names.map(function (name) {
+				return _this3.shortnames[name].toUpperCase() + _this3[name].toString();
+			}).join(' ');
+		}
+	}, {
+		key: 'add',
+		value: function add(other) {
+			return this.op(NamedVector.op_add, other);
+		}
+	}, {
+		key: 'mult',
+		value: function mult(other) {
+			return this.op(NamedVector.op_mult, other);
+		}
+	}, {
+		key: 'div',
+		value: function div(other) {
+			return this.op(NamedVector.op_div, other);
+		}
+	}, {
+		key: 'apply',
+		value: function apply(fun) {
+			var _this4 = this;
 
-	add(other) {
-		return this.op(NamedVector.op_add, other);
-	}
-	mult(other) {
-		return this.op(NamedVector.op_mult, other);
-	}
-	div(other) {
-		return this.op(NamedVector.op_div, other);
-	}
-	get floor() {
-		return this.apply(Math.floor);
-	}
-	get ceil() {
-		return this.apply(Math.ceil);
-	}
-
-	apply(fun) {
-		return new this.constructor(this.names.reduce((acc, name) => {
-			acc[name] = fun(this[name]);
-			return acc;
-		}, {}));
-	}
-
-	op(fun, other) {
-		if (typeof other === 'number') {
-			return new this.constructor(this.names.reduce((acc, name) => {
-				acc[name] = fun(this[name], other);
+			return new this.constructor(this.names.reduce(function (acc, name) {
+				acc[name] = fun(_this4[name]);
 				return acc;
 			}, {}));
-		} else {
-			return new this.constructor(this.names.reduce((acc, name) => {
-				acc[name] = fun(this[name], other[name]);
-				return acc;
-			}, {}));
-		};
-	}
-};
+		}
+	}, {
+		key: 'op',
+		value: function op(fun, other) {
+			var _this5 = this;
+
+			if (typeof other === 'number') {
+				return new this.constructor(this.names.reduce(function (acc, name) {
+					acc[name] = fun(_this5[name], other);
+					return acc;
+				}, {}));
+			} else {
+				return new this.constructor(this.names.reduce(function (acc, name) {
+					acc[name] = fun(_this5[name], other[name]);
+					return acc;
+				}, {}));
+			};
+		}
+	}, {
+		key: 'names',
+		get: function get() {
+			return Object.keys(this.shortnames);
+		}
+	}, {
+		key: 'floor',
+		get: function get() {
+			return this.apply(Math.floor);
+		}
+	}, {
+		key: 'ceil',
+		get: function get() {
+			return this.apply(Math.ceil);
+		}
+	}], [{
+		key: 'op_add',
+		value: function op_add(a, b) {
+			return a + b;
+		}
+	}, {
+		key: 'op_mult',
+		value: function op_mult(a, b) {
+			return a * b;
+		}
+	}, {
+		key: 'op_div',
+		value: function op_div(a, b) {
+			return a / b;
+		}
+	}]);
+
+	return NamedVector;
+}();
+
+;
 
 module.exports.NamedVector = NamedVector;
 
 /***/ }),
-/* 101 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Emitter = __webpack_require__(171);
+var Emitter = __webpack_require__(174);
 
 /**
  * Extend given object with emitter functions `on`, `off`, `once`, `emit`
@@ -36121,10 +37714,10 @@ exports.mixin = function (obj) {
 
 
 /***/ }),
-/* 102 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Complex = __webpack_require__(186);
+var Complex = __webpack_require__(189);
 var format = __webpack_require__(3).format;
 var isNumber = __webpack_require__(3).isNumber;
 
@@ -36324,7 +37917,7 @@ exports.math = true; // request access to the math namespace
 
 
 /***/ }),
-/* 103 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36400,7 +37993,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 104 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36723,7 +38316,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 105 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36801,7 +38394,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 106 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var memoize = __webpack_require__(35).memoize;
@@ -36856,7 +38449,7 @@ function hasher (args) {
 
 
 /***/ }),
-/* 107 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36928,7 +38521,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 108 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37109,7 +38702,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 109 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37230,7 +38823,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 110 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 function factory (construction, config, load, typed) {
@@ -37238,39 +38831,39 @@ function factory (construction, config, load, typed) {
 
 
   // construction functions
-  docs.bignumber = __webpack_require__(210);
-  docs['boolean'] = __webpack_require__(211);
-  docs.complex = __webpack_require__(212);
-  docs.createUnit = __webpack_require__(213);
-  docs.fraction = __webpack_require__(214);
-  docs.index = __webpack_require__(215);
-  docs.matrix = __webpack_require__(216);
-  docs.number = __webpack_require__(217);
-  docs.sparse = __webpack_require__(218);
-  docs.splitUnit = __webpack_require__(219);
-  docs.string = __webpack_require__(220);
-  docs.unit = __webpack_require__(221);
+  docs.bignumber = __webpack_require__(213);
+  docs['boolean'] = __webpack_require__(214);
+  docs.complex = __webpack_require__(215);
+  docs.createUnit = __webpack_require__(216);
+  docs.fraction = __webpack_require__(217);
+  docs.index = __webpack_require__(218);
+  docs.matrix = __webpack_require__(219);
+  docs.number = __webpack_require__(220);
+  docs.sparse = __webpack_require__(221);
+  docs.splitUnit = __webpack_require__(222);
+  docs.string = __webpack_require__(223);
+  docs.unit = __webpack_require__(224);
 
   // constants
-  docs.e = __webpack_require__(111);
-  docs.E = __webpack_require__(111);
-  docs['false'] = __webpack_require__(222);
-  docs.i = __webpack_require__(223);
-  docs['Infinity'] = __webpack_require__(224);
-  docs.LN2 = __webpack_require__(225);
-  docs.LN10 = __webpack_require__(226);
-  docs.LOG2E = __webpack_require__(227);
-  docs.LOG10E = __webpack_require__(228);
-  docs.NaN = __webpack_require__(229);
-  docs['null'] = __webpack_require__(230);
-  docs.pi = __webpack_require__(112);
-  docs.PI = __webpack_require__(112);
-  docs.phi = __webpack_require__(231);
-  docs.SQRT1_2 = __webpack_require__(232);
-  docs.SQRT2 = __webpack_require__(233);
-  docs.tau = __webpack_require__(234);
-  docs['true'] = __webpack_require__(235);
-  docs.version = __webpack_require__(236);
+  docs.e = __webpack_require__(112);
+  docs.E = __webpack_require__(112);
+  docs['false'] = __webpack_require__(225);
+  docs.i = __webpack_require__(226);
+  docs['Infinity'] = __webpack_require__(227);
+  docs.LN2 = __webpack_require__(228);
+  docs.LN10 = __webpack_require__(229);
+  docs.LOG2E = __webpack_require__(230);
+  docs.LOG10E = __webpack_require__(231);
+  docs.NaN = __webpack_require__(232);
+  docs['null'] = __webpack_require__(233);
+  docs.pi = __webpack_require__(113);
+  docs.PI = __webpack_require__(113);
+  docs.phi = __webpack_require__(234);
+  docs.SQRT1_2 = __webpack_require__(235);
+  docs.SQRT2 = __webpack_require__(236);
+  docs.tau = __webpack_require__(237);
+  docs['true'] = __webpack_require__(238);
+  docs.version = __webpack_require__(239);
 
   // physical constants
   // TODO: more detailed docs for physical constants
@@ -37333,206 +38926,206 @@ function factory (construction, config, load, typed) {
   docs.planckTemperature = {description: 'Planck temperature', examples: ['planckTemperature']};
 
   // functions - algebra
-  docs.derivative = __webpack_require__(237);
-  docs.lsolve = __webpack_require__(238);
-  docs.lup = __webpack_require__(239);
-  docs.lusolve = __webpack_require__(240);
-  docs.simplify = __webpack_require__(241);
-  docs.slu = __webpack_require__(242);
-  docs.usolve = __webpack_require__(243);
-  docs.qr = __webpack_require__(244);
+  docs.derivative = __webpack_require__(240);
+  docs.lsolve = __webpack_require__(241);
+  docs.lup = __webpack_require__(242);
+  docs.lusolve = __webpack_require__(243);
+  docs.simplify = __webpack_require__(244);
+  docs.slu = __webpack_require__(245);
+  docs.usolve = __webpack_require__(246);
+  docs.qr = __webpack_require__(247);
 
   // functions - arithmetic
-  docs.abs = __webpack_require__(245);
-  docs.add = __webpack_require__(246);
-  docs.cbrt = __webpack_require__(247);
-  docs.ceil = __webpack_require__(248);
-  docs.cube = __webpack_require__(249);
-  docs.divide = __webpack_require__(250);
-  docs.dotDivide = __webpack_require__(251);
-  docs.dotMultiply = __webpack_require__(252);
-  docs.dotPow = __webpack_require__(253);
-  docs.exp = __webpack_require__(254);
-  docs.fix = __webpack_require__(255);
-  docs.floor = __webpack_require__(256);
-  docs.gcd = __webpack_require__(257);
-  docs.hypot = __webpack_require__(258);
-  docs.lcm = __webpack_require__(259);
-  docs.log = __webpack_require__(260);
-  docs.log10 = __webpack_require__(261);
-  docs.mod = __webpack_require__(262);
-  docs.multiply = __webpack_require__(263);
-  docs.norm = __webpack_require__(264);
-  docs.nthRoot = __webpack_require__(265);
-  docs.pow = __webpack_require__(266);
-  docs.round = __webpack_require__(267);
-  docs.sign = __webpack_require__(268);
-  docs.sqrt = __webpack_require__(269);
-  docs.square = __webpack_require__(270);
-  docs.subtract = __webpack_require__(271);
-  docs.unaryMinus = __webpack_require__(272);
-  docs.unaryPlus = __webpack_require__(273);
-  docs.xgcd = __webpack_require__(274);
+  docs.abs = __webpack_require__(248);
+  docs.add = __webpack_require__(249);
+  docs.cbrt = __webpack_require__(250);
+  docs.ceil = __webpack_require__(251);
+  docs.cube = __webpack_require__(252);
+  docs.divide = __webpack_require__(253);
+  docs.dotDivide = __webpack_require__(254);
+  docs.dotMultiply = __webpack_require__(255);
+  docs.dotPow = __webpack_require__(256);
+  docs.exp = __webpack_require__(257);
+  docs.fix = __webpack_require__(258);
+  docs.floor = __webpack_require__(259);
+  docs.gcd = __webpack_require__(260);
+  docs.hypot = __webpack_require__(261);
+  docs.lcm = __webpack_require__(262);
+  docs.log = __webpack_require__(263);
+  docs.log10 = __webpack_require__(264);
+  docs.mod = __webpack_require__(265);
+  docs.multiply = __webpack_require__(266);
+  docs.norm = __webpack_require__(267);
+  docs.nthRoot = __webpack_require__(268);
+  docs.pow = __webpack_require__(269);
+  docs.round = __webpack_require__(270);
+  docs.sign = __webpack_require__(271);
+  docs.sqrt = __webpack_require__(272);
+  docs.square = __webpack_require__(273);
+  docs.subtract = __webpack_require__(274);
+  docs.unaryMinus = __webpack_require__(275);
+  docs.unaryPlus = __webpack_require__(276);
+  docs.xgcd = __webpack_require__(277);
 
   // functions - bitwise
-  docs.bitAnd = __webpack_require__(275);
-  docs.bitNot = __webpack_require__(276);
-  docs.bitOr = __webpack_require__(277);
-  docs.bitXor = __webpack_require__(278);
-  docs.leftShift = __webpack_require__(279);
-  docs.rightArithShift = __webpack_require__(280);
-  docs.rightLogShift = __webpack_require__(281);
+  docs.bitAnd = __webpack_require__(278);
+  docs.bitNot = __webpack_require__(279);
+  docs.bitOr = __webpack_require__(280);
+  docs.bitXor = __webpack_require__(281);
+  docs.leftShift = __webpack_require__(282);
+  docs.rightArithShift = __webpack_require__(283);
+  docs.rightLogShift = __webpack_require__(284);
 
   // functions - combinatorics
-  docs.bellNumbers = __webpack_require__(282);
-  docs.catalan = __webpack_require__(283);
-  docs.composition = __webpack_require__(284);
-  docs.stirlingS2 = __webpack_require__(285);
+  docs.bellNumbers = __webpack_require__(285);
+  docs.catalan = __webpack_require__(286);
+  docs.composition = __webpack_require__(287);
+  docs.stirlingS2 = __webpack_require__(288);
 
   // functions - core
-  docs['config'] =  __webpack_require__(286);
-  docs['import'] =  __webpack_require__(287);
-  docs['typed'] =  __webpack_require__(288);
+  docs['config'] =  __webpack_require__(289);
+  docs['import'] =  __webpack_require__(290);
+  docs['typed'] =  __webpack_require__(291);
 
   // functions - complex
-  docs.arg = __webpack_require__(289);
-  docs.conj = __webpack_require__(290);
-  docs.re = __webpack_require__(291);
-  docs.im = __webpack_require__(292);
+  docs.arg = __webpack_require__(292);
+  docs.conj = __webpack_require__(293);
+  docs.re = __webpack_require__(294);
+  docs.im = __webpack_require__(295);
 
   // functions - expression
-  docs['eval'] =  __webpack_require__(293);
-  docs.help =  __webpack_require__(294);
+  docs['eval'] =  __webpack_require__(296);
+  docs.help =  __webpack_require__(297);
 
   // functions - geometry
-  docs.distance = __webpack_require__(295);
-  docs.intersect = __webpack_require__(296);
+  docs.distance = __webpack_require__(298);
+  docs.intersect = __webpack_require__(299);
 
   // functions - logical
-  docs['and'] = __webpack_require__(297);
-  docs['not'] = __webpack_require__(298);
-  docs['or'] = __webpack_require__(299);
-  docs['xor'] = __webpack_require__(300);
+  docs['and'] = __webpack_require__(300);
+  docs['not'] = __webpack_require__(301);
+  docs['or'] = __webpack_require__(302);
+  docs['xor'] = __webpack_require__(303);
 
   // functions - matrix
-  docs['concat'] = __webpack_require__(301);
-  docs.cross = __webpack_require__(302);
-  docs.det = __webpack_require__(303);
-  docs.diag = __webpack_require__(304);
-  docs.dot = __webpack_require__(305);
-  docs.eye = __webpack_require__(306);
-  docs.filter =  __webpack_require__(307);
-  docs.flatten = __webpack_require__(308);
-  docs.forEach =  __webpack_require__(309);
-  docs.inv = __webpack_require__(310);
-  docs.kron = __webpack_require__(311);
-  docs.map =  __webpack_require__(312);
-  docs.ones = __webpack_require__(313);
-  docs.partitionSelect =  __webpack_require__(314);
-  docs.range = __webpack_require__(315);
-  docs.resize = __webpack_require__(316);
-  docs.reshape = __webpack_require__(317);
-  docs.size = __webpack_require__(318);
-  docs.sort =  __webpack_require__(319);
-  docs.squeeze = __webpack_require__(320);
-  docs.subset = __webpack_require__(321);
-  docs.trace = __webpack_require__(322);
-  docs.transpose = __webpack_require__(323);
-  docs.zeros = __webpack_require__(324);
+  docs['concat'] = __webpack_require__(304);
+  docs.cross = __webpack_require__(305);
+  docs.det = __webpack_require__(306);
+  docs.diag = __webpack_require__(307);
+  docs.dot = __webpack_require__(308);
+  docs.eye = __webpack_require__(309);
+  docs.filter =  __webpack_require__(310);
+  docs.flatten = __webpack_require__(311);
+  docs.forEach =  __webpack_require__(312);
+  docs.inv = __webpack_require__(313);
+  docs.kron = __webpack_require__(314);
+  docs.map =  __webpack_require__(315);
+  docs.ones = __webpack_require__(316);
+  docs.partitionSelect =  __webpack_require__(317);
+  docs.range = __webpack_require__(318);
+  docs.resize = __webpack_require__(319);
+  docs.reshape = __webpack_require__(320);
+  docs.size = __webpack_require__(321);
+  docs.sort =  __webpack_require__(322);
+  docs.squeeze = __webpack_require__(323);
+  docs.subset = __webpack_require__(324);
+  docs.trace = __webpack_require__(325);
+  docs.transpose = __webpack_require__(326);
+  docs.zeros = __webpack_require__(327);
 
   // functions - probability
-  docs.combinations = __webpack_require__(325);
+  docs.combinations = __webpack_require__(328);
   //docs.distribution = require('./function/probability/distribution');
-  docs.factorial = __webpack_require__(326);
-  docs.gamma = __webpack_require__(327);
-  docs.kldivergence = __webpack_require__(328);
-  docs.multinomial = __webpack_require__(329);
-  docs.permutations = __webpack_require__(330);
-  docs.pickRandom = __webpack_require__(331);
-  docs.random = __webpack_require__(332);
-  docs.randomInt = __webpack_require__(333);
+  docs.factorial = __webpack_require__(329);
+  docs.gamma = __webpack_require__(330);
+  docs.kldivergence = __webpack_require__(331);
+  docs.multinomial = __webpack_require__(332);
+  docs.permutations = __webpack_require__(333);
+  docs.pickRandom = __webpack_require__(334);
+  docs.random = __webpack_require__(335);
+  docs.randomInt = __webpack_require__(336);
 
   // functions - relational
-  docs.compare = __webpack_require__(334);
-  docs.compareNatural = __webpack_require__(335);
-  docs.deepEqual = __webpack_require__(336);
-  docs['equal'] = __webpack_require__(337);
-  docs.larger = __webpack_require__(338);
-  docs.largerEq = __webpack_require__(339);
-  docs.smaller = __webpack_require__(340);
-  docs.smallerEq = __webpack_require__(341);
-  docs.unequal = __webpack_require__(342);
+  docs.compare = __webpack_require__(337);
+  docs.compareNatural = __webpack_require__(338);
+  docs.deepEqual = __webpack_require__(339);
+  docs['equal'] = __webpack_require__(340);
+  docs.larger = __webpack_require__(341);
+  docs.largerEq = __webpack_require__(342);
+  docs.smaller = __webpack_require__(343);
+  docs.smallerEq = __webpack_require__(344);
+  docs.unequal = __webpack_require__(345);
 
   // functions - set
-  docs.setCartesian = __webpack_require__(343);
-  docs.setDifference = __webpack_require__(344);
-  docs.setDistinct = __webpack_require__(345);
-  docs.setIntersect = __webpack_require__(346);
-  docs.setIsSubset = __webpack_require__(347);
-  docs.setMultiplicity = __webpack_require__(348);
-  docs.setPowerset = __webpack_require__(349);
-  docs.setSize = __webpack_require__(350);
-  docs.setSymDifference = __webpack_require__(351);
-  docs.setUnion = __webpack_require__(352);
+  docs.setCartesian = __webpack_require__(346);
+  docs.setDifference = __webpack_require__(347);
+  docs.setDistinct = __webpack_require__(348);
+  docs.setIntersect = __webpack_require__(349);
+  docs.setIsSubset = __webpack_require__(350);
+  docs.setMultiplicity = __webpack_require__(351);
+  docs.setPowerset = __webpack_require__(352);
+  docs.setSize = __webpack_require__(353);
+  docs.setSymDifference = __webpack_require__(354);
+  docs.setUnion = __webpack_require__(355);
 
   // functions - special
-  docs.erf = __webpack_require__(353);
+  docs.erf = __webpack_require__(356);
 
   // functions - statistics
-  docs.mad = __webpack_require__(354);
-  docs.max = __webpack_require__(355);
-  docs.mean = __webpack_require__(356);
-  docs.median = __webpack_require__(357);
-  docs.min = __webpack_require__(358);
-  docs.mode = __webpack_require__(359);
-  docs.prod = __webpack_require__(360);
-  docs.quantileSeq = __webpack_require__(361);
-  docs.std = __webpack_require__(362);
-  docs.sum = __webpack_require__(363);
-  docs['var'] = __webpack_require__(364);
+  docs.mad = __webpack_require__(357);
+  docs.max = __webpack_require__(358);
+  docs.mean = __webpack_require__(359);
+  docs.median = __webpack_require__(360);
+  docs.min = __webpack_require__(361);
+  docs.mode = __webpack_require__(362);
+  docs.prod = __webpack_require__(363);
+  docs.quantileSeq = __webpack_require__(364);
+  docs.std = __webpack_require__(365);
+  docs.sum = __webpack_require__(366);
+  docs['var'] = __webpack_require__(367);
 
   // functions - trigonometry
-  docs.acos = __webpack_require__(365);
-  docs.acosh = __webpack_require__(366);
-  docs.acot = __webpack_require__(367);
-  docs.acoth = __webpack_require__(368);
-  docs.acsc = __webpack_require__(369);
-  docs.acsch = __webpack_require__(370);
-  docs.asec = __webpack_require__(371);
-  docs.asech = __webpack_require__(372);
-  docs.asin = __webpack_require__(373);
-  docs.asinh = __webpack_require__(374);
-  docs.atan = __webpack_require__(375);
-  docs.atanh = __webpack_require__(376);
-  docs.atan2 = __webpack_require__(377);
-  docs.cos = __webpack_require__(378);
-  docs.cosh = __webpack_require__(379);
-  docs.cot = __webpack_require__(380);
-  docs.coth = __webpack_require__(381);
-  docs.csc = __webpack_require__(382);
-  docs.csch = __webpack_require__(383);
-  docs.sec = __webpack_require__(384);
-  docs.sech = __webpack_require__(385);
-  docs.sin = __webpack_require__(386);
-  docs.sinh = __webpack_require__(387);
-  docs.tan = __webpack_require__(388);
-  docs.tanh = __webpack_require__(389);
+  docs.acos = __webpack_require__(368);
+  docs.acosh = __webpack_require__(369);
+  docs.acot = __webpack_require__(370);
+  docs.acoth = __webpack_require__(371);
+  docs.acsc = __webpack_require__(372);
+  docs.acsch = __webpack_require__(373);
+  docs.asec = __webpack_require__(374);
+  docs.asech = __webpack_require__(375);
+  docs.asin = __webpack_require__(376);
+  docs.asinh = __webpack_require__(377);
+  docs.atan = __webpack_require__(378);
+  docs.atanh = __webpack_require__(379);
+  docs.atan2 = __webpack_require__(380);
+  docs.cos = __webpack_require__(381);
+  docs.cosh = __webpack_require__(382);
+  docs.cot = __webpack_require__(383);
+  docs.coth = __webpack_require__(384);
+  docs.csc = __webpack_require__(385);
+  docs.csch = __webpack_require__(386);
+  docs.sec = __webpack_require__(387);
+  docs.sech = __webpack_require__(388);
+  docs.sin = __webpack_require__(389);
+  docs.sinh = __webpack_require__(390);
+  docs.tan = __webpack_require__(391);
+  docs.tanh = __webpack_require__(392);
 
   // functions - units
-  docs.to = __webpack_require__(390);
+  docs.to = __webpack_require__(393);
 
   // functions - utils
-  docs.clone = __webpack_require__(391);
-  docs.format = __webpack_require__(392);
-  docs.isNaN = __webpack_require__(393);
-  docs.isInteger = __webpack_require__(394);
-  docs.isNegative = __webpack_require__(395);
-  docs.isNumeric = __webpack_require__(396);
-  docs.isPositive = __webpack_require__(397);
-  docs.isPrime = __webpack_require__(398);
-  docs.isZero = __webpack_require__(399);
+  docs.clone = __webpack_require__(394);
+  docs.format = __webpack_require__(395);
+  docs.isNaN = __webpack_require__(396);
+  docs.isInteger = __webpack_require__(397);
+  docs.isNegative = __webpack_require__(398);
+  docs.isNumeric = __webpack_require__(399);
+  docs.isPositive = __webpack_require__(400);
+  docs.isPrime = __webpack_require__(401);
+  docs.isZero = __webpack_require__(402);
   // docs.print = require('./function/utils/print'); // TODO: add documentation for print as soon as the parser supports objects.
-  docs['typeof'] =  __webpack_require__(400);
+  docs['typeof'] =  __webpack_require__(403);
 
   return docs;
 }
@@ -37543,7 +39136,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 111 */
+/* 112 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -37564,7 +39157,7 @@ module.exports = {
 
 
 /***/ }),
-/* 112 */
+/* 113 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -37583,7 +39176,7 @@ module.exports = {
 
 
 /***/ }),
-/* 113 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37596,8 +39189,8 @@ function factory (type, config, load, typed) {
   var register = load(__webpack_require__(7)).register;
   var compile = load(__webpack_require__(7)).compile;
   var Node = load(__webpack_require__(16));
-  var IndexNode = load(__webpack_require__(84));
-  var access = load(__webpack_require__(114));
+  var IndexNode = load(__webpack_require__(85));
+  var access = load(__webpack_require__(115));
 
   /**
    * @constructor AccessorNode
@@ -37788,7 +39381,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 114 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37844,7 +39437,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 115 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37859,12 +39452,12 @@ function factory (type, config, load, typed) {
   var register = load(__webpack_require__(7)).register;
   var compile = load(__webpack_require__(7)).compile;
   var Node = load(__webpack_require__(16));
-  var ArrayNode = load(__webpack_require__(86));
+  var ArrayNode = load(__webpack_require__(87));
   var matrix = load(__webpack_require__(0));
-  var assign = load(__webpack_require__(403));
-  var access = load(__webpack_require__(114));
+  var assign = load(__webpack_require__(406));
+  var access = load(__webpack_require__(115));
 
-  var keywords = __webpack_require__(83);
+  var keywords = __webpack_require__(84);
   var operators = __webpack_require__(57);
 
   /**
@@ -38146,7 +39739,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 116 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38159,7 +39752,7 @@ function factory (type, config, load, typed) {
   var register = load(__webpack_require__(7)).register;
   var compile = load(__webpack_require__(7)).compile;
   var Node = load(__webpack_require__(16));
-  var ResultSet = load(__webpack_require__(105));
+  var ResultSet = load(__webpack_require__(106));
 
   /**
    * @constructor BlockNode
@@ -38324,7 +39917,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 117 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38560,13 +40153,13 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 118 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var keywords = __webpack_require__(83);
+var keywords = __webpack_require__(84);
 var stringify = __webpack_require__(9).stringify;
 var escape = __webpack_require__(9).escape;
 var map = __webpack_require__(2).map;
@@ -38574,7 +40167,7 @@ var join = __webpack_require__(2).join;
 var latex = __webpack_require__(4);
 var operators = __webpack_require__(57);
 var setSafeProperty = __webpack_require__(15).setSafeProperty;
-var getUniqueArgumentName = __webpack_require__(119);
+var getUniqueArgumentName = __webpack_require__(120);
 
 function factory (type, config, load, typed) {
   var register = load(__webpack_require__(7)).register;
@@ -38769,7 +40362,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 119 */
+/* 120 */
 /***/ (function(module, exports) {
 
 /**
@@ -38786,7 +40379,7 @@ module.exports = getUniqueArgumentName;
 
 
 /***/ }),
-/* 120 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38964,14 +40557,14 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 121 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 function factory (type, config, load, typed, math) {
-  var Parser = load(__webpack_require__(122));
+  var Parser = load(__webpack_require__(123));
 
   /**
    * Create a parser. The function creates a new `math.expression.Parser` object.
@@ -39029,7 +40622,7 @@ exports.math = true; // requires the math namespace as 5th argument
 
 
 /***/ }),
-/* 122 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39200,15 +40793,15 @@ exports.math = true; // requires the math namespace as 5th argument
 
 
 /***/ }),
-/* 123 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var deepForEach = __webpack_require__(46);
-var reduce = __webpack_require__(71);
-var containsCollections = __webpack_require__(72);
+var reduce = __webpack_require__(72);
+var containsCollections = __webpack_require__(73);
 
 function factory (type, config, load, typed) {
   var larger = load(__webpack_require__(37));
@@ -39306,7 +40899,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 124 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39314,8 +40907,8 @@ exports.factory = factory;
 
 var size = __webpack_require__(2).size;
 var deepForEach = __webpack_require__(46);
-var reduce = __webpack_require__(71);
-var containsCollections = __webpack_require__(72);
+var reduce = __webpack_require__(72);
+var containsCollections = __webpack_require__(73);
 
 function factory (type, config, load, typed) {
   var add = load(__webpack_require__(20));
@@ -39411,7 +41004,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 125 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39425,8 +41018,8 @@ function factory (type, config, load, typed) {
   var addScalar    = load(__webpack_require__(22));
   var multiply     = load(__webpack_require__(12));
   var unaryMinus   = load(__webpack_require__(41));
-  var det          = load(__webpack_require__(126));
-  var eye          = load(__webpack_require__(67));
+  var det          = load(__webpack_require__(127));
+  var eye          = load(__webpack_require__(68));
 
   /**
    * Calculate the inverse of a square matrix.
@@ -39625,7 +41218,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 126 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39800,15 +41393,15 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 127 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var deepForEach = __webpack_require__(46);
-var reduce = __webpack_require__(71);
-var containsCollections = __webpack_require__(72);
+var reduce = __webpack_require__(72);
+var containsCollections = __webpack_require__(73);
 
 function factory (type, config, load, typed) {
   var smaller = load(__webpack_require__(49));
@@ -39906,7 +41499,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 128 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40192,7 +41785,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 129 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40203,15 +41796,15 @@ function factory (type, config, load, typed, math) {
   var parse = load(__webpack_require__(43));
   var ConstantNode = load(__webpack_require__(58));
   var FunctionNode = load(__webpack_require__(59));
-  var OperatorNode = load(__webpack_require__(68));
-  var ParenthesisNode = load(__webpack_require__(69));
+  var OperatorNode = load(__webpack_require__(69));
+  var ParenthesisNode = load(__webpack_require__(70));
   var SymbolNode = load(__webpack_require__(44));
   var Node = load(__webpack_require__(16));
-  var simplifyConstant = load(__webpack_require__(424));
-  var simplifyCore = load(__webpack_require__(425));
-  var resolve = load(__webpack_require__(426));
+  var simplifyConstant = load(__webpack_require__(427));
+  var simplifyCore = load(__webpack_require__(428));
+  var resolve = load(__webpack_require__(429));
 
-  var util = load(__webpack_require__(130));
+  var util = load(__webpack_require__(131));
   var isCommutative = util.isCommutative;
   var isAssociative = util.isAssociative;
   var flatten = util.flatten;
@@ -40864,7 +42457,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 130 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41028,7 +42621,7 @@ exports.factory = factory;
 exports.math = true;
 
 /***/ }),
-/* 131 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41069,7 +42662,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 132 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41280,7 +42873,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 133 */
+/* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41356,7 +42949,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 134 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41418,7 +43011,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 135 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41812,7 +43405,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 136 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41826,8 +43419,8 @@ var number = util.number,
 
 function factory (type, config, load, typed) {
 
-  var cs_sqr = load(__webpack_require__(428));
-  var cs_lu = load(__webpack_require__(436));
+  var cs_sqr = load(__webpack_require__(431));
+  var cs_lu = load(__webpack_require__(439));
 
   /**
    * Calculate the Sparse Matrix LU decomposition with full pivoting. Sparse Matrix `A` is decomposed in two matrices (`L`, `U`) and two permutation vectors (`pinv`, `q`) where
@@ -41891,7 +43484,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 137 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41950,7 +43543,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 138 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42132,7 +43725,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 139 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42162,7 +43755,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 140 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42170,7 +43763,7 @@ exports.factory = factory;
 
 function factory (type, config, load) {
 
-  var cs_flip = load(__webpack_require__(89));
+  var cs_flip = load(__webpack_require__(90));
 
   /**
    * Marks the node at w[j]
@@ -42194,7 +43787,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 141 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42208,7 +43801,7 @@ function factory (type, config, load, typed) {
   var subtract = load(__webpack_require__(23));
   var equalScalar = load(__webpack_require__(11));
 
-  var solveValidation = load(__webpack_require__(90));
+  var solveValidation = load(__webpack_require__(91));
 
   var DenseMatrix = type.DenseMatrix;
 
@@ -42388,7 +43981,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 142 */
+/* 143 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42402,7 +43995,7 @@ function factory (type, config, load, typed) {
   var subtract = load(__webpack_require__(23));
   var equalScalar = load(__webpack_require__(11));
 
-  var solveValidation = load(__webpack_require__(90));
+  var solveValidation = load(__webpack_require__(91));
   
   var DenseMatrix = type.DenseMatrix;
 
@@ -42583,7 +44176,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 143 */
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42735,7 +44328,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 144 */
+/* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42891,7 +44484,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 145 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42984,7 +44577,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 146 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43138,7 +44731,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 147 */
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43150,8 +44743,8 @@ function factory (type, config, load, typed) {
   var multiply = load(__webpack_require__(12));
   var divide = load(__webpack_require__(52));
   var pow = load(__webpack_require__(50));
-  var factorial = load(__webpack_require__(75));
-  var combinations = load(__webpack_require__(76));
+  var factorial = load(__webpack_require__(76));
+  var combinations = load(__webpack_require__(77));
   var isNegative = load(__webpack_require__(62));
   var isInteger = load(__webpack_require__(53));
   var larger = load(__webpack_require__(37));
@@ -43214,7 +44807,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 148 */
+/* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43423,7 +45016,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 149 */
+/* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43493,7 +45086,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 150 */
+/* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43579,7 +45172,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 151 */
+/* 152 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43710,7 +45303,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 152 */
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43801,7 +45394,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 153 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43883,7 +45476,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 154 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43957,7 +45550,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 155 */
+/* 156 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43967,11 +45560,11 @@ var flatten = __webpack_require__(2).flatten;
 
 function factory (type, config, load, typed) {
   var index = load(__webpack_require__(29));
-  var concat = load(__webpack_require__(70));
+  var concat = load(__webpack_require__(71));
   var size = load(__webpack_require__(30));
-  var sort = load(__webpack_require__(151));
+  var sort = load(__webpack_require__(152));
   var subset = load(__webpack_require__(24));
-  var setDifference = load(__webpack_require__(153));
+  var setDifference = load(__webpack_require__(154));
   
   /**
    * Create the symmetric difference of two (multi)sets.
@@ -44016,21 +45609,21 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 156 */
+/* 157 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var flatten = __webpack_require__(2).flatten;
-var reduce = __webpack_require__(71);
-var containsCollections = __webpack_require__(72);
+var reduce = __webpack_require__(72);
+var containsCollections = __webpack_require__(73);
 
 function factory (type, config, load, typed) {
   var add = load(__webpack_require__(22));
   var divide = load(__webpack_require__(21));
   var compare = load(__webpack_require__(54));
-  var partitionSelect = load(__webpack_require__(94));
+  var partitionSelect = load(__webpack_require__(95));
 
   /**
    * Compute the median of a matrix or a list with values. The values are
@@ -44141,7 +45734,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 157 */
+/* 158 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44276,7 +45869,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 158 */
+/* 159 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44351,28 +45944,29 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 159 */
+/* 160 */
 /***/ (function(module, exports) {
 
 module.exports = [{"Type Sort":1,"Type":"Phasers","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Phasers","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"Size Filter","Full Tier List":"Tier Filter"},{"Type Sort":1,"Type":"Phasers","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Model 31 Phaser Bank","Effect":0.28,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0.6,"Scale Pwr":0.8,"Unit Power":1.5,"O":0.18,"E":0.2,"T":0.03,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"Light","Full Tier List":"T-3"},{"Type Sort":1,"Type":"Phasers","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Model 28 Twin Phaser Bank","Effect":0.425,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0.8,"Unit Power":1.8,"O":0.35,"E":0.35,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"Medium","Full Tier List":"T-2"},{"Type Sort":1,"Type":"Phasers","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Model 47 Phaser Bank","Effect":0.32,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0.6,"Scale Pwr":0.8,"Unit Power":1.5,"O":0.18,"E":0.2,"T":0.03,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"Heavy","Full Tier List":"T-1"},{"Type Sort":1,"Type":"Phasers","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Model 44 Twin Phaser Bank","Effect":0.5,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0.8,"Unit Power":1.8,"O":0.35,"E":0.35,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":"T0"},{"Type Sort":1,"Type":"Phasers","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Model 68 Phaser Bank","Effect":0.36,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0.6,"Scale Pwr":0.8,"Unit Power":1.5,"O":0.18,"E":0.2,"T":0.03,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":"T1"},{"Type Sort":1,"Type":"Phasers","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Model 62 Twin Phaser Bank","Effect":0.625,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0.8,"Unit Power":1.8,"O":0.35,"E":0.35,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":"T2"},{"Type Sort":1,"Type":"Phasers","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Model 83 Phaser Bank","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.085,"Pwr O/H":0.65,"Scale Pwr":0.8,"Unit Power":1.1,"O":0.18,"E":0.2,"T":0.02,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":"T3"},{"Type Sort":1,"Type":"Phasers","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Model 83 Twin Phaser Bank","Effect":0.75,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.08,"Pwr O/H":1,"Scale Pwr":0.8,"Unit Power":2,"O":0.34,"E":0.34,"T":0.01,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":"T4"},{"Type Sort":1,"Type":"Phasers","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type IV Single Phaser Bank","Effect":0.44,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.065,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.18,"E":0.2,"T":0.02,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-IV Twin Phaser Bank","Effect":0.825,"Weight O/H":8,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.33,"E":0.33,"T":0.01,"Reliability":0.99995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type V Single Phaser Bank","Effect":0.48,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.065,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.175,"E":0.19,"T":0.02,"Reliability":0.995,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Type-V Twin Phaser Bank","Effect":0.9,"Weight O/H":8,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.32,"E":0.32,"T":0.01,"Reliability":0.99995,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type VI Single Phaser Bank","Effect":0.52,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.065,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.175,"E":0.19,"T":0.02,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Type-VI Twin Phaser Bank","Effect":0.975,"Weight O/H":8,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.32,"E":0.32,"T":0.01,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Type IX Experimental Phaser Array Mid Bank","Effect":0.8,"Weight O/H":8,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.13,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.225,"E":0.25,"T":0.025,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Type-IX Experimental Phaser Array Full Bank","Effect":1.2,"Weight O/H":12,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.16,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.35,"E":0.35,"T":0.02,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T-2] Type 48 Phaser Bank","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":0.995,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Torp","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] TSF-2 Torpedo System","Effect":0.4,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.035,"Pwr O/H":2.5,"Scale Pwr":0.1,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mod 3a Battery System","Effect":0.4,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.07,"Pwr O/H":5,"Scale Pwr":0.05,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] TSF-3 Torpedo System","Effect":0.45,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.035,"Pwr O/H":2.5,"Scale Pwr":0.1,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mod 4 Battery System","Effect":0.45,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.07,"Pwr O/H":5,"Scale Pwr":0.05,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mk-I Torpedo System","Effect":0.5,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.035,"Pwr O/H":2.5,"Scale Pwr":0.1,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Type-I Auto System","Effect":0.5,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.07,"Pwr O/H":5,"Scale Pwr":0.05,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mk-II LW Torpedo System","Effect":0.55,"Weight O/H":8,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":0.3,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mk-II Torpedo System","Effect":0.55,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.045,"Pwr O/H":2.5,"Scale Pwr":0.2,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.99995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-II Auto System","Effect":0.55,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.09,"Pwr O/H":5,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mk-III LW Torpedo System","Effect":0.6,"Weight O/H":8,"Scale Weight":0,"Unit Weight":9.5,"SR Cost x":0.085,"Pwr O/H":4.5,"Scale Pwr":0.25,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mk-III Torpedo System","Effect":0.6,"Weight O/H":12,"Scale Weight":0,"Unit Weight":9.5,"SR Cost x":0.0475,"Pwr O/H":2.25,"Scale Pwr":0.175,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.9998,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-III Auto System","Effect":0.6,"Weight O/H":15.5,"Scale Weight":0,"Unit Weight":10.5,"SR Cost x":0.095,"Pwr O/H":4.5,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mk-IV LW Torpedo System","Effect":0.65,"Weight O/H":8,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.09,"Pwr O/H":4,"Scale Pwr":0.2,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][SR-] Mk-IV Torpedo System","Effect":0.65,"Weight O/H":12,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.05,"Pwr O/H":2,"Scale Pwr":0.15,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.9998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][C-] Type-IV Auto System","Effect":0.65,"Weight O/H":15,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":4,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mk-V LW Torpedo System","Effect":0.7,"Weight O/H":8,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.09,"Pwr O/H":4,"Scale Pwr":0.2,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][SR-] Mk-V Torpedo System","Effect":0.7,"Weight O/H":12,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.05,"Pwr O/H":2,"Scale Pwr":0.15,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.9998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][C-] Type-V Auto System","Effect":0.7,"Weight O/H":15,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":4,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sensor","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mark-I-Light LR Sensor Array","Effect":0.15,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Mark-I-Heavy LR Sensors","Effect":0.225,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12.5,"SR Cost x":0.06,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.06,"E":0.16,"T":0.3,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-II-Heavy LR Sensor Array","Effect":0.4,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.13,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Mark-II-Light LR Sensor Array","Effect":0.175,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Mark-II-Heavy LR Sensors","Effect":0.25,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12.5,"SR Cost x":0.06,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.06,"E":0.16,"T":0.3,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-III-Heavy LR Sensor Array","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.13,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Mark-III-Light LR Sensor Array","Effect":0.2,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mark-III-Heavy LR Sensors","Effect":0.275,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12.5,"SR Cost x":0.06,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.06,"E":0.16,"T":0.3,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mark-IV-Heavy LR Sensor Array","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.13,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Grade LR Sensor Array","Effect":0.1,"Weight O/H":0.5,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":0.5,"O":0.05,"E":0.04,"T":0.06,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mark-V-Light LR Sensor Array","Effect":0.225,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mark-V LR Sensor Array","Effect":0.3,"Weight O/H":2,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.11,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Mark-V-Heavy LR Sensor Array","Effect":0.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mark-VI-Light LR Sensor Array","Effect":0.225,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.75,"SR Cost x":0.18,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mark-VI LR Sensor Array","Effect":0.325,"Weight O/H":2,"Scale Weight":0,"Unit Weight":9.5,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mark-VI-Heavy LR Sensor Array","Effect":0.525,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mark-VII-Light LR Sensor Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.25,"SR Cost x":0.18,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mark-VII LR Sensor Array","Effect":0.35,"Weight O/H":2,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mark-VII-Heavy LR Sensor Array","Effect":0.55,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mark-VIII-Light LR Sensor Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.18,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mark-VIII LR Sensor Array","Effect":0.375,"Weight O/H":2,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mark-VIII-Heavy LR Sensor Array","Effect":0.575,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Subspace Flux Detector *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Subspace Pulse Scanner *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Subspace Phased Array Scanner *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Subspace Interferometry Suite *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sensor","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mark-I-Light SR Lateral Sensor Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Mark-I-Medium SR Lateral Sensor Array","Effect":0.375,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-I-Heavy SR Lateral Sensor Array","Effect":0.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21.5,"SR Cost x":0.05,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":"No","Size Class":"Light","Name":"[T-2][L] Mark-III-Light SR Lateral Sensor Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Mark-III-Medium SR Lateral Sensor Array","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-III-Heavy SR Lateral Sensor Array","Effect":0.55,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21.5,"SR Cost x":0.05,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Grade SR Lateral Sensor","Effect":0.1,"Weight O/H":0.5,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":0.5,"O":0.02,"E":0.04,"T":0.06,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mark-IV SR Lateral Sensor Array","Effect":0.3,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.02,"E":0.06,"T":0.09,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mark-IV-Heavy SR Lateral Sensor Array","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Mark-V-Heavy SR Lateral Sensor Array","Effect":0.65,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21.5,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.025,"E":0.06,"T":0.105,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mark-VB-Light SR Lateral Sensor Array","Effect":0.2375,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.75,"SR Cost x":0.1,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.15,"O":0.025,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mark-VB SR Lateral Sensor Array","Effect":0.335,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.75,"SR Cost x":0.1,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.15,"O":0.025,"E":0.06,"T":0.105,"Reliability":0.99999,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mark-VB-Heavy SR Lateral Sensor Array","Effect":0.7,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.15,"O":0.05,"E":0.1,"T":0.135,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mark-VI-Light SR Lateral Sensor Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.6,"SR Cost x":0.12,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.025,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2312,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mark-VI SR Lateral Sensor Array","Effect":0.35,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.6,"SR Cost x":0.1,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.06,"E":0.12,"T":0.15,"Reliability":0.99999,"Year Available (SF)":2312,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mark-VI-Heavy SR Lateral Sensor Array","Effect":0.75,"Weight O/H":5,"Scale Weight":0,"Unit Weight":20.75,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.1,"T":0.135,"Reliability":1,"Year Available (SF)":2312,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mark-VII-Light SR Lateral Sensor Array","Effect":0.2675,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.7,"SR Cost x":0.125,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.115,"T":0.1425,"Reliability":0.9995,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mark-VII SR Lateral Sensor Array","Effect":0.365,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.8,"SR Cost x":0.115,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.0065,"E":0.125,"T":0.1725,"Reliability":0.99999,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mark-VII-Heavy SR Lateral Sensor Array","Effect":0.8,"Weight O/H":6.5,"Scale Weight":0,"Unit Weight":21.25,"SR Cost x":0.07,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.055,"E":0.105,"T":0.1425,"Reliability":1,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Mark-VII-Light SR Lateral Sensor Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.7,"SR Cost x":0.125,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.115,"T":0.1425,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Mark-VII SR Lateral Sensor Array","Effect":0.38,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.8,"SR Cost x":0.115,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.0065,"E":0.125,"T":0.1725,"Reliability":0.99999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Mark-VII-Heavy SR Lateral Sensor Array","Effect":0.85,"Weight O/H":6.5,"Scale Weight":0,"Unit Weight":21.25,"SR Cost x":0.07,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.055,"E":0.105,"T":0.1425,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Full Spectrum Sensor Array","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sensor","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mark-I-Light Nav Sensors","Effect":0.15,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-I-Heavy Nav Sensors","Effect":0.4,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-II-Heavy Nav Array","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Mark-II-Light Nav Sensors","Effect":0.175,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-II-Heavy Nav Sensors","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-III-Heavy Nav Array","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Mark-III-Light Nav Sensors","Effect":0.2,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mark-III-Heavy Nav Sensors","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mark-IV-Heavy Nav Array","Effect":0.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mark-V Nav Sensors","Effect":0.3,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mark-VI-Light Nav Array","Effect":0.225,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.75,"SR Cost x":0.15,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.3,"O":0.02,"E":0.15,"T":0.2475,"Reliability":0.9995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mark-VI Nav Array","Effect":0.325,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":9.75,"SR Cost x":0.11,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.04,"E":0.15,"T":0.2625,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mark-VI-Heavy Nav Array","Effect":0.525,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18.5,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mark-VII-Light Nav Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.6,"SR Cost x":0.15,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.4,"O":0.02,"E":0.15,"T":0.2475,"Reliability":0.9995,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mark-VII Nav Array","Effect":0.35,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":9.6,"SR Cost x":0.11,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.15,"T":0.2625,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mark-VII-Heavy Nav Array","Effect":0.55,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18.25,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mark-VIII-Light Nav Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.6,"SR Cost x":0.15,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.4,"O":0.02,"E":0.15,"T":0.2475,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mark-VIII Nav Array","Effect":0.375,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":9.6,"SR Cost x":0.11,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.15,"T":0.2625,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mark-VIII-Heavy Nav Array","Effect":0.575,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18.25,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Basic Nav Sensor Package","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Mass Detector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Gaseous Anomaly Detector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Subspace Gradient Analytics","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Astrometric Course Optimizer","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Survey Sensors","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Basic Survey Sensor Package","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Basic Survey Sensor Package *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] EM/Subspace Heterodyne Circuit *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Ground-Penetrating Spectroscope *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Stellar Core Imager *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T5] Polycyclic Subspace Tomograph *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Science","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Pattern U Compact Lab","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.06,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Pattern V Lab","Effect":0.475,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0.25,"Unit Power":0.25,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Pattern S Lab","Effect":0.6,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.06,"Pwr O/H":1,"Scale Pwr":0.35,"Unit Power":0.25,"O":0.25,"E":0.2,"T":0.25,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Pattern W Compact Lab","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.06,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Pattern X Lab","Effect":0.525,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0.25,"Unit Power":0.25,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Pattern Y Lab","Effect":0.7,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.06,"Pwr O/H":1,"Scale Pwr":0.35,"Unit Power":0.25,"O":0.25,"E":0.2,"T":0.25,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Pattern D Compact Lab","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.06,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Pattern C Lab","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0.25,"Unit Power":0.25,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Pattern E Lab","Effect":0.8,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.06,"Pwr O/H":1,"Scale Pwr":0.35,"Unit Power":0.25,"O":0.25,"E":0.2,"T":0.25,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Pattern-K Compact Lab","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.08,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Pattern C2 Lab","Effect":0.675,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.08,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Spock-Pattern Lab","Effect":0.9,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.05,"E":0.05,"T":0.22,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Pattern-K2 Compact Lab","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":14.667,"SR Cost x":0.09,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Cruiser Pattern Lab","Effect":0.75,"Weight O/H":0,"Scale Weight":0,"Unit Weight":29.333,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.06,"E":0.1,"T":0.25,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Spock-B Pattern Lab","Effect":1,"Weight O/H":3,"Scale Weight":0,"Unit Weight":44,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.055,"E":0.055,"T":0.23,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Pattern-K3 Compact Lab","Effect":0.55,"Weight O/H":0,"Scale Weight":0,"Unit Weight":14.333,"SR Cost x":0.09,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Cruiser-2 Pattern Lab","Effect":0.825,"Weight O/H":0,"Scale Weight":0,"Unit Weight":28.667,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.06,"E":0.1,"T":0.25,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Spock-C Pattern Lab","Effect":1.1,"Weight O/H":3,"Scale Weight":0,"Unit Weight":43,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.055,"E":0.055,"T":0.23,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Pattern-K4 Compact Lab","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.09,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Cruiser-3 Pattern Lab","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":28,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.06,"E":0.1,"T":0.25,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Spock-D Pattern Lab","Effect":1.2,"Weight O/H":3,"Scale Weight":0,"Unit Weight":42,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.055,"E":0.055,"T":0.23,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Core","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mkv V Monotronic Core","Effect":0.325,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.04,"T":0.18,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mk V-B Monotronic Core","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.225,"Pwr O/H":4.12,"Scale Pwr":2.5,"Unit Power":0,"O":0.1,"E":0.03,"T":0.125,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] SFA Mk1 Duotronic Core","Effect":0.375,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.04,"T":0.18,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] SFA MkI-B Duotronic Core","Effect":0.45,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.225,"Pwr O/H":4.12,"Scale Pwr":2.5,"Unit Power":0,"O":0.1,"E":0.03,"T":0.125,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Type-I Duotronic Core","Effect":0.425,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.04,"T":0.18,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Type-I-B Duotronic Core","Effect":0.475,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.225,"Pwr O/H":4.12,"Scale Pwr":2.5,"Unit Power":0,"O":0.1,"E":0.03,"T":0.125,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Generic Monotronic Civilian Core","Effect":0.2,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.02,"T":0.09,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Type-II Duotronic Core","Effect":0.475,"Weight O/H":20,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.2,"Pwr O/H":6.5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0.02,"T":0.135,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Type-III Duotronic Core","Effect":0.5,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":5.2,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.09,"Reliability":0.998,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-II Heavy Duotronic Core","Effect":0.525,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.2,"Pwr O/H":6.5,"Scale Pwr":2,"Unit Power":0,"O":0.1,"E":0.02,"T":0.08,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type-III-A Duotronic Core","Effect":0.6,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":1,"Unit Power":0,"O":0,"E":0.02,"T":0.1,"Reliability":0.9999,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Type-IV Duotronic Core","Effect":0.625,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.998,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-IV Heavy Duotronic Core","Effect":0.66,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type-IV-B Duotronic Core","Effect":0.64,"Weight O/H":10,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.4,"Pwr O/H":7,"Scale Pwr":0.5,"Unit Power":0,"O":0,"E":0.02,"T":0.11,"Reliability":0.998,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Type-IV-A Duotronic Core","Effect":0.68,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":7,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.9999,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Type-IV-C Heavy Duotronic Core","Effect":0.7,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type-V Compact Duotronic Core","Effect":0.68,"Weight O/H":10,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.4,"Pwr O/H":7,"Scale Pwr":0.5,"Unit Power":0,"O":0,"E":0.02,"T":0.11,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Type-V Duotronic Core","Effect":0.72,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":7,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.9999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Type-V Heavy Duotronic Core","Effect":0.76,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Type-VI Compact Duotronic Core","Effect":0.72,"Weight O/H":10,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.4,"Pwr O/H":7,"Scale Pwr":0.5,"Unit Power":0,"O":0,"E":0.02,"T":0.11,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Type-VI Duotronic Core","Effect":0.79,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":7,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.9999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Type-VI Heavy Duotronic Core","Effect":0.9,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No OS","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-3,"Size Sort":-99,"Size Class":"N/A","Name":"[T-3] Majel OS","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Majel 1.5 OS","Effect":0.475,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-1,"Size Sort":-99,"Size Class":"N/A","Name":"[T-1] Majel 2.0 OS","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Civilian OS","Effect":0.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.0125,"E":0.0075,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":0,"Size Sort":-99,"Size Class":"N/A","Name":"[T0] Majel 2.1 OS","Effect":0.525,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.85,"Scale Pwr":0.125,"Unit Power":0.4,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":1,"Size Sort":-99,"Size Class":"N/A","Name":"[T1] Majel 3.0 OS","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.2,"Unit Power":1,"O":0.1375,"E":0.0825,"T":0.11,"Reliability":0.9998,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":2,"Size Sort":-99,"Size Class":"N/A","Name":"[T2] Majel 3.1 Explorer OS","Effect":1.05,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":5,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.1,"E":0.06,"T":0.08,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":2,"Size Sort":-99,"Size Class":"N/A","Name":"[T2] Majel 3.1 OS","Effect":1.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.25,"Unit Power":1.1,"O":0.13125,"E":0.07875,"T":0.105,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":3,"Size Sort":-99,"Size Class":"N/A","Name":"[T3] Majel 3.5 OS","Effect":1.2,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.25,"Unit Power":1.1,"O":0.125,"E":0.075,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":4,"Size Sort":-99,"Size Class":"N/A","Name":"[T4] Majel 4.0 OS","Effect":1.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.25,"Unit Power":1.1,"O":0.125,"E":0.075,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No TCU","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Model 17 Light TCU","Effect":0.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Model 31 Advanced TCU","Effect":0.325,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Model 20 Heavy TCU","Effect":0.375,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Model 37 Light TCU","Effect":0.275,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Model 42 Advanced TCU","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Model 39 Heavy TCU","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Model 57 Light TCU","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Model 64 Advanced TCU","Effect":0.375,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Model 57 Heavy TCU","Effect":0.425,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian TCU","Effect":0.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.045,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Type-I Duotronic TCU","Effect":0.325,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Type-1 TCU","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-1-A 'Seeker' TCU","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.065,"Pwr O/H":0.8,"Scale Pwr":0.45,"Unit Power":1.8,"O":0.1,"E":0.05,"T":0.05,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type-II Duotronic TCU","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Type-2 TCU","Effect":0.425,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2.05,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] 'Dauntless' Tracking System","Effect":0.575,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.1,"Pwr O/H":1.2,"Scale Pwr":0.6,"Unit Power":2.2,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.9992,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type-III Duotronic TCU","Effect":0.375,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.975,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Type-3 TCU","Effect":0.475,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2.1,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] DI-4 Predictive Targeting Array","Effect":0.675,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.098,"Pwr O/H":1.15,"Scale Pwr":0.575,"Unit Power":2.3,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.9999,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type-IV Duotronic TCU","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.975,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Type-4 TCU","Effect":0.525,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2.1,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] TH-5 Rangemaster Unit","Effect":0.775,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.098,"Pwr O/H":1.15,"Scale Pwr":0.575,"Unit Power":2.3,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.9999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Diplomacy","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Escort Diplomatic Package '24","Effect":0.7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.035,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.015,"E":0,"T":0.015,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Cruiser Diplomatic Package '20","Effect":0.85,"Weight O/H":14,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.07,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.03,"E":0.02,"T":0.03,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Explorer Diplomatic Package '28","Effect":1.1,"Weight O/H":45,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.2,"Scale Pwr":0.4,"Unit Power":2.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Escort Diplomatic Package '41","Effect":0.75,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.035,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.015,"E":0,"T":0.015,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Cruiser Diplomatic Package '39","Effect":0.9,"Weight O/H":14,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.07,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.03,"E":0.02,"T":0.03,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Explorer Diplomatic Package '45","Effect":1.35,"Weight O/H":45,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.2,"Scale Pwr":0.4,"Unit Power":2.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Escort Diplomatic Package '61","Effect":0.8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.035,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.015,"E":0,"T":0.015,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Cruiser Diplomatic Package '61","Effect":1,"Weight O/H":14,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.07,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.03,"E":0.02,"T":0.03,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Explorer Diplomatic Package '67","Effect":1.5,"Weight O/H":45,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.2,"Scale Pwr":0.4,"Unit Power":2.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Escort Diplomatic Package '85","Effect":0.85,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.075,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":3,"O":0.02,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Explorer Diplomatic Package '85","Effect":1.6,"Weight O/H":50,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":3.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Lwaxana '04 Escort Protocol","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.08,"Pwr O/H":2,"Scale Pwr":0.5,"Unit Power":2.75,"O":0.06,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2309,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Lwaxana '04 General Protocol","Effect":1.2,"Weight O/H":16,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.105,"Pwr O/H":2,"Scale Pwr":0.5,"Unit Power":3.25,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2309,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Lwaxana '04 Explorer Protocol","Effect":1.75,"Weight O/H":60,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":0.5,"Unit Power":3.75,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2309,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Lwaxana '12 Escort Protocol","Effect":1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.08,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3,"O":0.06,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Lwaxana '12 General Protocol","Effect":1.3,"Weight O/H":16,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.105,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Lwaxana '12 Explorer Protocol","Effect":2,"Weight O/H":64,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.12,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":4,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Lwaxana '21 Escort Protocol","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.08,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3,"O":0.06,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Lwaxana '21 General Protocol","Effect":1.425,"Weight O/H":16,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.105,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Lwaxana '21 Explorer Protocol","Effect":2.25,"Weight O/H":64,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.12,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":4,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Onboard Recreation","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] 2260s Rec Space","Effect":0.3,"Weight O/H":4,"Scale Weight":0,"Unit Weight":17.5,"SR Cost x":0.03,"Pwr O/H":1,"Scale Pwr":0.4,"Unit Power":2,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] 2280s Rec Space","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":4,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] 2300s Compact Rec Space","Effect":0.2,"Weight O/H":6,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.04,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":4,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] 2300s Rec Space","Effect":0.6,"Weight O/H":8,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":8,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] 2310s Compact Rec Space","Effect":0.275,"Weight O/H":6,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.04,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":4,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] 2310s Rec Space","Effect":0.725,"Weight O/H":8,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":8,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sickbay","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] S-Medical '24 Standard Sickbay","Effect":0.2,"Weight O/H":0,"Scale Weight":0,"Unit Weight":13,"SR Cost x":0.04,"Pwr O/H":0.5,"Scale Pwr":0.27,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] S-Medical '25 Explorer Sickbay","Effect":0.3,"Weight O/H":10,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] S-Medical '42 Standard Sickbay","Effect":0.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":13,"SR Cost x":0.04,"Pwr O/H":0.5,"Scale Pwr":0.27,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] S-Medical '46 Explorer Sickbay","Effect":0.35,"Weight O/H":10,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] S-Medical '61 Standard Sickbay","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":13,"SR Cost x":0.04,"Pwr O/H":0.5,"Scale Pwr":0.27,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] S-Medical '68 Explorer Sickbay","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] S-Medical '84 Pattern Sickbay","Effect":0.5,"Weight O/H":10,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.06,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] S-Medical '04 Pattern Sickbay","Effect":0.6,"Weight O/H":10,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.18,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] T'Koren Pattern Small Sickbay","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.045,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] T'Koren Pattern Large Sickbay","Effect":0.7,"Weight O/H":10,"Scale Weight":0,"Unit Weight":22,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] T'Koren-B Pattern Small Sickbay","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.045,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2319,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] T'Koren-B Pattern Large Sickbay","Effect":0.8,"Weight O/H":10,"Scale Weight":0,"Unit Weight":22,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2319,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] T'Koren-B Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] T'Koren-C Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T5] T'Koren-D Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T6] Pulaski Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Single Alloy-2 Duranium Hull","Effect":0.33,"Weight O/H":0,"Scale Weight":15,"Unit Weight":0,"SR Cost x":0.011,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.25,"T":0.04,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Double Alloy-2 Duranium Hull","Effect":0.62,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.014,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.02,"E":0.4,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Duranium w/ Bartridium Rebar","Effect":0.725,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.0375,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.2,"E":0.5,"T":0.2,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Single Alloy-4 Duranium Hull","Effect":0.34,"Weight O/H":0,"Scale Weight":14,"Unit Weight":0,"SR Cost x":0.011,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.25,"T":0.04,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Double Alloy-4 Duranium Hull","Effect":0.66,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.014,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.02,"E":0.4,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Duranium w/ Bartridium Rebar","Effect":0.775,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.0375,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.2,"E":0.5,"T":0.2,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Single Duranium Hull","Effect":0.35,"Weight O/H":0,"Scale Weight":13,"Unit Weight":0,"SR Cost x":0.011,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.25,"T":0.04,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Double Duranium Hull","Effect":0.7,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.014,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.02,"E":0.4,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Duranium w/ Exotic Rebar","Effect":0.8,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.0375,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.2,"E":0.5,"T":0.2,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Grade","Effect":0.25,"Weight O/H":0,"Scale Weight":11.5,"Unit Weight":0,"SR Cost x":0.001,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Lt. Alloy-1 Duranium Hull","Effect":0.36,"Weight O/H":0,"Scale Weight":12.5,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Duranium-335 Alloy Hull","Effect":0.74,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.05,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Duranium-447 Alloy Hull","Effect":0.85,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.016,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Lt. Alloy-2 Duranium Hull","Effect":0.37,"Weight O/H":0,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Med. Alloy-2 Duranium Hull","Effect":0.78,"Weight O/H":35,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.015,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.075,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Hvy. Alloy-2 Duranium Hull","Effect":0.9,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.018,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Lt. Alloy-3 Duranium Hull","Effect":0.38,"Weight O/H":0,"Scale Weight":11.5,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Med. Alloy-3 Duranium Hull","Effect":0.82,"Weight O/H":35,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.015,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.075,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Hvy. Alloy-3 Duranium Hull","Effect":0.95,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.018,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Lt. Alloy-4 Duranium Hull","Effect":0.4,"Weight O/H":0,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Med. Alloy-4 Duranium Hull","Effect":0.86,"Weight O/H":35,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.015,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.075,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Hvy. Alloy-4 Duranium Hull","Effect":1,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.018,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No SIF","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Type-I-L SIF","Effect":0.215,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Type-I SIF","Effect":0.375,"Weight O/H":10,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.05,"E":0.35,"T":0.05,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mars-III Special SIF","Effect":0.5,"Weight O/H":27,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.22,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.08,"E":0.4,"T":0.075,"Reliability":0.998,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Type-II-L SIF","Effect":0.25,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Type-II SIF","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.05,"E":0.35,"T":0.05,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mars-IV Special SIF","Effect":0.6,"Weight O/H":27,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.22,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.08,"E":0.4,"T":0.075,"Reliability":0.998,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Type-III-L SIF","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Type-III SIF","Effect":0.45,"Weight O/H":10,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.05,"E":0.35,"T":0.05,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mars-V Special SIF","Effect":0.7,"Weight O/H":27,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.22,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.08,"E":0.4,"T":0.075,"Reliability":0.998,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Type-IV-L SIF","Effect":0.6,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Type-IV SIF","Effect":0.75,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-IV-H SIF","Effect":0.9,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type-V-L SIF","Effect":0.65,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Type-V SIF","Effect":0.8,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-V-H SIF","Effect":0.95,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type-VI-L SIF","Effect":0.675,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Type-VI SIF","Effect":0.825,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Type-VI-H SIF","Effect":0.975,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type-VII-L SIF","Effect":0.7,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Type-VII SIF","Effect":0.85,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Type-VII-H SIF","Effect":1,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Type-VIII-L SIF","Effect":0.725,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Type-VIII SIF","Effect":0.9,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Type-VIII-H SIF","Effect":1.1,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Shields","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] AAE-L Monophasic Escort Pattern","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":2,"Unit Power":1.5,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] AAE-M Cyclic Monophasic","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.1,"E":0.005,"T":0.14,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] AAE-H Monophasic Heavy Pattern","Effect":0.8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.175,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] AAE-B-L Monophasic Escort Pattern","Effect":0.7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":2,"Unit Power":1.5,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] AAE-B-M Cyclic Monophasic","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.1,"E":0.005,"T":0.14,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] AAE-B-H Monophasic Heavy Pattern","Effect":1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.175,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Mk1 Monophasic Escort Pattern","Effect":0.8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":2,"Unit Power":1.5,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mk1 Cyclic Monophasic E-Type","Effect":1.05,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.1,"E":0.005,"T":0.14,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mk1 Monophasic Heavy Pattern","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.175,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mk-III-E Shield Gens","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mk-III-H Shield Gens","Effect":1.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":4,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Mk-III-SH Shield Gens","Effect":1.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.135,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":4,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mk-IV-E Shield Gens","Effect":0.95,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mk-IV-H Shield Gens","Effect":1.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":4.5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mk-V-E Shield Gens","Effect":1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mk-V-H Shield Gens","Effect":1.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mk-V-SH Shield Gens","Effect":1.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.135,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mk-VI-E Shield Gens","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mk-VI-H Shield Gens","Effect":1.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mk-VI-SH Shield Gens","Effect":2.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.135,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Monophasic Shields (2260s DS)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Biphasic Shields (DS I)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Detuned Ellipsoidal Shields (DS II)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Polyphasic Shields (DS III)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Self-Integrating Shields (DS IV)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"xNo Nav Deflector","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Saucer-Only Polyphasic Deflector","Effect":0.2,"Weight O/H":2,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.04,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Polyphasic Deflector","Effect":0.25,"Weight O/H":4,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.06,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Advanced Polyphasic Deflector","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.08,"E":0.075,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Saucer-Only Gravitic Deflector","Effect":0.25,"Weight O/H":2,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.04,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Gravitic Deflector","Effect":0.3,"Weight O/H":4,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.06,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Advanced Gravitic Deflector","Effect":0.5,"Weight O/H":4,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.08,"E":0.075,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Saucer-Only Graviton Deflector","Effect":0.3,"Weight O/H":2,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.04,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Graviton Deflector","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.06,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Advanced Graviton Deflector","Effect":0.6,"Weight O/H":4,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.08,"E":0.075,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Graviton Beam Deflector Saucer-Only","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.11,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Advanced Graviton Beam Deflector","Effect":0.65,"Weight O/H":8,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.11,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Modulated Graviton Beam Deflector Saucer-Only","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.11,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Modulated Graviton Beam Deflector","Effect":0.7,"Weight O/H":7.5,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.11,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Graviton Wavefront Deflector Saucer-Only","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.1,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2317,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Graviton Wavefront Deflector","Effect":0.75,"Weight O/H":7.5,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.1,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":2317,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Shaped Wavefront Deflector Saucer-Only","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.1,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Shaped Wavefront Deflector","Effect":0.825,"Weight O/H":7.5,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.1,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Graviton Beam Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Modulated Graviton Beam Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Graviton Wavefront Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Shaped Wavefront Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Astrodynamic Wavefront Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] SDB-26 Std Impulse","Effect":0.18,"Weight O/H":5,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.17,"Unit Power":0.35,"O":0,"E":0.1,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] SDB R-Type Heavy Impulse","Effect":0.45,"Weight O/H":35,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.09,"Pwr O/H":0.1,"Scale Pwr":0.12,"Unit Power":0.25,"O":0.1,"E":0.045,"T":0.045,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] SDB-44 Std Impulse","Effect":0.2,"Weight O/H":5,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.17,"Unit Power":0.35,"O":0,"E":0.1,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] SDB C-Type Heavy Impulse","Effect":0.55,"Weight O/H":35,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.09,"Pwr O/H":0.1,"Scale Pwr":0.12,"Unit Power":0.25,"O":0.1,"E":0.045,"T":0.045,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] SDB-65 Std Impulse","Effect":0.22,"Weight O/H":5,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.17,"Unit Power":0.35,"O":0,"E":0.1,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] SDB E-Type Heavy Impulse","Effect":0.65,"Weight O/H":35,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.09,"Pwr O/H":0.1,"Scale Pwr":0.12,"Unit Power":0.25,"O":0.1,"E":0.045,"T":0.045,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Basic Impulse","Effect":0.2,"Weight O/H":10,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.02,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.2,"O":0,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] SDB-86 Impulse Drive Sys","Effect":0.26,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] SDB-97 High-Power Impulse Drive Sys","Effect":0.3,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] SDB-97 High-Efficiency Impulse Drive Sys","Effect":0.75,"Weight O/H":45,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.025,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] SDB-09 High-Power Impulse Drive Sys","Effect":0.36,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] SDB-09 High-Efficiency Impulse Drive Sys","Effect":0.85,"Weight O/H":45,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.025,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] SDB-09 High-Power Impulse Drive Sys","Effect":0.42,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] SDB-09 High-Efficiency Impulse Drive Sys","Effect":0.95,"Weight O/H":45,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.025,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Warp Drive","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] 2 X Saladin Nacelles","Effect":0.77,"Weight O/H":5,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] 2 X Ranger Heavy Nacelles","Effect":1.1,"Weight O/H":10,"Scale Weight":0,"Unit Weight":85,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] 2 X Soyuz Nacelles","Effect":0.89,"Weight O/H":5,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] 2 X Constitution Heavy Nacelles","Effect":1.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":85,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] 2 X Miranda Nacelles","Effect":1.084,"Weight O/H":5,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] 4 X Constellation Nacelles","Effect":1.088,"Weight O/H":5,"Scale Weight":0,"Unit Weight":55,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] 2 X Constitution-A Heavy Nacelles","Effect":1.626,"Weight O/H":10,"Scale Weight":0,"Unit Weight":85,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] 2 X Centaur Nacelles","Effect":1.174,"Weight O/H":5,"Scale Weight":0,"Unit Weight":65,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] 2 X Excelsior Pattern Nacelles","Effect":2.457,"Weight O/H":20,"Scale Weight":0,"Unit Weight":120,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] 2 X Centaur-A Pattern Nacelle","Effect":1.536,"Weight O/H":5,"Scale Weight":0,"Unit Weight":50,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":4,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] 2 X 2305 Cruiser Nacelle","Effect":2.16,"Weight O/H":10,"Scale Weight":0,"Unit Weight":80,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3.5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] 2 X Excelsior Type-II Pattern Nacelles","Effect":2.52,"Weight O/H":20,"Scale Weight":0,"Unit Weight":135,"SR Cost x":0.16,"Pwr O/H":5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] 2 X New Orleans Pattern Nacelles","Effect":1.85,"Weight O/H":5.25,"Scale Weight":0,"Unit Weight":52,"SR Cost x":0.15,"Pwr O/H":6,"Scale Pwr":6,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] 2 X Ambassador Pattern Nacelles","Effect":2.64,"Weight O/H":20,"Scale Weight":0,"Unit Weight":125,"SR Cost x":0.16,"Pwr O/H":5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T-1] Constitution-A Pattern Nacelles","Effect":1.25,"Weight O/H":10,"Scale Weight":0,"Unit Weight":55,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Dual Layer Field Effect Coils","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Onboard Industry","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] S-Medical Mk I Protein Synth","Effect":0.1,"Weight O/H":7,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] S-Medical Mk I High-Endurance Protein Synth","Effect":0.2,"Weight O/H":7,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] S-Medical Mk II Protein Synth","Effect":0.15,"Weight O/H":7,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] S-Medical Mk II High-Endurance Protein Synth","Effect":0.25,"Weight O/H":7,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] S-Medical Mk III Protein Synth","Effect":0.2,"Weight O/H":7,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] S-Medical Mk III High-Endurance Protein Synth","Effect":0.375,"Weight O/H":7,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] S-Medical Mk IV Protein Synth","Effect":0.3,"Weight O/H":7,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] S-Medical Mk IV High-Endurance Protein Synth","Effect":0.5,"Weight O/H":7,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] S-Medical Mk V Protein Synth","Effect":0.4,"Weight O/H":7,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] S-Medical Mk V High-Endurance Protein Synth","Effect":0.625,"Weight O/H":7,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] S-Medical Mk VI Protein Synth","Effect":0.5,"Weight O/H":7,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] S-Medical Mk VI High-Endurance Protein Synth","Effect":0.75,"Weight O/H":7,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Fuel","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] 2220-Light Pattern Deuterium Tanks","Effect":0.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] 2220-Heavy Pattern Deuterium Tanks","Effect":0.4,"Weight O/H":30,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] 2220-Large Ship Pattern Deuterium Tanks","Effect":0.8,"Weight O/H":80,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.0675,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] 2240-Light Pattern Deuterium Tanks","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] 2240-Heavy Pattern Deuterium Tanks","Effect":0.55,"Weight O/H":30,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] 2240-Large Ship Pattern Deuterium Tanks","Effect":0.9,"Weight O/H":80,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.0675,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] 2260-Light Pattern Deuterium Tanks","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] 2260-Heavy Pattern Deuterium Tanks","Effect":0.7,"Weight O/H":30,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] 2260-Large Ship Pattern Deuterium Tanks","Effect":1,"Weight O/H":80,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.0675,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] 2295-Light Pattern Deuterium Tanks","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] 2285-Super-Heavy Pattern Deuterium","Effect":1.2,"Weight O/H":85,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] 2305-Light Pattern Deuterium Tanks","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2304,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] 2305-Heavy Pattern Deuterium Tanks","Effect":1.1,"Weight O/H":40,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2304,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] 2305-Super-Heavy Pattern Deuterium","Effect":1.4,"Weight O/H":85,"Scale Weight":0,"Unit Weight":3,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2304,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] 2310-Light Pattern Deuterium Tanks","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] 2310-Heavy Pattern Deuterium Tanks","Effect":1.25,"Weight O/H":40,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] 2310-Super-Heavy Pattern Deuterium","Effect":1.6,"Weight O/H":85,"Scale Weight":0,"Unit Weight":3,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] 2310-Light Pattern Deuterium Tanks","Effect":0.7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] 2310-Heavy Pattern Deuterium Tanks","Effect":1.4,"Weight O/H":40,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] 2310-Super-Heavy Pattern Deuterium","Effect":1.8,"Weight O/H":85,"Scale Weight":0,"Unit Weight":3,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Mk1 Antimatter Containment Tank","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Yoyodyne Pulse Fusion (Fusion Only)","Effect":10,"Weight O/H":8,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.05,"T":0.05,"Reliability":1,"Year Available (SF)":2120,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][C+] Delta Vega-12 Warp Core","Effect":26,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][R+C+] Venus-I C-Layout Warp Core","Effect":34,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][C-SR+] YYD-VI Heavy Core","Effect":34,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][C+] Delta Vega-12 Warp Core","Effect":28,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][R+C+] Venus-II C-Layout Warp Core","Effect":36,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][C-SR+] Type-E Block-1 Automated Core","Effect":36,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][C+] Delta Vega-24 Warp Core","Effect":29,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][R+C+] Venus-III C-Layout Warp Core","Effect":38,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][C-SR+] Type-E Block-2 Automated Core","Effect":38,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][R-C-SR+] Delta Vega-28 Automated Core","Effect":30,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.025,"T":0.05,"Reliability":0.995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][C+] Delta Vega-26 Warp Core","Effect":30,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][R+C+] Venus-IV C-Layout Warp Core","Effect":40,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][C-SR+] Type-E Block-3 Automated Core","Effect":40,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R---C+] Type-I Experimental (40E) Warp Core","Effect":40,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.98,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R---C+] Type-II Experimental (Venus) Warp Core","Effect":50,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.13,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.98,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R+C-] Type-E Block-4 Automated Core","Effect":42,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.999,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R--C-SR+] ONA-III-L Experimental","Effect":41,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.16,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.065,"T":0.05,"Reliability":0.99,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][C+] Type-I Block-A (40E) Warp Core","Effect":41,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.997,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R--C-SR+] ONA-III-M Experimental","Effect":51,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.06,"E":0.075,"T":0.06,"Reliability":0.99,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R-C+] Type-III Block-A (YYD) Warp Core","Effect":51,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.11,"E":0.16,"T":0.11,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R--C-SR+] ONA-III-H Experimental","Effect":61,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.085,"T":0.07,"Reliability":0.99,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][C+] Type-II Block-A (Venus) Warp Core","Effect":61,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.12,"E":0.17,"T":0.12,"Reliability":0.997,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R-C-SR+] ONA-IV-L Standard","Effect":42,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.065,"T":0.05,"Reliability":0.995,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R+C+] Type-I Block-B (40E) Warp Core","Effect":42,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.999,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][R-C-SR+] ONA-IV-M Standard","Effect":52,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.16,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.06,"E":0.075,"T":0.06,"Reliability":0.995,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][C+] Type-III Block-B (YYD) Warp Core","Effect":52,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.11,"E":0.16,"T":0.11,"Reliability":0.997,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R-C-SR+] ONA-IV-H Standard","Effect":62,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.16,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.085,"T":0.07,"Reliability":0.995,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R+C+] Type-II Block-B (Venus) Warp Core","Effect":62,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.12,"E":0.17,"T":0.12,"Reliability":0.999,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2][R--]Integrated Injectors","Effect":-4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":0.99,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][C-] Luna-I High-Efficiency M/AM System","Effect":6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M][R+] Mk IV M/AM System","Effect":9,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.5,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][C+SR+] Mk IV High Volume M/AM System","Effect":13.5,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.5,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][C-] Luna-II High-Efficiency M/AM System","Effect":7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M][R+] Mk V M/AM System","Effect":10.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.5,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][C+SR+] Mk V High Volume M/AM System","Effect":15.75,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.5,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][C-] Luna-III High-Efficiency M/AM System","Effect":8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M][R+] Mk VI M/AM System","Effect":12,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.5,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][C+SR+] Mk VI High Volume M/AM System","Effect":18,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.5,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][C-] Luna-IV High-Efficiency M/AM System","Effect":9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.2,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M][R+] Mk VII Sublimator-Compressor","Effect":13.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.77,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][C+SR+] Mk VII Complex Sublimator-Compressor","Effect":20.25,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.81,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R-C-] Luna-V High-Efficiency M/AM System","Effect":10,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mk VIII Sublimator-Compressor","Effect":15,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.04,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R-C+SR+] Mk VIII High Volume Compressor","Effect":22.5,"Weight O/H":12,"Scale Weight":0,"Unit Weight":16.12,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R-C-] Luna-VI High-Efficiency M/AM System","Effect":11,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.6,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mk IX Sublimator-Compressor","Effect":16.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.31,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R-C+SR+] Mk IX High Volume Compressor","Effect":24.75,"Weight O/H":12,"Scale Weight":0,"Unit Weight":16.43,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R-C-] Luna-VII High-Efficiency M/AM System","Effect":12,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.8,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mk X Sublimator-Compressor","Effect":18,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.58,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R-C+SR+] Mk X High Volume Compressor","Effect":27,"Weight O/H":12,"Scale Weight":0,"Unit Weight":16.74,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L][R-C-] Luna-VIII High-Efficiency M/AM System","Effect":13,"Weight O/H":0,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Mk XI Sublimator-Compressor","Effect":19.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.85,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H][R-C+SR+] Mk XI High Volume Compressor","Effect":29.25,"Weight O/H":12,"Scale Weight":0,"Unit Weight":17.05,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2][R-SR-] Integrated Coolant","Effect":-15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][R-] Mk IV Mod L Coolant System","Effect":-14.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Mk IV Yoyodyne Coolant System","Effect":-11,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][R-] Mk V Mod L Coolant System","Effect":-14,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Mk V Yoyodyne Coolant System","Effect":-10.25,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][R-] Mk V Mod L Coolant System","Effect":-13,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mk V Yoyodyne Coolant System","Effect":-10,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][R-SR-] VSA-12-L Efficient Coolant System","Effect":-12.1875,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.03,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mk VI Mod L Yoyodyne Coolant System","Effect":-9.75,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][SR-] SBD-VI Efficient Coolant System","Effect":-4.875,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][R+] Mk VI Mod H Yoyodyne Coolant System","Effect":-3.9,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R-SR-] VSA-13-L Efficient Coolant System","Effect":-11.875,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mk VII Mod L Yoyodyne Coolant System","Effect":-9.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][SR-] SBD-VII Efficient Coolant System","Effect":-4.75,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R+] Mk VII Mod H Yoyodyne Coolant System","Effect":-3.8,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R-SR-] VSA-14-L Efficient Coolant System","Effect":-11.5625,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mk VIII Mod L Yoyodyne Coolant System","Effect":-9.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R+SR+] Mars-8 Experimental Coolant System","Effect":-7.4,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.0125,"E":0.0125,"T":0.0125,"Reliability":1.005,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][SR-] SBD-VIII Efficient Coolant System","Effect":-4.625,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R+] Mk VIII Mod H Yododyne SBD Coolant System","Effect":-3.7,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R-SR-] VSA-15-L Efficient Coolant System","Effect":-11.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mk IX Mod L Yoyodyne Coolant System","Effect":-9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][R+SR+] Mars-9 Experimental Coolant System","Effect":-7.2,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.0125,"E":0.0125,"T":0.0125,"Reliability":1.005,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][SR-] SBD-IX Efficient Coolant System","Effect":-4.5,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R+] Mk IX Mod H Yoyodyne Coolant System","Effect":-3.6,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T-1] Constitution Coolant System","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Basic Plasma Intercooler","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Mk II Plasma Intercooler","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"xNo EPS Manifold","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][R+] Tellar HIG-63 Pulse Injection Manifold","Effect":7,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M][R++E+] VSA-1 Plasma Manifold","Effect":10.25,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][R++O+] YYD-M3 Manifold","Effect":13,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][R+] Tellar HIG-76 Pulse Injection Manifold","Effect":8,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M][R++E+] VSA-2 Plasma Manifold","Effect":11.5,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][R++O+] YYD-M4 Manifold","Effect":14,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][R+] Tellar HIG-84 Pulse Injection Manifold","Effect":9,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M][R++E+] VSA-3 Plasma Manifold","Effect":13,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][R++O+] SBD-1 Manifold","Effect":15.5,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][R+] Tellar HIG-92 Pulse Injection Manifold","Effect":10,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] VSA-4 Pulse Injection Manifold","Effect":14,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][R-] SF-V Performance Manifold","Effect":17,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R+] Tellar HIG-103 Pulse Injection Manifold","Effect":11,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] VSA-5 Pulse Injection Manifold","Effect":15.25,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][SR-] 40EA-I Industrial Injection Manifold","Effect":9,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R+] Tellar HIG-110 Pulse Injection Manifold","Effect":12,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][SR-] SBD-A Efficient Manifold","Effect":12.375,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.997,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R+] VSA-6 Pulse Injection Manifold","Effect":16.5,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R-SR-] YYD-4 Performance Manifold","Effect":15,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.995,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] SF-VII Performance Manifold","Effect":20,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.997,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][SR-] 40EA-II Industrial Injection Manifold","Effect":9.75,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.998,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R+] Tellar HIG-117 Pulse Injection Manifold","Effect":13,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9995,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][SR-] SBD-B Efficient Manifold","Effect":13.3125,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][R+] VSA-7 Pulse Injection Manifold","Effect":17.75,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R-SR-] YYD-5 Performance Manifold","Effect":16.125,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.996,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] SF-VIII Performance Manifold","Effect":21.5,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L][SR-] 40EA-III Industrial Injection Manifold","Effect":10.5,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L][R+] Tellar HIG-122 Pulse Injection Manifold","Effect":14,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M][SR-] SBD-C Efficient Manifold","Effect":14.25,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M][R+] VSA-8 Pulse Injection Manifold","Effect":19,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H][R-SR-] YYD-7 Performance Manifold","Effect":17.25,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.996,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] SF-IX Performance Manifold","Effect":23,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Ion Distributor","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Pulse Injection Manifold","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Phased Injection Manifold","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Eject","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":0.7,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-3,"Size Sort":-99,"Size Class":"N/A","Name":"[T-3] Manual Ejection - Early Mechanical","Effect":0,"Weight O/H":15,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.65,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Manual Ejection - Mechanical","Effect":0,"Weight O/H":15,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.6,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-1,"Size Sort":-99,"Size Class":"N/A","Name":"[T-1] Manual Ejection - Basic EM Rails","Effect":0,"Weight O/H":10,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":1,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.5,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":0,"Size Sort":-99,"Size Class":"N/A","Name":"[T0] EngOS Monitoring - Heavy EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.45,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":1,"Size Sort":-99,"Size Class":"N/A","Name":"[T1] EngOS Monitoring - Super Heavy EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.375,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":2,"Size Sort":-99,"Size Class":"N/A","Name":"[T2] EngOS Monitoring - Anak-Krueger EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.365,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":3,"Size Sort":-99,"Size Class":"N/A","Name":"[T3] EngOS 3.1 Monitoring - YYD-Emergency VI EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.36,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""}]
 
 /***/ }),
-/* 160 */
+/* 161 */
 /***/ (function(module, exports) {
 
 module.exports = [{"Type":"No Module","Weight Cap":0,"Variant":"-","Tier":-99,"Build Time":0,"C":0,"S":0,"H":0,"L":0,"P":0,"D":0,"Weight":0,"SR Cost":0,"Power Cost":0,"O":0,"E":0,"T":0,"Reliability":"100.000%"},{"Type":"Miranda Rollbar","Weight Cap":0,"Variant":"Combat","Tier":-1,"Build Time":0.25,"C":1,"S":0,"H":0,"L":0,"P":0,"D":0,"Weight":50,"SR Cost":5,"Power Cost":5,"O":0.1,"E":0.25,"T":0.1,"Reliability":"100.000%"},{"Type":"Miranda Rollbar","Weight Cap":0,"Variant":"Science","Tier":-1,"Build Time":0.25,"C":0,"S":1,"H":0,"L":0,"P":0,"D":0,"Weight":50,"SR Cost":5,"Power Cost":5,"O":0.1,"E":0.1,"T":0.25,"Reliability":"100.000%"},{"Type":"300kt Module Placeholder","Weight Cap":300,"Variant":"Combat *","Tier":0,"Build Time":0.5,"C":1,"S":0,"H":0.5,"L":0,"P":0,"D":0,"Weight":100,"SR Cost":10,"Power Cost":10,"O":0.25,"E":0.4,"T":0.2,"Reliability":"100.000%"},{"Type":"300kt Module Placeholder","Weight Cap":300,"Variant":"Diplomacy *","Tier":0,"Build Time":0.5,"C":0,"S":0,"H":0,"L":0,"P":1.5,"D":0,"Weight":100,"SR Cost":10,"Power Cost":10,"O":0.35,"E":0.35,"T":0.25,"Reliability":"100.000%"},{"Type":"300kt Module Placeholder","Weight Cap":300,"Variant":"Science *","Tier":0,"Build Time":0.5,"C":0,"S":1.5,"H":0,"L":0,"P":0,"D":0,"Weight":100,"SR Cost":10,"Power Cost":10,"O":0.2,"E":0.25,"T":0.4,"Reliability":"100.000%"},{"Type":"300kt Module Placeholder","Weight Cap":300,"Variant":"Shields *","Tier":0,"Build Time":0.5,"C":0,"S":0,"H":0,"L":1.5,"P":0,"D":0,"Weight":100,"SR Cost":15,"Power Cost":10,"O":0.35,"E":0.35,"T":0.25,"Reliability":"100.000%"},{"Type":"450kt Module Placeholder","Weight Cap":450,"Variant":"Combat *","Tier":1,"Build Time":0.75,"C":1,"S":0,"H":0.5,"L":0,"P":0,"D":0,"Weight":150,"SR Cost":10,"Power Cost":10,"O":0.25,"E":0.4,"T":0.2,"Reliability":"100.000%"},{"Type":"450kt Module Placeholder","Weight Cap":450,"Variant":"Diplomacy *","Tier":1,"Build Time":0.75,"C":0,"S":0,"H":0,"L":0,"P":1.5,"D":0,"Weight":150,"SR Cost":10,"Power Cost":10,"O":0.35,"E":0.35,"T":0.25,"Reliability":"100.000%"},{"Type":"450kt Module Placeholder","Weight Cap":450,"Variant":"Science *","Tier":1,"Build Time":0.75,"C":0,"S":1.5,"H":0,"L":0,"P":0,"D":0,"Weight":150,"SR Cost":10,"Power Cost":10,"O":0.2,"E":0.25,"T":0.4,"Reliability":"100.000%"},{"Type":"450kt Module Placeholder","Weight Cap":450,"Variant":"Shields *","Tier":1,"Build Time":0.75,"C":0,"S":0,"H":0,"L":1.5,"P":0,"D":0,"Weight":150,"SR Cost":15,"Power Cost":10,"O":0.35,"E":0.35,"T":0.25,"Reliability":"100.000%"}]
 
 /***/ }),
-/* 161 */
+/* 162 */
 /***/ (function(module, exports) {
 
 module.exports = [{"Type Sort":0,"Type":"Frame","Tier":-3,"Weight Class":1,"Size Class":"","Name":"[T-3] 250kt Frigate Frame","MaxSz":250,"Wt":50,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.08,"T-Mod":1,"SR-Mod":0.925,"Year Available (SF)":2230,"Weight Class List":"Frigate"},{"Type Sort":0,"Type":"Frame","Tier":-3,"Weight Class":1,"Size Class":"","Name":"[T-3] 400kt Frigate Frame","MaxSz":400,"Wt":70,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.09,"T-Mod":1,"SR-Mod":0.925,"Year Available (SF)":2230,"Weight Class List":"Cruiser"},{"Type Sort":0,"Type":"Frame","Tier":-3,"Weight Class":1,"Size Class":"","Name":"[T-3] 600kt Frigate Frame","MaxSz":600,"Wt":100,"Build Time":"11/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.76,"E-Mod":1.11,"T-Mod":1,"SR-Mod":0.925,"Year Available (SF)":2230,"Weight Class List":"Explorer"},{"Type Sort":0,"Type":"Frame","Tier":-2,"Weight Class":1,"Size Class":"","Name":"[T-2] 300kt Frigate Frame","MaxSz":300,"Wt":55,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.08,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-2,"Weight Class":1,"Size Class":"","Name":"[T-2] 450kt Frigate Frame","MaxSz":450,"Wt":75,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.09,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-2,"Weight Class":1,"Size Class":"","Name":"[T-2] 600kt Frigate Frame","MaxSz":600,"Wt":90,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-1,"Weight Class":1,"Size Class":"","Name":"[T-1] 400kt Frigate Frame","MaxSz":400,"Wt":70,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.09,"T-Mod":1,"SR-Mod":0.9675,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-1,"Weight Class":1,"Size Class":"","Name":"[T-1] 700kt Frigate Frame","MaxSz":700,"Wt":100,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.1,"T-Mod":1,"SR-Mod":0.9675,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":0,"Weight Class":1,"Size Class":"","Name":"[T0] 650kt Frigate Frame","MaxSz":650,"Wt":95,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.1,"T-Mod":1,"SR-Mod":0.975,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":0,"Weight Class":1,"Size Class":"","Name":"[T0] 800kt Frigate Frame","MaxSz":800,"Wt":105,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.1,"T-Mod":1,"SR-Mod":0.975,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":1,"Weight Class":1,"Size Class":"","Name":"[T1] 450kt Frigate Frame","MaxSz":450,"Wt":70,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.725,"E-Mod":1.05,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2310,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":1,"Weight Class":1,"Size Class":"","Name":"[T1] 900kt Frigate Frame","MaxSz":900,"Wt":135,"Build Time":"11/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.2,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2310,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":1,"Size Class":"","Name":"[T2] 750kt Frigate Frame","MaxSz":750,"Wt":95,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.75,"E-Mod":1.2,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":1,"Size Class":"","Name":"[T2] 1050kt Frigate Frame","MaxSz":1050,"Wt":155,"Build Time":"14/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.85,"E-Mod":1.2,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":1,"Size Class":"","Name":"[T3] 450kt Frigate Frame","MaxSz":450,"Wt":67,"Build Time":"7/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.7,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":1,"Size Class":"","Name":"[T3] 600kt Frigate Frame","MaxSz":600,"Wt":85,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.7,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":1,"Size Class":"","Name":"[T3] 1050kt Frigate Frame","MaxSz":1050,"Wt":145,"Build Time":"12/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.825,"E-Mod":1.15,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-3,"Weight Class":2,"Size Class":"","Name":"[T-3] 700kt Cruiser Frame","MaxSz":700,"Wt":115,"Build Time":"13/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.975,"E-Mod":1.25,"T-Mod":0.875,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-2,"Weight Class":2,"Size Class":"","Name":"[T-2] 750kt Cruiser Frame","MaxSz":750,"Wt":110,"Build Time":"13/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-1,"Weight Class":2,"Size Class":"","Name":"[T-1] 1mt Cruiser Frame","MaxSz":1000,"Wt":170,"Build Time":"15/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":0,"Weight Class":2,"Size Class":"","Name":"[T0] 1500kt Cruiser Frame","MaxSz":1500,"Wt":240,"Build Time":"16/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":1,"Weight Class":2,"Size Class":"","Name":"[T1] 1mt Cruiser Frame","MaxSz":1000,"Wt":160,"Build Time":"13/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2310,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":1,"Weight Class":2,"Size Class":"","Name":"[T1] 1800kt Cruiser Frame","MaxSz":1800,"Wt":300,"Build Time":"19/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2310,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":2,"Size Class":"","Name":"[T2] 2100kt Cruiser Frame","MaxSz":2100,"Wt":375,"Build Time":"22/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":2,"Size Class":"","Name":"[T3] 1mt Cruiser Frame","MaxSz":1000,"Wt":150,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":2,"Size Class":"","Name":"[T3] 1500kt Cruiser Frame","MaxSz":1500,"Wt":230,"Build Time":"13/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":2,"Size Class":"","Name":"[T3] 2100kt Cruiser Frame","MaxSz":2100,"Wt":365,"Build Time":"19/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1.2,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-3,"Weight Class":3,"Size Class":"","Name":"[T-3] 750kt 'Ranger' Frame","MaxSz":750,"Wt":100,"Build Time":"12/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1.1,"E-Mod":1.1,"T-Mod":0.95,"SR-Mod":1.2,"Year Available (SF)":2220,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-2,"Weight Class":3,"Size Class":"","Name":"[T-2] 1mt 'Constitution' Frame","MaxSz":1050,"Wt":115,"Build Time":"15/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1.1,"E-Mod":1.1,"T-Mod":0.95,"SR-Mod":1.2,"Year Available (SF)":2240,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":-1,"Weight Class":3,"Size Class":"","Name":"[T-1] 1800kt Explorer Frame","MaxSz":1800,"Wt":300,"Build Time":"18/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":0.875,"SR-Mod":1.1,"Year Available (SF)":2260,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":0,"Weight Class":3,"Size Class":"","Name":"[T0] 2400kt Explorer Frame","MaxSz":2400,"Wt":425,"Build Time":"21/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.85,"SR-Mod":1.1,"Year Available (SF)":2280,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":1,"Weight Class":3,"Size Class":"","Name":"[T1] 3100kt Explorer Frame","MaxSz":3100,"Wt":550,"Build Time":"24/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.825,"E-Mod":0.825,"T-Mod":0.775,"SR-Mod":1.1,"Year Available (SF)":2310,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":3,"Size Class":"","Name":"[T2] 2400kt Explorer Frame","MaxSz":2400,"Wt":410,"Build Time":"18/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.85,"E-Mod":0.85,"T-Mod":0.8,"SR-Mod":1.1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":3,"Size Class":"","Name":"[T2] 3100kt Explorer Frame","MaxSz":3100,"Wt":525,"Build Time":"21/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.8,"E-Mod":0.8,"T-Mod":0.75,"SR-Mod":1.1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":2,"Weight Class":3,"Size Class":"","Name":"[T2] 3400kt Explorer Frame","MaxSz":3400,"Wt":555,"Build Time":"24/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.825,"E-Mod":0.825,"T-Mod":0.775,"SR-Mod":1.1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":3,"Size Class":"","Name":"[T3] 2700kt Explorer Frame","MaxSz":2700,"Wt":450,"Build Time":"18/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.825,"E-Mod":0.825,"T-Mod":0.775,"SR-Mod":1.1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":3,"Size Class":"","Name":"[T3] 3400kt Explorer Frame","MaxSz":3400,"Wt":540,"Build Time":"21/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.8,"E-Mod":0.8,"T-Mod":0.75,"SR-Mod":1.1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":0,"Type":"Frame","Tier":3,"Weight Class":3,"Size Class":"","Name":"[T3] 4000kt Explorer Frame","MaxSz":4000,"Wt":640,"Build Time":"27/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.825,"E-Mod":0.825,"T-Mod":0.775,"SR-Mod":1.1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":1,"Size Class":1,"Name":"[T-3][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.94,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.965,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":1,"Size Class":2,"Name":"[T-3][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":0.965,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.93,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":1,"Size Class":3,"Name":"[T-3][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":0.97,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.88,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":1,"Size Class":1,"Name":"[T-2][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.95,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.96,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":1,"Size Class":2,"Name":"[T-2][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.92,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":1,"Size Class":3,"Name":"[T-2][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.86,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":1,"Size Class":1,"Name":"[T-1][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.96,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.955,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":1,"Size Class":2,"Name":"[T-1][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.91,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":1,"Size Class":3,"Name":"[T-1][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.84,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":1,"Size Class":1,"Name":"[T0][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.97,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":1,"Size Class":2,"Name":"[T0][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":1,"Size Class":3,"Name":"[T0][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1.05,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.82,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":1,"Size Class":1,"Name":"[T1][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.945,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":1,"Size Class":2,"Name":"[T1][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1.04,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.89,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":1,"Size Class":3,"Name":"[T1][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.8,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":1,"Size Class":1,"Name":"[T2][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":1,"Size Class":2,"Name":"[T2][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1.06,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.88,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":1,"Size Class":3,"Name":"[T2][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1.11,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.78,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":1,"Size Class":1,"Name":"[T3][SR+] Sm Frigate Tactical Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.935,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":1,"Size Class":2,"Name":"[T3][O-] Md Frigate Tactical Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.87,"E-Mod":1,"T-Mod":1,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":1,"Size Class":3,"Name":"[T3][O--SR-] Lg Frigate Tactical Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1.14,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.76,"E-Mod":1,"T-Mod":1,"SR-Mod":0.96,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":2,"Size Class":1,"Name":"[T-3] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.94,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":2,"Size Class":2,"Name":"[T-3][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":0.96,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.99,"T-Mod":0.995,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":2,"Size Class":3,"Name":"[T-3][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":0.97,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.99,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":2,"Size Class":1,"Name":"[T-2] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.95,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":2,"Size Class":2,"Name":"[T-2][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.98,"E-Mod":0.98,"T-Mod":0.99,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":2,"Size Class":3,"Name":"[T-2][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":2,"Size Class":1,"Name":"[T-1] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.96,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":2,"Size Class":2,"Name":"[T-1][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.985,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":2,"Size Class":3,"Name":"[T-1][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.97,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":2,"Size Class":1,"Name":"[T0] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.97,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":2,"Size Class":2,"Name":"[T0][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.96,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":2,"Size Class":3,"Name":"[T0][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1.05,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.91,"E-Mod":0.91,"T-Mod":0.96,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":2,"Size Class":1,"Name":"[T1] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":2,"Size Class":2,"Name":"[T1][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1.04,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.975,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":2,"Size Class":3,"Name":"[T1][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":2,"Size Class":1,"Name":"[T2] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":2,"Size Class":2,"Name":"[T2][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1.06,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.97,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":2,"Size Class":3,"Name":"[T2][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1.11,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.89,"E-Mod":0.89,"T-Mod":0.94,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":2,"Size Class":1,"Name":"[T3] Sm Cruiser Tactical Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":2,"Size Class":2,"Name":"[T3][C-] Md Cruiser Tactical Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.965,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":2,"Size Class":3,"Name":"[T3][C--] Lg Cruiser Tactical Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1.14,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.93,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":3,"Size Class":1,"Name":"[T-3] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.95,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":3,"Size Class":2,"Name":"[T-3][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.965,"E-Mod":0.915,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-3,"Weight Class":3,"Size Class":3,"Name":"[T-3][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.84,"T-Mod":0.94,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":3,"Size Class":1,"Name":"[T-2] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.95,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":3,"Size Class":2,"Name":"[T-2][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.91,"T-Mod":0.97,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-2,"Weight Class":3,"Size Class":3,"Name":"[T-2][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.83,"T-Mod":0.93,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":3,"Size Class":1,"Name":"[T-1] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.96,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":3,"Size Class":2,"Name":"[T-1][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.955,"E-Mod":0.905,"T-Mod":0.96,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":-1,"Weight Class":3,"Size Class":3,"Name":"[T-1][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.82,"T-Mod":0.92,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":3,"Size Class":1,"Name":"[T0] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.97,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":3,"Size Class":2,"Name":"[T0][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1.02,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":0,"Weight Class":3,"Size Class":3,"Name":"[T0][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1.05,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.91,"E-Mod":0.81,"T-Mod":0.91,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":3,"Size Class":1,"Name":"[T1] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.98,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":3,"Size Class":2,"Name":"[T1][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1.04,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.945,"E-Mod":0.895,"T-Mod":0.945,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":1,"Weight Class":3,"Size Class":3,"Name":"[T1][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":3,"Size Class":1,"Name":"[T2] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":0.99,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":3,"Size Class":2,"Name":"[T2][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1.06,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.89,"T-Mod":0.94,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":2,"Weight Class":3,"Size Class":3,"Name":"[T2][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1.11,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.89,"E-Mod":0.79,"T-Mod":0.89,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":3,"Size Class":1,"Name":"[T3] Sm Explorer Tactical Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":3,"Size Class":2,"Name":"[T3][C-] Md Explorer Tactical Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1.08,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.935,"E-Mod":0.885,"T-Mod":0.935,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":1,"Type":"Tactical","Tier":3,"Weight Class":3,"Size Class":3,"Name":"[T3][C--] Lg Explorer Tactical Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1.14,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.88,"E-Mod":0.78,"T-Mod":0.88,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":1,"Size Class":1,"Name":"[T-3][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":0.96,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.98,"SR-Mod":0.96,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":1,"Size Class":2,"Name":"[T-3][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":1.005,"SR-Mod":0.98,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":1,"Size Class":3,"Name":"[T-3][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":0.99,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":1.03,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":1,"Size Class":1,"Name":"[T-2][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.97,"SR-Mod":0.96,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":1,"Size Class":2,"Name":"[T-2][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.995,"SR-Mod":0.98,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":1,"Size Class":3,"Name":"[T-2][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":1.02,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":1,"Size Class":1,"Name":"[T-1][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.96,"SR-Mod":0.96,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":1,"Size Class":2,"Name":"[T-1][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.985,"SR-Mod":0.98,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":1,"Size Class":3,"Name":"[T-1][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":1.01,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":1,"Size Class":1,"Name":"[T0][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":0.99,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.95,"SR-Mod":0.96,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":1,"Size Class":2,"Name":"[T0][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.975,"SR-Mod":0.98,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":1,"Size Class":3,"Name":"[T0][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.07,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":1,"Size Class":1,"Name":"[T1][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.94,"SR-Mod":0.96,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":1,"Size Class":2,"Name":"[T1][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.965,"SR-Mod":0.98,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":1,"Size Class":3,"Name":"[T1][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":0.99,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":1,"Size Class":1,"Name":"[T2][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.93,"SR-Mod":0.96,"Year Available (SF)":2314,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":1,"Size Class":2,"Name":"[T2][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1.06,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.955,"SR-Mod":0.98,"Year Available (SF)":2314,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":1,"Size Class":3,"Name":"[T2][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.13,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2314,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":1,"Size Class":1,"Name":"[T3][T--SR--] Sm Frigate Operations Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.92,"SR-Mod":0.96,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":1,"Size Class":2,"Name":"[T3][OET-SR-] Md Frigate Operations Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1.08,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.945,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":1,"Size Class":3,"Name":"[T3][OE--] Lg Frigate Operations Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.16,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.925,"E-Mod":0.925,"T-Mod":0.97,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":2,"Size Class":1,"Name":"[T-3][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":0.96,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":2,"Size Class":2,"Name":"[T-3][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.995,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":2,"Size Class":3,"Name":"[T-3][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.97,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":2,"Size Class":1,"Name":"[T-2][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":2,"Size Class":2,"Name":"[T-2][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":0.985,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.995,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":2,"Size Class":3,"Name":"[T-2][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.97,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":2,"Size Class":1,"Name":"[T-1][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":2,"Size Class":2,"Name":"[T-1][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.995,"E-Mod":0.985,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":2,"Size Class":3,"Name":"[T-1][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.97,"T-Mod":0.98,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":2,"Size Class":1,"Name":"[T0][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":0.99,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.98,"T-Mod":0.955,"SR-Mod":0.9,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":2,"Size Class":2,"Name":"[T0][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.98,"T-Mod":0.955,"SR-Mod":0.95,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":2,"Size Class":3,"Name":"[T0][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.07,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.98,"E-Mod":0.96,"T-Mod":0.97,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":2,"Size Class":1,"Name":"[T1][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.975,"T-Mod":0.94,"SR-Mod":0.9,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":2,"Size Class":2,"Name":"[T1][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.985,"E-Mod":0.975,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":2,"Size Class":3,"Name":"[T1][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.95,"T-Mod":0.96,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":2,"Size Class":1,"Name":"[T2][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.97,"T-Mod":0.925,"SR-Mod":0.9,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":2,"Size Class":2,"Name":"[T2][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1.06,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.98,"E-Mod":0.97,"T-Mod":0.925,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":2,"Size Class":3,"Name":"[T2][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.13,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.94,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":2,"Size Class":1,"Name":"[T3][T-SR--] Sm Cruiser Operations Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.965,"T-Mod":0.91,"SR-Mod":0.9,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":2,"Size Class":2,"Name":"[T3][T-SR-] Md Cruiser Operations Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1.08,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.975,"E-Mod":0.965,"T-Mod":0.91,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":2,"Size Class":3,"Name":"[T3][OE-] Lg Cruiser Operations Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1.16,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.93,"T-Mod":0.94,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":3,"Size Class":1,"Name":"[T-3][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":0.96,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":3,"Size Class":2,"Name":"[T-3][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-3,"Weight Class":3,"Size Class":3,"Name":"[T-3][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.91,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":3,"Size Class":1,"Name":"[T-2][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":0.97,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":3,"Size Class":2,"Name":"[T-2][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-2,"Weight Class":3,"Size Class":3,"Name":"[T-2][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.91,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":3,"Size Class":1,"Name":"[T-1][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":0.98,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.97,"SR-Mod":0.9,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":3,"Size Class":2,"Name":"[T-1][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":-1,"Weight Class":3,"Size Class":3,"Name":"[T-1][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.91,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":3,"Size Class":1,"Name":"[T0][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":0.99,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.96,"SR-Mod":0.9,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":3,"Size Class":2,"Name":"[T0][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.96,"T-Mod":0.92,"SR-Mod":0.95,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":0,"Weight Class":3,"Size Class":3,"Name":"[T0][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.07,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.88,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":3,"Size Class":1,"Name":"[T1][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.95,"SR-Mod":0.9,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":3,"Size Class":2,"Name":"[T1][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.04,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.9,"SR-Mod":0.95,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":1,"Weight Class":3,"Size Class":3,"Name":"[T1][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.85,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":3,"Size Class":1,"Name":"[T2][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1.01,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.94,"SR-Mod":0.9,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":3,"Size Class":2,"Name":"[T2][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.06,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.88,"SR-Mod":0.95,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":2,"Weight Class":3,"Size Class":3,"Name":"[T2][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.13,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.82,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":3,"Size Class":1,"Name":"[T3][SR--] Sm Explorer Operations Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1.02,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":0.93,"SR-Mod":0.9,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":3,"Size Class":2,"Name":"[T3][C-SR-] Md Explorer Operations Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1.08,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.86,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":2,"Type":"Operations","Tier":3,"Weight Class":3,"Size Class":3,"Name":"[T3][C--] Lg Explorer Operations Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1.16,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.86,"E-Mod":0.86,"T-Mod":0.79,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":1,"Size Class":1,"Name":"[T-3] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.94,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":1,"Size Class":2,"Name":"[T-3][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":1,"Size Class":3,"Name":"[T-3][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":1,"Size Class":1,"Name":"[T-2] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.95,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":1,"Size Class":2,"Name":"[T-2][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":1,"Size Class":3,"Name":"[T-2][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":1,"Size Class":1,"Name":"[T-1] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":1,"Size Class":2,"Name":"[T-1][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":1,"Size Class":3,"Name":"[T-1][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":1,"Size Class":1,"Name":"[T0] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.97,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":1,"Size Class":2,"Name":"[T0][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":1,"Size Class":3,"Name":"[T0][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.05,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":1,"Size Class":1,"Name":"[T1] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":1,"Size Class":2,"Name":"[T1][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.04,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":1,"Size Class":3,"Name":"[T1][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":1,"Size Class":1,"Name":"[T2] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.99,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":1,"Size Class":2,"Name":"[T2][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.06,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":1,"Size Class":3,"Name":"[T2][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.11,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":1,"Size Class":1,"Name":"[T3] Sm Frigate Hull Suite","MaxSz":15,"Wt":"","Build Time":"1/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":1,"Size Class":2,"Name":"[T3][C-] Md Frigate Hull Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":1,"Size Class":3,"Name":"[T3][C--] Lg Frigate Hull Suite","MaxSz":25,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.14,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":2,"Size Class":1,"Name":"[T-3] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.94,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":2,"Size Class":2,"Name":"[T-3][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":2,"Size Class":3,"Name":"[T-3][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":2,"Size Class":1,"Name":"[T-2] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.95,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":2,"Size Class":2,"Name":"[T-2][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":2,"Size Class":3,"Name":"[T-2][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":2,"Size Class":1,"Name":"[T-1] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":2,"Size Class":2,"Name":"[T-1][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":2,"Size Class":3,"Name":"[T-1][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":2,"Size Class":1,"Name":"[T0] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.97,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":2,"Size Class":2,"Name":"[T0][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":2,"Size Class":3,"Name":"[T0][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.05,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":2,"Size Class":1,"Name":"[T1] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":2,"Size Class":2,"Name":"[T1][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.04,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":2,"Size Class":3,"Name":"[T1][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":2,"Size Class":1,"Name":"[T2] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.99,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":2,"Size Class":2,"Name":"[T2][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.06,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":2,"Size Class":3,"Name":"[T2][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.11,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":2,"Size Class":1,"Name":"[T3] Sm Cruiser Hull Suite","MaxSz":15,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":2,"Size Class":2,"Name":"[T3][C-] Md Cruiser Hull Suite","MaxSz":20,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":2,"Size Class":3,"Name":"[T3][C--] Lg Cruiser Hull Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.14,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":3,"Size Class":1,"Name":"[T-3] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.94,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":3,"Size Class":2,"Name":"[T-3][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-3,"Weight Class":3,"Size Class":3,"Name":"[T-3][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":3,"Size Class":1,"Name":"[T-2] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.95,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":3,"Size Class":2,"Name":"[T-2][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-2,"Weight Class":3,"Size Class":3,"Name":"[T-2][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":3,"Size Class":1,"Name":"[T-1] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.96,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":3,"Size Class":2,"Name":"[T-1][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":-1,"Weight Class":3,"Size Class":3,"Name":"[T-1][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":3,"Size Class":1,"Name":"[T0] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.97,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":3,"Size Class":2,"Name":"[T0][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.02,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":0,"Weight Class":3,"Size Class":3,"Name":"[T0][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.05,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":3,"Size Class":1,"Name":"[T1] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.98,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":3,"Size Class":2,"Name":"[T1][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.04,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":1,"Weight Class":3,"Size Class":3,"Name":"[T1][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":3,"Size Class":1,"Name":"[T2] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":0.99,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":3,"Size Class":2,"Name":"[T2][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.06,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":2,"Weight Class":3,"Size Class":3,"Name":"[T2][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.11,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":3,"Size Class":1,"Name":"[T3] Sm Explorer Hull Suite","MaxSz":10,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":3,"Size Class":2,"Name":"[T3][C-] Md Explorer Hull Suite","MaxSz":15,"Wt":5,"Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.08,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":3,"Type":"Hull","Tier":3,"Weight Class":3,"Size Class":3,"Name":"[T3][C--] Lg Explorer Hull Suite","MaxSz":20,"Wt":15,"Build Time":"9/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1.14,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":1,"Size Class":1,"Name":"[T-3][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.96,"Core Mod":1,"O-Mod":1,"E-Mod":0.94,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":1,"Size Class":2,"Name":"[T-3][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.975,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":1,"Size Class":3,"Name":"[T-3][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.99,"Core Mod":1,"O-Mod":0.94,"E-Mod":1,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":1,"Size Class":1,"Name":"[T-2][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.97,"Core Mod":1,"O-Mod":1,"E-Mod":0.94,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":1,"Size Class":2,"Name":"[T-2][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.985,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":1,"Size Class":3,"Name":"[T-2][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":0.94,"E-Mod":1,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":1,"Size Class":1,"Name":"[T-1][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.98,"Core Mod":1,"O-Mod":1,"E-Mod":0.94,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":1,"Size Class":2,"Name":"[T-1][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":1,"Size Class":3,"Name":"[T-1][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.94,"E-Mod":1,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":1,"Size Class":1,"Name":"[T0][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.99,"Core Mod":1,"O-Mod":1,"E-Mod":0.92,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":1,"Size Class":2,"Name":"[T0][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.96,"T-Mod":0.96,"SR-Mod":0.975,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":1,"Size Class":3,"Name":"[T0][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.07,"Core Mod":1,"O-Mod":0.92,"E-Mod":1,"T-Mod":0.92,"SR-Mod":0.95,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":1,"Size Class":1,"Name":"[T1][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.9,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":1,"Size Class":2,"Name":"[T1][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":0.975,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":1,"Size Class":3,"Name":"[T1][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.1,"Core Mod":1,"O-Mod":0.9,"E-Mod":1,"T-Mod":0.9,"SR-Mod":0.95,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":1,"Size Class":1,"Name":"[T2][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":1,"E-Mod":0.88,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":1,"Size Class":2,"Name":"[T2][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.06,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.975,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":1,"Size Class":3,"Name":"[T2][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.13,"Core Mod":1,"O-Mod":0.88,"E-Mod":1,"T-Mod":0.88,"SR-Mod":0.95,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":1,"Size Class":1,"Name":"[T3][T--] Sm Frigate Engineering Suite","MaxSz":25,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":1,"E-Mod":0.86,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":1,"Size Class":2,"Name":"[T3][OET-SR-] Md Frigate Engineering Suite","MaxSz":35,"Wt":5,"Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.08,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.975,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":1,"Size Class":3,"Name":"[T3][OE--SR--] Lg Frigate Engineering Suite","MaxSz":45,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.16,"Core Mod":1,"O-Mod":0.86,"E-Mod":1,"T-Mod":0.86,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":2,"Size Class":1,"Name":"[T-3][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.96,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":2,"Size Class":2,"Name":"[T-3][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.97,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":2,"Size Class":3,"Name":"[T-3][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.98,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":2,"Size Class":1,"Name":"[T-2][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.97,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":2,"Size Class":2,"Name":"[T-2][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.985,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":2,"Size Class":3,"Name":"[T-2][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":2,"Size Class":1,"Name":"[T-1][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.98,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":2,"Size Class":2,"Name":"[T-1][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.975,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":2,"Size Class":3,"Name":"[T-1][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":2,"Size Class":1,"Name":"[T0][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.99,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":2,"Size Class":2,"Name":"[T0][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.96,"T-Mod":0.96,"SR-Mod":0.975,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":2,"Size Class":3,"Name":"[T0][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.07,"Core Mod":1,"O-Mod":0.91,"E-Mod":0.91,"T-Mod":0.91,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":2,"Size Class":1,"Name":"[T1][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":2,"Size Class":2,"Name":"[T1][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":0.975,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":2,"Size Class":3,"Name":"[T1][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":2,"Size Class":1,"Name":"[T2][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":2,"Size Class":2,"Name":"[T2][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.06,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.975,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":2,"Size Class":3,"Name":"[T2][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.13,"Core Mod":1,"O-Mod":0.89,"E-Mod":0.89,"T-Mod":0.89,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":2,"Size Class":1,"Name":"[T3][SR--] Sm Cruiser Engineering Suite","MaxSz":20,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":2,"Size Class":2,"Name":"[T3][C-SR-] Md Cruiser Engineering Suite","MaxSz":25,"Wt":10,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.08,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.975,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":2,"Size Class":3,"Name":"[T3][C--] Lg Cruiser Engineering Suite","MaxSz":30,"Wt":20,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.16,"Core Mod":1,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.88,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":3,"Size Class":1,"Name":"[T-3][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.96,"Core Mod":1,"O-Mod":1.02,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":3,"Size Class":2,"Name":"[T-3][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.97,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.975,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-3,"Weight Class":3,"Size Class":3,"Name":"[T-3][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.98,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.82,"T-Mod":0.82,"SR-Mod":1,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":3,"Size Class":1,"Name":"[T-2][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.97,"Core Mod":1,"O-Mod":1.02,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":3,"Size Class":2,"Name":"[T-2][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.985,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.975,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-2,"Weight Class":3,"Size Class":3,"Name":"[T-2][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.82,"T-Mod":0.82,"SR-Mod":1,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":3,"Size Class":1,"Name":"[T-1][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.98,"Core Mod":1,"O-Mod":1.02,"E-Mod":0.97,"T-Mod":0.97,"SR-Mod":0.95,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":3,"Size Class":2,"Name":"[T-1][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":0.97,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.975,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":-1,"Weight Class":3,"Size Class":3,"Name":"[T-1][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.92,"E-Mod":0.82,"T-Mod":0.82,"SR-Mod":1,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":3,"Size Class":1,"Name":"[T0][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":0.99,"Core Mod":1,"O-Mod":1.01,"E-Mod":0.96,"T-Mod":0.96,"SR-Mod":0.95,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":3,"Size Class":2,"Name":"[T0][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":0.96,"E-Mod":0.91,"T-Mod":0.91,"SR-Mod":0.975,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":0,"Weight Class":3,"Size Class":3,"Name":"[T0][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.07,"Core Mod":1,"O-Mod":0.91,"E-Mod":0.81,"T-Mod":0.81,"SR-Mod":1,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":3,"Size Class":1,"Name":"[T1][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1,"O-Mod":1,"E-Mod":0.95,"T-Mod":0.95,"SR-Mod":0.95,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":3,"Size Class":2,"Name":"[T1][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.04,"Core Mod":1,"O-Mod":0.95,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":0.975,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":1,"Weight Class":3,"Size Class":3,"Name":"[T1][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.1,"Core Mod":1,"O-Mod":0.9,"E-Mod":0.8,"T-Mod":0.8,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":3,"Size Class":1,"Name":"[T2][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.01,"Core Mod":1,"O-Mod":0.99,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.95,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":3,"Size Class":2,"Name":"[T2][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.06,"Core Mod":1,"O-Mod":0.94,"E-Mod":0.89,"T-Mod":0.89,"SR-Mod":0.975,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":2,"Weight Class":3,"Size Class":3,"Name":"[T2][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.13,"Core Mod":1,"O-Mod":0.89,"E-Mod":0.79,"T-Mod":0.79,"SR-Mod":1,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":3,"Size Class":1,"Name":"[T3][SR--] Sm Explorer Engineering Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.02,"Core Mod":1,"O-Mod":0.98,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.95,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":3,"Size Class":2,"Name":"[T3][C-SR-] Md Explorer Engineering Suite","MaxSz":20,"Wt":10,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.08,"Core Mod":1,"O-Mod":0.93,"E-Mod":0.88,"T-Mod":0.88,"SR-Mod":0.975,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":4,"Type":"Engineering","Tier":3,"Weight Class":3,"Size Class":3,"Name":"[T3][C--] Lg Explorer Engineering Suite","MaxSz":25,"Wt":30,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1.16,"Core Mod":1,"O-Mod":0.88,"E-Mod":0.78,"T-Mod":0.78,"SR-Mod":1,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":1,"Size Class":1,"Name":"[T-3][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.04,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.88,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":1,"Size Class":2,"Name":"[T-3] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.92,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":1,"Size Class":3,"Name":"[T-3][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.97,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":1,"Size Class":1,"Name":"[T-2][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.89,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":1,"Size Class":2,"Name":"[T-2] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.94,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":1,"Size Class":3,"Name":"[T-2][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.98,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":1,"Size Class":1,"Name":"[T-1][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.12,"E-Mod":1.12,"T-Mod":1.12,"SR-Mod":0.91,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":1,"Size Class":2,"Name":"[T-1] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.96,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":1,"Size Class":3,"Name":"[T-1][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.99,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":1,"Size Class":1,"Name":"[T0][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":1.11,"E-Mod":1.11,"T-Mod":1.11,"SR-Mod":0.93,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":1,"Size Class":2,"Name":"[T0] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.01,"E-Mod":1.01,"T-Mod":1.01,"SR-Mod":0.98,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":1,"Size Class":3,"Name":"[T0][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.13,"O-Mod":0.91,"E-Mod":0.91,"T-Mod":0.91,"SR-Mod":1.03,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":1,"Size Class":1,"Name":"[T1][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.1,"E-Mod":1.1,"T-Mod":1.1,"SR-Mod":0.95,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":1,"Size Class":2,"Name":"[T1] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.12,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":1,"Size Class":3,"Name":"[T1][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1.05,"Year Available (SF)":2308,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":1,"Size Class":1,"Name":"[T2][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.09,"O-Mod":1.09,"E-Mod":1.09,"T-Mod":1.09,"SR-Mod":0.94,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":1,"Size Class":2,"Name":"[T2] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.14,"O-Mod":0.99,"E-Mod":0.99,"T-Mod":0.99,"SR-Mod":0.99,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":1,"Size Class":3,"Name":"[T2][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.19,"O-Mod":0.89,"E-Mod":0.89,"T-Mod":0.89,"SR-Mod":1.04,"Year Available (SF)":2315,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":1,"Size Class":1,"Name":"[T3][C+SR-] Sm Frigate Warp Core Suite","MaxSz":20,"Wt":"","Build Time":"2/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.08,"E-Mod":1.08,"T-Mod":1.08,"SR-Mod":0.93,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":1,"Size Class":2,"Name":"[T3] Md Frigate Warp Core Suite","MaxSz":25,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.98,"E-Mod":0.98,"T-Mod":0.98,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":1,"Size Class":3,"Name":"[T3][C-SR+] Lg Frigate Warp Core Suite","MaxSz":30,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.22,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.88,"SR-Mod":1.03,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":2,"Size Class":1,"Name":"[T-3][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.04,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.88,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":2,"Size Class":2,"Name":"[T-3] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.92,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":2,"Size Class":3,"Name":"[T-3][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.97,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":2,"Size Class":1,"Name":"[T-2][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.89,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":2,"Size Class":2,"Name":"[T-2] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.94,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":2,"Size Class":3,"Name":"[T-2][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.98,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":2,"Size Class":1,"Name":"[T-1][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.12,"E-Mod":1.12,"T-Mod":1.12,"SR-Mod":0.91,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":2,"Size Class":2,"Name":"[T-1] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.96,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":2,"Size Class":3,"Name":"[T-1][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.99,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":2,"Size Class":1,"Name":"[T0][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":1.11,"E-Mod":1.11,"T-Mod":1.11,"SR-Mod":0.93,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":2,"Size Class":2,"Name":"[T0] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.01,"E-Mod":1.01,"T-Mod":1.01,"SR-Mod":0.98,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":2,"Size Class":3,"Name":"[T0][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.13,"O-Mod":0.91,"E-Mod":0.91,"T-Mod":0.91,"SR-Mod":1.03,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":2,"Size Class":1,"Name":"[T1][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.1,"E-Mod":1.1,"T-Mod":1.1,"SR-Mod":0.95,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":2,"Size Class":2,"Name":"[T1] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.12,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":2,"Size Class":3,"Name":"[T1][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1.05,"Year Available (SF)":2307,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":2,"Size Class":1,"Name":"[T2][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.09,"O-Mod":1.09,"E-Mod":1.09,"T-Mod":1.09,"SR-Mod":0.94,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":2,"Size Class":2,"Name":"[T2] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.14,"O-Mod":0.99,"E-Mod":0.99,"T-Mod":0.99,"SR-Mod":0.99,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":2,"Size Class":3,"Name":"[T2][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.19,"O-Mod":0.89,"E-Mod":0.89,"T-Mod":0.89,"SR-Mod":1.04,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":2,"Size Class":1,"Name":"[T3][C+SR-] Sm Cruiser Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"3/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.08,"E-Mod":1.08,"T-Mod":1.08,"SR-Mod":0.93,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":2,"Size Class":2,"Name":"[T3] Md Cruiser Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"5/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.98,"E-Mod":0.98,"T-Mod":0.98,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":2,"Size Class":3,"Name":"[T3][C-SR+] Lg Cruiser Warp Core Suite","MaxSz":25,"Wt":10,"Build Time":"8/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.22,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.88,"SR-Mod":1.03,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":3,"Size Class":1,"Name":"[T-3][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.04,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.88,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":3,"Size Class":2,"Name":"[T-3] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.92,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-3,"Weight Class":3,"Size Class":3,"Name":"[T-3][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":0.94,"E-Mod":0.94,"T-Mod":0.94,"SR-Mod":0.97,"Year Available (SF)":2230,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":3,"Size Class":1,"Name":"[T-2][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.05,"O-Mod":1.13,"E-Mod":1.13,"T-Mod":1.13,"SR-Mod":0.89,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":3,"Size Class":2,"Name":"[T-2] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.94,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-2,"Weight Class":3,"Size Class":3,"Name":"[T-2][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":0.93,"E-Mod":0.93,"T-Mod":0.93,"SR-Mod":0.98,"Year Available (SF)":2250,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":3,"Size Class":1,"Name":"[T-1][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.06,"O-Mod":1.12,"E-Mod":1.12,"T-Mod":1.12,"SR-Mod":0.91,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":3,"Size Class":2,"Name":"[T-1] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.02,"E-Mod":1.02,"T-Mod":1.02,"SR-Mod":0.96,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":-1,"Weight Class":3,"Size Class":3,"Name":"[T-1][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":0.92,"E-Mod":0.92,"T-Mod":0.92,"SR-Mod":0.99,"Year Available (SF)":2270,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":3,"Size Class":1,"Name":"[T0][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.07,"O-Mod":1.11,"E-Mod":1.11,"T-Mod":1.11,"SR-Mod":0.93,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":3,"Size Class":2,"Name":"[T0] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.01,"E-Mod":1.01,"T-Mod":1.01,"SR-Mod":0.98,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":0,"Weight Class":3,"Size Class":3,"Name":"[T0][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.13,"O-Mod":0.91,"E-Mod":0.91,"T-Mod":0.91,"SR-Mod":1.03,"Year Available (SF)":2290,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":3,"Size Class":1,"Name":"[T1][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.08,"O-Mod":1.1,"E-Mod":1.1,"T-Mod":1.1,"SR-Mod":0.95,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":3,"Size Class":2,"Name":"[T1] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.12,"O-Mod":1,"E-Mod":1,"T-Mod":1,"SR-Mod":1,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":1,"Weight Class":3,"Size Class":3,"Name":"[T1][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.9,"E-Mod":0.9,"T-Mod":0.9,"SR-Mod":1.05,"Year Available (SF)":2309,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":3,"Size Class":1,"Name":"[T2][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.09,"O-Mod":1.09,"E-Mod":1.09,"T-Mod":1.09,"SR-Mod":0.94,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":3,"Size Class":2,"Name":"[T2] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.14,"O-Mod":0.99,"E-Mod":0.99,"T-Mod":0.99,"SR-Mod":0.99,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":2,"Weight Class":3,"Size Class":3,"Name":"[T2][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.19,"O-Mod":0.89,"E-Mod":0.89,"T-Mod":0.89,"SR-Mod":1.04,"Year Available (SF)":2313,"Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":3,"Size Class":1,"Name":"[T3][C+SR-] Sm Explorer Warp Core Suite","MaxSz":15,"Wt":"","Build Time":"4/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.1,"O-Mod":1.08,"E-Mod":1.08,"T-Mod":1.08,"SR-Mod":0.93,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":3,"Size Class":2,"Name":"[T3] Md Explorer Warp Core Suite","MaxSz":20,"Wt":5,"Build Time":"6/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.16,"O-Mod":0.98,"E-Mod":0.98,"T-Mod":0.98,"SR-Mod":0.98,"Year Available (SF)":"*","Weight Class List":""},{"Type Sort":5,"Type":"Warp Core","Tier":3,"Weight Class":3,"Size Class":3,"Name":"[T3][C-SR+] Lg Explorer Warp Core Suite","MaxSz":25,"Wt":15,"Build Time":"10/12","Tac Mod":1,"Ops Mod":1,"Hull Mod":1,"Eng. Mod":1,"Core Mod":1.22,"O-Mod":0.88,"E-Mod":0.88,"T-Mod":0.88,"SR-Mod":1.03,"Year Available (SF)":"*","Weight Class List":""}]
 
 /***/ }),
-/* 162 */
+/* 163 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* WEBPACK VAR INJECTION */(function(process, global) {/*!
  * Vue.js v2.4.4
  * (c) 2014-2017 Evan You
@@ -51917,12 +53511,12 @@ setTimeout(function () {
 
 /*  */
 
-/* harmony default export */ __webpack_exports__["a"] = (Vue$3);
+/* harmony default export */ __webpack_exports__["default"] = (Vue$3);
 
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(63), __webpack_require__(47)))
 
 /***/ }),
-/* 163 */
+/* 164 */
 /***/ (function(module, exports) {
 
 /**
@@ -51955,7 +53549,78 @@ module.exports = function listToStyles (parentId, list) {
 
 
 /***/ }),
-/* 164 */
+/* 165 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var util = __webpack_require__(100);
+var NamedVector = __webpack_require__(101).NamedVector;
+
+var Papa = __webpack_require__(168);
+var ShipEngine = __webpack_require__(38);
+
+var COMPONENT_MAPPING = [{
+	name: "Warp Core",
+	frame_row: 76,
+	components: [{ name: "Warp Core Type", row: 78 }, { name: "M/AM Injectors", row: 80 }, { name: "Coolant Systems", row: 81 }, { name: "EPS Manifold System", row: 82 }, { name: "Eject System", row: 83 }],
+	settings: [{ name: "Safety/Performance", row: 79 }]
+}, {
+	name: "Engineering",
+	frame_row: 65,
+	components: [{ name: "Structural Integrity Fields", row: 67 }, { name: "Navigational Deflector", row: 68 }, { name: "Nacelle System", row: 69 }, { name: "Replication Package", row: 71 }, { name: "Fuel & Matter Stores", row: 72 }],
+	settings: []
+}, {
+	name: "Hull",
+	frame_row: 59,
+	components: [{ name: "Hull System", row: 61 }],
+	settings: []
+}, {
+	name: "Operations",
+	frame_row: 43,
+	components: [{ name: "Long-Range Sensors", row: 45 }, { name: "Navigational Sensors", row: 46 }, { name: "Survey Sensors", row: 47 }, { name: "Science Labs", row: 48 }, { name: "Computer Core", row: 49 }, { name: "Operating System", row: 50 }, { name: "Secondary Core", row: 51 }, { name: "Diplomatic Package", row: 53 }, { name: "Recreation Package", row: 54 }, { name: "Sickbay", row: 55 }],
+	settings: [{ name: "Isolinear?", row: 52 }]
+}, {
+	name: "Tactical",
+	frame_row: 28,
+	components: [{ name: "Primary Phasers", row: 30 }, { name: "Secondary Phasers", row: 31 }, { name: "Torpedo System", row: 33 }, { name: "Short-Range Sensors", row: 35 }, { name: "Targeting Computer", row: 36 }, { name: "Deflector Shields", row: 37 }, { name: "Backup Deflectors", row: 38 }, { name: "Impulse Engine Pwr", row: 39 }],
+	settings: [{ name: "Phaser Arrays", row: 32 }, { name: "Burst Launchers", row: 34 }]
+}];
+
+function import_design(design_csv) {
+	var result = Papa.parse(design_csv, { dynamicTyping: true });
+	return {
+		"Name": result.data[0][3],
+		"Principal Frame": result.data[17][4],
+		"Module": {
+			"Variant": result.data[87][4],
+			"Type": result.data[87][2]
+		},
+		"Subsystems": COMPONENT_MAPPING.map(function (subsystem) {
+			return {
+				"Name": subsystem.name,
+				"Sub-Frame": result.data[subsystem.frame_row][4],
+				"Settings": subsystem.settings.reduce(function (acc, value) {
+					acc[value.name] = result.data[value.row][3];
+					return acc;
+				}, {}),
+				"Components": subsystem.components.map(function (row) {
+					return {
+						"Name": row.name,
+						"Quantity": result.data[row.row][3],
+						"Part": result.data[row.row][4]
+					};
+				})
+			};
+		})
+	};
+};
+
+module.exports.import_design = import_design;
+
+/***/ }),
+/* 166 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -51966,7 +53631,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 165 */
+/* 167 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -51995,10 +53660,1608 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 166 */
+/* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var core = __webpack_require__(167);
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	Papa Parse
+	v4.3.6
+	https://github.com/mholt/PapaParse
+	License: MIT
+*/
+(function(root, factory)
+{
+	if (true)
+	{
+		// AMD. Register as an anonymous module.
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	}
+	else if (typeof module === 'object' && typeof exports !== 'undefined')
+	{
+		// Node. Does not work with strict CommonJS, but
+		// only CommonJS-like environments that support module.exports,
+		// like Node.
+		module.exports = factory();
+	}
+	else
+	{
+		// Browser globals (root is window)
+		root.Papa = factory();
+	}
+}(this, function()
+{
+	'use strict';
+
+	var global = (function () {
+		// alternative method, similar to `Function('return this')()`
+		// but without using `eval` (which is disabled when
+		// using Content Security Policy).
+
+		if (typeof self !== 'undefined') { return self; }
+		if (typeof window !== 'undefined') { return window; }
+		if (typeof global !== 'undefined') { return global; }
+
+		// When running tests none of the above have been defined
+		return {};
+	})();
+
+
+	var IS_WORKER = !global.document && !!global.postMessage,
+		IS_PAPA_WORKER = IS_WORKER && /(\?|&)papaworker(=|&|$)/.test(global.location.search),
+		LOADED_SYNC = false, AUTO_SCRIPT_PATH;
+	var workers = {}, workerIdCounter = 0;
+
+	var Papa = {};
+
+	Papa.parse = CsvToJson;
+	Papa.unparse = JsonToCsv;
+
+	Papa.RECORD_SEP = String.fromCharCode(30);
+	Papa.UNIT_SEP = String.fromCharCode(31);
+	Papa.BYTE_ORDER_MARK = '\ufeff';
+	Papa.BAD_DELIMITERS = ['\r', '\n', '"', Papa.BYTE_ORDER_MARK];
+	Papa.WORKERS_SUPPORTED = !IS_WORKER && !!global.Worker;
+	Papa.SCRIPT_PATH = null;	// Must be set by your code if you use workers and this lib is loaded asynchronously
+
+	// Configurable chunk sizes for local and remote files, respectively
+	Papa.LocalChunkSize = 1024 * 1024 * 10;	// 10 MB
+	Papa.RemoteChunkSize = 1024 * 1024 * 5;	// 5 MB
+	Papa.DefaultDelimiter = ',';			// Used if not specified and detection fails
+
+	// Exposed for testing and development only
+	Papa.Parser = Parser;
+	Papa.ParserHandle = ParserHandle;
+	Papa.NetworkStreamer = NetworkStreamer;
+	Papa.FileStreamer = FileStreamer;
+	Papa.StringStreamer = StringStreamer;
+	Papa.ReadableStreamStreamer = ReadableStreamStreamer;
+
+	if (global.jQuery)
+	{
+		var $ = global.jQuery;
+		$.fn.parse = function(options)
+		{
+			var config = options.config || {};
+			var queue = [];
+
+			this.each(function(idx)
+			{
+				var supported = $(this).prop('tagName').toUpperCase() === 'INPUT'
+								&& $(this).attr('type').toLowerCase() === 'file'
+								&& global.FileReader;
+
+				if (!supported || !this.files || this.files.length === 0)
+					return true;	// continue to next input element
+
+				for (var i = 0; i < this.files.length; i++)
+				{
+					queue.push({
+						file: this.files[i],
+						inputElem: this,
+						instanceConfig: $.extend({}, config)
+					});
+				}
+			});
+
+			parseNextFile();	// begin parsing
+			return this;		// maintains chainability
+
+
+			function parseNextFile()
+			{
+				if (queue.length === 0)
+				{
+					if (isFunction(options.complete))
+						options.complete();
+					return;
+				}
+
+				var f = queue[0];
+
+				if (isFunction(options.before))
+				{
+					var returned = options.before(f.file, f.inputElem);
+
+					if (typeof returned === 'object')
+					{
+						if (returned.action === 'abort')
+						{
+							error('AbortError', f.file, f.inputElem, returned.reason);
+							return;	// Aborts all queued files immediately
+						}
+						else if (returned.action === 'skip')
+						{
+							fileComplete();	// parse the next file in the queue, if any
+							return;
+						}
+						else if (typeof returned.config === 'object')
+							f.instanceConfig = $.extend(f.instanceConfig, returned.config);
+					}
+					else if (returned === 'skip')
+					{
+						fileComplete();	// parse the next file in the queue, if any
+						return;
+					}
+				}
+
+				// Wrap up the user's complete callback, if any, so that ours also gets executed
+				var userCompleteFunc = f.instanceConfig.complete;
+				f.instanceConfig.complete = function(results)
+				{
+					if (isFunction(userCompleteFunc))
+						userCompleteFunc(results, f.file, f.inputElem);
+					fileComplete();
+				};
+
+				Papa.parse(f.file, f.instanceConfig);
+			}
+
+			function error(name, file, elem, reason)
+			{
+				if (isFunction(options.error))
+					options.error({name: name}, file, elem, reason);
+			}
+
+			function fileComplete()
+			{
+				queue.splice(0, 1);
+				parseNextFile();
+			}
+		}
+	}
+
+
+	if (IS_PAPA_WORKER)
+	{
+		global.onmessage = workerThreadReceivedMessage;
+	}
+	else if (Papa.WORKERS_SUPPORTED)
+	{
+		AUTO_SCRIPT_PATH = getScriptPath();
+
+		// Check if the script was loaded synchronously
+		if (!document.body)
+		{
+			// Body doesn't exist yet, must be synchronous
+			LOADED_SYNC = true;
+		}
+		else
+		{
+			document.addEventListener('DOMContentLoaded', function () {
+				LOADED_SYNC = true;
+			}, true);
+		}
+	}
+
+
+
+
+	function CsvToJson(_input, _config)
+	{
+		_config = _config || {};
+		var dynamicTyping = _config.dynamicTyping || false;
+		if (isFunction(dynamicTyping)) {
+			_config.dynamicTypingFunction = dynamicTyping;
+			// Will be filled on first row call
+			dynamicTyping = {};
+		}
+		_config.dynamicTyping = dynamicTyping;
+
+		if (_config.worker && Papa.WORKERS_SUPPORTED)
+		{
+			var w = newWorker();
+
+			w.userStep = _config.step;
+			w.userChunk = _config.chunk;
+			w.userComplete = _config.complete;
+			w.userError = _config.error;
+
+			_config.step = isFunction(_config.step);
+			_config.chunk = isFunction(_config.chunk);
+			_config.complete = isFunction(_config.complete);
+			_config.error = isFunction(_config.error);
+			delete _config.worker;	// prevent infinite loop
+
+			w.postMessage({
+				input: _input,
+				config: _config,
+				workerId: w.id
+			});
+
+			return;
+		}
+
+		var streamer = null;
+		if (typeof _input === 'string')
+		{
+			if (_config.download)
+				streamer = new NetworkStreamer(_config);
+			else
+				streamer = new StringStreamer(_config);
+		}
+		else if (_input.readable === true && isFunction(_input.read) && isFunction(_input.on))
+		{
+			streamer = new ReadableStreamStreamer(_config);
+		}
+		else if ((global.File && _input instanceof File) || _input instanceof Object)	// ...Safari. (see issue #106)
+			streamer = new FileStreamer(_config);
+
+		return streamer.stream(_input);
+	}
+
+
+
+
+
+
+	function JsonToCsv(_input, _config)
+	{
+		var _output = '';
+		var _fields = [];
+
+		// Default configuration
+
+		/** whether to surround every datum with quotes */
+		var _quotes = false;
+
+		/** whether to write headers */
+		var _writeHeader = true;
+
+		/** delimiting character */
+		var _delimiter = ',';
+
+		/** newline character(s) */
+		var _newline = '\r\n';
+
+		/** quote character */
+		var _quoteChar = '"';
+
+		unpackConfig();
+
+		var quoteCharRegex = new RegExp(_quoteChar, 'g');
+
+		if (typeof _input === 'string')
+			_input = JSON.parse(_input);
+
+		if (_input instanceof Array)
+		{
+			if (!_input.length || _input[0] instanceof Array)
+				return serialize(null, _input);
+			else if (typeof _input[0] === 'object')
+				return serialize(objectKeys(_input[0]), _input);
+		}
+		else if (typeof _input === 'object')
+		{
+			if (typeof _input.data === 'string')
+				_input.data = JSON.parse(_input.data);
+
+			if (_input.data instanceof Array)
+			{
+				if (!_input.fields)
+					_input.fields =  _input.meta && _input.meta.fields;
+
+				if (!_input.fields)
+					_input.fields =  _input.data[0] instanceof Array
+									? _input.fields
+									: objectKeys(_input.data[0]);
+
+				if (!(_input.data[0] instanceof Array) && typeof _input.data[0] !== 'object')
+					_input.data = [_input.data];	// handles input like [1,2,3] or ['asdf']
+			}
+
+			return serialize(_input.fields || [], _input.data || []);
+		}
+
+		// Default (any valid paths should return before this)
+		throw 'exception: Unable to serialize unrecognized input';
+
+
+		function unpackConfig()
+		{
+			if (typeof _config !== 'object')
+				return;
+
+			if (typeof _config.delimiter === 'string'
+				&& _config.delimiter.length === 1
+				&& Papa.BAD_DELIMITERS.indexOf(_config.delimiter) === -1)
+			{
+				_delimiter = _config.delimiter;
+			}
+
+			if (typeof _config.quotes === 'boolean'
+				|| _config.quotes instanceof Array)
+				_quotes = _config.quotes;
+
+			if (typeof _config.newline === 'string')
+				_newline = _config.newline;
+
+			if (typeof _config.quoteChar === 'string')
+				_quoteChar = _config.quoteChar;
+
+			if (typeof _config.header === 'boolean')
+				_writeHeader = _config.header;
+		}
+
+
+		/** Turns an object's keys into an array */
+		function objectKeys(obj)
+		{
+			if (typeof obj !== 'object')
+				return [];
+			var keys = [];
+			for (var key in obj)
+				keys.push(key);
+			return keys;
+		}
+
+		/** The double for loop that iterates the data and writes out a CSV string including header row */
+		function serialize(fields, data)
+		{
+			var csv = '';
+
+			if (typeof fields === 'string')
+				fields = JSON.parse(fields);
+			if (typeof data === 'string')
+				data = JSON.parse(data);
+
+			var hasHeader = fields instanceof Array && fields.length > 0;
+			var dataKeyedByField = !(data[0] instanceof Array);
+
+			// If there a header row, write it first
+			if (hasHeader && _writeHeader)
+			{
+				for (var i = 0; i < fields.length; i++)
+				{
+					if (i > 0)
+						csv += _delimiter;
+					csv += safe(fields[i], i);
+				}
+				if (data.length > 0)
+					csv += _newline;
+			}
+
+			// Then write out the data
+			for (var row = 0; row < data.length; row++)
+			{
+				var maxCol = hasHeader ? fields.length : data[row].length;
+
+				for (var col = 0; col < maxCol; col++)
+				{
+					if (col > 0)
+						csv += _delimiter;
+					var colIdx = hasHeader && dataKeyedByField ? fields[col] : col;
+					csv += safe(data[row][colIdx], col);
+				}
+
+				if (row < data.length - 1)
+					csv += _newline;
+			}
+
+			return csv;
+		}
+
+		/** Encloses a value around quotes if needed (makes a value safe for CSV insertion) */
+		function safe(str, col)
+		{
+			if (typeof str === 'undefined' || str === null)
+				return '';
+
+			str = str.toString().replace(quoteCharRegex, _quoteChar+_quoteChar);
+
+			var needsQuotes = (typeof _quotes === 'boolean' && _quotes)
+							|| (_quotes instanceof Array && _quotes[col])
+							|| hasAny(str, Papa.BAD_DELIMITERS)
+							|| str.indexOf(_delimiter) > -1
+							|| str.charAt(0) === ' '
+							|| str.charAt(str.length - 1) === ' ';
+
+			return needsQuotes ? _quoteChar + str + _quoteChar : str;
+		}
+
+		function hasAny(str, substrings)
+		{
+			for (var i = 0; i < substrings.length; i++)
+				if (str.indexOf(substrings[i]) > -1)
+					return true;
+			return false;
+		}
+	}
+
+	/** ChunkStreamer is the base prototype for various streamer implementations. */
+	function ChunkStreamer(config)
+	{
+		this._handle = null;
+		this._paused = false;
+		this._finished = false;
+		this._input = null;
+		this._baseIndex = 0;
+		this._partialLine = '';
+		this._rowCount = 0;
+		this._start = 0;
+		this._nextChunk = null;
+		this.isFirstChunk = true;
+		this._completeResults = {
+			data: [],
+			errors: [],
+			meta: {}
+		};
+		replaceConfig.call(this, config);
+
+		this.parseChunk = function(chunk)
+		{
+			// First chunk pre-processing
+			if (this.isFirstChunk && isFunction(this._config.beforeFirstChunk))
+			{
+				var modifiedChunk = this._config.beforeFirstChunk(chunk);
+				if (modifiedChunk !== undefined)
+					chunk = modifiedChunk;
+			}
+			this.isFirstChunk = false;
+
+			// Rejoin the line we likely just split in two by chunking the file
+			var aggregate = this._partialLine + chunk;
+			this._partialLine = '';
+
+			var results = this._handle.parse(aggregate, this._baseIndex, !this._finished);
+
+			if (this._handle.paused() || this._handle.aborted())
+				return;
+
+			var lastIndex = results.meta.cursor;
+
+			if (!this._finished)
+			{
+				this._partialLine = aggregate.substring(lastIndex - this._baseIndex);
+				this._baseIndex = lastIndex;
+			}
+
+			if (results && results.data)
+				this._rowCount += results.data.length;
+
+			var finishedIncludingPreview = this._finished || (this._config.preview && this._rowCount >= this._config.preview);
+
+			if (IS_PAPA_WORKER)
+			{
+				global.postMessage({
+					results: results,
+					workerId: Papa.WORKER_ID,
+					finished: finishedIncludingPreview
+				});
+			}
+			else if (isFunction(this._config.chunk))
+			{
+				this._config.chunk(results, this._handle);
+				if (this._paused)
+					return;
+				results = undefined;
+				this._completeResults = undefined;
+			}
+
+			if (!this._config.step && !this._config.chunk) {
+				this._completeResults.data = this._completeResults.data.concat(results.data);
+				this._completeResults.errors = this._completeResults.errors.concat(results.errors);
+				this._completeResults.meta = results.meta;
+			}
+
+			if (finishedIncludingPreview && isFunction(this._config.complete) && (!results || !results.meta.aborted))
+				this._config.complete(this._completeResults, this._input);
+
+			if (!finishedIncludingPreview && (!results || !results.meta.paused))
+				this._nextChunk();
+
+			return results;
+		};
+
+		this._sendError = function(error)
+		{
+			if (isFunction(this._config.error))
+				this._config.error(error);
+			else if (IS_PAPA_WORKER && this._config.error)
+			{
+				global.postMessage({
+					workerId: Papa.WORKER_ID,
+					error: error,
+					finished: false
+				});
+			}
+		};
+
+		function replaceConfig(config)
+		{
+			// Deep-copy the config so we can edit it
+			var configCopy = copy(config);
+			configCopy.chunkSize = parseInt(configCopy.chunkSize);	// parseInt VERY important so we don't concatenate strings!
+			if (!config.step && !config.chunk)
+				configCopy.chunkSize = null;  // disable Range header if not streaming; bad values break IIS - see issue #196
+			this._handle = new ParserHandle(configCopy);
+			this._handle.streamer = this;
+			this._config = configCopy;	// persist the copy to the caller
+		}
+	}
+
+
+	function NetworkStreamer(config)
+	{
+		config = config || {};
+		if (!config.chunkSize)
+			config.chunkSize = Papa.RemoteChunkSize;
+		ChunkStreamer.call(this, config);
+
+		var xhr;
+
+		if (IS_WORKER)
+		{
+			this._nextChunk = function()
+			{
+				this._readChunk();
+				this._chunkLoaded();
+			};
+		}
+		else
+		{
+			this._nextChunk = function()
+			{
+				this._readChunk();
+			};
+		}
+
+		this.stream = function(url)
+		{
+			this._input = url;
+			this._nextChunk();	// Starts streaming
+		};
+
+		this._readChunk = function()
+		{
+			if (this._finished)
+			{
+				this._chunkLoaded();
+				return;
+			}
+
+			xhr = new XMLHttpRequest();
+
+			if (this._config.withCredentials)
+			{
+				xhr.withCredentials = this._config.withCredentials;
+			}
+
+			if (!IS_WORKER)
+			{
+				xhr.onload = bindFunction(this._chunkLoaded, this);
+				xhr.onerror = bindFunction(this._chunkError, this);
+			}
+
+			xhr.open('GET', this._input, !IS_WORKER);
+			// Headers can only be set when once the request state is OPENED
+			if (this._config.downloadRequestHeaders)
+			{
+				var headers = this._config.downloadRequestHeaders;
+
+				for (var headerName in headers)
+				{
+					xhr.setRequestHeader(headerName, headers[headerName]);
+				}
+			}
+
+			if (this._config.chunkSize)
+			{
+				var end = this._start + this._config.chunkSize - 1;	// minus one because byte range is inclusive
+				xhr.setRequestHeader('Range', 'bytes='+this._start+'-'+end);
+				xhr.setRequestHeader('If-None-Match', 'webkit-no-cache'); // https://bugs.webkit.org/show_bug.cgi?id=82672
+			}
+
+			try {
+				xhr.send();
+			}
+			catch (err) {
+				this._chunkError(err.message);
+			}
+
+			if (IS_WORKER && xhr.status === 0)
+				this._chunkError();
+			else
+				this._start += this._config.chunkSize;
+		}
+
+		this._chunkLoaded = function()
+		{
+			if (xhr.readyState != 4)
+				return;
+
+			if (xhr.status < 200 || xhr.status >= 400)
+			{
+				this._chunkError();
+				return;
+			}
+
+			this._finished = !this._config.chunkSize || this._start > getFileSize(xhr);
+			this.parseChunk(xhr.responseText);
+		}
+
+		this._chunkError = function(errorMessage)
+		{
+			var errorText = xhr.statusText || errorMessage;
+			this._sendError(errorText);
+		}
+
+		function getFileSize(xhr)
+		{
+			var contentRange = xhr.getResponseHeader('Content-Range');
+			if (contentRange === null) { // no content range, then finish!
+					return -1;
+					}
+			return parseInt(contentRange.substr(contentRange.lastIndexOf('/') + 1));
+		}
+	}
+	NetworkStreamer.prototype = Object.create(ChunkStreamer.prototype);
+	NetworkStreamer.prototype.constructor = NetworkStreamer;
+
+
+	function FileStreamer(config)
+	{
+		config = config || {};
+		if (!config.chunkSize)
+			config.chunkSize = Papa.LocalChunkSize;
+		ChunkStreamer.call(this, config);
+
+		var reader, slice;
+
+		// FileReader is better than FileReaderSync (even in worker) - see http://stackoverflow.com/q/24708649/1048862
+		// But Firefox is a pill, too - see issue #76: https://github.com/mholt/PapaParse/issues/76
+		var usingAsyncReader = typeof FileReader !== 'undefined';	// Safari doesn't consider it a function - see issue #105
+
+		this.stream = function(file)
+		{
+			this._input = file;
+			slice = file.slice || file.webkitSlice || file.mozSlice;
+
+			if (usingAsyncReader)
+			{
+				reader = new FileReader();		// Preferred method of reading files, even in workers
+				reader.onload = bindFunction(this._chunkLoaded, this);
+				reader.onerror = bindFunction(this._chunkError, this);
+			}
+			else
+				reader = new FileReaderSync();	// Hack for running in a web worker in Firefox
+
+			this._nextChunk();	// Starts streaming
+		};
+
+		this._nextChunk = function()
+		{
+			if (!this._finished && (!this._config.preview || this._rowCount < this._config.preview))
+				this._readChunk();
+		}
+
+		this._readChunk = function()
+		{
+			var input = this._input;
+			if (this._config.chunkSize)
+			{
+				var end = Math.min(this._start + this._config.chunkSize, this._input.size);
+				input = slice.call(input, this._start, end);
+			}
+			var txt = reader.readAsText(input, this._config.encoding);
+			if (!usingAsyncReader)
+				this._chunkLoaded({ target: { result: txt } });	// mimic the async signature
+		}
+
+		this._chunkLoaded = function(event)
+		{
+			// Very important to increment start each time before handling results
+			this._start += this._config.chunkSize;
+			this._finished = !this._config.chunkSize || this._start >= this._input.size;
+			this.parseChunk(event.target.result);
+		}
+
+		this._chunkError = function()
+		{
+			this._sendError(reader.error);
+		}
+
+	}
+	FileStreamer.prototype = Object.create(ChunkStreamer.prototype);
+	FileStreamer.prototype.constructor = FileStreamer;
+
+
+	function StringStreamer(config)
+	{
+		config = config || {};
+		ChunkStreamer.call(this, config);
+
+		var string;
+		var remaining;
+		this.stream = function(s)
+		{
+			string = s;
+			remaining = s;
+			return this._nextChunk();
+		}
+		this._nextChunk = function()
+		{
+			if (this._finished) return;
+			var size = this._config.chunkSize;
+			var chunk = size ? remaining.substr(0, size) : remaining;
+			remaining = size ? remaining.substr(size) : '';
+			this._finished = !remaining;
+			return this.parseChunk(chunk);
+		}
+	}
+	StringStreamer.prototype = Object.create(StringStreamer.prototype);
+	StringStreamer.prototype.constructor = StringStreamer;
+
+
+	function ReadableStreamStreamer(config)
+	{
+		config = config || {};
+
+		ChunkStreamer.call(this, config);
+
+		var queue = [];
+		var parseOnData = true;
+
+		this.stream = function(stream)
+		{
+			this._input = stream;
+
+			this._input.on('data', this._streamData);
+			this._input.on('end', this._streamEnd);
+			this._input.on('error', this._streamError);
+		}
+
+		this._nextChunk = function()
+		{
+			if (queue.length)
+			{
+				this.parseChunk(queue.shift());
+			}
+			else
+			{
+				parseOnData = true;
+			}
+		}
+
+		this._streamData = bindFunction(function(chunk)
+		{
+			try
+			{
+				queue.push(typeof chunk === 'string' ? chunk : chunk.toString(this._config.encoding));
+
+				if (parseOnData)
+				{
+					parseOnData = false;
+					this.parseChunk(queue.shift());
+				}
+			}
+			catch (error)
+			{
+				this._streamError(error);
+			}
+		}, this);
+
+		this._streamError = bindFunction(function(error)
+		{
+			this._streamCleanUp();
+			this._sendError(error.message);
+		}, this);
+
+		this._streamEnd = bindFunction(function()
+		{
+			this._streamCleanUp();
+			this._finished = true;
+			this._streamData('');
+		}, this);
+
+		this._streamCleanUp = bindFunction(function()
+		{
+			this._input.removeListener('data', this._streamData);
+			this._input.removeListener('end', this._streamEnd);
+			this._input.removeListener('error', this._streamError);
+		}, this);
+	}
+	ReadableStreamStreamer.prototype = Object.create(ChunkStreamer.prototype);
+	ReadableStreamStreamer.prototype.constructor = ReadableStreamStreamer;
+
+
+	// Use one ParserHandle per entire CSV file or string
+	function ParserHandle(_config)
+	{
+		// One goal is to minimize the use of regular expressions...
+		var FLOAT = /^\s*-?(\d*\.?\d+|\d+\.?\d*)(e[-+]?\d+)?\s*$/i;
+
+		var self = this;
+		var _stepCounter = 0;	// Number of times step was called (number of rows parsed)
+		var _input;				// The input being parsed
+		var _parser;			// The core parser being used
+		var _paused = false;	// Whether we are paused or not
+		var _aborted = false;	// Whether the parser has aborted or not
+		var _delimiterError;	// Temporary state between delimiter detection and processing results
+		var _fields = [];		// Fields are from the header row of the input, if there is one
+		var _results = {		// The last results returned from the parser
+			data: [],
+			errors: [],
+			meta: {}
+		};
+
+		if (isFunction(_config.step))
+		{
+			var userStep = _config.step;
+			_config.step = function(results)
+			{
+				_results = results;
+
+				if (needsHeaderRow())
+					processResults();
+				else	// only call user's step function after header row
+				{
+					processResults();
+
+					// It's possbile that this line was empty and there's no row here after all
+					if (_results.data.length === 0)
+						return;
+
+					_stepCounter += results.data.length;
+					if (_config.preview && _stepCounter > _config.preview)
+						_parser.abort();
+					else
+						userStep(_results, self);
+				}
+			};
+		}
+
+		/**
+		 * Parses input. Most users won't need, and shouldn't mess with, the baseIndex
+		 * and ignoreLastRow parameters. They are used by streamers (wrapper functions)
+		 * when an input comes in multiple chunks, like from a file.
+		 */
+		this.parse = function(input, baseIndex, ignoreLastRow)
+		{
+			if (!_config.newline)
+				_config.newline = guessLineEndings(input);
+
+			_delimiterError = false;
+			if (!_config.delimiter)
+			{
+				var delimGuess = guessDelimiter(input, _config.newline, _config.skipEmptyLines);
+				if (delimGuess.successful)
+					_config.delimiter = delimGuess.bestDelimiter;
+				else
+				{
+					_delimiterError = true;	// add error after parsing (otherwise it would be overwritten)
+					_config.delimiter = Papa.DefaultDelimiter;
+				}
+				_results.meta.delimiter = _config.delimiter;
+			}
+			else if(isFunction(_config.delimiter))
+			{
+				_config.delimiter = _config.delimiter(input);
+				_results.meta.delimiter = _config.delimiter;
+			}
+
+			var parserConfig = copy(_config);
+			if (_config.preview && _config.header)
+				parserConfig.preview++;	// to compensate for header row
+
+			_input = input;
+			_parser = new Parser(parserConfig);
+			_results = _parser.parse(_input, baseIndex, ignoreLastRow);
+			processResults();
+			return _paused ? { meta: { paused: true } } : (_results || { meta: { paused: false } });
+		};
+
+		this.paused = function()
+		{
+			return _paused;
+		};
+
+		this.pause = function()
+		{
+			_paused = true;
+			_parser.abort();
+			_input = _input.substr(_parser.getCharIndex());
+		};
+
+		this.resume = function()
+		{
+			_paused = false;
+			self.streamer.parseChunk(_input);
+		};
+
+		this.aborted = function ()
+		{
+			return _aborted;
+		};
+
+		this.abort = function()
+		{
+			_aborted = true;
+			_parser.abort();
+			_results.meta.aborted = true;
+			if (isFunction(_config.complete))
+				_config.complete(_results);
+			_input = '';
+		};
+
+		function processResults()
+		{
+			if (_results && _delimiterError)
+			{
+				addError('Delimiter', 'UndetectableDelimiter', 'Unable to auto-detect delimiting character; defaulted to \''+Papa.DefaultDelimiter+'\'');
+				_delimiterError = false;
+			}
+
+			if (_config.skipEmptyLines)
+			{
+				for (var i = 0; i < _results.data.length; i++)
+					if (_results.data[i].length === 1 && _results.data[i][0] === '')
+						_results.data.splice(i--, 1);
+			}
+
+			if (needsHeaderRow())
+				fillHeaderFields();
+
+			return applyHeaderAndDynamicTyping();
+		}
+
+		function needsHeaderRow()
+		{
+			return _config.header && _fields.length === 0;
+		}
+
+		function fillHeaderFields()
+		{
+			if (!_results)
+				return;
+			for (var i = 0; needsHeaderRow() && i < _results.data.length; i++)
+				for (var j = 0; j < _results.data[i].length; j++)
+					_fields.push(_results.data[i][j]);
+			_results.data.splice(0, 1);
+		}
+
+		function shouldApplyDynamicTyping(field) {
+			// Cache function values to avoid calling it for each row
+			if (_config.dynamicTypingFunction && _config.dynamicTyping[field] === undefined) {
+				_config.dynamicTyping[field] = _config.dynamicTypingFunction(field);
+			}
+			return (_config.dynamicTyping[field] || _config.dynamicTyping) === true
+		}
+
+		function parseDynamic(field, value)
+		{
+			if (shouldApplyDynamicTyping(field))
+			{
+				if (value === 'true' || value === 'TRUE')
+					return true;
+				else if (value === 'false' || value === 'FALSE')
+					return false;
+				else
+					return tryParseFloat(value);
+			}
+			return value;
+		}
+
+		function applyHeaderAndDynamicTyping()
+		{
+			if (!_results || (!_config.header && !_config.dynamicTyping))
+				return _results;
+
+			for (var i = 0; i < _results.data.length; i++)
+			{
+				var row = _config.header ? {} : [];
+
+				for (var j = 0; j < _results.data[i].length; j++)
+				{
+					var field = j;
+					var value = _results.data[i][j];
+
+					if (_config.header)
+						field = j >= _fields.length ? '__parsed_extra' : _fields[j];
+
+					value = parseDynamic(field, value);
+
+					if (field === '__parsed_extra')
+					{
+						row[field] = row[field] || [];
+						row[field].push(value);
+					}
+					else
+						row[field] = value;
+				}
+
+				_results.data[i] = row;
+
+				if (_config.header)
+				{
+					if (j > _fields.length)
+						addError('FieldMismatch', 'TooManyFields', 'Too many fields: expected ' + _fields.length + ' fields but parsed ' + j, i);
+					else if (j < _fields.length)
+						addError('FieldMismatch', 'TooFewFields', 'Too few fields: expected ' + _fields.length + ' fields but parsed ' + j, i);
+				}
+			}
+
+			if (_config.header && _results.meta)
+				_results.meta.fields = _fields;
+			return _results;
+		}
+
+		function guessDelimiter(input, newline, skipEmptyLines)
+		{
+			var delimChoices = [',', '\t', '|', ';', Papa.RECORD_SEP, Papa.UNIT_SEP];
+			var bestDelim, bestDelta, fieldCountPrevRow;
+
+			for (var i = 0; i < delimChoices.length; i++)
+			{
+				var delim = delimChoices[i];
+				var delta = 0, avgFieldCount = 0, emptyLinesCount = 0;
+				fieldCountPrevRow = undefined;
+
+				var preview = new Parser({
+					delimiter: delim,
+					newline: newline,
+					preview: 10
+				}).parse(input);
+
+				for (var j = 0; j < preview.data.length; j++)
+				{
+					if (skipEmptyLines && preview.data[j].length === 1 && preview.data[j][0].length === 0) {
+						emptyLinesCount++
+						continue
+					}
+					var fieldCount = preview.data[j].length;
+					avgFieldCount += fieldCount;
+
+					if (typeof fieldCountPrevRow === 'undefined')
+					{
+						fieldCountPrevRow = fieldCount;
+						continue;
+					}
+					else if (fieldCount > 1)
+					{
+						delta += Math.abs(fieldCount - fieldCountPrevRow);
+						fieldCountPrevRow = fieldCount;
+					}
+				}
+
+				if (preview.data.length > 0)
+					avgFieldCount /= (preview.data.length - emptyLinesCount);
+
+				if ((typeof bestDelta === 'undefined' || delta < bestDelta)
+					&& avgFieldCount > 1.99)
+				{
+					bestDelta = delta;
+					bestDelim = delim;
+				}
+			}
+
+			_config.delimiter = bestDelim;
+
+			return {
+				successful: !!bestDelim,
+				bestDelimiter: bestDelim
+			}
+		}
+
+		function guessLineEndings(input)
+		{
+			input = input.substr(0, 1024*1024);	// max length 1 MB
+
+			var r = input.split('\r');
+
+			var n = input.split('\n');
+
+			var nAppearsFirst = (n.length > 1 && n[0].length < r[0].length);
+
+			if (r.length === 1 || nAppearsFirst)
+				return '\n';
+
+			var numWithN = 0;
+			for (var i = 0; i < r.length; i++)
+			{
+				if (r[i][0] === '\n')
+					numWithN++;
+			}
+
+			return numWithN >= r.length / 2 ? '\r\n' : '\r';
+		}
+
+		function tryParseFloat(val)
+		{
+			var isNumber = FLOAT.test(val);
+			return isNumber ? parseFloat(val) : val;
+		}
+
+		function addError(type, code, msg, row)
+		{
+			_results.errors.push({
+				type: type,
+				code: code,
+				message: msg,
+				row: row
+			});
+		}
+	}
+
+
+
+
+
+	/** The core parser implements speedy and correct CSV parsing */
+	function Parser(config)
+	{
+		// Unpack the config object
+		config = config || {};
+		var delim = config.delimiter;
+		var newline = config.newline;
+		var comments = config.comments;
+		var step = config.step;
+		var preview = config.preview;
+		var fastMode = config.fastMode;
+		var quoteChar = config.quoteChar || '"';
+
+		// Delimiter must be valid
+		if (typeof delim !== 'string'
+			|| Papa.BAD_DELIMITERS.indexOf(delim) > -1)
+			delim = ',';
+
+		// Comment character must be valid
+		if (comments === delim)
+			throw 'Comment character same as delimiter';
+		else if (comments === true)
+			comments = '#';
+		else if (typeof comments !== 'string'
+			|| Papa.BAD_DELIMITERS.indexOf(comments) > -1)
+			comments = false;
+
+		// Newline must be valid: \r, \n, or \r\n
+		if (newline != '\n' && newline != '\r' && newline != '\r\n')
+			newline = '\n';
+
+		// We're gonna need these at the Parser scope
+		var cursor = 0;
+		var aborted = false;
+
+		this.parse = function(input, baseIndex, ignoreLastRow)
+		{
+			// For some reason, in Chrome, this speeds things up (!?)
+			if (typeof input !== 'string')
+				throw 'Input must be a string';
+
+			// We don't need to compute some of these every time parse() is called,
+			// but having them in a more local scope seems to perform better
+			var inputLen = input.length,
+				delimLen = delim.length,
+				newlineLen = newline.length,
+				commentsLen = comments.length;
+			var stepIsFunction = isFunction(step);
+
+			// Establish starting state
+			cursor = 0;
+			var data = [], errors = [], row = [], lastCursor = 0;
+
+			if (!input)
+				return returnable();
+
+			if (fastMode || (fastMode !== false && input.indexOf(quoteChar) === -1))
+			{
+				var rows = input.split(newline);
+				for (var i = 0; i < rows.length; i++)
+				{
+					var row = rows[i];
+					cursor += row.length;
+					if (i !== rows.length - 1)
+						cursor += newline.length;
+					else if (ignoreLastRow)
+						return returnable();
+					if (comments && row.substr(0, commentsLen) === comments)
+						continue;
+					if (stepIsFunction)
+					{
+						data = [];
+						pushRow(row.split(delim));
+						doStep();
+						if (aborted)
+							return returnable();
+					}
+					else
+						pushRow(row.split(delim));
+					if (preview && i >= preview)
+					{
+						data = data.slice(0, preview);
+						return returnable(true);
+					}
+				}
+				return returnable();
+			}
+
+			var nextDelim = input.indexOf(delim, cursor);
+			var nextNewline = input.indexOf(newline, cursor);
+			var quoteCharRegex = new RegExp(quoteChar+quoteChar, 'g');
+
+			// Parser loop
+			for (;;)
+			{
+				// Field has opening quote
+				if (input[cursor] === quoteChar)
+				{
+					// Start our search for the closing quote where the cursor is
+					var quoteSearch = cursor;
+
+					// Skip the opening quote
+					cursor++;
+
+					for (;;)
+					{
+						// Find closing quote
+						var quoteSearch = input.indexOf(quoteChar, quoteSearch+1);
+
+						//No other quotes are found - no other delimiters
+						if (quoteSearch === -1)
+						{
+							if (!ignoreLastRow) {
+								// No closing quote... what a pity
+								errors.push({
+									type: 'Quotes',
+									code: 'MissingQuotes',
+									message: 'Quoted field unterminated',
+									row: data.length,	// row has yet to be inserted
+									index: cursor
+								});
+							}
+							return finish();
+						}
+
+						// Closing quote at EOF
+						if (quoteSearch === inputLen-1)
+						{
+							var value = input.substring(cursor, quoteSearch).replace(quoteCharRegex, quoteChar);
+							return finish(value);
+						}
+
+						// If this quote is escaped, it's part of the data; skip it
+						if (input[quoteSearch+1] === quoteChar)
+						{
+							quoteSearch++;
+							continue;
+						}
+
+						// Closing quote followed by delimiter
+						if (input[quoteSearch+1] === delim)
+						{
+							row.push(input.substring(cursor, quoteSearch).replace(quoteCharRegex, quoteChar));
+							cursor = quoteSearch + 1 + delimLen;
+							nextDelim = input.indexOf(delim, cursor);
+							nextNewline = input.indexOf(newline, cursor);
+							break;
+						}
+
+						// Closing quote followed by newline
+						if (input.substr(quoteSearch+1, newlineLen) === newline)
+						{
+							row.push(input.substring(cursor, quoteSearch).replace(quoteCharRegex, quoteChar));
+							saveRow(quoteSearch + 1 + newlineLen);
+							nextDelim = input.indexOf(delim, cursor);	// because we may have skipped the nextDelim in the quoted field
+
+							if (stepIsFunction)
+							{
+								doStep();
+								if (aborted)
+									return returnable();
+							}
+
+							if (preview && data.length >= preview)
+								return returnable(true);
+
+							break;
+						}
+
+
+						// Checks for valid closing quotes are complete (escaped quotes or quote followed by EOF/delimiter/newline) -- assume these quotes are part of an invalid text string
+						errors.push({
+							type: 'Quotes',
+							code: 'InvalidQuotes',
+							message: 'Trailing quote on quoted field is malformed',
+							row: data.length,	// row has yet to be inserted
+							index: cursor
+						});
+
+						quoteSearch++;
+						continue;
+
+					}
+
+					continue;
+				}
+
+				// Comment found at start of new line
+				if (comments && row.length === 0 && input.substr(cursor, commentsLen) === comments)
+				{
+					if (nextNewline === -1)	// Comment ends at EOF
+						return returnable();
+					cursor = nextNewline + newlineLen;
+					nextNewline = input.indexOf(newline, cursor);
+					nextDelim = input.indexOf(delim, cursor);
+					continue;
+				}
+
+				// Next delimiter comes before next newline, so we've reached end of field
+				if (nextDelim !== -1 && (nextDelim < nextNewline || nextNewline === -1))
+				{
+					row.push(input.substring(cursor, nextDelim));
+					cursor = nextDelim + delimLen;
+					nextDelim = input.indexOf(delim, cursor);
+					continue;
+				}
+
+				// End of row
+				if (nextNewline !== -1)
+				{
+					row.push(input.substring(cursor, nextNewline));
+					saveRow(nextNewline + newlineLen);
+
+					if (stepIsFunction)
+					{
+						doStep();
+						if (aborted)
+							return returnable();
+					}
+
+					if (preview && data.length >= preview)
+						return returnable(true);
+
+					continue;
+				}
+
+				break;
+			}
+
+
+			return finish();
+
+
+			function pushRow(row)
+			{
+				data.push(row);
+				lastCursor = cursor;
+			}
+
+			/**
+			 * Appends the remaining input from cursor to the end into
+			 * row, saves the row, calls step, and returns the results.
+			 */
+			function finish(value)
+			{
+				if (ignoreLastRow)
+					return returnable();
+				if (typeof value === 'undefined')
+					value = input.substr(cursor);
+				row.push(value);
+				cursor = inputLen;	// important in case parsing is paused
+				pushRow(row);
+				if (stepIsFunction)
+					doStep();
+				return returnable();
+			}
+
+			/**
+			 * Appends the current row to the results. It sets the cursor
+			 * to newCursor and finds the nextNewline. The caller should
+			 * take care to execute user's step function and check for
+			 * preview and end parsing if necessary.
+			 */
+			function saveRow(newCursor)
+			{
+				cursor = newCursor;
+				pushRow(row);
+				row = [];
+				nextNewline = input.indexOf(newline, cursor);
+			}
+
+			/** Returns an object with the results, errors, and meta. */
+			function returnable(stopped)
+			{
+				return {
+					data: data,
+					errors: errors,
+					meta: {
+						delimiter: delim,
+						linebreak: newline,
+						aborted: aborted,
+						truncated: !!stopped,
+						cursor: lastCursor + (baseIndex || 0)
+					}
+				};
+			}
+
+			/** Executes the user's step function and resets data & errors. */
+			function doStep()
+			{
+				step(returnable());
+				data = [], errors = [];
+			}
+		};
+
+		/** Sets the abort flag */
+		this.abort = function()
+		{
+			aborted = true;
+		};
+
+		/** Gets the cursor position */
+		this.getCharIndex = function()
+		{
+			return cursor;
+		};
+	}
+
+
+	// If you need to load Papa Parse asynchronously and you also need worker threads, hard-code
+	// the script path here. See: https://github.com/mholt/PapaParse/issues/87#issuecomment-57885358
+	function getScriptPath()
+	{
+		var scripts = document.getElementsByTagName('script');
+		return scripts.length ? scripts[scripts.length - 1].src : '';
+	}
+
+	function newWorker()
+	{
+		if (!Papa.WORKERS_SUPPORTED)
+			return false;
+		if (!LOADED_SYNC && Papa.SCRIPT_PATH === null)
+			throw new Error(
+				'Script path cannot be determined automatically when Papa Parse is loaded asynchronously. ' +
+				'You need to set Papa.SCRIPT_PATH manually.'
+			);
+		var workerUrl = Papa.SCRIPT_PATH || AUTO_SCRIPT_PATH;
+		// Append 'papaworker' to the search string to tell papaparse that this is our worker.
+		workerUrl += (workerUrl.indexOf('?') !== -1 ? '&' : '?') + 'papaworker';
+		var w = new global.Worker(workerUrl);
+		w.onmessage = mainThreadReceivedMessage;
+		w.id = workerIdCounter++;
+		workers[w.id] = w;
+		return w;
+	}
+
+	/** Callback when main thread receives a message */
+	function mainThreadReceivedMessage(e)
+	{
+		var msg = e.data;
+		var worker = workers[msg.workerId];
+		var aborted = false;
+
+		if (msg.error)
+			worker.userError(msg.error, msg.file);
+		else if (msg.results && msg.results.data)
+		{
+			var abort = function() {
+				aborted = true;
+				completeWorker(msg.workerId, { data: [], errors: [], meta: { aborted: true } });
+			};
+
+			var handle = {
+				abort: abort,
+				pause: notImplemented,
+				resume: notImplemented
+			};
+
+			if (isFunction(worker.userStep))
+			{
+				for (var i = 0; i < msg.results.data.length; i++)
+				{
+					worker.userStep({
+						data: [msg.results.data[i]],
+						errors: msg.results.errors,
+						meta: msg.results.meta
+					}, handle);
+					if (aborted)
+						break;
+				}
+				delete msg.results;	// free memory ASAP
+			}
+			else if (isFunction(worker.userChunk))
+			{
+				worker.userChunk(msg.results, handle, msg.file);
+				delete msg.results;
+			}
+		}
+
+		if (msg.finished && !aborted)
+			completeWorker(msg.workerId, msg.results);
+	}
+
+	function completeWorker(workerId, results) {
+		var worker = workers[workerId];
+		if (isFunction(worker.userComplete))
+			worker.userComplete(results);
+		worker.terminate();
+		delete workers[workerId];
+	}
+
+	function notImplemented() {
+		throw 'Not implemented.';
+	}
+
+	/** Callback when worker thread receives a message */
+	function workerThreadReceivedMessage(e)
+	{
+		var msg = e.data;
+
+		if (typeof Papa.WORKER_ID === 'undefined' && msg)
+			Papa.WORKER_ID = msg.workerId;
+
+		if (typeof msg.input === 'string')
+		{
+			global.postMessage({
+				workerId: Papa.WORKER_ID,
+				results: Papa.parse(msg.input, msg.config),
+				finished: true
+			});
+		}
+		else if ((global.File && msg.input instanceof File) || msg.input instanceof Object)	// thank you, Safari (see issue #106)
+		{
+			var results = Papa.parse(msg.input, msg.config);
+			if (results)
+				global.postMessage({
+					workerId: Papa.WORKER_ID,
+					results: results,
+					finished: true
+				});
+		}
+	}
+
+	/** Makes a deep copy of an array or object (mostly) */
+	function copy(obj)
+	{
+		if (typeof obj !== 'object')
+			return obj;
+		var cpy = obj instanceof Array ? [] : {};
+		for (var key in obj)
+			cpy[key] = copy(obj[key]);
+		return cpy;
+	}
+
+	function bindFunction(f, self)
+	{
+		return function() { f.apply(self, arguments); };
+	}
+
+	function isFunction(func)
+	{
+		return typeof func === 'function';
+	}
+
+	return Papa;
+}));
+
+
+/***/ }),
+/* 169 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(170);
 
 /**
  * math.js factory function. Creates a new instance of math.js
@@ -52029,7 +55292,7 @@ function create (config) {
   math.create = create;
 
   // import data types, functions, constants, expression parser, etc.
-  math['import'](__webpack_require__(174));
+  math['import'](__webpack_require__(177));
 
   return math;
 }
@@ -52039,21 +55302,21 @@ module.exports = create();
 
 
 /***/ }),
-/* 167 */
+/* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(168);
+module.exports = __webpack_require__(171);
 
 /***/ }),
-/* 168 */
+/* 171 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var isFactory = __webpack_require__(5).isFactory;
-var typedFactory = __webpack_require__(169);
-var emitter = __webpack_require__(101);
+var typedFactory = __webpack_require__(172);
+var emitter = __webpack_require__(102);
 
-var importFactory = __webpack_require__(172);
-var configFactory = __webpack_require__(173);
+var importFactory = __webpack_require__(175);
+var configFactory = __webpack_require__(176);
 
 /**
  * Math.js core. Creates a new, empty math.js instance
@@ -52183,13 +55446,13 @@ exports.create = function create (options) {
 
 
 /***/ }),
-/* 169 */
+/* 172 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var typedFunction = __webpack_require__(170);
+var typedFunction = __webpack_require__(173);
 var digits = __webpack_require__(3).digits;
-var isBigNumber = __webpack_require__(77);
-var isMatrix = __webpack_require__(64);
+var isBigNumber = __webpack_require__(78);
+var isMatrix = __webpack_require__(65);
 
 // returns a new instance of typed-function
 var createTyped = function () {
@@ -52480,7 +55743,7 @@ exports.create = function create(type) {
 
 
 /***/ }),
-/* 170 */
+/* 173 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -53877,7 +57140,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 171 */
+/* 174 */
 /***/ (function(module, exports) {
 
 function E () {
@@ -53949,7 +57212,7 @@ module.exports = E;
 
 
 /***/ }),
-/* 172 */
+/* 175 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -54263,7 +57526,7 @@ exports.lazy = true;
 
 
 /***/ }),
-/* 173 */
+/* 176 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -54394,55 +57657,55 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 174 */
+/* 177 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(175),        // data types (Matrix, Complex, Unit, ...)
-  __webpack_require__(207),   // constants
-  __webpack_require__(209),  // expression parsing
-  __webpack_require__(421),    // functions
-  __webpack_require__(563),        // serialization utility (math.json.reviver)
-  __webpack_require__(565)        // errors
+  __webpack_require__(178),        // data types (Matrix, Complex, Unit, ...)
+  __webpack_require__(210),   // constants
+  __webpack_require__(212),  // expression parsing
+  __webpack_require__(424),    // functions
+  __webpack_require__(566),        // serialization utility (math.json.reviver)
+  __webpack_require__(568)        // errors
 ];
 
 
 /***/ }),
-/* 175 */
+/* 178 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(176),
-  __webpack_require__(180),
-  __webpack_require__(181),
-  __webpack_require__(185),
+  __webpack_require__(179),
+  __webpack_require__(183),
+  __webpack_require__(184),
   __webpack_require__(188),
   __webpack_require__(191),
-  __webpack_require__(80),
-  __webpack_require__(199),
-  __webpack_require__(200),
-  __webpack_require__(201)
+  __webpack_require__(194),
+  __webpack_require__(81),
+  __webpack_require__(202),
+  __webpack_require__(203),
+  __webpack_require__(204)
 ];
 
 
 /***/ }),
-/* 176 */
+/* 179 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   // type
-  __webpack_require__(177),
+  __webpack_require__(180),
 
   // construction function
-  __webpack_require__(179)
+  __webpack_require__(182)
 ];
 
 
 /***/ }),
-/* 177 */
+/* 180 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Decimal = __webpack_require__(178); // make sure to pick the es5 version
+var Decimal = __webpack_require__(181); // make sure to pick the es5 version
 
 function factory (type, config, load, typed, math) {
   var BigNumber = Decimal.clone({precision: config.precision});
@@ -54492,7 +57755,7 @@ exports.factory = factory;
 exports.math = true; // request access to the math namespace
 
 /***/ }),
-/* 178 */
+/* 181 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/*! decimal.js v7.2.3 https://github.com/MikeMcl/decimal.js/LICENCE */
@@ -59312,7 +62575,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*! decimal.js v7.2.3 https://github.com/MikeM
 
 
 /***/ }),
-/* 179 */
+/* 182 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -59387,7 +62650,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 180 */
+/* 183 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -59472,20 +62735,20 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 181 */
+/* 184 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   // type
-  __webpack_require__(182),
+  __webpack_require__(185),
 
   // construction function
-  __webpack_require__(184)
+  __webpack_require__(187)
 ];
 
 
 /***/ }),
-/* 182 */
+/* 185 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -59657,7 +62920,7 @@ exports.lazy = false; // we need to register a listener on the import events, so
 
 
 /***/ }),
-/* 183 */
+/* 186 */
 /***/ (function(module, exports) {
 
 /**
@@ -59846,7 +63109,7 @@ exports.toFixed = function (value, precision) {
 
 
 /***/ }),
-/* 184 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -59904,20 +63167,20 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 185 */
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   // type
-  __webpack_require__(102),
+  __webpack_require__(103),
 
   // construction function
-  __webpack_require__(187)
+  __webpack_require__(190)
 ];
 
 
 /***/ }),
-/* 186 */
+/* 189 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -61177,7 +64440,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
-/* 187 */
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61284,23 +64547,23 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 188 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   // type
-  __webpack_require__(189),
+  __webpack_require__(192),
 
   // construction function
-  __webpack_require__(103)
+  __webpack_require__(104)
 ];
 
 
 /***/ }),
-/* 189 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Fraction = __webpack_require__(190);
+var Fraction = __webpack_require__(193);
 
 /**
  * Attach type information
@@ -61342,7 +64605,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 190 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -62130,29 +65393,29 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
-/* 191 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   // types
-  __webpack_require__(78),
+  __webpack_require__(79),
   __webpack_require__(48),
-  __webpack_require__(193),
-  __webpack_require__(194),
-  __webpack_require__(195),
   __webpack_require__(196),
+  __webpack_require__(197),
+  __webpack_require__(198),
+  __webpack_require__(199),
   __webpack_require__(29),
-  __webpack_require__(104),
+  __webpack_require__(105),
 
   // construction functions
-  __webpack_require__(197),
+  __webpack_require__(200),
   __webpack_require__(0),
-  __webpack_require__(198)
+  __webpack_require__(201)
 ];
 
 
 /***/ }),
-/* 192 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62169,7 +65432,7 @@ exports.isBoolean = function(value) {
 
 
 /***/ }),
-/* 193 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62191,7 +65454,7 @@ var isString = string.isString;
 var validateIndex = array.validateIndex;
 
 function factory (type, config, load, typed) {
-  var Matrix = load(__webpack_require__(78)); // force loading Matrix (do not use via type.Matrix)
+  var Matrix = load(__webpack_require__(79)); // force loading Matrix (do not use via type.Matrix)
   var equalScalar = load(__webpack_require__(11));
 
   /**
@@ -63610,7 +66873,7 @@ exports.lazy = false;  // no lazy loading, as we alter type.Matrix._storage
 
 
 /***/ }),
-/* 194 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63758,7 +67021,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 195 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64114,7 +67377,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 196 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64354,7 +67617,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 197 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64425,7 +67688,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 198 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64493,17 +67756,17 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 199 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   // type
-  __webpack_require__(105)
+  __webpack_require__(106)
 ];
 
 
 /***/ }),
-/* 200 */
+/* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64579,29 +67842,29 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 201 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   // type
-  __webpack_require__(202),
-
-  // construction function
-  __webpack_require__(203),
-
-  // create new units
-  __webpack_require__(204),
-
-  // split units
   __webpack_require__(205),
 
+  // construction function
+  __webpack_require__(206),
+
+  // create new units
+  __webpack_require__(207),
+
+  // split units
+  __webpack_require__(208),
+
   // physical constants
-  __webpack_require__(206)
+  __webpack_require__(209)
 ];
 
 
 /***/ }),
-/* 202 */
+/* 205 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64609,7 +67872,7 @@ module.exports = [
 
 var endsWith = __webpack_require__(9).endsWith;
 var clone = __webpack_require__(5).clone;
-var constants = __webpack_require__(106);
+var constants = __webpack_require__(107);
 
 function factory (type, config, load, typed, math) {
   var add       = load(__webpack_require__(22));
@@ -64618,14 +67881,14 @@ function factory (type, config, load, typed, math) {
   var divide    = load(__webpack_require__(21));
   var pow       = load(__webpack_require__(50));
   var abs       = load(__webpack_require__(32));
-  var fix       = load(__webpack_require__(107));
-  var round     = load(__webpack_require__(108));
+  var fix       = load(__webpack_require__(108));
+  var round     = load(__webpack_require__(109));
   var equal     = load(__webpack_require__(33));
-  var isNumeric = load(__webpack_require__(81));
-  var format    = load(__webpack_require__(109));
-  var getTypeOf = load(__webpack_require__(82));
-  var toNumber  = load(__webpack_require__(80));
-  var Complex   = load(__webpack_require__(102));
+  var isNumeric = load(__webpack_require__(82));
+  var format    = load(__webpack_require__(110));
+  var getTypeOf = load(__webpack_require__(83));
+  var toNumber  = load(__webpack_require__(81));
+  var Complex   = load(__webpack_require__(103));
 
   /**
    * A unit can be constructed in the following ways:
@@ -67892,7 +71155,7 @@ exports.math = true; // request access to the math namespace
 
 
 /***/ }),
-/* 203 */
+/* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -67960,7 +71223,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 204 */
+/* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -68052,7 +71315,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 205 */
+/* 208 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -68096,7 +71359,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 206 */
+/* 209 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var lazy = __webpack_require__(5).lazy;
@@ -68192,14 +71455,14 @@ exports.math = true;   // request access to the math namespace
 
 
 /***/ }),
-/* 207 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var object = __webpack_require__(5);
-var bigConstants = __webpack_require__(106);
+var bigConstants = __webpack_require__(107);
 
 function factory (type, config, load, typed, math) {
   // listen for changed in the configuration, automatically reload
@@ -68258,7 +71521,7 @@ function factory (type, config, load, typed, math) {
   setConstant(math, 'i', type.Complex.I);
 
   // meta information
-  setConstant(math, 'version', __webpack_require__(208));
+  setConstant(math, 'version', __webpack_require__(211));
 }
 
 // create a constant in both math and mathWithTransform
@@ -68278,7 +71541,7 @@ exports.lazy = false;  // no lazy loading of constants, the constants themselves
 exports.math = true;   // request access to the math namespace
 
 /***/ }),
-/* 208 */
+/* 211 */
 /***/ (function(module, exports) {
 
 module.exports = '3.16.3';
@@ -68287,23 +71550,23 @@ module.exports = '3.16.3';
 
 
 /***/ }),
-/* 209 */
+/* 212 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(110),
-  __webpack_require__(401),
-  __webpack_require__(407),
-  __webpack_require__(409),
+  __webpack_require__(111),
+  __webpack_require__(404),
+  __webpack_require__(410),
+  __webpack_require__(412),
 
-  __webpack_require__(420),
+  __webpack_require__(423),
   __webpack_require__(43),
-  __webpack_require__(122)
+  __webpack_require__(123)
 ];
 
 
 /***/ }),
-/* 210 */
+/* 213 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68328,7 +71591,7 @@ module.exports = {
 
 
 /***/ }),
-/* 211 */
+/* 214 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68355,7 +71618,7 @@ module.exports = {
 
 
 /***/ }),
-/* 212 */
+/* 215 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68380,7 +71643,7 @@ module.exports = {
 
 
 /***/ }),
-/* 213 */
+/* 216 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68404,7 +71667,7 @@ module.exports = {
 
 
 /***/ }),
-/* 214 */
+/* 217 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68427,7 +71690,7 @@ module.exports = {
 
 
 /***/ }),
-/* 215 */
+/* 218 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68458,7 +71721,7 @@ module.exports = {
 
 
 /***/ }),
-/* 216 */
+/* 219 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68489,7 +71752,7 @@ module.exports = {
 
 
 /***/ }),
-/* 217 */
+/* 220 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68518,7 +71781,7 @@ module.exports = {
 
 
 /***/ }),
-/* 218 */
+/* 221 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68543,7 +71806,7 @@ module.exports = {
 
 
 /***/ }),
-/* 219 */
+/* 222 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68564,7 +71827,7 @@ module.exports = {
 
 
 /***/ }),
-/* 220 */
+/* 223 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68588,7 +71851,7 @@ module.exports = {
 
 
 /***/ }),
-/* 221 */
+/* 224 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68614,7 +71877,7 @@ module.exports = {
 
 
 /***/ }),
-/* 222 */
+/* 225 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68632,7 +71895,7 @@ module.exports = {
 
 
 /***/ }),
-/* 223 */
+/* 226 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68652,7 +71915,7 @@ module.exports = {
 
 
 /***/ }),
-/* 224 */
+/* 227 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68671,7 +71934,7 @@ module.exports = {
 
 
 /***/ }),
-/* 225 */
+/* 228 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68690,7 +71953,7 @@ module.exports = {
 
 
 /***/ }),
-/* 226 */
+/* 229 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68709,7 +71972,7 @@ module.exports = {
 
 
 /***/ }),
-/* 227 */
+/* 230 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68728,7 +71991,7 @@ module.exports = {
 
 
 /***/ }),
-/* 228 */
+/* 231 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68747,7 +72010,7 @@ module.exports = {
 
 
 /***/ }),
-/* 229 */
+/* 232 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68766,7 +72029,7 @@ module.exports = {
 
 
 /***/ }),
-/* 230 */
+/* 233 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68784,7 +72047,7 @@ module.exports = {
 
 
 /***/ }),
-/* 231 */
+/* 234 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68802,7 +72065,7 @@ module.exports = {
 
 
 /***/ }),
-/* 232 */
+/* 235 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68821,7 +72084,7 @@ module.exports = {
 
 
 /***/ }),
-/* 233 */
+/* 236 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68840,7 +72103,7 @@ module.exports = {
 
 
 /***/ }),
-/* 234 */
+/* 237 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68859,7 +72122,7 @@ module.exports = {
 
 
 /***/ }),
-/* 235 */
+/* 238 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68877,7 +72140,7 @@ module.exports = {
 
 
 /***/ }),
-/* 236 */
+/* 239 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68895,7 +72158,7 @@ module.exports = {
 
 
 /***/ }),
-/* 237 */
+/* 240 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68923,7 +72186,7 @@ module.exports = {
 
 
 /***/ }),
-/* 238 */
+/* 241 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68946,7 +72209,7 @@ module.exports = {
 
 
 /***/ }),
-/* 239 */
+/* 242 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68969,7 +72232,7 @@ module.exports = {
 
 
 /***/ }),
-/* 240 */
+/* 243 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -68992,7 +72255,7 @@ module.exports = {
 
 
 /***/ }),
-/* 241 */
+/* 244 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69017,7 +72280,7 @@ module.exports = {
 
 
 /***/ }),
-/* 242 */
+/* 245 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69037,7 +72300,7 @@ module.exports = {
 
 
 /***/ }),
-/* 243 */
+/* 246 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69058,7 +72321,7 @@ module.exports = {
 
 
 /***/ }),
-/* 244 */
+/* 247 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69079,7 +72342,7 @@ module.exports = {
 
 
 /***/ }),
-/* 245 */
+/* 248 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69098,7 +72361,7 @@ module.exports = {
 
 
 /***/ }),
-/* 246 */
+/* 249 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69123,7 +72386,7 @@ module.exports = {
 
 
 /***/ }),
-/* 247 */
+/* 250 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69154,7 +72417,7 @@ module.exports = {
 
 
 /***/ }),
-/* 248 */
+/* 251 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69175,7 +72438,7 @@ module.exports = {
 
 
 /***/ }),
-/* 249 */
+/* 252 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69199,7 +72462,7 @@ module.exports = {
 
 
 /***/ }),
-/* 250 */
+/* 253 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69225,7 +72488,7 @@ module.exports = {
 
 
 /***/ }),
-/* 251 */
+/* 254 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69250,7 +72513,7 @@ module.exports = {
 
 
 /***/ }),
-/* 252 */
+/* 255 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69275,7 +72538,7 @@ module.exports = {
 
 
 /***/ }),
-/* 253 */
+/* 256 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69298,7 +72561,7 @@ module.exports = {
 
 
 /***/ }),
-/* 254 */
+/* 257 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69323,7 +72586,7 @@ module.exports = {
 
 
 /***/ }),
-/* 255 */
+/* 258 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69345,7 +72608,7 @@ module.exports = {
 
 
 /***/ }),
-/* 256 */
+/* 259 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69366,7 +72629,7 @@ module.exports = {
 
 
 /***/ }),
-/* 257 */
+/* 260 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69387,7 +72650,7 @@ module.exports = {
 
 
 /***/ }),
-/* 258 */
+/* 261 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69409,7 +72672,7 @@ module.exports = {
 
 
 /***/ }),
-/* 259 */
+/* 262 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69429,7 +72692,7 @@ module.exports = {
 
 
 /***/ }),
-/* 260 */
+/* 263 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69457,7 +72720,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 261 */
+/* 264 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69482,7 +72745,7 @@ module.exports = {
 
 
 /***/ }),
-/* 262 */
+/* 265 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69508,7 +72771,7 @@ module.exports = {
 
 
 /***/ }),
-/* 263 */
+/* 266 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69533,7 +72796,7 @@ module.exports = {
 
 
 /***/ }),
-/* 264 */
+/* 267 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69559,7 +72822,7 @@ module.exports = {
 
 
 /***/ }),
-/* 265 */
+/* 268 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69585,7 +72848,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 266 */
+/* 269 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69607,7 +72870,7 @@ module.exports = {
 
 
 /***/ }),
-/* 267 */
+/* 270 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69632,7 +72895,7 @@ module.exports = {
 
 
 /***/ }),
-/* 268 */
+/* 271 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69655,7 +72918,7 @@ module.exports = {
 
 
 /***/ }),
-/* 269 */
+/* 272 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69679,7 +72942,7 @@ module.exports = {
 
 
 /***/ }),
-/* 270 */
+/* 273 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69706,7 +72969,7 @@ module.exports = {
 
 
 /***/ }),
-/* 271 */
+/* 274 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69731,7 +72994,7 @@ module.exports = {
 
 
 /***/ }),
-/* 272 */
+/* 275 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69755,7 +73018,7 @@ module.exports = {
 
 
 /***/ }),
-/* 273 */
+/* 276 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69778,7 +73041,7 @@ module.exports = {
 
 
 /***/ }),
-/* 274 */
+/* 277 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69798,7 +73061,7 @@ module.exports = {
 
 
 /***/ }),
-/* 275 */
+/* 278 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69821,7 +73084,7 @@ module.exports = {
 
 
 /***/ }),
-/* 276 */
+/* 279 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69844,7 +73107,7 @@ module.exports = {
 
 
 /***/ }),
-/* 277 */
+/* 280 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69866,7 +73129,7 @@ module.exports = {
 
 
 /***/ }),
-/* 278 */
+/* 281 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69887,7 +73150,7 @@ module.exports = {
 
 
 /***/ }),
-/* 279 */
+/* 282 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69909,7 +73172,7 @@ module.exports = {
 
 
 /***/ }),
-/* 280 */
+/* 283 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69932,7 +73195,7 @@ module.exports = {
 
 
 /***/ }),
-/* 281 */
+/* 284 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69955,7 +73218,7 @@ module.exports = {
 
 
 /***/ }),
-/* 282 */
+/* 285 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69973,7 +73236,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 283 */
+/* 286 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -69991,7 +73254,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 284 */
+/* 287 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70008,7 +73271,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 285 */
+/* 288 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70026,7 +73289,7 @@ module.exports = {
 
 
 /***/ }),
-/* 286 */
+/* 289 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70048,7 +73311,7 @@ module.exports = {
 
 
 /***/ }),
-/* 287 */
+/* 290 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70069,7 +73332,7 @@ module.exports = {
 
 
 /***/ }),
-/* 288 */
+/* 291 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70090,7 +73353,7 @@ module.exports = {
 
 
 /***/ }),
-/* 289 */
+/* 292 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70116,7 +73379,7 @@ module.exports = {
 
 
 /***/ }),
-/* 290 */
+/* 293 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70142,7 +73405,7 @@ module.exports = {
 
 
 /***/ }),
-/* 291 */
+/* 294 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70168,7 +73431,7 @@ module.exports = {
 
 
 /***/ }),
-/* 292 */
+/* 295 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70194,7 +73457,7 @@ module.exports = {
 
 
 /***/ }),
-/* 293 */
+/* 296 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70214,7 +73477,7 @@ module.exports = {
 
 
 /***/ }),
-/* 294 */
+/* 297 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70234,7 +73497,7 @@ module.exports = {
 
 
 /***/ }),
-/* 295 */
+/* 298 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70254,7 +73517,7 @@ module.exports = {
 
 
 /***/ }),
-/* 296 */
+/* 299 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70274,7 +73537,7 @@ module.exports = {
 
 
 /***/ }),
-/* 297 */
+/* 300 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70297,7 +73560,7 @@ module.exports = {
 
 
 /***/ }),
-/* 298 */
+/* 301 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70321,7 +73584,7 @@ module.exports = {
 
 
 /***/ }),
-/* 299 */
+/* 302 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70344,7 +73607,7 @@ module.exports = {
 
 
 /***/ }),
-/* 300 */
+/* 303 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70368,7 +73631,7 @@ module.exports = {
 
 
 /***/ }),
-/* 301 */
+/* 304 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70393,7 +73656,7 @@ module.exports = {
 
 
 /***/ }),
-/* 302 */
+/* 305 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70416,7 +73679,7 @@ module.exports = {
 
 
 /***/ }),
-/* 303 */
+/* 306 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70437,7 +73700,7 @@ module.exports = {
 
 
 /***/ }),
-/* 304 */
+/* 307 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70461,7 +73724,7 @@ module.exports = {
 
 
 /***/ }),
-/* 305 */
+/* 308 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70485,7 +73748,7 @@ module.exports = {
 
 
 /***/ }),
-/* 306 */
+/* 309 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70511,7 +73774,7 @@ module.exports = {
 
 
 /***/ }),
-/* 307 */
+/* 310 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70531,7 +73794,7 @@ module.exports = {
 
 
 /***/ }),
-/* 308 */
+/* 311 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70554,7 +73817,7 @@ module.exports = {
 
 
 /***/ }),
-/* 309 */
+/* 312 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70572,7 +73835,7 @@ module.exports = {
 
 
 /***/ }),
-/* 310 */
+/* 313 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70594,7 +73857,7 @@ module.exports = {
 
 
 /***/ }),
-/* 311 */
+/* 314 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70615,7 +73878,7 @@ module.exports = {
 
 
 /***/ }),
-/* 312 */
+/* 315 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70633,7 +73896,7 @@ module.exports = {
 
 
 /***/ }),
-/* 313 */
+/* 316 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70663,7 +73926,7 @@ module.exports = {
 
 
 /***/ }),
-/* 314 */
+/* 317 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70683,7 +73946,7 @@ module.exports = {
 
 
 /***/ }),
-/* 315 */
+/* 318 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70714,7 +73977,7 @@ module.exports = {
 
 
 /***/ }),
-/* 316 */
+/* 319 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70739,7 +74002,7 @@ module.exports = {
 
 
 /***/ }),
-/* 317 */
+/* 320 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70761,7 +74024,7 @@ module.exports = {
 
 
 /***/ }),
-/* 318 */
+/* 321 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70785,7 +74048,7 @@ module.exports = {
 
 
 /***/ }),
-/* 319 */
+/* 322 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70808,7 +74071,7 @@ module.exports = {
 
 
 /***/ }),
-/* 320 */
+/* 323 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70831,7 +74094,7 @@ module.exports = {
 
 
 /***/ }),
-/* 321 */
+/* 324 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70862,7 +74125,7 @@ module.exports = {
 
 
 /***/ }),
-/* 322 */
+/* 325 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70883,7 +74146,7 @@ module.exports = {
 
 
 /***/ }),
-/* 323 */
+/* 326 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70906,7 +74169,7 @@ module.exports = {
 
 
 /***/ }),
-/* 324 */
+/* 327 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70935,7 +74198,7 @@ module.exports = {
 
 
 /***/ }),
-/* 325 */
+/* 328 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70953,7 +74216,7 @@ module.exports = {
 
 
 /***/ }),
-/* 326 */
+/* 329 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70973,7 +74236,7 @@ module.exports = {
 
 
 /***/ }),
-/* 327 */
+/* 330 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -70994,7 +74257,7 @@ module.exports = {
 
 
 /***/ }),
-/* 328 */
+/* 331 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71013,7 +74276,7 @@ module.exports = {
 
 
 /***/ }),
-/* 329 */
+/* 332 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71030,7 +74293,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 330 */
+/* 333 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71050,7 +74313,7 @@ module.exports = {
 
 
 /***/ }),
-/* 331 */
+/* 334 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71078,7 +74341,7 @@ module.exports = {
 
 
 /***/ }),
-/* 332 */
+/* 335 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71104,7 +74367,7 @@ module.exports = {
 
 
 /***/ }),
-/* 333 */
+/* 336 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71127,7 +74390,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 334 */
+/* 337 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71152,7 +74415,7 @@ module.exports = {
 
 
 /***/ }),
-/* 335 */
+/* 338 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71181,7 +74444,7 @@ module.exports = {
 
 
 /***/ }),
-/* 336 */
+/* 339 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71203,7 +74466,7 @@ module.exports = {
 
 
 /***/ }),
-/* 337 */
+/* 340 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71230,7 +74493,7 @@ module.exports = {
 
 
 /***/ }),
-/* 338 */
+/* 341 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71258,7 +74521,7 @@ module.exports = {
 
 
 /***/ }),
-/* 339 */
+/* 342 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71284,7 +74547,7 @@ module.exports = {
 
 
 /***/ }),
-/* 340 */
+/* 343 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71311,7 +74574,7 @@ module.exports = {
 
 
 /***/ }),
-/* 341 */
+/* 344 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71337,7 +74600,7 @@ module.exports = {
 
 
 /***/ }),
-/* 342 */
+/* 345 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71365,7 +74628,7 @@ module.exports = {
 
 
 /***/ }),
-/* 343 */
+/* 346 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71386,7 +74649,7 @@ module.exports = {
 
 
 /***/ }),
-/* 344 */
+/* 347 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71408,7 +74671,7 @@ module.exports = {
 
 
 /***/ }),
-/* 345 */
+/* 348 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71429,7 +74692,7 @@ module.exports = {
 
 
 /***/ }),
-/* 346 */
+/* 349 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71451,7 +74714,7 @@ module.exports = {
 
 
 /***/ }),
-/* 347 */
+/* 350 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71473,7 +74736,7 @@ module.exports = {
 
 
 /***/ }),
-/* 348 */
+/* 351 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71495,7 +74758,7 @@ module.exports = {
 
 
 /***/ }),
-/* 349 */
+/* 352 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71516,7 +74779,7 @@ module.exports = {
 
 
 /***/ }),
-/* 350 */
+/* 353 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71539,7 +74802,7 @@ module.exports = {
 
 
 /***/ }),
-/* 351 */
+/* 354 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71561,7 +74824,7 @@ module.exports = {
 
 
 /***/ }),
-/* 352 */
+/* 355 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71583,7 +74846,7 @@ module.exports = {
 
 
 /***/ }),
-/* 353 */
+/* 356 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71603,7 +74866,7 @@ module.exports = {
 
 
 /***/ }),
-/* 354 */
+/* 357 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71629,7 +74892,7 @@ module.exports = {
 
 
 /***/ }),
-/* 355 */
+/* 358 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71663,7 +74926,7 @@ module.exports = {
 
 
 /***/ }),
-/* 356 */
+/* 359 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71696,7 +74959,7 @@ module.exports = {
 
 
 /***/ }),
-/* 357 */
+/* 360 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71725,7 +74988,7 @@ module.exports = {
 
 
 /***/ }),
-/* 358 */
+/* 361 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71759,7 +75022,7 @@ module.exports = {
 
 
 /***/ }),
-/* 359 */
+/* 362 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71789,7 +75052,7 @@ module.exports = {
 
 
 /***/ }),
-/* 360 */
+/* 363 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71819,7 +75082,7 @@ module.exports = {
 
 
 /***/ }),
-/* 361 */
+/* 364 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71850,7 +75113,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 362 */
+/* 365 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71883,7 +75146,7 @@ module.exports = {
 
 
 /***/ }),
-/* 363 */
+/* 366 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71913,7 +75176,7 @@ module.exports = {
 
 
 /***/ }),
-/* 364 */
+/* 367 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71946,7 +75209,7 @@ module.exports = {
 
 
 /***/ }),
-/* 365 */
+/* 368 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71969,7 +75232,7 @@ module.exports = {
 
 
 /***/ }),
-/* 366 */
+/* 369 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -71990,7 +75253,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 367 */
+/* 370 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72013,7 +75276,7 @@ module.exports = {
 
 
 /***/ }),
-/* 368 */
+/* 371 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72033,7 +75296,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 369 */
+/* 372 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72057,7 +75320,7 @@ module.exports = {
 
 
 /***/ }),
-/* 370 */
+/* 373 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72078,7 +75341,7 @@ module.exports = {
 
 
 /***/ }),
-/* 371 */
+/* 374 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72102,7 +75365,7 @@ module.exports = {
 
 
 /***/ }),
-/* 372 */
+/* 375 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72123,7 +75386,7 @@ module.exports = {
 
 
 /***/ }),
-/* 373 */
+/* 376 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72146,7 +75409,7 @@ module.exports = {
 
 
 /***/ }),
-/* 374 */
+/* 377 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72167,7 +75430,7 @@ module.exports = {
 
 
 /***/ }),
-/* 375 */
+/* 378 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72190,7 +75453,7 @@ module.exports = {
 
 
 /***/ }),
-/* 376 */
+/* 379 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72211,7 +75474,7 @@ module.exports = {
 
 
 /***/ }),
-/* 377 */
+/* 380 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72238,7 +75501,7 @@ module.exports = {
 
 
 /***/ }),
-/* 378 */
+/* 381 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72264,7 +75527,7 @@ module.exports = {
 
 
 /***/ }),
-/* 379 */
+/* 382 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72286,7 +75549,7 @@ module.exports = {
 
 
 /***/ }),
-/* 380 */
+/* 383 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72309,7 +75572,7 @@ module.exports = {
 
 
 /***/ }),
-/* 381 */
+/* 384 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72332,7 +75595,7 @@ module.exports = {
 
 
 /***/ }),
-/* 382 */
+/* 385 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72355,7 +75618,7 @@ module.exports = {
 
 
 /***/ }),
-/* 383 */
+/* 386 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72378,7 +75641,7 @@ module.exports = {
 
 
 /***/ }),
-/* 384 */
+/* 387 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72401,7 +75664,7 @@ module.exports = {
 
 
 /***/ }),
-/* 385 */
+/* 388 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72424,7 +75687,7 @@ module.exports = {
 
 
 /***/ }),
-/* 386 */
+/* 389 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72450,7 +75713,7 @@ module.exports = {
 
 
 /***/ }),
-/* 387 */
+/* 390 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72471,7 +75734,7 @@ module.exports = {
 
 
 /***/ }),
-/* 388 */
+/* 391 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72496,7 +75759,7 @@ module.exports = {
 
 
 /***/ }),
-/* 389 */
+/* 392 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72518,7 +75781,7 @@ module.exports = {
 
 
 /***/ }),
-/* 390 */
+/* 393 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72539,7 +75802,7 @@ module.exports = {
 
 
 /***/ }),
-/* 391 */
+/* 394 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72561,7 +75824,7 @@ module.exports = {
 
 
 /***/ }),
-/* 392 */
+/* 395 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72583,7 +75846,7 @@ module.exports = {
 
 
 /***/ }),
-/* 393 */
+/* 396 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72604,7 +75867,7 @@ module.exports = {
 
 
 /***/ }),
-/* 394 */
+/* 397 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72624,7 +75887,7 @@ module.exports = {
 
 
 /***/ }),
-/* 395 */
+/* 398 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72645,7 +75908,7 @@ module.exports = {
 
 
 /***/ }),
-/* 396 */
+/* 399 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72670,7 +75933,7 @@ module.exports = {
 
 
 /***/ }),
-/* 397 */
+/* 400 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72691,7 +75954,7 @@ module.exports = {
 
 
 /***/ }),
-/* 398 */
+/* 401 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72710,7 +75973,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 399 */
+/* 402 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72731,7 +75994,7 @@ module.exports = {
 
 
 /***/ }),
-/* 400 */
+/* 403 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -72752,20 +76015,20 @@ module.exports = {
 
 
 /***/ }),
-/* 401 */
+/* 404 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(402),
-  __webpack_require__(404),
   __webpack_require__(405),
-  __webpack_require__(406),
-  __webpack_require__(121)
+  __webpack_require__(407),
+  __webpack_require__(408),
+  __webpack_require__(409),
+  __webpack_require__(122)
 ];
 
 
 /***/ }),
-/* 402 */
+/* 405 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -72828,7 +76091,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 403 */
+/* 406 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -72888,7 +76151,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 404 */
+/* 407 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -72960,7 +76223,7 @@ exports.name = 'eval';
 exports.factory = factory;
 
 /***/ }),
-/* 405 */
+/* 408 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -72969,7 +76232,7 @@ exports.factory = factory;
 var getSafeProperty = __webpack_require__(15).getSafeProperty;
 
 function factory (type, config, load, typed, math) {
-  var docs = load(__webpack_require__(110));
+  var docs = load(__webpack_require__(111));
 
   /**
    * Retrieve help on a function or data type.
@@ -73033,7 +76296,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 406 */
+/* 409 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73092,31 +76355,31 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 407 */
+/* 410 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(113),
-  __webpack_require__(86),
-  __webpack_require__(115),
+  __webpack_require__(114),
+  __webpack_require__(87),
   __webpack_require__(116),
   __webpack_require__(117),
-  __webpack_require__(58),
-  __webpack_require__(84),
   __webpack_require__(118),
+  __webpack_require__(58),
+  __webpack_require__(85),
+  __webpack_require__(119),
   __webpack_require__(59),
   __webpack_require__(16),
-  __webpack_require__(120),
-  __webpack_require__(68),
+  __webpack_require__(121),
   __webpack_require__(69),
-  __webpack_require__(85),
+  __webpack_require__(70),
+  __webpack_require__(86),
   __webpack_require__(44),
-  __webpack_require__(408)
+  __webpack_require__(411)
 ];
 
 
 /***/ }),
-/* 408 */
+/* 411 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73140,25 +76403,25 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 409 */
+/* 412 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(410),
-  __webpack_require__(411),
-  __webpack_require__(412),
   __webpack_require__(413),
   __webpack_require__(414),
   __webpack_require__(415),
   __webpack_require__(416),
   __webpack_require__(417),
   __webpack_require__(418),
-  __webpack_require__(419)
+  __webpack_require__(419),
+  __webpack_require__(420),
+  __webpack_require__(421),
+  __webpack_require__(422)
 ];
 
 
 /***/ }),
-/* 410 */
+/* 413 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73174,7 +76437,7 @@ var errorTransform = __webpack_require__(45).transform;
  * from one-based to zero based
  */
 function factory (type, config, load, typed) {
-  var concat = load(__webpack_require__(70));
+  var concat = load(__webpack_require__(71));
 
   // @see: comment of concat itself
  return typed('concat', {
@@ -73205,7 +76468,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 411 */
+/* 414 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73223,7 +76486,7 @@ var maxArgumentCount = __webpack_require__(35).maxArgumentCount;
  * so you can do something like 'filter([3, -2, 5], x > 0)'.
  */
 function factory (type, config, load, typed) {
-  var compileInlineExpression = load(__webpack_require__(87));
+  var compileInlineExpression = load(__webpack_require__(88));
   var matrix = load(__webpack_require__(0));
 
   function filterTransform(args, math, scope) {
@@ -73302,7 +76565,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 412 */
+/* 415 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73318,7 +76581,7 @@ var forEach = __webpack_require__(2).forEach;
  * This transform creates a one-based index instead of a zero-based index
  */
 function factory (type, config, load, typed) {
-  var compileInlineExpression = load(__webpack_require__(87));
+  var compileInlineExpression = load(__webpack_require__(88));
 
   function forEachTransform(args, math, scope) {
     var x, callback;
@@ -73381,7 +76644,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 413 */
+/* 416 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73439,7 +76702,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 414 */
+/* 417 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73455,7 +76718,7 @@ var map = __webpack_require__(2).map;
  * This transform creates a one-based index instead of a zero-based index
  */
 function factory (type, config, load, typed) {
-  var compileInlineExpression = load(__webpack_require__(87));
+  var compileInlineExpression = load(__webpack_require__(88));
   var matrix = load(__webpack_require__(0));
 
   function mapTransform(args, math, scope) {
@@ -73536,7 +76799,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 415 */
+/* 418 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73553,7 +76816,7 @@ var isCollection = __webpack_require__(51);
  * from one-based to zero based
  */
 function factory (type, config, load, typed) {
-  var max = load(__webpack_require__(123));
+  var max = load(__webpack_require__(124));
 
   return typed('max', {
     '...any': function (args) {
@@ -73584,7 +76847,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 416 */
+/* 419 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73601,7 +76864,7 @@ var isCollection = __webpack_require__(51);
  * from one-based to zero based
  */
 function factory (type, config, load, typed) {
-  var mean = load(__webpack_require__(124));
+  var mean = load(__webpack_require__(125));
 
   return typed('mean', {
     '...any': function (args) {
@@ -73632,7 +76895,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 417 */
+/* 420 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73649,7 +76912,7 @@ var isCollection = __webpack_require__(51);
  * from one-based to zero based
  */
 function factory (type, config, load, typed) {
-  var min = load(__webpack_require__(127));
+  var min = load(__webpack_require__(128));
 
   return typed('min', {
     '...any': function (args) {
@@ -73680,7 +76943,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 418 */
+/* 421 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73693,7 +76956,7 @@ exports.factory = factory;
  * This transform creates a range which includes the end value
  */
 function factory (type, config, load, typed) {
-  var range = load(__webpack_require__(128));
+  var range = load(__webpack_require__(129));
 
   return typed('range', {
     '...any': function (args) {
@@ -73715,7 +76978,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 419 */
+/* 422 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73750,7 +77013,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 420 */
+/* 423 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73760,7 +77023,7 @@ var object = __webpack_require__(5);
 var string = __webpack_require__(9);
 
 function factory (type, config, load, typed) {
-  var parser = load(__webpack_require__(121))();
+  var parser = load(__webpack_require__(122))();
 
   /**
    * Documentation object
@@ -73874,54 +77137,54 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 421 */
+/* 424 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(422),
-  __webpack_require__(443),
-  __webpack_require__(462),
-  __webpack_require__(475),
-  __webpack_require__(479),
-  __webpack_require__(483),
+  __webpack_require__(425),
+  __webpack_require__(446),
+  __webpack_require__(465),
+  __webpack_require__(478),
+  __webpack_require__(482),
   __webpack_require__(486),
-  __webpack_require__(490),
-  __webpack_require__(503),
-  __webpack_require__(512),
+  __webpack_require__(489),
+  __webpack_require__(493),
+  __webpack_require__(506),
   __webpack_require__(515),
-  __webpack_require__(523),
-  __webpack_require__(525),
-  __webpack_require__(531),
-  __webpack_require__(533),
-  __webpack_require__(558),
-  __webpack_require__(560)
+  __webpack_require__(518),
+  __webpack_require__(526),
+  __webpack_require__(528),
+  __webpack_require__(534),
+  __webpack_require__(536),
+  __webpack_require__(561),
+  __webpack_require__(563)
 ];
 
 
 /***/ }),
-/* 422 */
+/* 425 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(423),
+  __webpack_require__(426),
 
   // simplify
-  __webpack_require__(129),
+  __webpack_require__(130),
 
   // decomposition
-  __webpack_require__(427),
-  __webpack_require__(135),
+  __webpack_require__(430),
   __webpack_require__(136),
+  __webpack_require__(137),
 
   // solver
-  __webpack_require__(141),
-  __webpack_require__(441),
-  __webpack_require__(142)
+  __webpack_require__(142),
+  __webpack_require__(444),
+  __webpack_require__(143)
 ];
 
 
 /***/ }),
-/* 423 */
+/* 426 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73929,11 +77192,11 @@ module.exports = [
 
 function factory (type, config, load, typed) {
   var parse = load(__webpack_require__(43));
-  var simplify = load(__webpack_require__(129));
+  var simplify = load(__webpack_require__(130));
   var ConstantNode = load(__webpack_require__(58));
   var FunctionNode = load(__webpack_require__(59));
-  var OperatorNode = load(__webpack_require__(68));
-  var ParenthesisNode = load(__webpack_require__(69));
+  var OperatorNode = load(__webpack_require__(69));
+  var ParenthesisNode = load(__webpack_require__(70));
   var SymbolNode = load(__webpack_require__(44));
 
   /**
@@ -74649,7 +77912,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 424 */
+/* 427 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -74658,7 +77921,7 @@ exports.factory = factory;
 var digits = __webpack_require__(3).digits;
 // TODO this could be improved by simplifying seperated constants under associative and commutative operators
 function factory(type, config, load, typed, math) {
-  var util = load(__webpack_require__(130));
+  var util = load(__webpack_require__(131));
   var isCommutative = util.isCommutative;
   var isAssociative = util.isAssociative;
   var allChildren = util.allChildren;
@@ -74904,7 +78167,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 425 */
+/* 428 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -75065,7 +78328,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 426 */
+/* 429 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -75131,7 +78394,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 427 */
+/* 430 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -75141,17 +78404,17 @@ function factory (type, config, load, typed) {
 
   var matrix = load(__webpack_require__(0));
   var zeros = load(__webpack_require__(42));
-  var eye = load(__webpack_require__(67));
-  var clone = load(__webpack_require__(131));
+  var eye = load(__webpack_require__(68));
+  var clone = load(__webpack_require__(132));
   
-  var isZero = load(__webpack_require__(88));
+  var isZero = load(__webpack_require__(89));
   var isPositive = load(__webpack_require__(60));
-  var unequal = load(__webpack_require__(132));
+  var unequal = load(__webpack_require__(133));
     
   var abs = load(__webpack_require__(32));
-  var sign = load(__webpack_require__(133));
+  var sign = load(__webpack_require__(134));
   var sqrt = load(__webpack_require__(61));
-  var conj = load(__webpack_require__(134));
+  var conj = load(__webpack_require__(135));
   
   var unaryMinus = load(__webpack_require__(41)); 
   var addScalar = load(__webpack_require__(22));  
@@ -75397,7 +78660,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 428 */
+/* 431 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -75405,11 +78668,11 @@ exports.factory = factory;
 
 function factory (type, config, load) {
 
-  var cs_amd = load(__webpack_require__(429));
-  var cs_permute = load(__webpack_require__(431));
-  var cs_etree = load(__webpack_require__(432));
-  var cs_post = load(__webpack_require__(433));
-  var cs_counts = load(__webpack_require__(434));
+  var cs_amd = load(__webpack_require__(432));
+  var cs_permute = load(__webpack_require__(434));
+  var cs_etree = load(__webpack_require__(435));
+  var cs_post = load(__webpack_require__(436));
+  var cs_counts = load(__webpack_require__(437));
 
   /**
    * Symbolic ordering and analysis for QR and LU decompositions.
@@ -75567,7 +78830,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 429 */
+/* 432 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -75575,13 +78838,13 @@ exports.factory = factory;
 
 function factory (type, config, load) {
 
-  var cs_flip = load(__webpack_require__(89));
-  var cs_fkeep = load(__webpack_require__(430));
-  var cs_tdfs = load(__webpack_require__(137));
+  var cs_flip = load(__webpack_require__(90));
+  var cs_fkeep = load(__webpack_require__(433));
+  var cs_tdfs = load(__webpack_require__(138));
   
   var add       = load(__webpack_require__(20));
   var multiply  = load(__webpack_require__(12));
-  var transpose = load(__webpack_require__(73));
+  var transpose = load(__webpack_require__(74));
 
   /**
    * Approximate minimum degree ordering. The minimum degree algorithm is a widely used 
@@ -76147,7 +79410,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 430 */
+/* 433 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76219,7 +79482,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 431 */
+/* 434 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76297,7 +79560,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 432 */
+/* 435 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76380,7 +79643,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 433 */
+/* 436 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76388,7 +79651,7 @@ exports.factory = factory;
 
 function factory (type, config, load) {
 
-  var cs_tdfs = load(__webpack_require__(137));
+  var cs_tdfs = load(__webpack_require__(138));
 
   /**
    * Post order a tree of forest
@@ -76446,7 +79709,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 434 */
+/* 437 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76454,9 +79717,9 @@ exports.factory = factory;
 
 function factory (type, config, load) {
 
-  var transpose = load(__webpack_require__(73));
+  var transpose = load(__webpack_require__(74));
   
-  var cs_leaf = load(__webpack_require__(435));
+  var cs_leaf = load(__webpack_require__(438));
 
   /**
    * Computes the column counts using the upper triangular part of A.
@@ -76574,7 +79837,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 435 */
+/* 438 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76647,7 +79910,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 436 */
+/* 439 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76660,9 +79923,9 @@ function factory (type, config, load) {
   var multiply = load(__webpack_require__(12));
   
   var larger = load(__webpack_require__(37));
-  var largerEq = load(__webpack_require__(138));
+  var largerEq = load(__webpack_require__(139));
   
-  var cs_spsolve = load(__webpack_require__(437));
+  var cs_spsolve = load(__webpack_require__(440));
 
   var SparseMatrix = type.SparseMatrix;
 
@@ -76832,7 +80095,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 437 */
+/* 440 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76844,7 +80107,7 @@ function factory (type, config, load) {
   var multiply = load(__webpack_require__(12));
   var subtract = load(__webpack_require__(23));
 
-  var cs_reach = load(__webpack_require__(438));
+  var cs_reach = load(__webpack_require__(441));
 
   /**
    * The function cs_spsolve() computes the solution to G * x = bk, where bk is the
@@ -76925,7 +80188,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 438 */
+/* 441 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -76933,9 +80196,9 @@ exports.factory = factory;
 
 function factory (type, config, load) {
 
-  var cs_dfs = load(__webpack_require__(439));
-  var cs_marked = load(__webpack_require__(139));
-  var cs_mark = load(__webpack_require__(140));
+  var cs_dfs = load(__webpack_require__(442));
+  var cs_marked = load(__webpack_require__(140));
+  var cs_mark = load(__webpack_require__(141));
 
   /**
    * The cs_reach function computes X = Reach(B), where B is the nonzero pattern of the n-by-1 
@@ -76993,7 +80256,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 439 */
+/* 442 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77001,9 +80264,9 @@ exports.factory = factory;
 
 function factory (type, config, load) {
 
-  var cs_marked = load(__webpack_require__(139));
-  var cs_mark   = load(__webpack_require__(140));
-  var cs_unflip = load(__webpack_require__(440));
+  var cs_marked = load(__webpack_require__(140));
+  var cs_mark   = load(__webpack_require__(141));
+  var cs_unflip = load(__webpack_require__(443));
 
   /**
    * Depth-first search computes the nonzero pattern xi of the directed graph G (Matrix) starting
@@ -77085,7 +80348,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 440 */
+/* 443 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77093,7 +80356,7 @@ exports.factory = factory;
 
 function factory (type, config, load) {
 
-  var cs_flip = load(__webpack_require__(89));
+  var cs_flip = load(__webpack_require__(90));
   
   /**
    * Flips the value if it is negative of returns the same value otherwise.
@@ -77116,7 +80379,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 441 */
+/* 444 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77127,14 +80390,14 @@ var isArray = Array.isArray;
 function factory (type, config, load, typed) {
   
   var matrix = load(__webpack_require__(0));
-  var lup = load(__webpack_require__(135));
-  var slu = load(__webpack_require__(136));
-  var cs_ipvec = load(__webpack_require__(442));
+  var lup = load(__webpack_require__(136));
+  var slu = load(__webpack_require__(137));
+  var cs_ipvec = load(__webpack_require__(445));
 
-  var solveValidation = load(__webpack_require__(90));
+  var solveValidation = load(__webpack_require__(91));
 
-  var usolve = load(__webpack_require__(142));
-  var lsolve = load(__webpack_require__(141));
+  var usolve = load(__webpack_require__(143));
+  var lsolve = load(__webpack_require__(142));
 
   /**
    * Solves the linear system `A * x = b` where `A` is an [n x n] matrix and `b` is a [n] column vector.
@@ -77248,7 +80511,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 442 */
+/* 445 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77296,46 +80559,46 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 443 */
+/* 446 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   __webpack_require__(32),
   __webpack_require__(20),
   __webpack_require__(22),
-  __webpack_require__(444),
-  __webpack_require__(445),
-  __webpack_require__(446),
-  __webpack_require__(52),
-  __webpack_require__(143),
   __webpack_require__(447),
   __webpack_require__(448),
   __webpack_require__(449),
-  __webpack_require__(107),
+  __webpack_require__(52),
+  __webpack_require__(144),
   __webpack_require__(450),
   __webpack_require__(451),
   __webpack_require__(452),
+  __webpack_require__(108),
   __webpack_require__(453),
-  __webpack_require__(145),
+  __webpack_require__(454),
   __webpack_require__(455),
   __webpack_require__(456),
-  __webpack_require__(12),
-  __webpack_require__(457),
+  __webpack_require__(146),
   __webpack_require__(458),
-  __webpack_require__(50),
-  __webpack_require__(108),
-  __webpack_require__(133),
-  __webpack_require__(61),
   __webpack_require__(459),
+  __webpack_require__(12),
+  __webpack_require__(460),
+  __webpack_require__(461),
+  __webpack_require__(50),
+  __webpack_require__(109),
+  __webpack_require__(134),
+  __webpack_require__(61),
+  __webpack_require__(462),
   __webpack_require__(23),
   __webpack_require__(41),
-  __webpack_require__(460),
-  __webpack_require__(461)
+  __webpack_require__(463),
+  __webpack_require__(464)
 ];
 
 
 /***/ }),
-/* 444 */
+/* 447 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77527,7 +80790,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 445 */
+/* 448 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77595,7 +80858,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 446 */
+/* 449 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77666,7 +80929,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 447 */
+/* 450 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77679,7 +80942,7 @@ function factory (type, config, load, typed) {
   var latex = __webpack_require__(4);
 
   var algorithm02 = load(__webpack_require__(26));
-  var algorithm09 = load(__webpack_require__(144));
+  var algorithm09 = load(__webpack_require__(145));
   var algorithm11 = load(__webpack_require__(19));
   var algorithm13 = load(__webpack_require__(8));
   var algorithm14 = load(__webpack_require__(6));
@@ -77816,7 +81079,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 448 */
+/* 451 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77964,7 +81227,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 449 */
+/* 452 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78028,7 +81291,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 450 */
+/* 453 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78095,7 +81358,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 451 */
+/* 454 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78108,7 +81371,7 @@ function factory (type, config, load, typed) {
   var matrix = load(__webpack_require__(0));
 
   var algorithm01 = load(__webpack_require__(36));
-  var algorithm04 = load(__webpack_require__(79));
+  var algorithm04 = load(__webpack_require__(80));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm13 = load(__webpack_require__(8));
   var algorithm14 = load(__webpack_require__(6));
@@ -78301,7 +81564,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 452 */
+/* 455 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78392,7 +81655,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 453 */
+/* 456 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78405,7 +81668,7 @@ function factory (type, config, load, typed) {
   var matrix = load(__webpack_require__(0));
 
   var algorithm02 = load(__webpack_require__(26));
-  var algorithm06 = load(__webpack_require__(74));
+  var algorithm06 = load(__webpack_require__(75));
   var algorithm11 = load(__webpack_require__(19));
   var algorithm13 = load(__webpack_require__(8));
   var algorithm14 = load(__webpack_require__(6));
@@ -78613,7 +81876,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 454 */
+/* 457 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78684,7 +81947,7 @@ module.exports = function scatter(a, j, w, x, u, mark, c, f, inverse, update, va
 
 
 /***/ }),
-/* 455 */
+/* 458 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78769,7 +82032,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 456 */
+/* 459 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78782,7 +82045,7 @@ function factory (type, config, load, typed) {
 
   var algorithm02 = load(__webpack_require__(26));
   var algorithm03 = load(__webpack_require__(17));
-  var algorithm05 = load(__webpack_require__(66));
+  var algorithm05 = load(__webpack_require__(67));
   var algorithm11 = load(__webpack_require__(19));
   var algorithm12 = load(__webpack_require__(18));
   var algorithm13 = load(__webpack_require__(8));
@@ -78960,7 +82223,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 457 */
+/* 460 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78977,8 +82240,8 @@ function factory (type, config, load, typed) {
   var larger      = load(__webpack_require__(37));
   var smaller     = load(__webpack_require__(49));
   var matrix      = load(__webpack_require__(0));
-  var trace       = load(__webpack_require__(146));
-  var transpose   = load(__webpack_require__(73));
+  var trace       = load(__webpack_require__(147));
+  var transpose   = load(__webpack_require__(74));
 
 
   /**
@@ -79182,7 +82445,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 458 */
+/* 461 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79194,7 +82457,7 @@ function factory (type, config, load, typed) {
 
   var algorithm01 = load(__webpack_require__(36));
   var algorithm02 = load(__webpack_require__(26));
-  var algorithm06 = load(__webpack_require__(74));
+  var algorithm06 = load(__webpack_require__(75));
   var algorithm11 = load(__webpack_require__(19));
   var algorithm13 = load(__webpack_require__(8));
   var algorithm14 = load(__webpack_require__(6));
@@ -79488,7 +82751,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 459 */
+/* 462 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79560,7 +82823,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 460 */
+/* 463 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79639,7 +82902,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 461 */
+/* 464 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79783,29 +83046,29 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 462 */
+/* 465 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(463),
-  __webpack_require__(465),
   __webpack_require__(466),
   __webpack_require__(468),
-  __webpack_require__(470),
-  __webpack_require__(472),
-  __webpack_require__(474)
+  __webpack_require__(469),
+  __webpack_require__(471),
+  __webpack_require__(473),
+  __webpack_require__(475),
+  __webpack_require__(477)
 ];
 
 
 /***/ }),
-/* 463 */
+/* 466 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var isInteger = __webpack_require__(3).isInteger;
-var bigBitAnd = __webpack_require__(464);
+var bigBitAnd = __webpack_require__(467);
 
 function factory (type, config, load, typed) {
   var latex = __webpack_require__(4);
@@ -79813,7 +83076,7 @@ function factory (type, config, load, typed) {
   var matrix = load(__webpack_require__(0));
 
   var algorithm02 = load(__webpack_require__(26));
-  var algorithm06 = load(__webpack_require__(74));
+  var algorithm06 = load(__webpack_require__(75));
   var algorithm11 = load(__webpack_require__(19));
   var algorithm13 = load(__webpack_require__(8));
   var algorithm14 = load(__webpack_require__(6));
@@ -79954,10 +83217,10 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 464 */
+/* 467 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var bitwise = __webpack_require__(91);
+var bitwise = __webpack_require__(92);
 
 /**
  * Bitwise and for Bignumbers
@@ -80028,14 +83291,14 @@ module.exports = function bitAnd(x, y) {
 
 
 /***/ }),
-/* 465 */
+/* 468 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var deepMap = __webpack_require__(1);
-var bigBitNot = __webpack_require__(92);
+var bigBitNot = __webpack_require__(93);
 var isInteger = __webpack_require__(3).isInteger;
 
 function factory (type, config, load, typed) {
@@ -80091,14 +83354,14 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 466 */
+/* 469 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var isInteger = __webpack_require__(3).isInteger;
-var bigBitOr = __webpack_require__(467);
+var bigBitOr = __webpack_require__(470);
 
 function factory (type, config, load, typed) {
   var latex = __webpack_require__(4);
@@ -80106,7 +83369,7 @@ function factory (type, config, load, typed) {
   var matrix = load(__webpack_require__(0));
 
   var algorithm01 = load(__webpack_require__(36));
-  var algorithm04 = load(__webpack_require__(79));
+  var algorithm04 = load(__webpack_require__(80));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm13 = load(__webpack_require__(8));
   var algorithm14 = load(__webpack_require__(6));
@@ -80247,10 +83510,10 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 467 */
+/* 470 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var bitwise = __webpack_require__(91);
+var bitwise = __webpack_require__(92);
 
 /**
  * Bitwise OR for BigNumbers
@@ -80306,14 +83569,14 @@ module.exports = function bitOr (x, y) {
 
 
 /***/ }),
-/* 468 */
+/* 471 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var isInteger = __webpack_require__(3).isInteger;
-var bigBitXor = __webpack_require__(469);
+var bigBitXor = __webpack_require__(472);
 
 function factory (type, config, load, typed) {
   var latex = __webpack_require__(4);
@@ -80462,11 +83725,11 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 469 */
+/* 472 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var bitwise = __webpack_require__(91);
-var bitNot = __webpack_require__(92);
+var bitwise = __webpack_require__(92);
+var bitNot = __webpack_require__(93);
 
 /**
  * Bitwise XOR for BigNumbers
@@ -80528,14 +83791,14 @@ module.exports = function bitXor(x, y) {
 
 
 /***/ }),
-/* 470 */
+/* 473 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var isInteger = __webpack_require__(3).isInteger;
-var bigLeftShift = __webpack_require__(471);
+var bigLeftShift = __webpack_require__(474);
 
 function factory (type, config, load, typed) {
   var latex = __webpack_require__(4);
@@ -80546,7 +83809,7 @@ function factory (type, config, load, typed) {
 
   var algorithm01 = load(__webpack_require__(36));
   var algorithm02 = load(__webpack_require__(26));
-  var algorithm08 = load(__webpack_require__(93));
+  var algorithm08 = load(__webpack_require__(94));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm11 = load(__webpack_require__(19));
   var algorithm13 = load(__webpack_require__(8));
@@ -80697,7 +83960,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 471 */
+/* 474 */
 /***/ (function(module, exports) {
 
 
@@ -80744,14 +84007,14 @@ module.exports = function leftShift (x, y) {
 
 
 /***/ }),
-/* 472 */
+/* 475 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var isInteger = __webpack_require__(3).isInteger;
-var bigRightArithShift = __webpack_require__(473);
+var bigRightArithShift = __webpack_require__(476);
 
 function factory (type, config, load, typed) {
   var latex = __webpack_require__(4);
@@ -80762,7 +84025,7 @@ function factory (type, config, load, typed) {
 
   var algorithm01 = load(__webpack_require__(36));
   var algorithm02 = load(__webpack_require__(26));
-  var algorithm08 = load(__webpack_require__(93));
+  var algorithm08 = load(__webpack_require__(94));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm11 = load(__webpack_require__(19));
   var algorithm13 = load(__webpack_require__(8));
@@ -80913,7 +84176,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 473 */
+/* 476 */
 /***/ (function(module, exports) {
 
 /*
@@ -80966,7 +84229,7 @@ module.exports = function rightArithShift (x, y) {
 
 
 /***/ }),
-/* 474 */
+/* 477 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -80983,7 +84246,7 @@ function factory (type, config, load, typed) {
 
   var algorithm01 = load(__webpack_require__(36));
   var algorithm02 = load(__webpack_require__(26));
-  var algorithm08 = load(__webpack_require__(93));
+  var algorithm08 = load(__webpack_require__(94));
   var algorithm10 = load(__webpack_require__(40));
   var algorithm11 = load(__webpack_require__(19));
   var algorithm13 = load(__webpack_require__(8));
@@ -81135,19 +84398,19 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 475 */
+/* 478 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(476),
-  __webpack_require__(477),
-  __webpack_require__(147),
-  __webpack_require__(478)
+  __webpack_require__(479),
+  __webpack_require__(480),
+  __webpack_require__(148),
+  __webpack_require__(481)
 ];
 
 
 /***/ }),
-/* 476 */
+/* 479 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81155,7 +84418,7 @@ module.exports = [
 
 function factory (type, config, load, typed) {
   var add = load(__webpack_require__(20));
-  var stirlingS2 = load(__webpack_require__(147));
+  var stirlingS2 = load(__webpack_require__(148));
   var isNegative = load(__webpack_require__(62));
   var isInteger = load(__webpack_require__(53));
 
@@ -81207,14 +84470,14 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 477 */
+/* 480 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 function factory (type, config, load, typed) {
-  var combinations = load(__webpack_require__(76));
+  var combinations = load(__webpack_require__(77));
   var add = load(__webpack_require__(22));
   var isPositive = load(__webpack_require__(60));
   var isInteger = load(__webpack_require__(53));
@@ -81265,7 +84528,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 478 */
+/* 481 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81275,7 +84538,7 @@ function factory (type, config, load, typed) {
   var add = load(__webpack_require__(20));
   var divide = load(__webpack_require__(52));
   var multiply = load(__webpack_require__(12));
-  var combinations = load(__webpack_require__(76));
+  var combinations = load(__webpack_require__(77));
   var isNegative = load(__webpack_require__(62));
   var isInteger = load(__webpack_require__(53));
 
@@ -81323,19 +84586,19 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 479 */
+/* 482 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(480),
-  __webpack_require__(134),
-  __webpack_require__(481),
-  __webpack_require__(482)
+  __webpack_require__(483),
+  __webpack_require__(135),
+  __webpack_require__(484),
+  __webpack_require__(485)
 ];
 
 
 /***/ }),
-/* 480 */
+/* 483 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81401,7 +84664,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 481 */
+/* 484 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81465,7 +84728,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 482 */
+/* 485 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81529,17 +84792,17 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 483 */
+/* 486 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(484),
-  __webpack_require__(485)
+  __webpack_require__(487),
+  __webpack_require__(488)
 ];
 
 
 /***/ }),
-/* 484 */
+/* 487 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81688,7 +84951,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 485 */
+/* 488 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81996,19 +85259,19 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 486 */
+/* 489 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(487),
-  __webpack_require__(149),
-  __webpack_require__(488),
-  __webpack_require__(489)
+  __webpack_require__(490),
+  __webpack_require__(150),
+  __webpack_require__(491),
+  __webpack_require__(492)
 ];
 
 
 /***/ }),
-/* 487 */
+/* 490 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82019,11 +85282,11 @@ function factory (type, config, load, typed) {
 
   var matrix = load(__webpack_require__(0));
   var zeros = load(__webpack_require__(42));
-  var not = load(__webpack_require__(149));
-  var isZero = load(__webpack_require__(88));
+  var not = load(__webpack_require__(150));
+  var isZero = load(__webpack_require__(89));
 
   var algorithm02 = load(__webpack_require__(26));
-  var algorithm06 = load(__webpack_require__(74));
+  var algorithm06 = load(__webpack_require__(75));
   var algorithm11 = load(__webpack_require__(19));
   var algorithm13 = load(__webpack_require__(8));
   var algorithm14 = load(__webpack_require__(6));
@@ -82186,7 +85449,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 488 */
+/* 491 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82198,7 +85461,7 @@ function factory (type, config, load, typed) {
   var matrix = load(__webpack_require__(0));
 
   var algorithm03 = load(__webpack_require__(17));
-  var algorithm05 = load(__webpack_require__(66));
+  var algorithm05 = load(__webpack_require__(67));
   var algorithm12 = load(__webpack_require__(18));
   var algorithm13 = load(__webpack_require__(8));
   var algorithm14 = load(__webpack_require__(6));
@@ -82351,7 +85614,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 489 */
+/* 492 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82516,39 +85779,39 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 490 */
+/* 493 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(70),
-  __webpack_require__(491),
-  __webpack_require__(126),
-  __webpack_require__(492),
-  __webpack_require__(493),
-  __webpack_require__(67),
+  __webpack_require__(71),
   __webpack_require__(494),
+  __webpack_require__(127),
   __webpack_require__(495),
   __webpack_require__(496),
-  __webpack_require__(125),
+  __webpack_require__(68),
   __webpack_require__(497),
-  __webpack_require__(150),
   __webpack_require__(498),
-  __webpack_require__(94),
-  __webpack_require__(128),
   __webpack_require__(499),
+  __webpack_require__(126),
   __webpack_require__(500),
-  __webpack_require__(30),
   __webpack_require__(151),
+  __webpack_require__(501),
+  __webpack_require__(95),
+  __webpack_require__(129),
   __webpack_require__(502),
+  __webpack_require__(503),
+  __webpack_require__(30),
+  __webpack_require__(152),
+  __webpack_require__(505),
   __webpack_require__(24),
-  __webpack_require__(146),
-  __webpack_require__(73),
+  __webpack_require__(147),
+  __webpack_require__(74),
   __webpack_require__(42)
 ];
 
 
 /***/ }),
-/* 491 */
+/* 494 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82656,7 +85919,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 492 */
+/* 495 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82833,7 +86096,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 493 */
+/* 496 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82919,7 +86182,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 494 */
+/* 497 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83010,7 +86273,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 495 */
+/* 498 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83062,7 +86325,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 496 */
+/* 499 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83146,7 +86409,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 497 */
+/* 500 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83243,7 +86506,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 498 */
+/* 501 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83384,7 +86647,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 499 */
+/* 502 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83465,7 +86728,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 500 */
+/* 503 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83610,7 +86873,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 501 */
+/* 504 */
 /***/ (function(module, exports) {
 
 /*
@@ -83661,7 +86924,7 @@ module.exports = function naturalSort (a, b) {
 
 
 /***/ }),
-/* 502 */
+/* 505 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83729,25 +86992,25 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 503 */
+/* 506 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   //require('./distribution'), // TODO: rethink math.distribution
+  __webpack_require__(77),
   __webpack_require__(76),
-  __webpack_require__(75),
-  __webpack_require__(148),
-  __webpack_require__(504),
-  __webpack_require__(505),
-  __webpack_require__(506),
+  __webpack_require__(149),
   __webpack_require__(507),
+  __webpack_require__(508),
+  __webpack_require__(509),
   __webpack_require__(510),
-  __webpack_require__(511)
+  __webpack_require__(513),
+  __webpack_require__(514)
 ];
 
 
 /***/ }),
-/* 504 */
+/* 507 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83757,11 +87020,11 @@ module.exports = [
 function factory(type, config, load, typed) {
     var matrix = load(__webpack_require__(0));
     var divide = load(__webpack_require__(52));
-    var sum = load(__webpack_require__(152));
+    var sum = load(__webpack_require__(153));
     var multiply = load(__webpack_require__(12));
-    var dotDivide = load(__webpack_require__(143));
-    var log = load(__webpack_require__(145));
-    var isNumeric = load(__webpack_require__(81));
+    var dotDivide = load(__webpack_require__(144));
+    var log = load(__webpack_require__(146));
+    var isNumeric = load(__webpack_require__(82));
 
     /**
      * Calculate the Kullback-Leibler (KL) divergence  between two distributions
@@ -83845,7 +87108,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 505 */
+/* 508 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83857,7 +87120,7 @@ function factory (type, config, load, typed) {
   var add = load(__webpack_require__(20));
   var multiply = load(__webpack_require__(12));
   var divide = load(__webpack_require__(52));
-  var factorial = load(__webpack_require__(75));
+  var factorial = load(__webpack_require__(76));
   var isInteger = load(__webpack_require__(53));
   var isPositive = load(__webpack_require__(60));
 
@@ -83905,7 +87168,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 506 */
+/* 509 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83914,7 +87177,7 @@ exports.factory = factory;
 var isInteger = __webpack_require__(3).isInteger;
 
 function factory (type, config, load, typed) {
-  var factorial = load(__webpack_require__(75));
+  var factorial = load(__webpack_require__(76));
 
   /**
    * Compute the number of ways of obtaining an ordered subset of `k` elements
@@ -84006,14 +87269,14 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 507 */
+/* 510 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 function factory (type, config, load, typed) {
-  var distribution = load(__webpack_require__(95));
+  var distribution = load(__webpack_require__(96));
 
   /**
    * Random pick one or more values from a one dimensional array.
@@ -84058,13 +87321,13 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 508 */
+/* 511 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var seedrandom = __webpack_require__(509);
+var seedrandom = __webpack_require__(512);
 
 // create a random seed here to prevent an infinite loop from seed-random
 // inside the factory. Reason is that math.random is defined as a getter/setter
@@ -84107,7 +87370,7 @@ exports.math = true;
 
 
 /***/ }),
-/* 509 */
+/* 512 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84288,14 +87551,14 @@ mixkey(Math.random(), pool);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47)))
 
 /***/ }),
-/* 510 */
+/* 513 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 function factory (type, config, load, typed) {
-  var distribution = load(__webpack_require__(95));
+  var distribution = load(__webpack_require__(96));
 
   /**
    * Return a random number larger or equal to `min` and smaller than `max`
@@ -84340,14 +87603,14 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 511 */
+/* 514 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 function factory (type, config, load, typed) {
-  var distribution = load(__webpack_require__(95));
+  var distribution = load(__webpack_require__(96));
 
   /**
    * Return a random integer number larger or equal to `min` and smaller than `max`
@@ -84390,24 +87653,24 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 512 */
+/* 515 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
   __webpack_require__(54),
   __webpack_require__(34),
-  __webpack_require__(513),
+  __webpack_require__(516),
   __webpack_require__(33),
   __webpack_require__(37),
-  __webpack_require__(138),
+  __webpack_require__(139),
   __webpack_require__(49),
-  __webpack_require__(514),
-  __webpack_require__(132)
+  __webpack_require__(517),
+  __webpack_require__(133)
 ];
 
 
 /***/ }),
-/* 513 */
+/* 516 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84495,7 +87758,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 514 */
+/* 517 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84676,25 +87939,25 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 515 */
+/* 518 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(516),
-  __webpack_require__(153),
-  __webpack_require__(517),
-  __webpack_require__(154),
-  __webpack_require__(518),
   __webpack_require__(519),
+  __webpack_require__(154),
   __webpack_require__(520),
-  __webpack_require__(521),
   __webpack_require__(155),
-  __webpack_require__(522)
+  __webpack_require__(521),
+  __webpack_require__(522),
+  __webpack_require__(523),
+  __webpack_require__(524),
+  __webpack_require__(156),
+  __webpack_require__(525)
 ];
 
 
 /***/ }),
-/* 516 */
+/* 519 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84761,7 +88024,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 517 */
+/* 520 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84828,7 +88091,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 518 */
+/* 521 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84900,7 +88163,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 519 */
+/* 522 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84959,7 +88222,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 520 */
+/* 523 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85043,7 +88306,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 521 */
+/* 524 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85105,7 +88368,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 522 */
+/* 525 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85115,11 +88378,11 @@ var flatten = __webpack_require__(2).flatten;
 
 function factory (type, config, load, typed) {
   var index = load(__webpack_require__(29));
-  var concat = load(__webpack_require__(70));
+  var concat = load(__webpack_require__(71));
   var size = load(__webpack_require__(30));
   var subset = load(__webpack_require__(24));
-  var setIntersect = load(__webpack_require__(154));
-  var setSymDifference = load(__webpack_require__(155));
+  var setIntersect = load(__webpack_require__(155));
+  var setSymDifference = load(__webpack_require__(156));
   
   /**
    * Create the union of two (multi)sets.
@@ -85164,16 +88427,16 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 523 */
+/* 526 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(524)
+  __webpack_require__(527)
 ];
 
 
 /***/ }),
-/* 524 */
+/* 527 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85377,26 +88640,26 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 525 */
+/* 528 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(526),
-  __webpack_require__(123),
-  __webpack_require__(124),
-  __webpack_require__(156),
-  __webpack_require__(127),
-  __webpack_require__(527),
-  __webpack_require__(528),
   __webpack_require__(529),
+  __webpack_require__(124),
+  __webpack_require__(125),
+  __webpack_require__(157),
+  __webpack_require__(128),
   __webpack_require__(530),
-  __webpack_require__(152),
-  __webpack_require__(157)
+  __webpack_require__(531),
+  __webpack_require__(532),
+  __webpack_require__(533),
+  __webpack_require__(153),
+  __webpack_require__(158)
 ];
 
 
 /***/ }),
-/* 526 */
+/* 529 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85406,8 +88669,8 @@ var flatten = __webpack_require__(2).flatten;
 
 function factory (type, config, load, typed) {
   var abs      = load(__webpack_require__(32));
-  var map      = load(__webpack_require__(150));
-  var median   = load(__webpack_require__(156));
+  var map      = load(__webpack_require__(151));
+  var median   = load(__webpack_require__(157));
   var subtract = load(__webpack_require__(23));
 
   /**
@@ -85467,7 +88730,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 527 */
+/* 530 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85550,7 +88813,7 @@ exports.name = 'mode';
 exports.factory = factory;
 
 /***/ }),
-/* 528 */
+/* 531 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85633,7 +88896,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 529 */
+/* 532 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85647,7 +88910,7 @@ var isCollection = __webpack_require__(51);
 function factory (type, config, load, typed) {
   var add = load(__webpack_require__(20));
   var multiply = load(__webpack_require__(12));
-  var partitionSelect = load(__webpack_require__(94));
+  var partitionSelect = load(__webpack_require__(95));
   var compare = load(__webpack_require__(54));
 
   /**
@@ -85897,7 +89160,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 530 */
+/* 533 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85905,7 +89168,7 @@ exports.factory = factory;
 
 function factory (type, config, load, typed) {
   var sqrt       = load(__webpack_require__(61));
-  var variance   = load(__webpack_require__(157));
+  var variance   = load(__webpack_require__(158));
 
   /**
    * Compute the standard deviation of a matrix or a  list with values.
@@ -85978,17 +89241,17 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 531 */
+/* 534 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(109),
-  __webpack_require__(532)
+  __webpack_require__(110),
+  __webpack_require__(535)
 ];
 
 
 /***/ }),
-/* 532 */
+/* 535 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86082,15 +89345,12 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 533 */
+/* 536 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(534),
-  __webpack_require__(158),
-  __webpack_require__(535),
-  __webpack_require__(536),
   __webpack_require__(537),
+  __webpack_require__(159),
   __webpack_require__(538),
   __webpack_require__(539),
   __webpack_require__(540),
@@ -86110,12 +89370,15 @@ module.exports = [
   __webpack_require__(554),
   __webpack_require__(555),
   __webpack_require__(556),
-  __webpack_require__(557)
+  __webpack_require__(557),
+  __webpack_require__(558),
+  __webpack_require__(559),
+  __webpack_require__(560)
 ];
 
 
 /***/ }),
-/* 534 */
+/* 537 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86181,7 +89444,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 535 */
+/* 538 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86242,7 +89505,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 536 */
+/* 539 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86304,7 +89567,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 537 */
+/* 540 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86369,7 +89632,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 538 */
+/* 541 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86429,7 +89692,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 539 */
+/* 542 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86493,7 +89756,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 540 */
+/* 543 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86502,7 +89765,7 @@ exports.factory = factory;
 var deepMap = __webpack_require__(1);
 
 function factory (type, config, load, typed) {
-  var acosh = typed.find(load(__webpack_require__(158)), ['Complex']);
+  var acosh = typed.find(load(__webpack_require__(159)), ['Complex']);
 
   /**
    * Calculate the hyperbolic arcsecant of a value,
@@ -86564,7 +89827,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 541 */
+/* 544 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86631,7 +89894,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 542 */
+/* 545 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86691,7 +89954,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 543 */
+/* 546 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86753,7 +90016,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 544 */
+/* 547 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86765,7 +90028,7 @@ function factory (type, config, load, typed) {
 
   var algorithm02 = load(__webpack_require__(26));
   var algorithm03 = load(__webpack_require__(17));
-  var algorithm09 = load(__webpack_require__(144));
+  var algorithm09 = load(__webpack_require__(145));
   var algorithm11 = load(__webpack_require__(19));
   var algorithm12 = load(__webpack_require__(18));
   var algorithm13 = load(__webpack_require__(8));
@@ -86912,7 +90175,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 545 */
+/* 548 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -86984,7 +90247,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 546 */
+/* 549 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87053,7 +90316,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 547 */
+/* 550 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87126,7 +90389,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 548 */
+/* 551 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87191,7 +90454,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 549 */
+/* 552 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87267,7 +90530,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 550 */
+/* 553 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87332,7 +90595,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 551 */
+/* 554 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87414,7 +90677,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 552 */
+/* 555 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87479,7 +90742,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 553 */
+/* 556 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87554,7 +90817,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 554 */
+/* 557 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87624,7 +90887,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 555 */
+/* 558 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87698,7 +90961,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 556 */
+/* 559 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87764,7 +91027,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 557 */
+/* 560 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87842,15 +91105,15 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 558 */
+/* 561 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(559)
+  __webpack_require__(562)
 ];
 
 /***/ }),
-/* 559 */
+/* 562 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -87947,24 +91210,24 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 560 */
+/* 563 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(131),
+  __webpack_require__(132),
   __webpack_require__(53),
   __webpack_require__(62),
-  __webpack_require__(81),
+  __webpack_require__(82),
   __webpack_require__(60),
-  __webpack_require__(561),
-  __webpack_require__(88),
-  __webpack_require__(562),
-  __webpack_require__(82)
+  __webpack_require__(564),
+  __webpack_require__(89),
+  __webpack_require__(565),
+  __webpack_require__(83)
 ];
 
 
 /***/ }),
-/* 561 */
+/* 564 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -88052,7 +91315,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 562 */
+/* 565 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -88125,16 +91388,16 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 563 */
+/* 566 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = [
-  __webpack_require__(564)
+  __webpack_require__(567)
 ];
 
 
 /***/ }),
-/* 564 */
+/* 567 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -88163,7 +91426,7 @@ exports.factory = factory;
 
 
 /***/ }),
-/* 565 */
+/* 568 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -88200,1673 +91463,7 @@ module.exports = [
 
 
 /***/ }),
-/* 566 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const util = __webpack_require__(99);
-const NamedVector = __webpack_require__(100).NamedVector;
-
-const Papa = __webpack_require__(567);
-const ShipEngine = __webpack_require__(38);
-
-const COMPONENT_MAPPING = [{
-	name: "Warp Core",
-	frame_row: 76,
-	components: [{ name: "Warp Core Type", row: 78 }, { name: "M/AM Injectors", row: 80 }, { name: "Coolant Systems", row: 81 }, { name: "EPS Manifold System", row: 82 }, { name: "Eject System", row: 83 }],
-	settings: [{ name: "Safety/Performance", row: 79 }]
-}, {
-	name: "Engineering",
-	frame_row: 65,
-	components: [{ name: "Structural Integrity Fields", row: 67 }, { name: "Navigational Deflector", row: 68 }, { name: "Nacelle System", row: 69 }, { name: "Replication Package", row: 71 }, { name: "Fuel & Matter Stores", row: 72 }],
-	settings: []
-}, {
-	name: "Hull",
-	frame_row: 59,
-	components: [{ name: "Hull System", row: 61 }],
-	settings: []
-}, {
-	name: "Operations",
-	frame_row: 43,
-	components: [{ name: "Long-Range Sensors", row: 45 }, { name: "Navigational Sensors", row: 46 }, { name: "Survey Sensors", row: 47 }, { name: "Science Labs", row: 48 }, { name: "Computer Core", row: 49 }, { name: "Operating System", row: 50 }, { name: "Secondary Core", row: 51 }, { name: "Diplomatic Package", row: 53 }, { name: "Recreation Package", row: 54 }, { name: "Sickbay", row: 55 }],
-	settings: [{ name: "Isolinear?", row: 52 }]
-}, {
-	name: "Tactical",
-	frame_row: 28,
-	components: [{ name: "Primary Phasers", row: 30 }, { name: "Secondary Phasers", row: 31 }, { name: "Torpedo System", row: 33 }, { name: "Short-Range Sensors", row: 35 }, { name: "Targeting Computer", row: 36 }, { name: "Deflector Shields", row: 37 }, { name: "Backup Deflectors", row: 38 }, { name: "Impulse Engine Pwr", row: 39 }],
-	settings: [{ name: "Phaser Arrays", row: 32 }, { name: "Burst Launchers", row: 34 }]
-}];
-
-function import_design(design_csv) {
-	const result = Papa.parse(design_csv, { dynamicTyping: true });
-	return {
-		"Name": result.data[0][3],
-		"Principal Frame": result.data[17][4],
-		"Module": {
-			"Variant": result.data[87][4],
-			"Type": result.data[87][2]
-		},
-		"Subsystems": COMPONENT_MAPPING.map(function (subsystem) {
-			return {
-				"Name": subsystem.name,
-				"Sub-Frame": result.data[subsystem.frame_row][4],
-				"Settings": subsystem.settings.reduce((acc, value) => {
-					acc[value.name] = result.data[value.row][3];
-					return acc;
-				}, {}),
-				"Components": subsystem.components.map(row => {
-					return {
-						"Name": row.name,
-						"Quantity": result.data[row.row][3],
-						"Part": result.data[row.row][4]
-					};
-				})
-			};
-		})
-	};
-};
-
-module.exports.import_design = import_design;
-
-/***/ }),
-/* 567 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	Papa Parse
-	v4.3.6
-	https://github.com/mholt/PapaParse
-	License: MIT
-*/
-(function(root, factory)
-{
-	if (true)
-	{
-		// AMD. Register as an anonymous module.
-		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
-				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
-				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}
-	else if (typeof module === 'object' && typeof exports !== 'undefined')
-	{
-		// Node. Does not work with strict CommonJS, but
-		// only CommonJS-like environments that support module.exports,
-		// like Node.
-		module.exports = factory();
-	}
-	else
-	{
-		// Browser globals (root is window)
-		root.Papa = factory();
-	}
-}(this, function()
-{
-	'use strict';
-
-	var global = (function () {
-		// alternative method, similar to `Function('return this')()`
-		// but without using `eval` (which is disabled when
-		// using Content Security Policy).
-
-		if (typeof self !== 'undefined') { return self; }
-		if (typeof window !== 'undefined') { return window; }
-		if (typeof global !== 'undefined') { return global; }
-
-		// When running tests none of the above have been defined
-		return {};
-	})();
-
-
-	var IS_WORKER = !global.document && !!global.postMessage,
-		IS_PAPA_WORKER = IS_WORKER && /(\?|&)papaworker(=|&|$)/.test(global.location.search),
-		LOADED_SYNC = false, AUTO_SCRIPT_PATH;
-	var workers = {}, workerIdCounter = 0;
-
-	var Papa = {};
-
-	Papa.parse = CsvToJson;
-	Papa.unparse = JsonToCsv;
-
-	Papa.RECORD_SEP = String.fromCharCode(30);
-	Papa.UNIT_SEP = String.fromCharCode(31);
-	Papa.BYTE_ORDER_MARK = '\ufeff';
-	Papa.BAD_DELIMITERS = ['\r', '\n', '"', Papa.BYTE_ORDER_MARK];
-	Papa.WORKERS_SUPPORTED = !IS_WORKER && !!global.Worker;
-	Papa.SCRIPT_PATH = null;	// Must be set by your code if you use workers and this lib is loaded asynchronously
-
-	// Configurable chunk sizes for local and remote files, respectively
-	Papa.LocalChunkSize = 1024 * 1024 * 10;	// 10 MB
-	Papa.RemoteChunkSize = 1024 * 1024 * 5;	// 5 MB
-	Papa.DefaultDelimiter = ',';			// Used if not specified and detection fails
-
-	// Exposed for testing and development only
-	Papa.Parser = Parser;
-	Papa.ParserHandle = ParserHandle;
-	Papa.NetworkStreamer = NetworkStreamer;
-	Papa.FileStreamer = FileStreamer;
-	Papa.StringStreamer = StringStreamer;
-	Papa.ReadableStreamStreamer = ReadableStreamStreamer;
-
-	if (global.jQuery)
-	{
-		var $ = global.jQuery;
-		$.fn.parse = function(options)
-		{
-			var config = options.config || {};
-			var queue = [];
-
-			this.each(function(idx)
-			{
-				var supported = $(this).prop('tagName').toUpperCase() === 'INPUT'
-								&& $(this).attr('type').toLowerCase() === 'file'
-								&& global.FileReader;
-
-				if (!supported || !this.files || this.files.length === 0)
-					return true;	// continue to next input element
-
-				for (var i = 0; i < this.files.length; i++)
-				{
-					queue.push({
-						file: this.files[i],
-						inputElem: this,
-						instanceConfig: $.extend({}, config)
-					});
-				}
-			});
-
-			parseNextFile();	// begin parsing
-			return this;		// maintains chainability
-
-
-			function parseNextFile()
-			{
-				if (queue.length === 0)
-				{
-					if (isFunction(options.complete))
-						options.complete();
-					return;
-				}
-
-				var f = queue[0];
-
-				if (isFunction(options.before))
-				{
-					var returned = options.before(f.file, f.inputElem);
-
-					if (typeof returned === 'object')
-					{
-						if (returned.action === 'abort')
-						{
-							error('AbortError', f.file, f.inputElem, returned.reason);
-							return;	// Aborts all queued files immediately
-						}
-						else if (returned.action === 'skip')
-						{
-							fileComplete();	// parse the next file in the queue, if any
-							return;
-						}
-						else if (typeof returned.config === 'object')
-							f.instanceConfig = $.extend(f.instanceConfig, returned.config);
-					}
-					else if (returned === 'skip')
-					{
-						fileComplete();	// parse the next file in the queue, if any
-						return;
-					}
-				}
-
-				// Wrap up the user's complete callback, if any, so that ours also gets executed
-				var userCompleteFunc = f.instanceConfig.complete;
-				f.instanceConfig.complete = function(results)
-				{
-					if (isFunction(userCompleteFunc))
-						userCompleteFunc(results, f.file, f.inputElem);
-					fileComplete();
-				};
-
-				Papa.parse(f.file, f.instanceConfig);
-			}
-
-			function error(name, file, elem, reason)
-			{
-				if (isFunction(options.error))
-					options.error({name: name}, file, elem, reason);
-			}
-
-			function fileComplete()
-			{
-				queue.splice(0, 1);
-				parseNextFile();
-			}
-		}
-	}
-
-
-	if (IS_PAPA_WORKER)
-	{
-		global.onmessage = workerThreadReceivedMessage;
-	}
-	else if (Papa.WORKERS_SUPPORTED)
-	{
-		AUTO_SCRIPT_PATH = getScriptPath();
-
-		// Check if the script was loaded synchronously
-		if (!document.body)
-		{
-			// Body doesn't exist yet, must be synchronous
-			LOADED_SYNC = true;
-		}
-		else
-		{
-			document.addEventListener('DOMContentLoaded', function () {
-				LOADED_SYNC = true;
-			}, true);
-		}
-	}
-
-
-
-
-	function CsvToJson(_input, _config)
-	{
-		_config = _config || {};
-		var dynamicTyping = _config.dynamicTyping || false;
-		if (isFunction(dynamicTyping)) {
-			_config.dynamicTypingFunction = dynamicTyping;
-			// Will be filled on first row call
-			dynamicTyping = {};
-		}
-		_config.dynamicTyping = dynamicTyping;
-
-		if (_config.worker && Papa.WORKERS_SUPPORTED)
-		{
-			var w = newWorker();
-
-			w.userStep = _config.step;
-			w.userChunk = _config.chunk;
-			w.userComplete = _config.complete;
-			w.userError = _config.error;
-
-			_config.step = isFunction(_config.step);
-			_config.chunk = isFunction(_config.chunk);
-			_config.complete = isFunction(_config.complete);
-			_config.error = isFunction(_config.error);
-			delete _config.worker;	// prevent infinite loop
-
-			w.postMessage({
-				input: _input,
-				config: _config,
-				workerId: w.id
-			});
-
-			return;
-		}
-
-		var streamer = null;
-		if (typeof _input === 'string')
-		{
-			if (_config.download)
-				streamer = new NetworkStreamer(_config);
-			else
-				streamer = new StringStreamer(_config);
-		}
-		else if (_input.readable === true && isFunction(_input.read) && isFunction(_input.on))
-		{
-			streamer = new ReadableStreamStreamer(_config);
-		}
-		else if ((global.File && _input instanceof File) || _input instanceof Object)	// ...Safari. (see issue #106)
-			streamer = new FileStreamer(_config);
-
-		return streamer.stream(_input);
-	}
-
-
-
-
-
-
-	function JsonToCsv(_input, _config)
-	{
-		var _output = '';
-		var _fields = [];
-
-		// Default configuration
-
-		/** whether to surround every datum with quotes */
-		var _quotes = false;
-
-		/** whether to write headers */
-		var _writeHeader = true;
-
-		/** delimiting character */
-		var _delimiter = ',';
-
-		/** newline character(s) */
-		var _newline = '\r\n';
-
-		/** quote character */
-		var _quoteChar = '"';
-
-		unpackConfig();
-
-		var quoteCharRegex = new RegExp(_quoteChar, 'g');
-
-		if (typeof _input === 'string')
-			_input = JSON.parse(_input);
-
-		if (_input instanceof Array)
-		{
-			if (!_input.length || _input[0] instanceof Array)
-				return serialize(null, _input);
-			else if (typeof _input[0] === 'object')
-				return serialize(objectKeys(_input[0]), _input);
-		}
-		else if (typeof _input === 'object')
-		{
-			if (typeof _input.data === 'string')
-				_input.data = JSON.parse(_input.data);
-
-			if (_input.data instanceof Array)
-			{
-				if (!_input.fields)
-					_input.fields =  _input.meta && _input.meta.fields;
-
-				if (!_input.fields)
-					_input.fields =  _input.data[0] instanceof Array
-									? _input.fields
-									: objectKeys(_input.data[0]);
-
-				if (!(_input.data[0] instanceof Array) && typeof _input.data[0] !== 'object')
-					_input.data = [_input.data];	// handles input like [1,2,3] or ['asdf']
-			}
-
-			return serialize(_input.fields || [], _input.data || []);
-		}
-
-		// Default (any valid paths should return before this)
-		throw 'exception: Unable to serialize unrecognized input';
-
-
-		function unpackConfig()
-		{
-			if (typeof _config !== 'object')
-				return;
-
-			if (typeof _config.delimiter === 'string'
-				&& _config.delimiter.length === 1
-				&& Papa.BAD_DELIMITERS.indexOf(_config.delimiter) === -1)
-			{
-				_delimiter = _config.delimiter;
-			}
-
-			if (typeof _config.quotes === 'boolean'
-				|| _config.quotes instanceof Array)
-				_quotes = _config.quotes;
-
-			if (typeof _config.newline === 'string')
-				_newline = _config.newline;
-
-			if (typeof _config.quoteChar === 'string')
-				_quoteChar = _config.quoteChar;
-
-			if (typeof _config.header === 'boolean')
-				_writeHeader = _config.header;
-		}
-
-
-		/** Turns an object's keys into an array */
-		function objectKeys(obj)
-		{
-			if (typeof obj !== 'object')
-				return [];
-			var keys = [];
-			for (var key in obj)
-				keys.push(key);
-			return keys;
-		}
-
-		/** The double for loop that iterates the data and writes out a CSV string including header row */
-		function serialize(fields, data)
-		{
-			var csv = '';
-
-			if (typeof fields === 'string')
-				fields = JSON.parse(fields);
-			if (typeof data === 'string')
-				data = JSON.parse(data);
-
-			var hasHeader = fields instanceof Array && fields.length > 0;
-			var dataKeyedByField = !(data[0] instanceof Array);
-
-			// If there a header row, write it first
-			if (hasHeader && _writeHeader)
-			{
-				for (var i = 0; i < fields.length; i++)
-				{
-					if (i > 0)
-						csv += _delimiter;
-					csv += safe(fields[i], i);
-				}
-				if (data.length > 0)
-					csv += _newline;
-			}
-
-			// Then write out the data
-			for (var row = 0; row < data.length; row++)
-			{
-				var maxCol = hasHeader ? fields.length : data[row].length;
-
-				for (var col = 0; col < maxCol; col++)
-				{
-					if (col > 0)
-						csv += _delimiter;
-					var colIdx = hasHeader && dataKeyedByField ? fields[col] : col;
-					csv += safe(data[row][colIdx], col);
-				}
-
-				if (row < data.length - 1)
-					csv += _newline;
-			}
-
-			return csv;
-		}
-
-		/** Encloses a value around quotes if needed (makes a value safe for CSV insertion) */
-		function safe(str, col)
-		{
-			if (typeof str === 'undefined' || str === null)
-				return '';
-
-			str = str.toString().replace(quoteCharRegex, _quoteChar+_quoteChar);
-
-			var needsQuotes = (typeof _quotes === 'boolean' && _quotes)
-							|| (_quotes instanceof Array && _quotes[col])
-							|| hasAny(str, Papa.BAD_DELIMITERS)
-							|| str.indexOf(_delimiter) > -1
-							|| str.charAt(0) === ' '
-							|| str.charAt(str.length - 1) === ' ';
-
-			return needsQuotes ? _quoteChar + str + _quoteChar : str;
-		}
-
-		function hasAny(str, substrings)
-		{
-			for (var i = 0; i < substrings.length; i++)
-				if (str.indexOf(substrings[i]) > -1)
-					return true;
-			return false;
-		}
-	}
-
-	/** ChunkStreamer is the base prototype for various streamer implementations. */
-	function ChunkStreamer(config)
-	{
-		this._handle = null;
-		this._paused = false;
-		this._finished = false;
-		this._input = null;
-		this._baseIndex = 0;
-		this._partialLine = '';
-		this._rowCount = 0;
-		this._start = 0;
-		this._nextChunk = null;
-		this.isFirstChunk = true;
-		this._completeResults = {
-			data: [],
-			errors: [],
-			meta: {}
-		};
-		replaceConfig.call(this, config);
-
-		this.parseChunk = function(chunk)
-		{
-			// First chunk pre-processing
-			if (this.isFirstChunk && isFunction(this._config.beforeFirstChunk))
-			{
-				var modifiedChunk = this._config.beforeFirstChunk(chunk);
-				if (modifiedChunk !== undefined)
-					chunk = modifiedChunk;
-			}
-			this.isFirstChunk = false;
-
-			// Rejoin the line we likely just split in two by chunking the file
-			var aggregate = this._partialLine + chunk;
-			this._partialLine = '';
-
-			var results = this._handle.parse(aggregate, this._baseIndex, !this._finished);
-
-			if (this._handle.paused() || this._handle.aborted())
-				return;
-
-			var lastIndex = results.meta.cursor;
-
-			if (!this._finished)
-			{
-				this._partialLine = aggregate.substring(lastIndex - this._baseIndex);
-				this._baseIndex = lastIndex;
-			}
-
-			if (results && results.data)
-				this._rowCount += results.data.length;
-
-			var finishedIncludingPreview = this._finished || (this._config.preview && this._rowCount >= this._config.preview);
-
-			if (IS_PAPA_WORKER)
-			{
-				global.postMessage({
-					results: results,
-					workerId: Papa.WORKER_ID,
-					finished: finishedIncludingPreview
-				});
-			}
-			else if (isFunction(this._config.chunk))
-			{
-				this._config.chunk(results, this._handle);
-				if (this._paused)
-					return;
-				results = undefined;
-				this._completeResults = undefined;
-			}
-
-			if (!this._config.step && !this._config.chunk) {
-				this._completeResults.data = this._completeResults.data.concat(results.data);
-				this._completeResults.errors = this._completeResults.errors.concat(results.errors);
-				this._completeResults.meta = results.meta;
-			}
-
-			if (finishedIncludingPreview && isFunction(this._config.complete) && (!results || !results.meta.aborted))
-				this._config.complete(this._completeResults, this._input);
-
-			if (!finishedIncludingPreview && (!results || !results.meta.paused))
-				this._nextChunk();
-
-			return results;
-		};
-
-		this._sendError = function(error)
-		{
-			if (isFunction(this._config.error))
-				this._config.error(error);
-			else if (IS_PAPA_WORKER && this._config.error)
-			{
-				global.postMessage({
-					workerId: Papa.WORKER_ID,
-					error: error,
-					finished: false
-				});
-			}
-		};
-
-		function replaceConfig(config)
-		{
-			// Deep-copy the config so we can edit it
-			var configCopy = copy(config);
-			configCopy.chunkSize = parseInt(configCopy.chunkSize);	// parseInt VERY important so we don't concatenate strings!
-			if (!config.step && !config.chunk)
-				configCopy.chunkSize = null;  // disable Range header if not streaming; bad values break IIS - see issue #196
-			this._handle = new ParserHandle(configCopy);
-			this._handle.streamer = this;
-			this._config = configCopy;	// persist the copy to the caller
-		}
-	}
-
-
-	function NetworkStreamer(config)
-	{
-		config = config || {};
-		if (!config.chunkSize)
-			config.chunkSize = Papa.RemoteChunkSize;
-		ChunkStreamer.call(this, config);
-
-		var xhr;
-
-		if (IS_WORKER)
-		{
-			this._nextChunk = function()
-			{
-				this._readChunk();
-				this._chunkLoaded();
-			};
-		}
-		else
-		{
-			this._nextChunk = function()
-			{
-				this._readChunk();
-			};
-		}
-
-		this.stream = function(url)
-		{
-			this._input = url;
-			this._nextChunk();	// Starts streaming
-		};
-
-		this._readChunk = function()
-		{
-			if (this._finished)
-			{
-				this._chunkLoaded();
-				return;
-			}
-
-			xhr = new XMLHttpRequest();
-
-			if (this._config.withCredentials)
-			{
-				xhr.withCredentials = this._config.withCredentials;
-			}
-
-			if (!IS_WORKER)
-			{
-				xhr.onload = bindFunction(this._chunkLoaded, this);
-				xhr.onerror = bindFunction(this._chunkError, this);
-			}
-
-			xhr.open('GET', this._input, !IS_WORKER);
-			// Headers can only be set when once the request state is OPENED
-			if (this._config.downloadRequestHeaders)
-			{
-				var headers = this._config.downloadRequestHeaders;
-
-				for (var headerName in headers)
-				{
-					xhr.setRequestHeader(headerName, headers[headerName]);
-				}
-			}
-
-			if (this._config.chunkSize)
-			{
-				var end = this._start + this._config.chunkSize - 1;	// minus one because byte range is inclusive
-				xhr.setRequestHeader('Range', 'bytes='+this._start+'-'+end);
-				xhr.setRequestHeader('If-None-Match', 'webkit-no-cache'); // https://bugs.webkit.org/show_bug.cgi?id=82672
-			}
-
-			try {
-				xhr.send();
-			}
-			catch (err) {
-				this._chunkError(err.message);
-			}
-
-			if (IS_WORKER && xhr.status === 0)
-				this._chunkError();
-			else
-				this._start += this._config.chunkSize;
-		}
-
-		this._chunkLoaded = function()
-		{
-			if (xhr.readyState != 4)
-				return;
-
-			if (xhr.status < 200 || xhr.status >= 400)
-			{
-				this._chunkError();
-				return;
-			}
-
-			this._finished = !this._config.chunkSize || this._start > getFileSize(xhr);
-			this.parseChunk(xhr.responseText);
-		}
-
-		this._chunkError = function(errorMessage)
-		{
-			var errorText = xhr.statusText || errorMessage;
-			this._sendError(errorText);
-		}
-
-		function getFileSize(xhr)
-		{
-			var contentRange = xhr.getResponseHeader('Content-Range');
-			if (contentRange === null) { // no content range, then finish!
-					return -1;
-					}
-			return parseInt(contentRange.substr(contentRange.lastIndexOf('/') + 1));
-		}
-	}
-	NetworkStreamer.prototype = Object.create(ChunkStreamer.prototype);
-	NetworkStreamer.prototype.constructor = NetworkStreamer;
-
-
-	function FileStreamer(config)
-	{
-		config = config || {};
-		if (!config.chunkSize)
-			config.chunkSize = Papa.LocalChunkSize;
-		ChunkStreamer.call(this, config);
-
-		var reader, slice;
-
-		// FileReader is better than FileReaderSync (even in worker) - see http://stackoverflow.com/q/24708649/1048862
-		// But Firefox is a pill, too - see issue #76: https://github.com/mholt/PapaParse/issues/76
-		var usingAsyncReader = typeof FileReader !== 'undefined';	// Safari doesn't consider it a function - see issue #105
-
-		this.stream = function(file)
-		{
-			this._input = file;
-			slice = file.slice || file.webkitSlice || file.mozSlice;
-
-			if (usingAsyncReader)
-			{
-				reader = new FileReader();		// Preferred method of reading files, even in workers
-				reader.onload = bindFunction(this._chunkLoaded, this);
-				reader.onerror = bindFunction(this._chunkError, this);
-			}
-			else
-				reader = new FileReaderSync();	// Hack for running in a web worker in Firefox
-
-			this._nextChunk();	// Starts streaming
-		};
-
-		this._nextChunk = function()
-		{
-			if (!this._finished && (!this._config.preview || this._rowCount < this._config.preview))
-				this._readChunk();
-		}
-
-		this._readChunk = function()
-		{
-			var input = this._input;
-			if (this._config.chunkSize)
-			{
-				var end = Math.min(this._start + this._config.chunkSize, this._input.size);
-				input = slice.call(input, this._start, end);
-			}
-			var txt = reader.readAsText(input, this._config.encoding);
-			if (!usingAsyncReader)
-				this._chunkLoaded({ target: { result: txt } });	// mimic the async signature
-		}
-
-		this._chunkLoaded = function(event)
-		{
-			// Very important to increment start each time before handling results
-			this._start += this._config.chunkSize;
-			this._finished = !this._config.chunkSize || this._start >= this._input.size;
-			this.parseChunk(event.target.result);
-		}
-
-		this._chunkError = function()
-		{
-			this._sendError(reader.error);
-		}
-
-	}
-	FileStreamer.prototype = Object.create(ChunkStreamer.prototype);
-	FileStreamer.prototype.constructor = FileStreamer;
-
-
-	function StringStreamer(config)
-	{
-		config = config || {};
-		ChunkStreamer.call(this, config);
-
-		var string;
-		var remaining;
-		this.stream = function(s)
-		{
-			string = s;
-			remaining = s;
-			return this._nextChunk();
-		}
-		this._nextChunk = function()
-		{
-			if (this._finished) return;
-			var size = this._config.chunkSize;
-			var chunk = size ? remaining.substr(0, size) : remaining;
-			remaining = size ? remaining.substr(size) : '';
-			this._finished = !remaining;
-			return this.parseChunk(chunk);
-		}
-	}
-	StringStreamer.prototype = Object.create(StringStreamer.prototype);
-	StringStreamer.prototype.constructor = StringStreamer;
-
-
-	function ReadableStreamStreamer(config)
-	{
-		config = config || {};
-
-		ChunkStreamer.call(this, config);
-
-		var queue = [];
-		var parseOnData = true;
-
-		this.stream = function(stream)
-		{
-			this._input = stream;
-
-			this._input.on('data', this._streamData);
-			this._input.on('end', this._streamEnd);
-			this._input.on('error', this._streamError);
-		}
-
-		this._nextChunk = function()
-		{
-			if (queue.length)
-			{
-				this.parseChunk(queue.shift());
-			}
-			else
-			{
-				parseOnData = true;
-			}
-		}
-
-		this._streamData = bindFunction(function(chunk)
-		{
-			try
-			{
-				queue.push(typeof chunk === 'string' ? chunk : chunk.toString(this._config.encoding));
-
-				if (parseOnData)
-				{
-					parseOnData = false;
-					this.parseChunk(queue.shift());
-				}
-			}
-			catch (error)
-			{
-				this._streamError(error);
-			}
-		}, this);
-
-		this._streamError = bindFunction(function(error)
-		{
-			this._streamCleanUp();
-			this._sendError(error.message);
-		}, this);
-
-		this._streamEnd = bindFunction(function()
-		{
-			this._streamCleanUp();
-			this._finished = true;
-			this._streamData('');
-		}, this);
-
-		this._streamCleanUp = bindFunction(function()
-		{
-			this._input.removeListener('data', this._streamData);
-			this._input.removeListener('end', this._streamEnd);
-			this._input.removeListener('error', this._streamError);
-		}, this);
-	}
-	ReadableStreamStreamer.prototype = Object.create(ChunkStreamer.prototype);
-	ReadableStreamStreamer.prototype.constructor = ReadableStreamStreamer;
-
-
-	// Use one ParserHandle per entire CSV file or string
-	function ParserHandle(_config)
-	{
-		// One goal is to minimize the use of regular expressions...
-		var FLOAT = /^\s*-?(\d*\.?\d+|\d+\.?\d*)(e[-+]?\d+)?\s*$/i;
-
-		var self = this;
-		var _stepCounter = 0;	// Number of times step was called (number of rows parsed)
-		var _input;				// The input being parsed
-		var _parser;			// The core parser being used
-		var _paused = false;	// Whether we are paused or not
-		var _aborted = false;	// Whether the parser has aborted or not
-		var _delimiterError;	// Temporary state between delimiter detection and processing results
-		var _fields = [];		// Fields are from the header row of the input, if there is one
-		var _results = {		// The last results returned from the parser
-			data: [],
-			errors: [],
-			meta: {}
-		};
-
-		if (isFunction(_config.step))
-		{
-			var userStep = _config.step;
-			_config.step = function(results)
-			{
-				_results = results;
-
-				if (needsHeaderRow())
-					processResults();
-				else	// only call user's step function after header row
-				{
-					processResults();
-
-					// It's possbile that this line was empty and there's no row here after all
-					if (_results.data.length === 0)
-						return;
-
-					_stepCounter += results.data.length;
-					if (_config.preview && _stepCounter > _config.preview)
-						_parser.abort();
-					else
-						userStep(_results, self);
-				}
-			};
-		}
-
-		/**
-		 * Parses input. Most users won't need, and shouldn't mess with, the baseIndex
-		 * and ignoreLastRow parameters. They are used by streamers (wrapper functions)
-		 * when an input comes in multiple chunks, like from a file.
-		 */
-		this.parse = function(input, baseIndex, ignoreLastRow)
-		{
-			if (!_config.newline)
-				_config.newline = guessLineEndings(input);
-
-			_delimiterError = false;
-			if (!_config.delimiter)
-			{
-				var delimGuess = guessDelimiter(input, _config.newline, _config.skipEmptyLines);
-				if (delimGuess.successful)
-					_config.delimiter = delimGuess.bestDelimiter;
-				else
-				{
-					_delimiterError = true;	// add error after parsing (otherwise it would be overwritten)
-					_config.delimiter = Papa.DefaultDelimiter;
-				}
-				_results.meta.delimiter = _config.delimiter;
-			}
-			else if(isFunction(_config.delimiter))
-			{
-				_config.delimiter = _config.delimiter(input);
-				_results.meta.delimiter = _config.delimiter;
-			}
-
-			var parserConfig = copy(_config);
-			if (_config.preview && _config.header)
-				parserConfig.preview++;	// to compensate for header row
-
-			_input = input;
-			_parser = new Parser(parserConfig);
-			_results = _parser.parse(_input, baseIndex, ignoreLastRow);
-			processResults();
-			return _paused ? { meta: { paused: true } } : (_results || { meta: { paused: false } });
-		};
-
-		this.paused = function()
-		{
-			return _paused;
-		};
-
-		this.pause = function()
-		{
-			_paused = true;
-			_parser.abort();
-			_input = _input.substr(_parser.getCharIndex());
-		};
-
-		this.resume = function()
-		{
-			_paused = false;
-			self.streamer.parseChunk(_input);
-		};
-
-		this.aborted = function ()
-		{
-			return _aborted;
-		};
-
-		this.abort = function()
-		{
-			_aborted = true;
-			_parser.abort();
-			_results.meta.aborted = true;
-			if (isFunction(_config.complete))
-				_config.complete(_results);
-			_input = '';
-		};
-
-		function processResults()
-		{
-			if (_results && _delimiterError)
-			{
-				addError('Delimiter', 'UndetectableDelimiter', 'Unable to auto-detect delimiting character; defaulted to \''+Papa.DefaultDelimiter+'\'');
-				_delimiterError = false;
-			}
-
-			if (_config.skipEmptyLines)
-			{
-				for (var i = 0; i < _results.data.length; i++)
-					if (_results.data[i].length === 1 && _results.data[i][0] === '')
-						_results.data.splice(i--, 1);
-			}
-
-			if (needsHeaderRow())
-				fillHeaderFields();
-
-			return applyHeaderAndDynamicTyping();
-		}
-
-		function needsHeaderRow()
-		{
-			return _config.header && _fields.length === 0;
-		}
-
-		function fillHeaderFields()
-		{
-			if (!_results)
-				return;
-			for (var i = 0; needsHeaderRow() && i < _results.data.length; i++)
-				for (var j = 0; j < _results.data[i].length; j++)
-					_fields.push(_results.data[i][j]);
-			_results.data.splice(0, 1);
-		}
-
-		function shouldApplyDynamicTyping(field) {
-			// Cache function values to avoid calling it for each row
-			if (_config.dynamicTypingFunction && _config.dynamicTyping[field] === undefined) {
-				_config.dynamicTyping[field] = _config.dynamicTypingFunction(field);
-			}
-			return (_config.dynamicTyping[field] || _config.dynamicTyping) === true
-		}
-
-		function parseDynamic(field, value)
-		{
-			if (shouldApplyDynamicTyping(field))
-			{
-				if (value === 'true' || value === 'TRUE')
-					return true;
-				else if (value === 'false' || value === 'FALSE')
-					return false;
-				else
-					return tryParseFloat(value);
-			}
-			return value;
-		}
-
-		function applyHeaderAndDynamicTyping()
-		{
-			if (!_results || (!_config.header && !_config.dynamicTyping))
-				return _results;
-
-			for (var i = 0; i < _results.data.length; i++)
-			{
-				var row = _config.header ? {} : [];
-
-				for (var j = 0; j < _results.data[i].length; j++)
-				{
-					var field = j;
-					var value = _results.data[i][j];
-
-					if (_config.header)
-						field = j >= _fields.length ? '__parsed_extra' : _fields[j];
-
-					value = parseDynamic(field, value);
-
-					if (field === '__parsed_extra')
-					{
-						row[field] = row[field] || [];
-						row[field].push(value);
-					}
-					else
-						row[field] = value;
-				}
-
-				_results.data[i] = row;
-
-				if (_config.header)
-				{
-					if (j > _fields.length)
-						addError('FieldMismatch', 'TooManyFields', 'Too many fields: expected ' + _fields.length + ' fields but parsed ' + j, i);
-					else if (j < _fields.length)
-						addError('FieldMismatch', 'TooFewFields', 'Too few fields: expected ' + _fields.length + ' fields but parsed ' + j, i);
-				}
-			}
-
-			if (_config.header && _results.meta)
-				_results.meta.fields = _fields;
-			return _results;
-		}
-
-		function guessDelimiter(input, newline, skipEmptyLines)
-		{
-			var delimChoices = [',', '\t', '|', ';', Papa.RECORD_SEP, Papa.UNIT_SEP];
-			var bestDelim, bestDelta, fieldCountPrevRow;
-
-			for (var i = 0; i < delimChoices.length; i++)
-			{
-				var delim = delimChoices[i];
-				var delta = 0, avgFieldCount = 0, emptyLinesCount = 0;
-				fieldCountPrevRow = undefined;
-
-				var preview = new Parser({
-					delimiter: delim,
-					newline: newline,
-					preview: 10
-				}).parse(input);
-
-				for (var j = 0; j < preview.data.length; j++)
-				{
-					if (skipEmptyLines && preview.data[j].length === 1 && preview.data[j][0].length === 0) {
-						emptyLinesCount++
-						continue
-					}
-					var fieldCount = preview.data[j].length;
-					avgFieldCount += fieldCount;
-
-					if (typeof fieldCountPrevRow === 'undefined')
-					{
-						fieldCountPrevRow = fieldCount;
-						continue;
-					}
-					else if (fieldCount > 1)
-					{
-						delta += Math.abs(fieldCount - fieldCountPrevRow);
-						fieldCountPrevRow = fieldCount;
-					}
-				}
-
-				if (preview.data.length > 0)
-					avgFieldCount /= (preview.data.length - emptyLinesCount);
-
-				if ((typeof bestDelta === 'undefined' || delta < bestDelta)
-					&& avgFieldCount > 1.99)
-				{
-					bestDelta = delta;
-					bestDelim = delim;
-				}
-			}
-
-			_config.delimiter = bestDelim;
-
-			return {
-				successful: !!bestDelim,
-				bestDelimiter: bestDelim
-			}
-		}
-
-		function guessLineEndings(input)
-		{
-			input = input.substr(0, 1024*1024);	// max length 1 MB
-
-			var r = input.split('\r');
-
-			var n = input.split('\n');
-
-			var nAppearsFirst = (n.length > 1 && n[0].length < r[0].length);
-
-			if (r.length === 1 || nAppearsFirst)
-				return '\n';
-
-			var numWithN = 0;
-			for (var i = 0; i < r.length; i++)
-			{
-				if (r[i][0] === '\n')
-					numWithN++;
-			}
-
-			return numWithN >= r.length / 2 ? '\r\n' : '\r';
-		}
-
-		function tryParseFloat(val)
-		{
-			var isNumber = FLOAT.test(val);
-			return isNumber ? parseFloat(val) : val;
-		}
-
-		function addError(type, code, msg, row)
-		{
-			_results.errors.push({
-				type: type,
-				code: code,
-				message: msg,
-				row: row
-			});
-		}
-	}
-
-
-
-
-
-	/** The core parser implements speedy and correct CSV parsing */
-	function Parser(config)
-	{
-		// Unpack the config object
-		config = config || {};
-		var delim = config.delimiter;
-		var newline = config.newline;
-		var comments = config.comments;
-		var step = config.step;
-		var preview = config.preview;
-		var fastMode = config.fastMode;
-		var quoteChar = config.quoteChar || '"';
-
-		// Delimiter must be valid
-		if (typeof delim !== 'string'
-			|| Papa.BAD_DELIMITERS.indexOf(delim) > -1)
-			delim = ',';
-
-		// Comment character must be valid
-		if (comments === delim)
-			throw 'Comment character same as delimiter';
-		else if (comments === true)
-			comments = '#';
-		else if (typeof comments !== 'string'
-			|| Papa.BAD_DELIMITERS.indexOf(comments) > -1)
-			comments = false;
-
-		// Newline must be valid: \r, \n, or \r\n
-		if (newline != '\n' && newline != '\r' && newline != '\r\n')
-			newline = '\n';
-
-		// We're gonna need these at the Parser scope
-		var cursor = 0;
-		var aborted = false;
-
-		this.parse = function(input, baseIndex, ignoreLastRow)
-		{
-			// For some reason, in Chrome, this speeds things up (!?)
-			if (typeof input !== 'string')
-				throw 'Input must be a string';
-
-			// We don't need to compute some of these every time parse() is called,
-			// but having them in a more local scope seems to perform better
-			var inputLen = input.length,
-				delimLen = delim.length,
-				newlineLen = newline.length,
-				commentsLen = comments.length;
-			var stepIsFunction = isFunction(step);
-
-			// Establish starting state
-			cursor = 0;
-			var data = [], errors = [], row = [], lastCursor = 0;
-
-			if (!input)
-				return returnable();
-
-			if (fastMode || (fastMode !== false && input.indexOf(quoteChar) === -1))
-			{
-				var rows = input.split(newline);
-				for (var i = 0; i < rows.length; i++)
-				{
-					var row = rows[i];
-					cursor += row.length;
-					if (i !== rows.length - 1)
-						cursor += newline.length;
-					else if (ignoreLastRow)
-						return returnable();
-					if (comments && row.substr(0, commentsLen) === comments)
-						continue;
-					if (stepIsFunction)
-					{
-						data = [];
-						pushRow(row.split(delim));
-						doStep();
-						if (aborted)
-							return returnable();
-					}
-					else
-						pushRow(row.split(delim));
-					if (preview && i >= preview)
-					{
-						data = data.slice(0, preview);
-						return returnable(true);
-					}
-				}
-				return returnable();
-			}
-
-			var nextDelim = input.indexOf(delim, cursor);
-			var nextNewline = input.indexOf(newline, cursor);
-			var quoteCharRegex = new RegExp(quoteChar+quoteChar, 'g');
-
-			// Parser loop
-			for (;;)
-			{
-				// Field has opening quote
-				if (input[cursor] === quoteChar)
-				{
-					// Start our search for the closing quote where the cursor is
-					var quoteSearch = cursor;
-
-					// Skip the opening quote
-					cursor++;
-
-					for (;;)
-					{
-						// Find closing quote
-						var quoteSearch = input.indexOf(quoteChar, quoteSearch+1);
-
-						//No other quotes are found - no other delimiters
-						if (quoteSearch === -1)
-						{
-							if (!ignoreLastRow) {
-								// No closing quote... what a pity
-								errors.push({
-									type: 'Quotes',
-									code: 'MissingQuotes',
-									message: 'Quoted field unterminated',
-									row: data.length,	// row has yet to be inserted
-									index: cursor
-								});
-							}
-							return finish();
-						}
-
-						// Closing quote at EOF
-						if (quoteSearch === inputLen-1)
-						{
-							var value = input.substring(cursor, quoteSearch).replace(quoteCharRegex, quoteChar);
-							return finish(value);
-						}
-
-						// If this quote is escaped, it's part of the data; skip it
-						if (input[quoteSearch+1] === quoteChar)
-						{
-							quoteSearch++;
-							continue;
-						}
-
-						// Closing quote followed by delimiter
-						if (input[quoteSearch+1] === delim)
-						{
-							row.push(input.substring(cursor, quoteSearch).replace(quoteCharRegex, quoteChar));
-							cursor = quoteSearch + 1 + delimLen;
-							nextDelim = input.indexOf(delim, cursor);
-							nextNewline = input.indexOf(newline, cursor);
-							break;
-						}
-
-						// Closing quote followed by newline
-						if (input.substr(quoteSearch+1, newlineLen) === newline)
-						{
-							row.push(input.substring(cursor, quoteSearch).replace(quoteCharRegex, quoteChar));
-							saveRow(quoteSearch + 1 + newlineLen);
-							nextDelim = input.indexOf(delim, cursor);	// because we may have skipped the nextDelim in the quoted field
-
-							if (stepIsFunction)
-							{
-								doStep();
-								if (aborted)
-									return returnable();
-							}
-
-							if (preview && data.length >= preview)
-								return returnable(true);
-
-							break;
-						}
-
-
-						// Checks for valid closing quotes are complete (escaped quotes or quote followed by EOF/delimiter/newline) -- assume these quotes are part of an invalid text string
-						errors.push({
-							type: 'Quotes',
-							code: 'InvalidQuotes',
-							message: 'Trailing quote on quoted field is malformed',
-							row: data.length,	// row has yet to be inserted
-							index: cursor
-						});
-
-						quoteSearch++;
-						continue;
-
-					}
-
-					continue;
-				}
-
-				// Comment found at start of new line
-				if (comments && row.length === 0 && input.substr(cursor, commentsLen) === comments)
-				{
-					if (nextNewline === -1)	// Comment ends at EOF
-						return returnable();
-					cursor = nextNewline + newlineLen;
-					nextNewline = input.indexOf(newline, cursor);
-					nextDelim = input.indexOf(delim, cursor);
-					continue;
-				}
-
-				// Next delimiter comes before next newline, so we've reached end of field
-				if (nextDelim !== -1 && (nextDelim < nextNewline || nextNewline === -1))
-				{
-					row.push(input.substring(cursor, nextDelim));
-					cursor = nextDelim + delimLen;
-					nextDelim = input.indexOf(delim, cursor);
-					continue;
-				}
-
-				// End of row
-				if (nextNewline !== -1)
-				{
-					row.push(input.substring(cursor, nextNewline));
-					saveRow(nextNewline + newlineLen);
-
-					if (stepIsFunction)
-					{
-						doStep();
-						if (aborted)
-							return returnable();
-					}
-
-					if (preview && data.length >= preview)
-						return returnable(true);
-
-					continue;
-				}
-
-				break;
-			}
-
-
-			return finish();
-
-
-			function pushRow(row)
-			{
-				data.push(row);
-				lastCursor = cursor;
-			}
-
-			/**
-			 * Appends the remaining input from cursor to the end into
-			 * row, saves the row, calls step, and returns the results.
-			 */
-			function finish(value)
-			{
-				if (ignoreLastRow)
-					return returnable();
-				if (typeof value === 'undefined')
-					value = input.substr(cursor);
-				row.push(value);
-				cursor = inputLen;	// important in case parsing is paused
-				pushRow(row);
-				if (stepIsFunction)
-					doStep();
-				return returnable();
-			}
-
-			/**
-			 * Appends the current row to the results. It sets the cursor
-			 * to newCursor and finds the nextNewline. The caller should
-			 * take care to execute user's step function and check for
-			 * preview and end parsing if necessary.
-			 */
-			function saveRow(newCursor)
-			{
-				cursor = newCursor;
-				pushRow(row);
-				row = [];
-				nextNewline = input.indexOf(newline, cursor);
-			}
-
-			/** Returns an object with the results, errors, and meta. */
-			function returnable(stopped)
-			{
-				return {
-					data: data,
-					errors: errors,
-					meta: {
-						delimiter: delim,
-						linebreak: newline,
-						aborted: aborted,
-						truncated: !!stopped,
-						cursor: lastCursor + (baseIndex || 0)
-					}
-				};
-			}
-
-			/** Executes the user's step function and resets data & errors. */
-			function doStep()
-			{
-				step(returnable());
-				data = [], errors = [];
-			}
-		};
-
-		/** Sets the abort flag */
-		this.abort = function()
-		{
-			aborted = true;
-		};
-
-		/** Gets the cursor position */
-		this.getCharIndex = function()
-		{
-			return cursor;
-		};
-	}
-
-
-	// If you need to load Papa Parse asynchronously and you also need worker threads, hard-code
-	// the script path here. See: https://github.com/mholt/PapaParse/issues/87#issuecomment-57885358
-	function getScriptPath()
-	{
-		var scripts = document.getElementsByTagName('script');
-		return scripts.length ? scripts[scripts.length - 1].src : '';
-	}
-
-	function newWorker()
-	{
-		if (!Papa.WORKERS_SUPPORTED)
-			return false;
-		if (!LOADED_SYNC && Papa.SCRIPT_PATH === null)
-			throw new Error(
-				'Script path cannot be determined automatically when Papa Parse is loaded asynchronously. ' +
-				'You need to set Papa.SCRIPT_PATH manually.'
-			);
-		var workerUrl = Papa.SCRIPT_PATH || AUTO_SCRIPT_PATH;
-		// Append 'papaworker' to the search string to tell papaparse that this is our worker.
-		workerUrl += (workerUrl.indexOf('?') !== -1 ? '&' : '?') + 'papaworker';
-		var w = new global.Worker(workerUrl);
-		w.onmessage = mainThreadReceivedMessage;
-		w.id = workerIdCounter++;
-		workers[w.id] = w;
-		return w;
-	}
-
-	/** Callback when main thread receives a message */
-	function mainThreadReceivedMessage(e)
-	{
-		var msg = e.data;
-		var worker = workers[msg.workerId];
-		var aborted = false;
-
-		if (msg.error)
-			worker.userError(msg.error, msg.file);
-		else if (msg.results && msg.results.data)
-		{
-			var abort = function() {
-				aborted = true;
-				completeWorker(msg.workerId, { data: [], errors: [], meta: { aborted: true } });
-			};
-
-			var handle = {
-				abort: abort,
-				pause: notImplemented,
-				resume: notImplemented
-			};
-
-			if (isFunction(worker.userStep))
-			{
-				for (var i = 0; i < msg.results.data.length; i++)
-				{
-					worker.userStep({
-						data: [msg.results.data[i]],
-						errors: msg.results.errors,
-						meta: msg.results.meta
-					}, handle);
-					if (aborted)
-						break;
-				}
-				delete msg.results;	// free memory ASAP
-			}
-			else if (isFunction(worker.userChunk))
-			{
-				worker.userChunk(msg.results, handle, msg.file);
-				delete msg.results;
-			}
-		}
-
-		if (msg.finished && !aborted)
-			completeWorker(msg.workerId, msg.results);
-	}
-
-	function completeWorker(workerId, results) {
-		var worker = workers[workerId];
-		if (isFunction(worker.userComplete))
-			worker.userComplete(results);
-		worker.terminate();
-		delete workers[workerId];
-	}
-
-	function notImplemented() {
-		throw 'Not implemented.';
-	}
-
-	/** Callback when worker thread receives a message */
-	function workerThreadReceivedMessage(e)
-	{
-		var msg = e.data;
-
-		if (typeof Papa.WORKER_ID === 'undefined' && msg)
-			Papa.WORKER_ID = msg.workerId;
-
-		if (typeof msg.input === 'string')
-		{
-			global.postMessage({
-				workerId: Papa.WORKER_ID,
-				results: Papa.parse(msg.input, msg.config),
-				finished: true
-			});
-		}
-		else if ((global.File && msg.input instanceof File) || msg.input instanceof Object)	// thank you, Safari (see issue #106)
-		{
-			var results = Papa.parse(msg.input, msg.config);
-			if (results)
-				global.postMessage({
-					workerId: Papa.WORKER_ID,
-					results: results,
-					finished: true
-				});
-		}
-	}
-
-	/** Makes a deep copy of an array or object (mostly) */
-	function copy(obj)
-	{
-		if (typeof obj !== 'object')
-			return obj;
-		var cpy = obj instanceof Array ? [] : {};
-		for (var key in obj)
-			cpy[key] = copy(obj[key]);
-		return cpy;
-	}
-
-	function bindFunction(f, self)
-	{
-		return function() { f.apply(self, arguments); };
-	}
-
-	function isFunction(func)
-	{
-		return typeof func === 'function';
-	}
-
-	return Papa;
-}));
-
-
-/***/ }),
-/* 568 */
+/* 569 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -89894,12 +91491,12 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 569 */
+/* 570 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
     if (true) {
-        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, __webpack_require__(570), __webpack_require__(572), __webpack_require__(573)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, __webpack_require__(571), __webpack_require__(573), __webpack_require__(574)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -90109,12 +91706,12 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 });
 
 /***/ }),
-/* 570 */
+/* 571 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
     if (true) {
-        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, __webpack_require__(571)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, __webpack_require__(572)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -90346,7 +91943,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 });
 
 /***/ }),
-/* 571 */
+/* 572 */
 /***/ (function(module, exports) {
 
 function select(element) {
@@ -90395,7 +91992,7 @@ module.exports = select;
 
 
 /***/ }),
-/* 572 */
+/* 573 */
 /***/ (function(module, exports) {
 
 function E () {
@@ -90467,11 +92064,11 @@ module.exports = E;
 
 
 /***/ }),
-/* 573 */
+/* 574 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var is = __webpack_require__(574);
-var delegate = __webpack_require__(575);
+var is = __webpack_require__(575);
+var delegate = __webpack_require__(576);
 
 /**
  * Validates all params and calls the right
@@ -90568,7 +92165,7 @@ module.exports = listen;
 
 
 /***/ }),
-/* 574 */
+/* 575 */
 /***/ (function(module, exports) {
 
 /**
@@ -90623,10 +92220,10 @@ exports.fn = function(value) {
 
 
 /***/ }),
-/* 575 */
+/* 576 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var closest = __webpack_require__(576);
+var closest = __webpack_require__(577);
 
 /**
  * Delegates event to a selector.
@@ -90673,7 +92270,7 @@ module.exports = delegate;
 
 
 /***/ }),
-/* 576 */
+/* 577 */
 /***/ (function(module, exports) {
 
 var DOCUMENT_NODE_TYPE = 9;
@@ -90712,7 +92309,7 @@ module.exports = closest;
 
 
 /***/ }),
-/* 577 */
+/* 578 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {/* @preserve
@@ -96334,10 +97931,10 @@ module.exports = ret;
 
 },{"./es5":13}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(63), __webpack_require__(47), __webpack_require__(578).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(63), __webpack_require__(47), __webpack_require__(579).setImmediate))
 
 /***/ }),
-/* 578 */
+/* 579 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var apply = Function.prototype.apply;
@@ -96390,13 +97987,13 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(579);
+__webpack_require__(580);
 exports.setImmediate = setImmediate;
 exports.clearImmediate = clearImmediate;
 
 
 /***/ }),
-/* 579 */
+/* 580 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -96589,40 +98186,360 @@ exports.clearImmediate = clearImmediate;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47), __webpack_require__(63)))
 
 /***/ }),
-/* 580 */
+/* 581 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _vue = __webpack_require__(163);
+
+var _vue2 = _interopRequireDefault(_vue);
+
+var _shipdesigner = __webpack_require__(582);
+
+var _shipdesigner2 = _interopRequireDefault(_shipdesigner);
+
+var _vuex = __webpack_require__(64);
+
+var _vuex2 = _interopRequireDefault(_vuex);
+
+var _bluebird = __webpack_require__(578);
+
+var _bluebird2 = _interopRequireDefault(_bluebird);
+
+var _swb_kepler_recreation = __webpack_require__(662);
+
+var _swb_kepler_recreation2 = _interopRequireDefault(_swb_kepler_recreation);
+
+var _parts_C = __webpack_require__(160);
+
+var _parts_C2 = _interopRequireDefault(_parts_C);
+
+var _modules_C = __webpack_require__(161);
+
+var _modules_C2 = _interopRequireDefault(_modules_C);
+
+var _frames_C = __webpack_require__(162);
+
+var _frames_C2 = _interopRequireDefault(_frames_C);
+
+var _shipengine = __webpack_require__(38);
+
+var _shipengine2 = _interopRequireDefault(_shipengine);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_bluebird2.default.longStackTraces();
+
+_vue2.default.use(_vuex2.default);
+
+var design_json = void 0;
+var hash = new URL(location).hash;
+if (hash) {
+	design_json = JSON.parse(decodeURI(hash.substring(1)));
+} else {
+	design_json = _swb_kepler_recreation2.default;
+};
+
+var PARTS_KEY = 'working_parts_list';
+
+var store = new _vuex2.default.Store({
+	state: {
+		design_info: {
+			data: design_json
+		},
+		parts_info: {
+			parts: _parts_C2.default,
+			modules: _modules_C2.default,
+			frames: _frames_C2.default
+		},
+		undo: {
+			current: -1,
+			history: []
+		}
+	},
+	getters: {
+		se_design: function se_design(state, getters) {
+			return new _shipengine2.default.Design(getters.se_db, state.design_info.data);
+		},
+		se_db: function se_db(state, getters) {
+			return new _shipengine2.default.DB(state.parts_info);
+		},
+		design_info: function design_info(state, getters) {
+			return state.design_info;
+		}
+	},
+	actions: {
+		redo: function redo(context) {
+			if (context.state.undo.current < context.state.undo.history.length - 1) {
+				context.commit('history_forward');
+				context.commit(context.state.undo.history[context.state.undo.current].redo);
+			};
+		},
+		undo: function undo(context) {
+			if (context.state.undo.current >= 0) {
+				context.commit(context.state.undo.history[context.state.undo.current].undo);
+				context.commit('history_backward');
+			}
+		}
+	},
+	mutations: {
+		history_forward: function history_forward(state, payload) {
+			state.undo.current += 1;
+		},
+		history_backward: function history_backward(state, payload) {
+			state.undo.current -= 1;
+		},
+		timestamp_design: function timestamp_design(state, payload) {
+			var timestamp = new Date();
+			timestamp.setMilliseconds(0);
+			state.design_info.data['Blueprint Date'] = timestamp.toISOString();
+		},
+		load_parts_from_storage: function load_parts_from_storage(state, payload) {
+			var saved_parts = localStorage.getItem(PARTS_KEY);
+			if (saved_parts) {
+				var saved_parts_object = JSON.parse(saved_parts);
+				state.parts_info.parts = saved_parts_object.parts.records;
+				state.parts_info.modules = saved_parts_object.modules.records;
+				state.parts_info.frames = saved_parts_object.frames.records;
+			};
+		},
+		set_subsystem_frame: function set_subsystem_frame(state, payload) {
+			var old_frame = payload.subsystem.sub_frame;
+			payload.subsystem.sub_frame = payload.value;
+			state.undo.current += 1;
+			state.undo.history.splice(state.undo.current);
+			state.undo.history[state.undo.current] = {
+				undo: {
+					type: 'set_subsystem_frame_undo',
+					subsystem: payload.subsystem,
+					old_frame: old_frame
+				},
+				redo: {
+					type: 'set_subsystem_frame_redo',
+					subsystem: payload.subsystem,
+					new_frame: payload.subsystem.sub_frame
+				}
+			};
+		},
+		set_subsystem_frame_undo: function set_subsystem_frame_undo(state, payload) {
+			payload.subsystem.sub_frame = payload.old_frame;
+		},
+		set_subsystem_frame_redo: function set_subsystem_frame_redo(state, payload) {
+			payload.subsystem.sub_frame = payload.new_frame;
+		},
+		set_component_quantity: function set_component_quantity(state, payload) {
+			var old_quantity = payload.component.quantity;
+			var old_part = payload.component.part;
+			payload.component.quantity = payload.value;
+			state.undo.current += 1;
+			state.undo.history.splice(state.undo.current);
+			state.undo.history[state.undo.current] = {
+				undo: {
+					type: 'set_component_quantity_undo',
+					component: payload.component,
+					old_quantity: old_quantity,
+					old_part: old_part
+				},
+				redo: {
+					type: 'set_component_quantity_redo',
+					component: payload.component,
+					new_quantity: payload.component.quantity,
+					new_part: payload.component.part
+				}
+			};
+		},
+		set_component_quantity_undo: function set_component_quantity_undo(state, payload) {
+			payload.component.quantity = payload.old_quantity;
+			payload.component.part = payload.old_part;
+		},
+		set_component_quantity_redo: function set_component_quantity_redo(state, payload) {
+			payload.component.quantity = payload.new_quantity;
+			payload.component.part = payload.new_part;
+		},
+		set_component_part: function set_component_part(state, payload) {
+			var old_quantity = payload.component.quantity;
+			var old_part = payload.component.part;
+			payload.component.part = payload.value;
+			if (!payload.component.quantity && !payload.component.is_no_part) {
+				payload.component.quantity = 1;
+			};
+			state.undo.current += 1;
+			state.undo.history.splice(state.undo.current);
+			state.undo.history[state.undo.current] = {
+				undo: {
+					type: 'set_component_part_undo',
+					component: payload.component,
+					old_quantity: old_quantity,
+					old_part: old_part
+				},
+				redo: {
+					type: 'set_component_part_redo',
+					component: payload.component,
+					new_quantity: payload.component.quantity,
+					new_part: payload.component.part
+				}
+			};
+		},
+		set_component_part_undo: function set_component_part_undo(state, payload) {
+			payload.component.part = payload.old_part;
+			payload.component.quantity = payload.old_quantity;
+		},
+		set_component_part_redo: function set_component_part_redo(state, payload) {
+			payload.component.part = payload.new_part;
+			payload.component.quantity = payload.new_quantity;
+		},
+		set_setting: function set_setting(state, payload) {
+			var old_value = payload.setting['Value'];
+			switch (_typeof(payload.setting['Value'])) {
+				case 'number':
+					payload.setting['Value'] = parseInt(payload.value);
+					break;
+				case 'boolean':
+					payload.setting['Value'] = payload.value;
+					break;
+			}
+			state.undo.current += 1;
+			state.undo.history.splice(state.undo.current);
+			state.undo.history[state.undo.current] = {
+				undo: {
+					type: 'set_setting_undo',
+					setting: payload.setting,
+					old_value: old_value
+				},
+				redo: {
+					type: 'set_setting_redo',
+					setting: payload.setting,
+					new_value: payload.setting['Value']
+				}
+			};
+		},
+		set_setting_undo: function set_setting_undo(state, payload) {
+			payload.setting['Value'] = payload.old_value;
+		},
+		set_setting_redo: function set_setting_redo(state, payload) {
+			payload.setting['Value'] = payload.new_value;
+		},
+		set_module_type: function set_module_type(state, payload) {
+			var old_type = payload.module.module_type;
+			var old_variant = payload.module.module_variant;
+			payload.module.module_type = payload.value;
+			var valid_variants = payload.se_db.find_modules(payload.value);
+			payload.module.module_variant = valid_variants[0]['Variant'];
+			state.undo.current += 1;
+			state.undo.history.splice(state.undo.current);
+			state.undo.history[state.undo.current] = {
+				undo: {
+					type: 'set_module_type_undo',
+					module: payload.module,
+					old_type: old_type,
+					old_variant: old_variant
+				},
+				redo: {
+					type: 'set_module_type_redo',
+					module: payload.module,
+					new_type: payload.module.module_type,
+					new_variant: payload.module.module_variant
+				}
+			};
+		},
+		set_module_type_undo: function set_module_type_undo(state, payload) {
+			payload.module.module_type = payload.old_type;
+			payload.module.module_variant = payload.old_variant;
+		},
+		set_module_type_redo: function set_module_type_redo(state, payload) {
+			payload.module.module_type = payload.new_type;
+			payload.module.module_variant = payload.new_variant;
+		},
+		set_module_variant: function set_module_variant(state, payload) {
+			var old_variant = payload.module.module_variant;
+			payload.module.module_variant = payload.value;
+			state.undo.current += 1;
+			state.undo.history.splice(state.undo.current);
+			state.undo.history[state.undo.current] = {
+				undo: {
+					type: 'set_module_variant_undo',
+					module: payload.module,
+					old_variant: old_variant
+				},
+				redo: {
+					type: 'set_module_variant_redo',
+					module: payload.module,
+					new_variant: payload.module.module_variant
+				}
+			};
+		},
+		set_module_variant_undo: function set_module_variant_undo(state, payload) {
+			payload.module.module_variant = payload.old_variant;
+		},
+		set_module_variant_redo: function set_module_variant_redo(state, payload) {
+			payload.module.module_variant = payload.new_variant;
+		},
+		set_design_json: function set_design_json(state, payload) {
+			var old_data = state.design_info.data;
+			state.design_info.data = payload;
+			state.undo.current += 1;
+			state.undo.history.splice(state.undo.current);
+			state.undo.history[state.undo.current] = {
+				undo: {
+					type: 'set_design_json_undo',
+					old_data: old_data
+				},
+				redo: {
+					type: 'set_design_json_redo',
+					new_data: state.design_info.data
+				}
+			};
+		},
+		set_design_json_undo: function set_design_json_undo(state, payload) {
+			state.design_info.data = payload.old_data;
+		},
+		set_design_json_redo: function set_design_json_redo(state, payload) {
+			state.design_info.data = payload.new_data;
+		}
+	}
+});
+
+window.addEventListener('storage', function (ev) {
+	if (ev.key === PARTS_KEY) {
+		store.commit('load_parts_from_storage');
+	};
+});
+window.addEventListener('keydown', function (ev) {
+	console.log(ev);
+	if (ev.key === 'z' && ev.ctrlKey) {
+		store.dispatch('undo');
+	};
+	if (ev.key === 'y' && ev.ctrlKey) {
+		store.dispatch('redo');
+	};
+});
+
+// create a root instance
+new _vue2.default({
+	el: '#app',
+	render: function render(h) {
+		return h(_shipdesigner2.default);
+	},
+	store: store
+});
+
+/***/ }),
+/* 582 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(162);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shipdesigner_vue__ = __webpack_require__(581);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird__ = __webpack_require__(577);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_bluebird__);
-
-
-
-
-
-
-__WEBPACK_IMPORTED_MODULE_2_bluebird___default.a.longStackTraces();
-
-// create a root instance
-new __WEBPACK_IMPORTED_MODULE_0_vue__["a" /* default */]({
-  el: '#app',
-  render: h => h(__WEBPACK_IMPORTED_MODULE_1__shipdesigner_vue__["a" /* default */])
-});
-
-/***/ }),
-/* 581 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__ = __webpack_require__(584);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__ = __webpack_require__(585);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5ae9c078_hasScoped_false_node_modules_vue_loader_lib_selector_type_template_index_0_shipdesigner_vue__ = __webpack_require__(661);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(582)
+  __webpack_require__(583)
 }
 var normalizeComponent = __webpack_require__(31)
 /* script */
@@ -96636,7 +98553,7 @@ var __vue_scopeId__ = null
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue___default.a,
   __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5ae9c078_hasScoped_false_node_modules_vue_loader_lib_selector_type_template_index_0_shipdesigner_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
@@ -96662,17 +98579,17 @@ if (false) {(function () {
   })
 })()}
 
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
 
 
 /***/ }),
-/* 582 */
+/* 583 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(583);
+var content = __webpack_require__(584);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -96692,7 +98609,7 @@ if(false) {
 }
 
 /***/ }),
-/* 583 */
+/* 584 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(true);
@@ -96700,138 +98617,77 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\tfont-size: 15px;\n}\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/shipdesigner.vue?315c5a65"],"names":[],"mappings":";AAoGA;CACA,YAAA;CACA,aAAA;;CAEA,cAAA;CACA,uBAAA;CACA,kBAAA;CACA,gBAAA;CACA;AAEA;CACA,eAAA;CACA,yBAAA;CACA;AAEA;CACA,eAAA;CACA,mBAAA,yCAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,sBAAA;CACA","file":"shipdesigner.vue","sourcesContent":["<template>\n  <div class=\"root\">\n\t<div class=\"header\">\n\t  <DesignSummary :se_db=\"se_db\" :se_design=\"se_design\"></DesignSummary>\n\t</div>\n\t<div class=\"design\">\n\t  <Design :se_db=\"se_db\" :se_design=\"se_design\"></Design>\n\t</div>\n\t<div class=\"footer\">\n\t  <DesignImportExport :se_db=\"se_db\" :design_info=\"design_info\"></DesignImportExport>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\nimport ShipImporter from '../lib/shipimporter';\n\nimport design_json_init from '../dist/swb_kepler_recreation.json';\nimport canon_parts from '../dist/parts_C8.csv';\nimport canon_modules from '../dist/modules_C8.csv';\nimport canon_frames from '../dist/frames_C8.csv';\n\nimport DesignSummary from './design-summary.vue';\nimport Design from './design.vue';\nimport DesignImportExport from './design-import-export.vue';\n\nconst PARTS_KEY = 'working_parts_list';\nconst MODULES_KEY = 'working_modules_list';\nconst FRAMES_KEY = 'working_frames_list';\n\nconst se_db = new ShipEngine.DB({\n\tparts: canon_parts,\n\tframes: canon_frames,\n\tmodules: canon_modules,\n});\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tDesignSummary,\n\t\tDesign,\n\t\tDesignImportExport,\n\t},\n\tdata () {\n\t\tlet design_json;\n\t\tlet hash = new URL(location).hash;\n\t\tif (hash) {\n\t\t\tdesign_json = JSON.parse(decodeURI(hash.substring(1)));\n\t\t} else {\n\t\t\tdesign_json = design_json_init;\n\t\t};\n\n\t\treturn {\n\t\t\tdesign_info: {\n\t\t\t\tdata: design_json,\n\t\t\t},\n\t\t\tparts_info: {\n\t\t\t\tparts: canon_parts,\n\t\t\t\tmodules: canon_modules,\n\t\t\t\tframes: canon_frames,\n\t\t\t},\n\t\t};\n\t},\n\tmounted () {\n\t\tthis.load_parts_from_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === PARTS_KEY) {\n\t\t\t\tthis.load_parts_from_storage();\n\t\t\t};\n\t\t}.bind(this));\n\t},\n\tcomputed: {\n\t\tse_design () {\n\t\t\treturn new ShipEngine.Design(this.se_db, this.design_info.data);\n\t\t},\n\t\tse_db () {\n\t\t\treturn new ShipEngine.DB(this.parts_info);\n\t\t},\n\t},\n\tmethods: {\n\t\tload_parts_from_storage () {\n\t\t\tconst saved_parts = localStorage.getItem(PARTS_KEY);\n\t\t\tif (saved_parts) {\n\t\t\t\tconst saved_parts_object = JSON.parse(saved_parts);\n\t\t\t\tthis.parts_info.parts = saved_parts_object.parts.records;\n\t\t\t\tthis.parts_info.modules = saved_parts_object.modules.records;\n\t\t\t\tthis.parts_info.frames = saved_parts_object.frames.records;\n\t\t\t};\n\t\t},\n\t},\n};\n\n</script>\n\n\n<style>\n\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\tfont-size: 15px;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\tfont-size: 15px;\n}\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/shipdesigner.vue?4e0a1a42"],"names":[],"mappings":";AA8CA;CACA,YAAA;CACA,aAAA;;CAEA,cAAA;CACA,uBAAA;CACA,kBAAA;CACA,gBAAA;CACA;AAEA;CACA,eAAA;CACA,yBAAA;CACA;AAEA;CACA,eAAA;CACA,mBAAA,yCAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,sBAAA;CACA","file":"shipdesigner.vue","sourcesContent":["<template>\n  <div class=\"root\">\n\t<div class=\"header\">\n\t  <DesignSummary></DesignSummary>\n\t</div>\n\t<div class=\"design\">\n\t  <Design></Design>\n\t</div>\n\t<div class=\"footer\">\n\t  <DesignImportExport :se_db=\"se_db\" :design_info=\"design_info\"></DesignImportExport>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport ShipImporter from '../lib/shipimporter';\n\nimport DesignSummary from './design-summary.vue';\nimport Design from './design.vue';\nimport DesignImportExport from './design-import-export.vue';\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tDesignSummary,\n\t\tDesign,\n\t\tDesignImportExport,\n\t},\n\tcomputed: {\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t\t'design_info',\n\t\t]),\n\t},\n};\n\n</script>\n\n\n<style>\n\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\tfont-size: 15px;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
-/* 584 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/* 585 */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_shipimporter__ = __webpack_require__(566);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_shipimporter___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__lib_shipimporter__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dist_swb_kepler_recreation_json__ = __webpack_require__(585);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dist_swb_kepler_recreation_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__dist_swb_kepler_recreation_json__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dist_parts_C8_csv__ = __webpack_require__(159);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dist_parts_C8_csv___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__dist_parts_C8_csv__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__dist_modules_C8_csv__ = __webpack_require__(160);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__dist_modules_C8_csv___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__dist_modules_C8_csv__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv__ = __webpack_require__(161);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__design_summary_vue__ = __webpack_require__(586);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__design_vue__ = __webpack_require__(591);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__design_import_export_vue__ = __webpack_require__(656);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-const PARTS_KEY = 'working_parts_list';
-const MODULES_KEY = 'working_modules_list';
-const FRAMES_KEY = 'working_frames_list';
-
-const se_db = new __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default.a.DB({
-	parts: __WEBPACK_IMPORTED_MODULE_3__dist_parts_C8_csv___default.a,
-	frames: __WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv___default.a,
-	modules: __WEBPACK_IMPORTED_MODULE_4__dist_modules_C8_csv___default.a
+Object.defineProperty(exports, "__esModule", {
+	value: true
 });
 
-/* harmony default export */ __webpack_exports__["a"] = ({
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+var _vuex = __webpack_require__(64);
+
+var _shipimporter = __webpack_require__(165);
+
+var _shipimporter2 = _interopRequireDefault(_shipimporter);
+
+var _designSummary = __webpack_require__(586);
+
+var _designSummary2 = _interopRequireDefault(_designSummary);
+
+var _design = __webpack_require__(591);
+
+var _design2 = _interopRequireDefault(_design);
+
+var _designImportExport = __webpack_require__(656);
+
+var _designImportExport2 = _interopRequireDefault(_designImportExport);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
 	name: 'app',
 	components: {
-		DesignSummary: __WEBPACK_IMPORTED_MODULE_6__design_summary_vue__["a" /* default */],
-		Design: __WEBPACK_IMPORTED_MODULE_7__design_vue__["a" /* default */],
-		DesignImportExport: __WEBPACK_IMPORTED_MODULE_8__design_import_export_vue__["a" /* default */]
+		DesignSummary: _designSummary2.default,
+		Design: _design2.default,
+		DesignImportExport: _designImportExport2.default
 	},
-	data() {
-		let design_json;
-		let hash = new URL(location).hash;
-		if (hash) {
-			design_json = JSON.parse(decodeURI(hash.substring(1)));
-		} else {
-			design_json = __WEBPACK_IMPORTED_MODULE_2__dist_swb_kepler_recreation_json___default.a;
-		};
-
-		return {
-			design_info: {
-				data: design_json
-			},
-			parts_info: {
-				parts: __WEBPACK_IMPORTED_MODULE_3__dist_parts_C8_csv___default.a,
-				modules: __WEBPACK_IMPORTED_MODULE_4__dist_modules_C8_csv___default.a,
-				frames: __WEBPACK_IMPORTED_MODULE_5__dist_frames_C8_csv___default.a
-			}
-		};
-	},
-	mounted() {
-		this.load_parts_from_storage();
-		window.addEventListener('storage', function (ev) {
-			if (ev.key === PARTS_KEY) {
-				this.load_parts_from_storage();
-			};
-		}.bind(this));
-	},
-	computed: {
-		se_design() {
-			return new __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default.a.Design(this.se_db, this.design_info.data);
-		},
-		se_db() {
-			return new __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default.a.DB(this.parts_info);
-		}
-	},
-	methods: {
-		load_parts_from_storage() {
-			const saved_parts = localStorage.getItem(PARTS_KEY);
-			if (saved_parts) {
-				const saved_parts_object = JSON.parse(saved_parts);
-				this.parts_info.parts = saved_parts_object.parts.records;
-				this.parts_info.modules = saved_parts_object.modules.records;
-				this.parts_info.frames = saved_parts_object.frames.records;
-			};
-		}
-	}
-});
-
-/***/ }),
-/* 585 */
-/***/ (function(module, exports) {
-
-module.exports = {"Subsystems":[{"Components":[{"Part":"[T2][L][C+] Type-I Block-A (40E) Warp Core","Quantity":2,"Name":"Warp Core Type"},{"Part":"[T2][L][R-C-] Luna-VI High-Efficiency M/AM System","Quantity":2,"Name":"M/AM Injectors"},{"Part":"[T2][L] Mk VIII Mod L Yoyodyne Coolant System","Quantity":2,"Name":"Coolant Systems"},{"Part":"[T3][M][R+] VSA-7 Pulse Injection Manifold","Quantity":3,"Name":"EPS Manifold System"},{"Part":"[T2] EngOS Monitoring - Anak-Krueger EM Rails","Quantity":1,"Name":"Eject System"}],"Settings":[{"Name":"Safety/Performance","Value":0}],"Sub-Frame":"[T2] Md Frigate Warp Core Suite","Name":"Warp Core"},{"Components":[{"Part":"[T2][M] Type-VI SIF","Quantity":2,"Name":"Structural Integrity Fields"},{"Part":"[T1][L] Modulated Graviton Beam Deflector Saucer-Only","Quantity":3,"Name":"Navigational Deflector"},{"Part":"[T1][L] 2 X Centaur-A Pattern Nacelle","Quantity":1,"Name":"Nacelle System"},{"Part":"[T2][M] S-Medical Mk VI Protein Synth","Quantity":1,"Name":"Replication Package"},{"Part":"[T2][L] 2310-Light Pattern Deuterium Tanks","Quantity":3,"Name":"Fuel & Matter Stores"}],"Settings":[],"Sub-Frame":"[T2][OET-SR-] Md Frigate Engineering Suite","Name":"Engineering"},{"Components":[{"Part":"[T2][L] Lt. Alloy-3 Duranium Hull","Quantity":1,"Name":"Hull System"}],"Settings":[],"Sub-Frame":"[T2] Sm Frigate Hull Suite","Name":"Hull"},{"Components":[{"Part":"[T2][H] Mark-VII-Heavy LR Sensor Array","Quantity":2,"Name":"Long-Range Sensors"},{"Part":"[T2][H] Mark-VII-Heavy Nav Array","Quantity":2,"Name":"Navigational Sensors"},{"Part":"No Survey Sensors","Quantity":0,"Name":"Survey Sensors"},{"Part":"[T2][H] Spock-C Pattern Lab","Quantity":2,"Name":"Science Labs"},{"Part":"[T1][L] Type-III-A Duotronic Core","Quantity":3,"Name":"Computer Core"},{"Part":"[T2] Majel 3.1 OS","Quantity":3,"Name":"Operating System"},{"Part":"No Core","Quantity":0,"Name":"Secondary Core"},{"Part":"[T1][M] Lwaxana '04 General Protocol","Quantity":2,"Name":"Diplomatic Package"},{"Part":"[T-1][M] 2260s Rec Space","Quantity":1,"Name":"Recreation Package"},{"Part":"[T2][H] T'Koren Pattern Large Sickbay","Quantity":3,"Name":"Sickbay"}],"Settings":[{"Name":"Isolinear?","Value":false}],"Sub-Frame":"[T2][OE--] Lg Frigate Operations Suite","Name":"Operations"},{"Components":[{"Part":"[T-1][L] Model 68 Phaser Bank","Quantity":2,"Name":"Primary Phasers"},{"Part":"No Phasers","Quantity":0,"Name":"Secondary Phasers"},{"Part":"No Torp","Quantity":0,"Name":"Torpedo System"},{"Part":"[T2][H] Mark-VI-Heavy SR Lateral Sensor Array","Quantity":2,"Name":"Short-Range Sensors"},{"Part":"No TCU","Quantity":1,"Name":"Targeting Computer"},{"Part":"[T2][L] Mk-V-E Shield Gens","Quantity":5,"Name":"Deflector Shields"},{"Part":"[T2][L] Mk-V-E Shield Gens","Quantity":5,"Name":"Backup Deflectors"},{"Part":"[T2][M] SDB-09 High-Power Impulse Drive Sys","Quantity":1,"Name":"Impulse Engine Pwr"}],"Settings":[{"Name":"Burst Launchers","Value":true},{"Name":"Phaser Arrays","Value":false}],"Sub-Frame":"[T1][SR+] Sm Frigate Tactical Suite","Name":"Tactical"}],"Module":{"Type":"No Module","Variant":"-"},"Principal Frame":"[T1] 900kt Frigate Frame","Blueprint Date":"2017-09-23T17:31+00:00","Name":"SWB Cheapish Kepler"}
+	computed: _extends({}, (0, _vuex.mapGetters)(['se_design', 'se_db', 'design_info']))
+};
 
 /***/ }),
 /* 586 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_summary_vue__ = __webpack_require__(589);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_summary_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_summary_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_12e2d818_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_design_summary_vue__ = __webpack_require__(590);
 var disposed = false
 function injectStyle (ssrContext) {
@@ -96850,7 +98706,7 @@ var __vue_scopeId__ = "data-v-12e2d818"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_summary_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_summary_vue___default.a,
   __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_12e2d818_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_design_summary_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
@@ -96876,7 +98732,7 @@ if (false) {(function () {
   })
 })()}
 
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
 
 
 /***/ }),
@@ -96914,61 +98770,66 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.design-summary[data-v-12e2d818] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.has-error[data-v-12e2d818] {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n.design-weight-summary[data-v-12e2d818] {\n\tmargin-left: 5px;\n}\n.design-power-summary[data-v-12e2d818] {\n}\n.subsystem-weight-summary[data-v-12e2d818] {\n\tmargin-left: 5px;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/design-summary.vue?7d83f8ec"],"names":[],"mappings":";AA+CA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA,YAAA;CACA,kBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA;AAEA;CACA,iBAAA;CACA","file":"design-summary.vue","sourcesContent":["<template>\n  <div class=\"design-summary\">\n\t<div>{{se_design.name}} | {{se_design.pretty_miscstats}}</div>\n\t<div>{{se_design.stats_raw.toFixed(2)}} | [{{se_design.cost_BR_raw.toFixed(2)}}]br [{{se_design.cost_SR_raw.toFixed(2)}}]sr | {{se_design.cost_crew_raw.toFixed(2)}} | [{{build_time}}]years</div>\n\t<div>\n\t  <span\n\t\tclass=\"design-power-summary\"\n\t\tv-bind:class=\"{['has-error']: se_design.cost_power > se_design.power_generation}\"\n\t\t>Power[{{se_design.cost_power_raw.toFixed(2)}}/{{se_design.power_generation_raw.toFixed(2)}}]</span>\n\t  <span\n\t\tclass=\"design-weight-summary\"\n\t\tv-bind:class=\"{['has-error']: se_design.weight_internal > se_design.frame_max_size_raw}\"\n\t\t>Internal[{{se_design.weight_internal.toFixed(2)}}/{{se_design.frame_max_size_raw.toFixed(2)}}]</span>\n\t  <span\n\t\tclass=\"subsystem-weight-summary\"\n\t\tv-for=\"ss in se_design.subsystems\"\n\t\tv-bind:class=\"{['has-error']: ss.weight_internal > ss.weight_cap}\"\n\t\t>{{ss.name}}[{{ss.weight_internal.toFixed(2)}}/{{ss.weight_cap.toFixed(2)}}] </span>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'DesignSummary',\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tbuild_time () {\n\t\t\treturn frac(this.se_design.build_time, 12);\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.design-summary {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.has-error {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n\n.design-weight-summary {\n\tmargin-left: 5px;\n}\n\n.design-power-summary {\n}\n\n.subsystem-weight-summary {\n\tmargin-left: 5px;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.design-summary[data-v-12e2d818] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.has-error[data-v-12e2d818] {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n.design-weight-summary[data-v-12e2d818] {\n\tmargin-left: 5px;\n}\n.design-power-summary[data-v-12e2d818] {\n}\n.subsystem-weight-summary[data-v-12e2d818] {\n\tmargin-left: 5px;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/design-summary.vue?7f573713"],"names":[],"mappings":";AAkDA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA,YAAA;CACA,kBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA;AAEA;CACA,iBAAA;CACA","file":"design-summary.vue","sourcesContent":["<template>\n  <div class=\"design-summary\">\n\t<div>{{se_design.name}} | {{se_design.pretty_miscstats}}</div>\n\t<div>{{se_design.stats_raw.toFixed(2)}} | [{{se_design.cost_BR_raw.toFixed(2)}}]br [{{se_design.cost_SR_raw.toFixed(2)}}]sr | {{se_design.cost_crew_raw.toFixed(2)}} | [{{build_time}}]years</div>\n\t<div>\n\t  <span\n\t\tclass=\"design-power-summary\"\n\t\tv-bind:class=\"{['has-error']: se_design.cost_power > se_design.power_generation}\"\n\t\t>Power[{{se_design.cost_power_raw.toFixed(2)}}/{{se_design.power_generation_raw.toFixed(2)}}]</span>\n\t  <span\n\t\tclass=\"design-weight-summary\"\n\t\tv-bind:class=\"{['has-error']: se_design.weight_internal > se_design.frame_max_size_raw}\"\n\t\t>Internal[{{se_design.weight_internal.toFixed(2)}}/{{se_design.frame_max_size_raw.toFixed(2)}}]</span>\n\t  <span\n\t\tclass=\"subsystem-weight-summary\"\n\t\tv-for=\"ss in se_design.subsystems\"\n\t\tv-bind:class=\"{['has-error']: ss.weight_internal > ss.weight_cap}\"\n\t\t>{{ss.name}}[{{ss.weight_internal.toFixed(2)}}/{{ss.weight_cap.toFixed(2)}}] </span>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'DesignSummary',\n\tcomputed: {\n\t\tbuild_time () {\n\t\t\treturn frac(this.$store.getters.se_design.build_time, 12);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t\t'design_info',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.design-summary {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.has-error {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n\n.design-weight-summary {\n\tmargin-left: 5px;\n}\n\n.design-power-summary {\n}\n\n.subsystem-weight-summary {\n\tmargin-left: 5px;\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 /* 589 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ui_functions_js__ = __webpack_require__(96);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
-
-
-
-
-/* harmony default export */ __webpack_exports__["a"] = ({
-	name: 'DesignSummary',
-	props: {
-		se_db: Object,
-		se_design: Object
-	},
-	computed: {
-		build_time() {
-			return Object(__WEBPACK_IMPORTED_MODULE_1__ui_functions_js__["a" /* frac */])(this.se_design.build_time, 12);
-		}
-	},
-	methods: {}
+Object.defineProperty(exports, "__esModule", {
+	value: true
 });
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+var _vuex = __webpack_require__(64);
+
+var _shipengine = __webpack_require__(38);
+
+var _shipengine2 = _interopRequireDefault(_shipengine);
+
+var _uiFunctions = __webpack_require__(97);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+	name: 'DesignSummary',
+	computed: _extends({
+		build_time: function build_time() {
+			return (0, _uiFunctions.frac)(this.$store.getters.se_design.build_time, 12);
+		}
+	}, (0, _vuex.mapGetters)(['se_design', 'se_db', 'design_info'])),
+	methods: {}
+};
 
 /***/ }),
 /* 590 */
@@ -97091,7 +98952,9 @@ if (false) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_vue__ = __webpack_require__(594);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5c725eca_hasScoped_false_node_modules_vue_loader_lib_selector_type_template_index_0_design_vue__ = __webpack_require__(655);
 var disposed = false
 function injectStyle (ssrContext) {
@@ -97110,7 +98973,7 @@ var __vue_scopeId__ = null
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_vue___default.a,
   __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5c725eca_hasScoped_false_node_modules_vue_loader_lib_selector_type_template_index_0_design_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
@@ -97136,7 +98999,7 @@ if (false) {(function () {
   })
 })()}
 
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
 
 
 /***/ }),
@@ -97174,25 +99037,23 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n    /* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.name-column {\n}\n.part-column {\n}\n.part-column-select {\n\twidth: 100%;\n}\n.quantity-column {\n\twidth: 30px;\n}\n.quantity-column-input {\n\twidth: 100%;\n}\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.build-time-column {\n\ttext-align: right;\n}\n.design-table-head {\n}\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/design.vue?28d9bfb9"],"names":[],"mappings":";AAsFA;CACA,mBAAA;;CAEA,YAAA;CACA,YAAA;IACA,mBAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA;AAEA;CACA,qBAAA;CACA,yBAAA;CACA;AAGA;IACA,qBAAA;IACA,qBAAA;IACA,kBAAA;IACA,mBAAA;CACA","file":"design.vue","sourcesContent":["<template>\n  <div class=\"design-table\">\n\t<table>\n\t  <thead class=\"design-table-head\">\n\t\t<tr class=\"design-table-head-tr\">\n\t\t  <th></th>\t<!-- name -->\n\t\t  <th></th>\t<!-- quantity -->\n\t\t  <th></th>\t<!-- part -->\n\t\t  <th>C</th>\n\t\t  <th>S</th>\n\t\t  <th>H</th>\n\t\t  <th>L</th>\n\t\t  <th>P</th>\n\t\t  <th>D</th>\n\t\t  <th>Wt (Int</th>\n\t\t  <th>Ext)</th>\n\t\t  <th>BR</th>\n\t\t  <th>SR</th>\n\t\t  <th>Pwr Cost</th>\n\t\t  <th>Pwr Gen</th>\n\t\t  <th>O</th>\n\t\t  <th>E</th>\n\t\t  <th>T</th>\n\t\t  <th>Build Time</th>\n\t\t</tr>\n\t  </thead>\n\t  <tbody class=\"design-table-body\">\n\t\t<PrincipalFrameFinal :se_db=\"se_db\" :se_design=\"se_design\"></PrincipalFrameFinal>\n\t\t<PrincipalFrameRaw :se_db=\"se_db\" :se_design=\"se_design\"></PrincipalFrameRaw>\n\t\t<template v-for=\"se_subsystem in se_subsystems\">\n\t\t  <tr class=\"subsystem-spacer-row\"><td colspan=\"100\" height=\"30px\"></td></tr>\t<!-- empty line for spacing -->\n\t\t  <SubsystemFrame :se_db=\"se_db\" :se_subsystem=\"se_subsystem\"></SubsystemFrame>\n\t\t  <SubsystemSummary :se_db=\"se_db\" :se_subsystem=\"se_subsystem\"></SubsystemSummary>\n\t\t  <SubsystemSettings :se_db=\"se_db\" :se_subsystem=\"se_subsystem\"></SubsystemSettings>\n\n\t\t  <template v-for=\"se_component in se_subsystem.components\">\n\t\t\t<ComponentTr :se_db=\"se_db\" :se_component=\"se_component\"></ComponentTr>\n\t\t  </template>\n\t\t</template>\n\n\t\t<ModuleTr :se_db=\"se_db\" :se_module=\"se_design.module\"></ModuleTr>\n\t  </tbody>\n\t</table>\n  </div>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport PrincipalFrameRaw from './principal-frame-raw.vue';\nimport PrincipalFrameFinal from './principal-frame-final.vue';\nimport SubsystemSummary from './subsystem-summary.vue';\nimport SubsystemFrame from './subsystem-frame.vue';\nimport SubsystemSettings from './subsystem-settings.vue';\nimport ComponentTr from './component.vue';\nimport ModuleTr from './module.vue';\n\nexport default {\n\tname: 'Design',\n\tcomponents: {\n\t\tPrincipalFrameRaw,\n\t\tPrincipalFrameFinal,\n\t\tSubsystemSummary,\n\t\tSubsystemFrame,\n\t\tSubsystemSettings,\n\t\tComponentTr,\n\t\tModuleTr,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tse_subsystems () {\n\t\t\treturn this.se_design.subsystems;\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n    /* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.name-column {\n}\n\n.part-column {\n}\n\n.part-column-select {\n\twidth: 100%;\n}\n\n.quantity-column {\n\twidth: 30px;\n}\n\n.quantity-column-input {\n\twidth: 100%;\n}\n\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.build-time-column {\n\ttext-align: right;\n}\n\n.design-table-head {\n}\n\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n\n\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n    /* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.name-column {\n}\n.part-column {\n}\n.part-column-select {\n\twidth: 100%;\n}\n.quantity-column {\n\twidth: 30px;\n}\n.quantity-column-input {\n\twidth: 100%;\n}\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.build-time-column {\n\ttext-align: right;\n}\n.design-table-head {\n}\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/design.vue?4e12b0b1"],"names":[],"mappings":";AA0FA;CACA,mBAAA;;CAEA,YAAA;CACA,YAAA;IACA,mBAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA;AAEA;CACA,qBAAA;CACA,yBAAA;CACA;AAGA;IACA,qBAAA;IACA,qBAAA;IACA,kBAAA;IACA,mBAAA;CACA","file":"design.vue","sourcesContent":["<template>\n  <div class=\"design-table\">\n\t<table>\n\t  <thead class=\"design-table-head\">\n\t\t<tr class=\"design-table-head-tr\">\n\t\t  <th></th>\t<!-- name -->\n\t\t  <th></th>\t<!-- quantity -->\n\t\t  <th></th>\t<!-- part -->\n\t\t  <th>C</th>\n\t\t  <th>S</th>\n\t\t  <th>H</th>\n\t\t  <th>L</th>\n\t\t  <th>P</th>\n\t\t  <th>D</th>\n\t\t  <th>Wt (Int</th>\n\t\t  <th>Ext)</th>\n\t\t  <th>BR</th>\n\t\t  <th>SR</th>\n\t\t  <th>Pwr Cost</th>\n\t\t  <th>Pwr Gen</th>\n\t\t  <th>O</th>\n\t\t  <th>E</th>\n\t\t  <th>T</th>\n\t\t  <th>Build Time</th>\n\t\t</tr>\n\t  </thead>\n\t  <tbody class=\"design-table-body\">\n\t\t<PrincipalFrameFinal></PrincipalFrameFinal>\n\t\t<PrincipalFrameRaw></PrincipalFrameRaw>\n\t\t<template v-for=\"se_subsystem in se_subsystems\">\n\t\t  <tr class=\"subsystem-spacer-row\"><td colspan=\"100\" height=\"30px\"></td></tr>\t<!-- empty line for spacing -->\n\t\t  <SubsystemFrame :se_subsystem=\"se_subsystem\"></SubsystemFrame>\n\t\t  <SubsystemSummary :se_subsystem=\"se_subsystem\"></SubsystemSummary>\n\t\t  <SubsystemSettings :se_subsystem=\"se_subsystem\"></SubsystemSettings>\n\n\t\t  <template v-for=\"se_component in se_subsystem.components\">\n\t\t\t<ComponentTr :se_component=\"se_component\"></ComponentTr>\n\t\t  </template>\n\t\t</template>\n\n\t\t<tr class=\"subsystem-spacer-row\"><td colspan=\"100\" height=\"30px\"></td></tr>\t<!-- empty line for spacing -->\n\t\t<ModuleTr :se_module=\"se_design.module\"></ModuleTr>\n\t  </tbody>\n\t</table>\n  </div>\n</template>\n\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport PrincipalFrameRaw from './principal-frame-raw.vue';\nimport PrincipalFrameFinal from './principal-frame-final.vue';\nimport SubsystemSummary from './subsystem-summary.vue';\nimport SubsystemFrame from './subsystem-frame.vue';\nimport SubsystemSettings from './subsystem-settings.vue';\nimport ComponentTr from './component.vue';\nimport ModuleTr from './module.vue';\n\nexport default {\n\tname: 'Design',\n\tcomponents: {\n\t\tPrincipalFrameRaw,\n\t\tPrincipalFrameFinal,\n\t\tSubsystemSummary,\n\t\tSubsystemFrame,\n\t\tSubsystemSettings,\n\t\tComponentTr,\n\t\tModuleTr,\n\t},\n\tcomputed: {\n\t\tse_subsystems () {\n\t\t\treturn this.$store.getters.se_design.subsystems;\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t\t'design_info',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n    /* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.name-column {\n}\n\n.part-column {\n}\n\n.part-column-select {\n\twidth: 100%;\n}\n\n.quantity-column {\n\twidth: 30px;\n}\n\n.quantity-column-input {\n\twidth: 100%;\n}\n\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.build-time-column {\n\ttext-align: right;\n}\n\n.design-table-head {\n}\n\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n\n\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 /* 594 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__principal_frame_raw_vue__ = __webpack_require__(595);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__principal_frame_final_vue__ = __webpack_require__(608);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__subsystem_summary_vue__ = __webpack_require__(613);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__subsystem_frame_vue__ = __webpack_require__(620);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__subsystem_settings_vue__ = __webpack_require__(627);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__component_vue__ = __webpack_require__(641);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__module_vue__ = __webpack_require__(648);
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; //
 //
 //
 //
@@ -97242,45 +99103,69 @@ exports.push([module.i, "\n.design-table {\n\tborder-style: none;\n\n\twidth: 10
 //
 
 
+var _vuex = __webpack_require__(64);
 
+var _shipengine = __webpack_require__(38);
 
+var _shipengine2 = _interopRequireDefault(_shipengine);
 
+var _principalFrameRaw = __webpack_require__(595);
 
+var _principalFrameRaw2 = _interopRequireDefault(_principalFrameRaw);
 
+var _principalFrameFinal = __webpack_require__(608);
 
+var _principalFrameFinal2 = _interopRequireDefault(_principalFrameFinal);
 
+var _subsystemSummary = __webpack_require__(613);
 
+var _subsystemSummary2 = _interopRequireDefault(_subsystemSummary);
 
+var _subsystemFrame = __webpack_require__(620);
 
-/* harmony default export */ __webpack_exports__["a"] = ({
+var _subsystemFrame2 = _interopRequireDefault(_subsystemFrame);
+
+var _subsystemSettings = __webpack_require__(627);
+
+var _subsystemSettings2 = _interopRequireDefault(_subsystemSettings);
+
+var _component = __webpack_require__(641);
+
+var _component2 = _interopRequireDefault(_component);
+
+var _module = __webpack_require__(648);
+
+var _module2 = _interopRequireDefault(_module);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
 	name: 'Design',
 	components: {
-		PrincipalFrameRaw: __WEBPACK_IMPORTED_MODULE_1__principal_frame_raw_vue__["a" /* default */],
-		PrincipalFrameFinal: __WEBPACK_IMPORTED_MODULE_2__principal_frame_final_vue__["a" /* default */],
-		SubsystemSummary: __WEBPACK_IMPORTED_MODULE_3__subsystem_summary_vue__["a" /* default */],
-		SubsystemFrame: __WEBPACK_IMPORTED_MODULE_4__subsystem_frame_vue__["a" /* default */],
-		SubsystemSettings: __WEBPACK_IMPORTED_MODULE_5__subsystem_settings_vue__["a" /* default */],
-		ComponentTr: __WEBPACK_IMPORTED_MODULE_6__component_vue__["a" /* default */],
-		ModuleTr: __WEBPACK_IMPORTED_MODULE_7__module_vue__["a" /* default */]
+		PrincipalFrameRaw: _principalFrameRaw2.default,
+		PrincipalFrameFinal: _principalFrameFinal2.default,
+		SubsystemSummary: _subsystemSummary2.default,
+		SubsystemFrame: _subsystemFrame2.default,
+		SubsystemSettings: _subsystemSettings2.default,
+		ComponentTr: _component2.default,
+		ModuleTr: _module2.default
 	},
-	props: {
-		se_db: Object,
-		se_design: Object
-	},
-	computed: {
-		se_subsystems() {
-			return this.se_design.subsystems;
+	computed: _extends({
+		se_subsystems: function se_subsystems() {
+			return this.$store.getters.se_design.subsystems;
 		}
-	},
+	}, (0, _vuex.mapGetters)(['se_design', 'se_db', 'design_info'])),
 	methods: {}
-});
+};
 
 /***/ }),
 /* 595 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_raw_vue__ = __webpack_require__(600);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_raw_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_raw_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_d00ca848_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_raw_vue__ = __webpack_require__(607);
 var disposed = false
 function injectStyle (ssrContext) {
@@ -97300,7 +99185,7 @@ var __vue_scopeId__ = "data-v-d00ca848"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_raw_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_raw_vue___default.a,
   __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_d00ca848_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_raw_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
@@ -97326,7 +99211,7 @@ if (false) {(function () {
   })
 })()}
 
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
 
 
 /***/ }),
@@ -97364,7 +99249,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"principal-frame-raw.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"principal-frame-raw.vue","sourceRoot":""}]);
 
 // exports
 
@@ -97404,21 +99289,23 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.principal-frame-raw[data-v-d00ca848] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n.name-column[data-v-d00ca848] {\n\ttext-align: right;\n}\n.has-error[data-v-d00ca848] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/principal-frame-raw.vue?c5e7e534"],"names":[],"mappings":";AAyFA;CACA,iBAAA;CACA,YAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,yBAAA;CACA,gBAAA;CACA,eAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-raw.vue","sourcesContent":["<template>\n  <tr class=\"principal-frame-raw\">\n\t<td class=\"name-column\" colspan=\"2\">Size: {{frame_size.toFixed(2)}}</td>\n\n\t<td class=\"part-column\">\n\t  <select v-model=\"principal_frame\" class=\"part-column-select\">\n\t\t<option v-for=\"princ_frame_value in se_design.valid_frames\">{{princ_frame_value['Name']}}</option>\n\t  </select>\n\t</td>\n\n\t<template v-for=\"name in stats_raw.names\">\n\t  <StatlineCell :stats=\"stats_raw\" :name=\"name\"></StatlineCell>\n\t</template>\n\t\n\t<td class=\"weight-internal-column\" v-bind:class=\"weight_summary_class\">{{se_design.weight_internal.toFixed(2)}}</td>\n\t<td class=\"weight-external-column\">{{se_design.weight_external.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_design.cost_BR_raw.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_design.cost_SR_raw.toFixed(2)}}</td>\n\n\t<td class=\"power-cost-column\">{{se_design.cost_power_raw.toFixed(2)}}</td>\n\t<td class=\"power-gen-column\">{{se_design.power_generation_raw.toFixed(2)}}</td>\n\n\t<template v-for=\"name in crew_raw.names\">\n\t  <StatlineCell :stats=\"crew_raw\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time_frame}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrameRaw',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tweight_summary_class () {\n\t\t\treturn {\n\t\t\t\t['has-error']: this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error () {\n\t\t\treturn this.se_design.weight_internal > this.se_design.frame_max_size_raw;\n\t\t},\n\t\tprincipal_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.se_design.json['Principal Frame'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_design.json['Principal Frame'] = value;\n\t\t\t},\n\t\t},\n\t\tstats_raw () {\n\t\t\treturn this.se_design.stats_raw;\n\t\t},\n\t\tcrew_raw () {\n\t\t\treturn this.se_design.cost_crew_raw;\n\t\t},\n\t\tbuild_time_frame () {\n\t\t\treturn frac(this.se_design.build_time_frame, 12);\n\t\t},\n\t\tframe_size () {\n\t\t\treturn this.se_design.frame_size;\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n</style>\n\n<style scoped>\n.principal-frame-raw {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n\n.name-column {\n\ttext-align: right;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.principal-frame-raw[data-v-d00ca848] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n.name-column[data-v-d00ca848] {\n\ttext-align: right;\n}\n.has-error[data-v-d00ca848] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/principal-frame-raw.vue?ac09d47c"],"names":[],"mappings":";AA4FA;CACA,iBAAA;CACA,YAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,yBAAA;CACA,gBAAA;CACA,eAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-raw.vue","sourcesContent":["<template>\n  <tr class=\"principal-frame-raw\">\n\t<td class=\"name-column\" colspan=\"2\">Size: {{frame_size.toFixed(2)}}</td>\n\n\t<td class=\"part-column\">\n\t  <select v-model=\"principal_frame\" class=\"part-column-select\">\n\t\t<option v-for=\"princ_frame_value in se_design.valid_frames\">{{princ_frame_value['Name']}}</option>\n\t  </select>\n\t</td>\n\n\t<template v-for=\"name in stats_raw.names\">\n\t  <StatlineCell :stats=\"stats_raw\" :name=\"name\"></StatlineCell>\n\t</template>\n\t\n\t<td class=\"weight-internal-column\" v-bind:class=\"weight_summary_class\">{{se_design.weight_internal.toFixed(2)}}</td>\n\t<td class=\"weight-external-column\">{{se_design.weight_external.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_design.cost_BR_raw.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_design.cost_SR_raw.toFixed(2)}}</td>\n\n\t<td class=\"power-cost-column\">{{se_design.cost_power_raw.toFixed(2)}}</td>\n\t<td class=\"power-gen-column\">{{se_design.power_generation_raw.toFixed(2)}}</td>\n\n\t<template v-for=\"name in crew_raw.names\">\n\t  <StatlineCell :stats=\"crew_raw\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time_frame}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrameRaw',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tcomputed: {\n\t\tweight_summary_class () {\n\t\t\treturn {\n\t\t\t\t['has-error']: this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error () {\n\t\t\treturn this.$store.getters.se_design.weight_internal > this.$store.getters.se_design.frame_max_size_raw;\n\t\t},\n\t\tprincipal_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.$store.getters.se_design.json['Principal Frame'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.getters.se_design.json['Principal Frame'] = value;\n\t\t\t},\n\t\t},\n\t\tstats_raw () {\n\t\t\treturn this.$store.getters.se_design.stats_raw;\n\t\t},\n\t\tcrew_raw () {\n\t\t\treturn this.$store.getters.se_design.cost_crew_raw;\n\t\t},\n\t\tbuild_time_frame () {\n\t\t\treturn frac(this.$store.getters.se_design.build_time_frame, 12);\n\t\t},\n\t\tframe_size () {\n\t\t\treturn this.$store.getters.se_design.frame_size;\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t\t'design_info',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n</style>\n\n<style scoped>\n.principal-frame-raw {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n\n.name-column {\n\ttext-align: right;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 /* 600 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(97);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_functions_js__ = __webpack_require__(96);
-//
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; //
 //
 //
 //
@@ -97452,53 +99339,58 @@ exports.push([module.i, "\n.principal-frame-raw[data-v-d00ca848] {\n\tbackground
 //
 
 
+var _vuex = __webpack_require__(64);
 
+var _shipengine = __webpack_require__(38);
 
+var _shipengine2 = _interopRequireDefault(_shipengine);
 
+var _statlineCell = __webpack_require__(98);
 
+var _statlineCell2 = _interopRequireDefault(_statlineCell);
 
+var _uiFunctions = __webpack_require__(97);
 
-/* harmony default export */ __webpack_exports__["a"] = ({
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+exports.default = {
 	name: 'PrincipalFrameRaw',
 	components: {
-		StatlineCell: __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__["a" /* default */]
+		StatlineCell: _statlineCell2.default
 	},
-	props: {
-		se_db: Object,
-		se_design: Object
-	},
-	computed: {
-		weight_summary_class() {
-			return {
-				['has-error']: this.has_weight_error
-			};
+	computed: _extends({
+		weight_summary_class: function weight_summary_class() {
+			return _defineProperty({}, 'has-error', this.has_weight_error);
 		},
-		has_weight_error() {
-			return this.se_design.weight_internal > this.se_design.frame_max_size_raw;
+		has_weight_error: function has_weight_error() {
+			return this.$store.getters.se_design.weight_internal > this.$store.getters.se_design.frame_max_size_raw;
 		},
+
 		principal_frame: {
-			get() {
-				return this.se_design.json['Principal Frame'];
+			get: function get() {
+				return this.$store.getters.se_design.json['Principal Frame'];
 			},
-			set(value) {
-				this.se_design.json['Principal Frame'] = value;
+			set: function set(value) {
+				this.$store.getters.se_design.json['Principal Frame'] = value;
 			}
 		},
-		stats_raw() {
-			return this.se_design.stats_raw;
+		stats_raw: function stats_raw() {
+			return this.$store.getters.se_design.stats_raw;
 		},
-		crew_raw() {
-			return this.se_design.cost_crew_raw;
+		crew_raw: function crew_raw() {
+			return this.$store.getters.se_design.cost_crew_raw;
 		},
-		build_time_frame() {
-			return Object(__WEBPACK_IMPORTED_MODULE_2__ui_functions_js__["a" /* frac */])(this.se_design.build_time_frame, 12);
+		build_time_frame: function build_time_frame() {
+			return (0, _uiFunctions.frac)(this.$store.getters.se_design.build_time_frame, 12);
 		},
-		frame_size() {
-			return this.se_design.frame_size;
+		frame_size: function frame_size() {
+			return this.$store.getters.se_design.frame_size;
 		}
-	},
+	}, (0, _vuex.mapGetters)(['se_design', 'se_db', 'design_info'])),
 	methods: {}
-});
+};
 
 /***/ }),
 /* 601 */
@@ -97582,9 +99474,14 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 /***/ }),
 /* 605 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
 //
 //
 //
@@ -97592,7 +99489,7 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 //
 
 
-/* harmony default export */ __webpack_exports__["a"] = ({
+exports.default = {
 	name: 'StatlineCell',
 	components: {},
 	props: {
@@ -97600,19 +99497,19 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 		name: String,
 		fixed: {
 			type: Number,
-			default() {
+			default: function _default() {
 				return 2;
 			}
 		},
 		ispretty: {
 			type: Boolean,
-			default() {
+			default: function _default() {
 				return true;
 			}
 		}
 	},
 	computed: {
-		pretty() {
+		pretty: function pretty() {
 			if (this.is_zero) {
 				return '';
 			} else if (this.ispretty) {
@@ -97621,14 +99518,14 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 				return this.raw;
 			};
 		},
-		is_zero() {
+		is_zero: function is_zero() {
 			return Math.abs(this.raw) < Number.EPSILON;
 		},
-		raw() {
+		raw: function raw() {
 			return this.stats[this.name];
 		}
 	}
-});
+};
 
 /***/ }),
 /* 606 */
@@ -97768,7 +99665,9 @@ if (false) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_final_vue__ = __webpack_require__(611);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_final_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_final_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_4654872a_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_final_vue__ = __webpack_require__(612);
 var disposed = false
 function injectStyle (ssrContext) {
@@ -97787,7 +99686,7 @@ var __vue_scopeId__ = "data-v-4654872a"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_final_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_final_vue___default.a,
   __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_4654872a_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_final_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
@@ -97813,7 +99712,7 @@ if (false) {(function () {
   })
 })()}
 
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
 
 
 /***/ }),
@@ -97851,21 +99750,23 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.principal-frame-final[data-v-4654872a] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n.name-column-input[data-v-4654872a] {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.build-time-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.stat-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.br-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.sr-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.has-error[data-v-4654872a] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/principal-frame-final.vue?6bb34203"],"names":[],"mappings":";AA8FA;CACA,iBAAA;CACA,YAAA;;CAEA,kBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,mBAAA;CACA;AAEA;CACA,aAAA;CACA,kBAAA;CACA,kBAAA;CACA,YAAA;CACA,mBAAA;CACA,mBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-final.vue","sourcesContent":["<template>\n  <tr class=\"principal-frame-final\">\n\t<td class=\"name-column\" colspan=\"2\">\n\t  <input v-model=\"ship_name\" placeholder=\"Ship Name\" class=\"name-column-input\">\n\t</td>\n\n\t<td class=\"part-column\">{{principal_frame}}</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t</template>\n\t\n\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_design.weight_total}}</td>\n\n\t<td class=\"br-column\">{{se_design.cost_BR}}</td>\n\t<td class=\"sr-column\">{{se_design.cost_SR}}</td>\n\n\t<td class=\"power-cost-column\"\n\t\tv-bind:title=\"power_final_title\"\n\t\tv-bind:class=\"power_final_class\">{{se_design.cost_power}}</td>\n\t<td class=\"power-gen-column\"\n\t\tv-bind:title=\"power_final_title\"\n\t\tv-bind:class=\"power_final_class\">{{se_design.power_generation}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_design: Object,\n\t},\n\tcomputed: {\n\t\tpower_final_title () {\n\t\t\tif (this.has_power_error) {\n\t\t\t\treturn 'Error: Power cost greater than power generation.';\n\t\t\t} else {\n\t\t\t\treturn '';\n\t\t\t};\n\t\t},\n\t\tpower_final_class () {\n\t\t\treturn {\n\t\t\t\t['has-error']: this.has_power_error,\n\t\t\t};\n\t\t},\n\t\thas_power_error () {\n\t\t\treturn this.se_design.cost_power > this.se_design.power_generation;\n\t\t},\n\t\tprincipal_frame () {\n\t\t\treturn this.se_design.json['Principal Frame'];\n\t\t},\n\t\tstats () {\n\t\t\treturn this.se_design.stats;\n\t\t},\n\t\tcrew () {\n\t\t\treturn this.se_design.cost_crew;\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.se_design.build_time, 12, true);\n\t\t},\n\t\tship_name: {\n\t\t\tget () {\n\t\t\t\treturn this.se_design.json['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_design.json['Name'] = value;\n\t\t\t}\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.principal-frame-final {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n\n.name-column-input {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.build-time-column {\n\ttext-align: center;\n}\n\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.principal-frame-final[data-v-4654872a] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n.name-column-input[data-v-4654872a] {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.build-time-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.stat-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.br-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.sr-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-4654872a] {\n\ttext-align: center;\n}\n.has-error[data-v-4654872a] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/principal-frame-final.vue?7402d71b"],"names":[],"mappings":";AAiGA;CACA,iBAAA;CACA,YAAA;;CAEA,kBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,mBAAA;CACA;AAEA;CACA,aAAA;CACA,kBAAA;CACA,kBAAA;CACA,YAAA;CACA,mBAAA;CACA,mBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-final.vue","sourcesContent":["<template>\n  <tr class=\"principal-frame-final\">\n\t<td class=\"name-column\" colspan=\"2\">\n\t  <input v-model=\"ship_name\" placeholder=\"Ship Name\" class=\"name-column-input\">\n\t</td>\n\n\t<td class=\"part-column\">{{principal_frame}}</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t</template>\n\t\n\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_design.weight_total}}</td>\n\n\t<td class=\"br-column\">{{se_design.cost_BR}}</td>\n\t<td class=\"sr-column\">{{se_design.cost_SR}}</td>\n\n\t<td class=\"power-cost-column\"\n\t\tv-bind:title=\"power_final_title\"\n\t\tv-bind:class=\"power_final_class\">{{se_design.cost_power}}</td>\n\t<td class=\"power-gen-column\"\n\t\tv-bind:title=\"power_final_title\"\n\t\tv-bind:class=\"power_final_class\">{{se_design.power_generation}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tcomputed: {\n\t\tpower_final_title () {\n\t\t\tif (this.has_power_error) {\n\t\t\t\treturn 'Error: Power cost greater than power generation.';\n\t\t\t} else {\n\t\t\t\treturn '';\n\t\t\t};\n\t\t},\n\t\tpower_final_class () {\n\t\t\treturn {\n\t\t\t\t['has-error']: this.has_power_error,\n\t\t\t};\n\t\t},\n\t\thas_power_error () {\n\t\t\treturn this.$store.getters.se_design.cost_power > this.$store.getters.se_design.power_generation;\n\t\t},\n\t\tprincipal_frame () {\n\t\t\treturn this.$store.getters.se_design.json['Principal Frame'];\n\t\t},\n\t\tstats () {\n\t\t\treturn this.$store.getters.se_design.stats;\n\t\t},\n\t\tcrew () {\n\t\t\treturn this.$store.getters.se_design.cost_crew;\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.$store.getters.se_design.build_time, 12, true);\n\t\t},\n\t\tship_name: {\n\t\t\tget () {\n\t\t\t\treturn this.$store.getters.se_design.json['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.getters.se_design.json['Name'] = value;\n\t\t\t}\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t\t'design_info',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.principal-frame-final {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n\n.name-column-input {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.build-time-column {\n\ttext-align: center;\n}\n\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 /* 611 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(97);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_functions_js__ = __webpack_require__(96);
-//
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; //
 //
 //
 //
@@ -97900,60 +99801,65 @@ exports.push([module.i, "\n.principal-frame-final[data-v-4654872a] {\n\tbackgrou
 //
 
 
+var _vuex = __webpack_require__(64);
 
+var _shipengine = __webpack_require__(38);
 
+var _shipengine2 = _interopRequireDefault(_shipengine);
 
+var _statlineCell = __webpack_require__(98);
 
+var _statlineCell2 = _interopRequireDefault(_statlineCell);
 
+var _uiFunctions = __webpack_require__(97);
 
-/* harmony default export */ __webpack_exports__["a"] = ({
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+exports.default = {
 	name: 'PrincipalFrame',
 	components: {
-		StatlineCell: __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__["a" /* default */]
+		StatlineCell: _statlineCell2.default
 	},
-	props: {
-		se_db: Object,
-		se_design: Object
-	},
-	computed: {
-		power_final_title() {
+	computed: _extends({
+		power_final_title: function power_final_title() {
 			if (this.has_power_error) {
 				return 'Error: Power cost greater than power generation.';
 			} else {
 				return '';
 			};
 		},
-		power_final_class() {
-			return {
-				['has-error']: this.has_power_error
-			};
+		power_final_class: function power_final_class() {
+			return _defineProperty({}, 'has-error', this.has_power_error);
 		},
-		has_power_error() {
-			return this.se_design.cost_power > this.se_design.power_generation;
+		has_power_error: function has_power_error() {
+			return this.$store.getters.se_design.cost_power > this.$store.getters.se_design.power_generation;
 		},
-		principal_frame() {
-			return this.se_design.json['Principal Frame'];
+		principal_frame: function principal_frame() {
+			return this.$store.getters.se_design.json['Principal Frame'];
 		},
-		stats() {
-			return this.se_design.stats;
+		stats: function stats() {
+			return this.$store.getters.se_design.stats;
 		},
-		crew() {
-			return this.se_design.cost_crew;
+		crew: function crew() {
+			return this.$store.getters.se_design.cost_crew;
 		},
-		build_time() {
-			return Object(__WEBPACK_IMPORTED_MODULE_2__ui_functions_js__["a" /* frac */])(this.se_design.build_time, 12, true);
+		build_time: function build_time() {
+			return (0, _uiFunctions.frac)(this.$store.getters.se_design.build_time, 12, true);
 		},
+
 		ship_name: {
-			get() {
-				return this.se_design.json['Name'];
+			get: function get() {
+				return this.$store.getters.se_design.json['Name'];
 			},
-			set(value) {
-				this.se_design.json['Name'] = value;
+			set: function set(value) {
+				this.$store.getters.se_design.json['Name'] = value;
 			}
 		}
-	},
+	}, (0, _vuex.mapGetters)(['se_design', 'se_db', 'design_info'])),
 	methods: {}
-});
+};
 
 /***/ }),
 /* 612 */
@@ -98069,7 +99975,9 @@ if (false) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__ = __webpack_require__(618);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_24667b0a_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_summary_vue__ = __webpack_require__(619);
 var disposed = false
 function injectStyle (ssrContext) {
@@ -98089,7 +99997,7 @@ var __vue_scopeId__ = "data-v-24667b0a"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue___default.a,
   __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_24667b0a_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_summary_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
@@ -98115,7 +100023,7 @@ if (false) {(function () {
   })
 })()}
 
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
 
 
 /***/ }),
@@ -98153,7 +100061,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.subsystem-summary[data-v-24667b0a] {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n.name-cell[data-v-24667b0a] {\n\tborder-style: none;\n}\n.part-cell[data-v-24667b0a] {\n\tborder-style: none;\n}\n.part-select[data-v-24667b0a] {\n\twidth: 100%;\n}\n.has-error[data-v-24667b0a] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/subsystem-summary.vue?6be8bcf8"],"names":[],"mappings":";AAyEA;CACA,iBAAA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-summary.vue","sourcesContent":["<template>\n\n  <tr class=\"subsystem-summary\">\n\t<td class=\"name-column\"\n\t\tv-bind:class=\"weight_summary_class\"\n\t\tcolspan=\"2\">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t<td class=\"part-column\"></td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\" v-bind:class=\"weight_summary_class\">{{se_subsystem.weight_internal.toFixed(2)}}</td>\n\t<td class=\"weight-external-column\">{{se_subsystem.weight_external.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_subsystem.cost_BR.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_subsystem.cost_SR.toFixed(2)}}</td>\n\n\t<td class=\"power-cost-column\">{{se_subsystem.cost_power.toFixed(2)}}</td>\n\t<td class=\"power-gen-column\">{{se_subsystem.power_generation.toFixed(2)}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-cost-column\"></td>\n  </tr>\n\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'SubsystemSummary',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tweight_summary_class () {\n\t\t\treturn {\n\t\t\t\t['has-error']: this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error () {\n\t\t\treturn this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;\n\t\t},\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n\n.name-cell {\n\tborder-style: none;\n}\n\n.part-cell {\n\tborder-style: none;\n}\n\n.part-select {\n\twidth: 100%;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.subsystem-summary[data-v-24667b0a] {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n.name-cell[data-v-24667b0a] {\n\tborder-style: none;\n}\n.part-cell[data-v-24667b0a] {\n\tborder-style: none;\n}\n.part-select[data-v-24667b0a] {\n\twidth: 100%;\n}\n.has-error[data-v-24667b0a] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/subsystem-summary.vue?04a8d69a"],"names":[],"mappings":";AA+EA;CACA,iBAAA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-summary.vue","sourcesContent":["<template>\n\n  <tr class=\"subsystem-summary\">\n\t<td class=\"name-column\"\n\t\tv-bind:class=\"weight_summary_class\"\n\t\tcolspan=\"2\">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t<td class=\"part-column\"></td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\" v-bind:class=\"weight_summary_class\">{{se_subsystem.weight_internal.toFixed(2)}}</td>\n\t<td class=\"weight-external-column\">{{se_subsystem.weight_external.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_subsystem.cost_BR.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_subsystem.cost_SR.toFixed(2)}}</td>\n\n\t<td class=\"power-cost-column\">{{se_subsystem.cost_power.toFixed(2)}}</td>\n\t<td class=\"power-gen-column\">{{se_subsystem.power_generation.toFixed(2)}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-cost-column\"></td>\n  </tr>\n\n</template>\n\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'SubsystemSummary',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tweight_summary_class () {\n\t\t\treturn {\n\t\t\t\t['has-error']: this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error () {\n\t\t\treturn this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;\n\t\t},\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t\t'design_info',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n\n.name-cell {\n\tborder-style: none;\n}\n\n.part-cell {\n\tborder-style: none;\n}\n\n.part-select {\n\twidth: 100%;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -98193,20 +100101,23 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-summary.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-summary.vue","sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 /* 618 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(97);
-//
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; //
 //
 //
 //
@@ -98240,40 +100151,47 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 //
 
 
+var _vuex = __webpack_require__(64);
 
+var _shipengine = __webpack_require__(38);
 
+var _shipengine2 = _interopRequireDefault(_shipengine);
 
+var _statlineCell = __webpack_require__(98);
 
-/* harmony default export */ __webpack_exports__["a"] = ({
+var _statlineCell2 = _interopRequireDefault(_statlineCell);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+exports.default = {
 	name: 'SubsystemSummary',
 	components: {
-		StatlineCell: __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__["a" /* default */]
+		StatlineCell: _statlineCell2.default
 	},
 	props: {
-		se_db: Object,
 		se_subsystem: Object
 	},
-	computed: {
-		weight_summary_class() {
-			return {
-				['has-error']: this.has_weight_error
-			};
+	computed: _extends({
+		weight_summary_class: function weight_summary_class() {
+			return _defineProperty({}, 'has-error', this.has_weight_error);
 		},
-		has_weight_error() {
+		has_weight_error: function has_weight_error() {
 			return this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;
 		},
-		se_components() {
+		se_components: function se_components() {
 			return this.se_subsystem.components;
 		},
-		stats() {
+		stats: function stats() {
 			return this.se_subsystem.stats;
 		},
-		crew() {
+		crew: function crew() {
 			return this.se_subsystem.cost_crew;
 		}
-	},
+	}, (0, _vuex.mapGetters)(['se_design', 'se_db', 'design_info'])),
 	methods: {}
-});
+};
 
 /***/ }),
 /* 619 */
@@ -98364,7 +100282,9 @@ if (false) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__ = __webpack_require__(625);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_b63f97fc_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_frame_vue__ = __webpack_require__(626);
 var disposed = false
 function injectStyle (ssrContext) {
@@ -98384,7 +100304,7 @@ var __vue_scopeId__ = "data-v-b63f97fc"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue___default.a,
   __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_b63f97fc_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_frame_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
@@ -98410,7 +100330,7 @@ if (false) {(function () {
   })
 })()}
 
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
 
 
 /***/ }),
@@ -98448,7 +100368,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-frame.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-frame.vue","sourceRoot":""}]);
 
 // exports
 
@@ -98488,21 +100408,23 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.subsystem-frame[data-v-b63f97fc] {\n\tbackground: #ccc;\n}\n.has-error[data-v-b63f97fc] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/subsystem-frame.vue?77d4a4ab"],"names":[],"mappings":";AAyGA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-frame.vue","sourcesContent":["<template>\n\n  <tr class=\"subsystem-frame\">\n\t<td class=\"name-column\" colspan=\"2\">{{se_subsystem.name}}</td>\n\n\t<td class=\"part-column\">\n\t  <select v-model=\"sub_frame\" class=\"part-column-select\" v-bind:class=\"part_column_select_computed\">\n\t\t<option v-for=\"sub_frame_value in se_subsystem.valid_frames\">{{sub_frame_value['Name']}}</option>\n\t\t<option v-if=\"!is_valid_frame\">{{sub_frame}}</option>\n\t  </select>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <td class=\"stat-column\">{{stats_multiplier_pretty}}</td>\n\t</template>\n\n\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>\n\n\t<td class=\"power-cost-column\"></td>\n\t<td class=\"power-gen-column\"></td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew_mult_pretty\" :name=\"name\" :ispretty=\"false\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n\n\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'SubsystemFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tpart_column_select_computed () {\n\t\t\treturn {\n\t\t\t\t['has-error']: !this.is_valid_frame,\n\t\t\t};\n\t\t},\n\t\tis_valid_frame () {\n\t\t\treturn this.valid_frames\n\t\t\t\t.map((frame) => frame['Name'])\n\t\t\t\t.includes(this.sub_frame);\n\t\t},\n\t\tvalid_frames () {\n\t\t\treturn this.se_subsystem.valid_frames;\n\t\t},\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tstats_multiplier_pretty() {\n\t\t\treturn this.se_subsystem.stats_multiplier.toFixed(2) + 'x';\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tcrew_mult_pretty() {\n\t\t\treturn this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\tsub_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.se_subsystem.sub_frame;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_subsystem.sub_frame = value;\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n\n</style>\n\n\n<style scoped>\n.subsystem-frame {\n\tbackground: #ccc;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.subsystem-frame[data-v-b63f97fc] {\n\tbackground: #ccc;\n}\n.has-error[data-v-b63f97fc] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/subsystem-frame.vue?1c9df5de"],"names":[],"mappings":";AAkHA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-frame.vue","sourcesContent":["<template>\n\n  <tr class=\"subsystem-frame\">\n\t<td class=\"name-column\" colspan=\"2\">{{se_subsystem.name}}</td>\n\n\t<td class=\"part-column\">\n\t  <select v-model=\"sub_frame\" class=\"part-column-select\" v-bind:class=\"part_column_select_computed\">\n\t\t<option v-for=\"sub_frame_value in se_subsystem.valid_frames\">{{sub_frame_value['Name']}}</option>\n\t\t<option v-if=\"!is_valid_frame\">{{sub_frame}}</option>\n\t  </select>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <td class=\"stat-column\">{{stats_multiplier_pretty}}</td>\n\t</template>\n\n\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>\n\n\t<td class=\"power-cost-column\"></td>\n\t<td class=\"power-gen-column\"></td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew_mult_pretty\" :name=\"name\" :ispretty=\"false\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n\n\n</template>\n\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'SubsystemFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tpart_column_select_computed () {\n\t\t\treturn {\n\t\t\t\t['has-error']: !this.is_valid_frame,\n\t\t\t};\n\t\t},\n\t\tis_valid_frame () {\n\t\t\treturn this.valid_frames\n\t\t\t\t.map((frame) => frame['Name'])\n\t\t\t\t.includes(this.sub_frame);\n\t\t},\n\t\tvalid_frames () {\n\t\t\treturn this.se_subsystem.valid_frames;\n\t\t},\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tstats_multiplier_pretty() {\n\t\t\treturn this.se_subsystem.stats_multiplier.toFixed(2) + 'x';\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tcrew_mult_pretty() {\n\t\t\treturn this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\tsub_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.se_subsystem.sub_frame;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_subsystem_frame', {\n\t\t\t\t\tvalue: value,\n\t\t\t\t\tsubsystem: this.se_subsystem,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t\t'design_info',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n\n</style>\n\n\n<style scoped>\n.subsystem-frame {\n\tbackground: #ccc;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 /* 625 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__ = __webpack_require__(97);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_functions_js__ = __webpack_require__(96);
-//
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; //
 //
 //
 //
@@ -98539,62 +100461,77 @@ exports.push([module.i, "\n.subsystem-frame[data-v-b63f97fc] {\n\tbackground: #c
 //
 
 
+var _vuex = __webpack_require__(64);
 
+var _shipengine = __webpack_require__(38);
 
+var _shipengine2 = _interopRequireDefault(_shipengine);
 
+var _statlineCell = __webpack_require__(98);
 
+var _statlineCell2 = _interopRequireDefault(_statlineCell);
 
+var _uiFunctions = __webpack_require__(97);
 
-/* harmony default export */ __webpack_exports__["a"] = ({
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+exports.default = {
 	name: 'SubsystemFrame',
 	components: {
-		StatlineCell: __WEBPACK_IMPORTED_MODULE_1__statline_cell_vue__["a" /* default */]
+		StatlineCell: _statlineCell2.default
 	},
 	props: {
-		se_db: Object,
 		se_subsystem: Object
 	},
-	computed: {
-		part_column_select_computed() {
-			return {
-				['has-error']: !this.is_valid_frame
-			};
+	computed: _extends({
+		part_column_select_computed: function part_column_select_computed() {
+			return _defineProperty({}, 'has-error', !this.is_valid_frame);
 		},
-		is_valid_frame() {
-			return this.valid_frames.map(frame => frame['Name']).includes(this.sub_frame);
+		is_valid_frame: function is_valid_frame() {
+			return this.valid_frames.map(function (frame) {
+				return frame['Name'];
+			}).includes(this.sub_frame);
 		},
-		valid_frames() {
+		valid_frames: function valid_frames() {
 			return this.se_subsystem.valid_frames;
 		},
-		se_components() {
+		se_components: function se_components() {
 			return this.se_subsystem.components;
 		},
-		stats() {
+		stats: function stats() {
 			return this.se_subsystem.stats;
 		},
-		stats_multiplier_pretty() {
+		stats_multiplier_pretty: function stats_multiplier_pretty() {
 			return this.se_subsystem.stats_multiplier.toFixed(2) + 'x';
 		},
-		crew() {
+		crew: function crew() {
 			return this.se_subsystem.cost_crew;
 		},
-		crew_mult_pretty() {
-			return this.se_subsystem.cost_crew_frame_mult.apply(val => val.toFixed(2) + 'x');
+		crew_mult_pretty: function crew_mult_pretty() {
+			return this.se_subsystem.cost_crew_frame_mult.apply(function (val) {
+				return val.toFixed(2) + 'x';
+			});
 		},
-		build_time() {
-			return Object(__WEBPACK_IMPORTED_MODULE_2__ui_functions_js__["a" /* frac */])(this.se_subsystem.build_time, 12);
+		build_time: function build_time() {
+			return (0, _uiFunctions.frac)(this.se_subsystem.build_time, 12);
 		},
+
 		sub_frame: {
-			get() {
+			get: function get() {
 				return this.se_subsystem.sub_frame;
 			},
-			set(value) {
-				this.se_subsystem.sub_frame = value;
+			set: function set(value) {
+				this.$store.commit('set_subsystem_frame', {
+					value: value,
+					subsystem: this.se_subsystem
+				});
 			}
 		}
-	},
+	}, (0, _vuex.mapGetters)(['se_design', 'se_db', 'design_info'])),
 	methods: {}
-});
+};
 
 /***/ }),
 /* 626 */
@@ -98713,7 +100650,9 @@ if (false) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__ = __webpack_require__(632);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_ec733cc4_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_settings_vue__ = __webpack_require__(640);
 var disposed = false
 function injectStyle (ssrContext) {
@@ -98733,7 +100672,7 @@ var __vue_scopeId__ = "data-v-ec733cc4"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue___default.a,
   __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_ec733cc4_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_settings_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
@@ -98759,7 +100698,7 @@ if (false) {(function () {
   })
 })()}
 
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
 
 
 /***/ }),
@@ -98797,7 +100736,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-settings.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-settings.vue","sourceRoot":""}]);
 
 // exports
 
@@ -98837,20 +100776,23 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.setting-tr[data-v-ec733cc4] {\n\tbackground: #ccc;\n}\n.setting-container[data-v-ec733cc4] {\n\tdisplay: flex;\n}\n\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/subsystem-settings.vue?343842ba"],"names":[],"mappings":";AAyCA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA","file":"subsystem-settings.vue","sourcesContent":["<template>\n  <tr class=\"setting-tr\" v-if=\"has_settings\">\n\t<td class=\"settings-cell\" colspan=\"100\"> <!-- span all columns and we'll just fill it with settings -->\n\t  <SettingCell v-for=\"setting in settings\" :key=\"setting['Name']\" :setting=\"setting\"></SettingCell>\n\t</td>\n  </tr>\n</template>\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport SettingCell from './setting-cell.vue'\n\nexport default {\n\tname: 'SubsystemSettings',\n\tcomponents: {\n\t\tSettingCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\thas_settings () {\n\t\t\treturn this.se_subsystem.settings.length > 0;\n\t\t},\n\t\tsettings () {\n\t\t\treturn this.se_subsystem.settings;\n\t\t},\n\t},\n}\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-tr {\n\tbackground: #ccc;\n}\n\n.setting-container {\n\tdisplay: flex;\n}\n\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.setting-tr[data-v-ec733cc4] {\n\tbackground: #ccc;\n}\n.setting-container[data-v-ec733cc4] {\n\tdisplay: flex;\n}\n\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/subsystem-settings.vue?00c07f2e"],"names":[],"mappings":";AA+CA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA","file":"subsystem-settings.vue","sourcesContent":["<template>\n  <tr class=\"setting-tr\" v-if=\"has_settings\">\n\t<td class=\"settings-cell\" colspan=\"100\"> <!-- span all columns and we'll just fill it with settings -->\n\t  <SettingCell v-for=\"setting in settings\" :key=\"setting['Name']\" :setting=\"setting\"></SettingCell>\n\t</td>\n  </tr>\n</template>\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport SettingCell from './setting-cell.vue'\n\nexport default {\n\tname: 'SubsystemSettings',\n\tcomponents: {\n\t\tSettingCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\thas_settings () {\n\t\t\treturn this.se_subsystem.settings.length > 0;\n\t\t},\n\t\tsettings () {\n\t\t\treturn this.se_subsystem.settings;\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t\t'design_info',\n\t\t]),\n\t},\n}\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-tr {\n\tbackground: #ccc;\n}\n\n.setting-container {\n\tdisplay: flex;\n}\n\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 /* 632 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__setting_cell_vue__ = __webpack_require__(633);
-//
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; //
 //
 //
 //
@@ -98860,35 +100802,44 @@ exports.push([module.i, "\n.setting-tr[data-v-ec733cc4] {\n\tbackground: #ccc;\n
 //
 
 
+var _vuex = __webpack_require__(64);
 
+var _shipengine = __webpack_require__(38);
 
+var _shipengine2 = _interopRequireDefault(_shipengine);
 
+var _settingCell = __webpack_require__(633);
 
-/* harmony default export */ __webpack_exports__["a"] = ({
+var _settingCell2 = _interopRequireDefault(_settingCell);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
 	name: 'SubsystemSettings',
 	components: {
-		SettingCell: __WEBPACK_IMPORTED_MODULE_1__setting_cell_vue__["a" /* default */]
+		SettingCell: _settingCell2.default
 	},
 	props: {
-		se_db: Object,
 		se_subsystem: Object
 	},
-	computed: {
-		has_settings() {
+	computed: _extends({
+		has_settings: function has_settings() {
 			return this.se_subsystem.settings.length > 0;
 		},
-		settings() {
+		settings: function settings() {
 			return this.se_subsystem.settings;
 		}
-	}
-});
+	}, (0, _vuex.mapGetters)(['se_design', 'se_db', 'design_info']))
+};
 
 /***/ }),
 /* 633 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_setting_cell_vue__ = __webpack_require__(638);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_setting_cell_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_setting_cell_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_1ad72548_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_setting_cell_vue__ = __webpack_require__(639);
 var disposed = false
 function injectStyle (ssrContext) {
@@ -98908,7 +100859,7 @@ var __vue_scopeId__ = "data-v-1ad72548"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_setting_cell_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_setting_cell_vue___default.a,
   __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_1ad72548_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_setting_cell_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
@@ -98934,7 +100885,7 @@ if (false) {(function () {
   })
 })()}
 
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
 
 
 /***/ }),
@@ -98972,7 +100923,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"setting-cell.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"setting-cell.vue","sourceRoot":""}]);
 
 // exports
 
@@ -99012,80 +100963,83 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.setting-cell[data-v-1ad72548] {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n.setting-input-number[data-v-1ad72548] {\n\twidth: 60px;\n}\n.setting-input-bool[data-v-1ad72548] {\n}\n.setting-name[data-v-1ad72548] {\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/setting-cell.vue?286ab987"],"names":[],"mappings":";AAwEA;CACA,YAAA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA;AAEA;CACA","file":"setting-cell.vue","sourcesContent":["<template>\n  <span class=\"setting-cell\">\n\t<span class=\"setting-name\">{{setting_name}}</span>\n\n\t<select\n\t  v-if=\"typeof(setting_value) === 'number'\"\n\t  class=\"setting-input-number\"\n\t  type=\"number\"\n\t  v-model=\"setting_value\">\n\t  <option v-for=\"num in valid_numbers\">{{num}}</option>\n\t</select>\n\n\t<input\n\t  v-if=\"typeof(setting_value) === 'boolean'\"\n\t  class=\"setting-input-bool\"\n\t  type=\"checkbox\"\n\t  v-model=\"setting_value\">\n  </span>\n</template>\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nexport default {\n\tname: 'SettingCell',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tsetting: Object,\n\t},\n\tcomputed: {\n\t\tvalid_numbers () {\n\t\t\treturn [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];\n\t\t},\n\t\tsetting_name: {\n\t\t\tget () {\n\t\t\t\treturn this.setting['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.setting['Name'] = value;\n\t\t\t},\n\t\t},\n\t\tsetting_type () {\n\t\t\treturn typeof(this.setting_value);\n\t\t},\n\t\tsetting_value: {\n\t\t\tget () {\n\t\t\t\treturn this.setting['Value'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tswitch (this.setting_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\tthis.setting['Value'] = parseInt(value);\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'boolean':\n\t\t\t\t\tthis.setting['Value'] = value;\n\t\t\t\t\tbreak;\n\t\t\t\t};\n\t\t\t},\n\t\t}\n\t},\n}\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-cell {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n\n.setting-input-number {\n\twidth: 60px;\n}\n\n.setting-input-bool {\n}\n\n.setting-name {\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.setting-cell[data-v-1ad72548] {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n.setting-input-number[data-v-1ad72548] {\n\twidth: 60px;\n}\n.setting-input-bool[data-v-1ad72548] {\n}\n.setting-name[data-v-1ad72548] {\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/setting-cell.vue?6adf90db"],"names":[],"mappings":";AAoEA;CACA,YAAA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA;AAEA;CACA","file":"setting-cell.vue","sourcesContent":["<template>\n  <span class=\"setting-cell\">\n\t<span class=\"setting-name\">{{setting_name}}</span>\n\n\t<select\n\t  v-if=\"typeof(setting_value) === 'number'\"\n\t  class=\"setting-input-number\"\n\t  type=\"number\"\n\t  v-model=\"setting_value\">\n\t  <option v-for=\"num in valid_numbers\">{{num}}</option>\n\t</select>\n\n\t<input\n\t  v-if=\"typeof(setting_value) === 'boolean'\"\n\t  class=\"setting-input-bool\"\n\t  type=\"checkbox\"\n\t  v-model=\"setting_value\">\n  </span>\n</template>\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nexport default {\n\tname: 'SettingCell',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tsetting: Object,\n\t},\n\tcomputed: {\n\t\tvalid_numbers () {\n\t\t\treturn [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];\n\t\t},\n\t\tsetting_name: {\n\t\t\tget () {\n\t\t\t\treturn this.setting['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.setting['Name'] = value;\n\t\t\t},\n\t\t},\n\t\tsetting_type () {\n\t\t\treturn ;\n\t\t},\n\t\tsetting_value: {\n\t\t\tget () {\n\t\t\t\treturn this.setting['Value'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_setting', {\n\t\t\t\t\tsetting: this.setting,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t}\n\t},\n}\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-cell {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n\n.setting-input-number {\n\twidth: 60px;\n}\n\n.setting-input-bool {\n}\n\n.setting-name {\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 /* 638 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
 
+var _shipengine = __webpack_require__(38);
 
-/* harmony default export */ __webpack_exports__["a"] = ({
+var _shipengine2 = _interopRequireDefault(_shipengine);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
 	name: 'SettingCell',
 	components: {},
 	props: {
 		setting: Object
 	},
 	computed: {
-		valid_numbers() {
+		valid_numbers: function valid_numbers() {
 			return [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];
 		},
+
 		setting_name: {
-			get() {
+			get: function get() {
 				return this.setting['Name'];
 			},
-			set(value) {
+			set: function set(value) {
 				this.setting['Name'] = value;
 			}
 		},
-		setting_type() {
-			return typeof this.setting_value;
+		setting_type: function setting_type() {
+			return;
 		},
+
 		setting_value: {
-			get() {
+			get: function get() {
 				return this.setting['Value'];
 			},
-			set(value) {
-				switch (this.setting_type) {
-					case 'number':
-						this.setting['Value'] = parseInt(value);
-						break;
-					case 'boolean':
-						this.setting['Value'] = value;
-						break;
-				};
+			set: function set(value) {
+				this.$store.commit('set_setting', {
+					setting: this.setting,
+					value: value
+				});
 			}
 		}
 	}
-});
+}; //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /***/ }),
 /* 639 */
@@ -99230,7 +101184,9 @@ if (false) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_component_vue__ = __webpack_require__(646);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_component_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_component_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_702f1bb0_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_component_vue__ = __webpack_require__(647);
 var disposed = false
 function injectStyle (ssrContext) {
@@ -99250,7 +101206,7 @@ var __vue_scopeId__ = "data-v-702f1bb0"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_component_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_component_vue___default.a,
   __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_702f1bb0_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_component_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
@@ -99276,7 +101232,7 @@ if (false) {(function () {
   })
 })()}
 
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
 
 
 /***/ }),
@@ -99314,7 +101270,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"component.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"component.vue","sourceRoot":""}]);
 
 // exports
 
@@ -99354,21 +101310,35 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.component-tr[data-v-702f1bb0] {\n\twidth: 100%;\n\tmargin: 0px;\n}\n.has-error[data-v-702f1bb0] {\n\tbackground: #faa;\n}\n.quantity-column[data-v-702f1bb0] {\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/component.vue?3b3c4ce6"],"names":[],"mappings":";AAyLA;CACA,YAAA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA","file":"component.vue","sourcesContent":["<template>\n  <tr class=\"component-tr\" v-bind:class=\"{ ['has-error']: !isloaded }\">\n\t<td class=\"name-column\">{{se_component.name}}</td>\n\n\t<td class=\"quantity-column\" v-bind:class=\"{ ['has-error']: has_quantity_error }\">\n\t  <select\n\t\tv-if=\"quantity_configurable\"\n\t\tclass=\"quantity-column-select\"\n\t\tv-model=\"quantity\"\n\t\tv-on:wheel=\"quantity_select_wheel_event\"\n\t\tv-bind:class=\"{ ['has-error']: has_quantity_error }\">\n\n\t\t<option v-if=\"!valid_quantities.includes(quantity)\">{{quantity}}</option>\n\t\t<option v-for=\"valid_quantity in valid_quantities\">{{valid_quantity}}</option>\n\t  </select>\n\t  <span v-if=\"!quantity_configurable\">{{quantity_pretty}}</span>\n\t</td>\n\n\t<td class=\"part-column\" v-bind:class=\"part_column_select_computed\">\n\t  <select\n\t\tv-model=\"part\"\n\t\tv-bind:class=\"part_column_select_computed\"\n\t\tclass=\"part-column-select\">\n\t\t<option v-for=\"part_value in valid_parts\">{{part_value['Name']}}</option>\n\t\t<option v-if=\"!is_valid_part\">{{part}}</option>\n\t  </select>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t<td class=\"br-column\">{{cost_br}}</td>\n\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\"></td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport {\n\tpretty,\n} from './ui-functions.js'\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ComponentTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_component: Object,\n\t},\n\tcomputed: {\n\t\tpart_column_select_computed () {\n\t\t\treturn {\n\t\t\t\t['has-error']: !this.is_valid_part,\n\t\t\t};\n\t\t},\n\t\tis_valid_part () {\n\t\t\treturn this.valid_parts\n\t\t\t\t.map((part) => part['Name'])\n\t\t\t\t.includes(this.part);\n\t\t},\n\t\thas_quantity_error () {\n\t\t\treturn this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));\n\t\t},\n\t\tpower_gen () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.power_generation : 0);\n\t\t},\n\t\tpower_cost () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_power : 0);\n\t\t},\n\t\tcost_sr () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_SR : 0);\n\t\t},\n\t\tcost_br () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_BR : 0);\n\t\t},\n\t\tweight_internal () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.weight_internal : 0);\n\t\t},\n\t\tweight_external () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.weight_external : 0);\n\t\t},\n\t\tisloaded () {\n\t\t\treturn (!!this.se_component.part_def)\n\t\t},\n\t\tvalid_parts () {\n\t\t\treturn this.isloaded ? this.se_component.valid_parts : [];\n\t\t},\n\t\tquantity_configurable () {\n\t\t\treturn this.se_component.is_quantity_configurable;\n\t\t},\n\t\tquantity_pretty () {\n\t\t\tif (this.quantity === Math.round(this.quantity)) {\n\t\t\t\treturn this.quantity;\n\t\t\t} else {\n\t\t\t\treturn this.quantity.toFixed(2);\n\t\t\t};\n\t\t},\n\t\tquantity: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.quantity;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_component.quantity = value;\n\t\t\t},\n\t\t},\n\t\tvalid_quantities () {\n\t\t\treturn this.se_component.valid_quantities;\n\t\t},\n\t\tstats () {\n\t\t\treturn this.isloaded ? this.se_component.stats : new ShipEngine.Statline(0);\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.isloaded ? this.se_component.cost_crew : new ShipEngine.Crewline(0);\n\t\t},\n\t\tpart: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.part;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_component.part = value;\n\t\t\t\tif (!this.quantity && !this.se_component.is_no_part) {\n\t\t\t\t\tthis.quantity = 1;\n\t\t\t\t};\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tis_quantity_valid (hypothesis) {\n\t\t\treturn this\n\t\t\t\t.valid_quantities\n\t\t\t\t.map((elem) => (elem === hypothesis))\n\t\t\t\t.reduce((acc, elem) => acc || elem);\n\t\t},\n\t\tincrement_quantity () {\n\t\t\tlet hypothesis = this.quantity + 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t};\n\t\t},\n\t\tdecrement_quantity () {\n\t\t\tlet hypothesis = this.quantity - 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t};\n\t\t},\n\n\t\tquantity_select_wheel_event (ev) {\n\t\t\tif (ev.deltaY > 0) {\n\t\t\t\tthis.decrement_quantity();\n\t\t\t} else if (ev.deltaY < 0) {\n\t\t\t\tthis.increment_quantity();\n\t\t\t};\n\t\t\tif (ev.preventDefault)\n\t\t\t\tev.preventDefault();\n\t\t\tev.returnValue = false;\n\t\t},\n\t},\n}\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.component-tr {\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n\n.quantity-column {\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.component-tr[data-v-702f1bb0] {\n\twidth: 100%;\n\tmargin: 0px;\n}\n.has-error[data-v-702f1bb0] {\n\tbackground: #faa;\n}\n.quantity-column[data-v-702f1bb0] {\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/component.vue?b4ed64be"],"names":[],"mappings":";AA4LA;CACA,YAAA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA","file":"component.vue","sourcesContent":["<template>\n  <tr class=\"component-tr\" v-bind:class=\"{ ['has-error']: !isloaded }\">\n\t<td class=\"name-column\">{{se_component.name}}</td>\n\n\t<td class=\"quantity-column\" v-bind:class=\"{ ['has-error']: has_quantity_error }\">\n\t  <select\n\t\tv-if=\"quantity_configurable\"\n\t\tclass=\"quantity-column-select\"\n\t\tv-model=\"quantity\"\n\t\tv-on:wheel=\"quantity_select_wheel_event\"\n\t\tv-bind:class=\"{ ['has-error']: has_quantity_error }\">\n\n\t\t<option v-if=\"!valid_quantities.includes(quantity)\">{{quantity}}</option>\n\t\t<option v-for=\"valid_quantity in valid_quantities\">{{valid_quantity}}</option>\n\t  </select>\n\t  <span v-if=\"!quantity_configurable\">{{quantity_pretty}}</span>\n\t</td>\n\n\t<td class=\"part-column\" v-bind:class=\"part_column_select_computed\">\n\t  <select\n\t\tv-model=\"part\"\n\t\tv-bind:class=\"part_column_select_computed\"\n\t\tclass=\"part-column-select\">\n\t\t<option v-for=\"part_value in valid_parts\">{{part_value['Name']}}</option>\n\t\t<option v-if=\"!is_valid_part\">{{part}}</option>\n\t  </select>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t<td class=\"br-column\">{{cost_br}}</td>\n\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\"></td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport {\n\tpretty,\n} from './ui-functions.js'\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ComponentTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_component: Object,\n\t},\n\tcomputed: {\n\t\tpart_column_select_computed () {\n\t\t\treturn {\n\t\t\t\t['has-error']: !this.is_valid_part,\n\t\t\t};\n\t\t},\n\t\tis_valid_part () {\n\t\t\treturn this.valid_parts\n\t\t\t\t.map((part) => part['Name'])\n\t\t\t\t.includes(this.part);\n\t\t},\n\t\thas_quantity_error () {\n\t\t\treturn this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));\n\t\t},\n\t\tpower_gen () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.power_generation : 0);\n\t\t},\n\t\tpower_cost () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_power : 0);\n\t\t},\n\t\tcost_sr () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_SR : 0);\n\t\t},\n\t\tcost_br () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.cost_BR : 0);\n\t\t},\n\t\tweight_internal () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.weight_internal : 0);\n\t\t},\n\t\tweight_external () {\n\t\t\treturn pretty(this.isloaded ? this.se_component.weight_external : 0);\n\t\t},\n\t\tisloaded () {\n\t\t\treturn (!!this.se_component.part_def)\n\t\t},\n\t\tvalid_parts () {\n\t\t\treturn this.isloaded ? this.se_component.valid_parts : [];\n\t\t},\n\t\tquantity_configurable () {\n\t\t\treturn this.se_component.is_quantity_configurable;\n\t\t},\n\t\tquantity_pretty () {\n\t\t\tif (this.quantity === Math.round(this.quantity)) {\n\t\t\t\treturn this.quantity;\n\t\t\t} else {\n\t\t\t\treturn this.quantity.toFixed(2);\n\t\t\t};\n\t\t},\n\t\tquantity: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.quantity;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_component_quantity', {\n\t\t\t\t\tcomponent: this.se_component,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tvalid_quantities () {\n\t\t\treturn this.se_component.valid_quantities;\n\t\t},\n\t\tstats () {\n\t\t\treturn this.isloaded ? this.se_component.stats : new ShipEngine.Statline(0);\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.isloaded ? this.se_component.cost_crew : new ShipEngine.Crewline(0);\n\t\t},\n\t\tpart: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.part;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_component_part', {\n\t\t\t\t\tcomponent: this.se_component,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tis_quantity_valid () {\n\t\t\treturn function (hypothesis) {\n\t\t\t\treturn this\n\t\t\t\t\t.valid_quantities\n\t\t\t\t\t.map((elem) => (elem === hypothesis))\n\t\t\t\t\t.reduce((acc, elem) => acc || elem);\n\t\t\t}\n\t\t},\n\t},\n\tmethods: {\n\t\tincrement_quantity () {\n\t\t\tlet hypothesis = this.quantity + 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t};\n\t\t},\n\t\tdecrement_quantity () {\n\t\t\tlet hypothesis = this.quantity - 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t};\n\t\t},\n\t\tquantity_select_wheel_event (ev) {\n\t\t\tif (ev.deltaY > 0) {\n\t\t\t\tthis.decrement_quantity();\n\t\t\t} else if (ev.deltaY < 0) {\n\t\t\t\tthis.increment_quantity();\n\t\t\t};\n\t\t\tif (ev.preventDefault)\n\t\t\t\tev.preventDefault();\n\t\t\tev.returnValue = false;\n\t\t},\n\t},\n}\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.component-tr {\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n\n.quantity-column {\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 /* 646 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ui_functions_js__ = __webpack_require__(96);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__statline_cell_vue__ = __webpack_require__(97);
-//
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _shipengine = __webpack_require__(38);
+
+var _shipengine2 = _interopRequireDefault(_shipengine);
+
+var _uiFunctions = __webpack_require__(97);
+
+var _statlineCell = __webpack_require__(98);
+
+var _statlineCell2 = _interopRequireDefault(_statlineCell);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; } //
 //
 //
 //
@@ -99420,114 +101390,117 @@ exports.push([module.i, "\n.component-tr[data-v-702f1bb0] {\n\twidth: 100%;\n\tm
 //
 
 
-
-
-
-
-
-
-/* harmony default export */ __webpack_exports__["a"] = ({
+exports.default = {
 	name: 'ComponentTr',
 	components: {
-		StatlineCell: __WEBPACK_IMPORTED_MODULE_2__statline_cell_vue__["a" /* default */]
+		StatlineCell: _statlineCell2.default
 	},
 	props: {
-		se_db: Object,
 		se_component: Object
 	},
 	computed: {
-		part_column_select_computed() {
-			return {
-				['has-error']: !this.is_valid_part
-			};
+		part_column_select_computed: function part_column_select_computed() {
+			return _defineProperty({}, 'has-error', !this.is_valid_part);
 		},
-		is_valid_part() {
-			return this.valid_parts.map(part => part['Name']).includes(this.part);
+		is_valid_part: function is_valid_part() {
+			return this.valid_parts.map(function (part) {
+				return part['Name'];
+			}).includes(this.part);
 		},
-		has_quantity_error() {
+		has_quantity_error: function has_quantity_error() {
 			return this.quantity_configurable && !this.valid_quantities.includes(this.quantity);
 		},
-		power_gen() {
-			return Object(__WEBPACK_IMPORTED_MODULE_1__ui_functions_js__["b" /* pretty */])(this.isloaded ? this.se_component.power_generation : 0);
+		power_gen: function power_gen() {
+			return (0, _uiFunctions.pretty)(this.isloaded ? this.se_component.power_generation : 0);
 		},
-		power_cost() {
-			return Object(__WEBPACK_IMPORTED_MODULE_1__ui_functions_js__["b" /* pretty */])(this.isloaded ? this.se_component.cost_power : 0);
+		power_cost: function power_cost() {
+			return (0, _uiFunctions.pretty)(this.isloaded ? this.se_component.cost_power : 0);
 		},
-		cost_sr() {
-			return Object(__WEBPACK_IMPORTED_MODULE_1__ui_functions_js__["b" /* pretty */])(this.isloaded ? this.se_component.cost_SR : 0);
+		cost_sr: function cost_sr() {
+			return (0, _uiFunctions.pretty)(this.isloaded ? this.se_component.cost_SR : 0);
 		},
-		cost_br() {
-			return Object(__WEBPACK_IMPORTED_MODULE_1__ui_functions_js__["b" /* pretty */])(this.isloaded ? this.se_component.cost_BR : 0);
+		cost_br: function cost_br() {
+			return (0, _uiFunctions.pretty)(this.isloaded ? this.se_component.cost_BR : 0);
 		},
-		weight_internal() {
-			return Object(__WEBPACK_IMPORTED_MODULE_1__ui_functions_js__["b" /* pretty */])(this.isloaded ? this.se_component.weight_internal : 0);
+		weight_internal: function weight_internal() {
+			return (0, _uiFunctions.pretty)(this.isloaded ? this.se_component.weight_internal : 0);
 		},
-		weight_external() {
-			return Object(__WEBPACK_IMPORTED_MODULE_1__ui_functions_js__["b" /* pretty */])(this.isloaded ? this.se_component.weight_external : 0);
+		weight_external: function weight_external() {
+			return (0, _uiFunctions.pretty)(this.isloaded ? this.se_component.weight_external : 0);
 		},
-		isloaded() {
+		isloaded: function isloaded() {
 			return !!this.se_component.part_def;
 		},
-		valid_parts() {
+		valid_parts: function valid_parts() {
 			return this.isloaded ? this.se_component.valid_parts : [];
 		},
-		quantity_configurable() {
+		quantity_configurable: function quantity_configurable() {
 			return this.se_component.is_quantity_configurable;
 		},
-		quantity_pretty() {
+		quantity_pretty: function quantity_pretty() {
 			if (this.quantity === Math.round(this.quantity)) {
 				return this.quantity;
 			} else {
 				return this.quantity.toFixed(2);
 			};
 		},
+
 		quantity: {
-			get() {
+			get: function get() {
 				return this.se_component.quantity;
 			},
-			set(value) {
-				this.se_component.quantity = value;
+			set: function set(value) {
+				this.$store.commit('set_component_quantity', {
+					component: this.se_component,
+					value: value
+				});
 			}
 		},
-		valid_quantities() {
+		valid_quantities: function valid_quantities() {
 			return this.se_component.valid_quantities;
 		},
-		stats() {
-			return this.isloaded ? this.se_component.stats : new __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default.a.Statline(0);
+		stats: function stats() {
+			return this.isloaded ? this.se_component.stats : new _shipengine2.default.Statline(0);
 		},
-		crew() {
-			return this.isloaded ? this.se_component.cost_crew : new __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default.a.Crewline(0);
+		crew: function crew() {
+			return this.isloaded ? this.se_component.cost_crew : new _shipengine2.default.Crewline(0);
 		},
+
 		part: {
-			get() {
+			get: function get() {
 				return this.se_component.part;
 			},
-			set(value) {
-				this.se_component.part = value;
-				if (!this.quantity && !this.se_component.is_no_part) {
-					this.quantity = 1;
-				};
+			set: function set(value) {
+				this.$store.commit('set_component_part', {
+					component: this.se_component,
+					value: value
+				});
 			}
+		},
+		is_quantity_valid: function is_quantity_valid() {
+			return function (hypothesis) {
+				return this.valid_quantities.map(function (elem) {
+					return elem === hypothesis;
+				}).reduce(function (acc, elem) {
+					return acc || elem;
+				});
+			};
 		}
 	},
 	methods: {
-		is_quantity_valid(hypothesis) {
-			return this.valid_quantities.map(elem => elem === hypothesis).reduce((acc, elem) => acc || elem);
-		},
-		increment_quantity() {
-			let hypothesis = this.quantity + 1;
+		increment_quantity: function increment_quantity() {
+			var hypothesis = this.quantity + 1;
 			if (this.is_quantity_valid(hypothesis)) {
 				this.quantity = hypothesis;
 			};
 		},
-		decrement_quantity() {
-			let hypothesis = this.quantity - 1;
+		decrement_quantity: function decrement_quantity() {
+			var hypothesis = this.quantity - 1;
 			if (this.is_quantity_valid(hypothesis)) {
 				this.quantity = hypothesis;
 			};
 		},
-
-		quantity_select_wheel_event(ev) {
+		quantity_select_wheel_event: function quantity_select_wheel_event(ev) {
 			if (ev.deltaY > 0) {
 				this.decrement_quantity();
 			} else if (ev.deltaY < 0) {
@@ -99537,7 +101510,7 @@ exports.push([module.i, "\n.component-tr[data-v-702f1bb0] {\n\twidth: 100%;\n\tm
 			ev.returnValue = false;
 		}
 	}
-});
+};
 
 /***/ }),
 /* 647 */
@@ -99719,7 +101692,9 @@ if (false) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_module_vue__ = __webpack_require__(653);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_module_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_module_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_c0aaa36e_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_module_vue__ = __webpack_require__(654);
 var disposed = false
 function injectStyle (ssrContext) {
@@ -99739,7 +101714,7 @@ var __vue_scopeId__ = "data-v-c0aaa36e"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_module_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_module_vue___default.a,
   __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_c0aaa36e_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_module_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
@@ -99765,7 +101740,7 @@ if (false) {(function () {
   })
 })()}
 
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
 
 
 /***/ }),
@@ -99803,7 +101778,7 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"module.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"module.vue","sourceRoot":""}]);
 
 // exports
 
@@ -99843,139 +101818,151 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.module-tr[data-v-c0aaa36e] {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n.hasloaderror[data-v-c0aaa36e] {\n\tbackground: #faa;\n}\n.module-pair-span[data-v-c0aaa36e] {\n\tdisplay: flex;\n}\n.module-pair-type[data-v-c0aaa36e] {\n\tflex: 1 1 0;\n}\n.module-pair-variant[data-v-c0aaa36e] {\n\tflex: 1 1 0;\n}\n.part-column-select[data-v-c0aaa36e] {\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/module.vue?beaf059e"],"names":[],"mappings":";AAiIA;CACA,iBAAA;;CAEA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA","file":"module.vue","sourcesContent":["<template>\n  <tr class=\"module-tr\" v-bind:class=\"{ hasloaderror: !isloaded }\">\n\t<td class=\"name-column\" colspan=\"2\">Module</td>\n\n\t<td class=\"part-column\">\n\t  <span class=\"module-pair-span\">\n\t\t<span class=\"module-pair-type\"><select v-model=\"module_type\" class=\"part-column-select\">\n\t\t\t<option v-for=\"module_type_value in valid_types\">{{module_type_value}}</option>\n\t\t</select></span>\n\t\t<span class=\"module-pair-variant\"><select v-model=\"module_variant\" class=\"part-column-select\">\n\t\t\t<option v-for=\"module_variant_value in valid_variants\">{{module_variant_value['Variant']}}</option>\n\t\t</select></span>\n\t  </span>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t<td class=\"br-column\">{{cost_br}}</td>\n\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport {\n\tpretty,\n\tfrac,\n} from './ui-functions.js'\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ModuleTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_db: Object,\n\t\tse_module: Object,\n\t},\n\tcomputed: {\n\t\tbuild_time () {\n\t\t\treturn this.isloaded ? frac(this.se_module.build_time, 12) || '' : '';\n\t\t},\n\t\tpower_gen () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.power_generation : 0);\n\t\t},\n\t\tpower_cost () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.cost_power : 0);\n\t\t},\n\t\tcost_sr () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.cost_SR : 0);\n\t\t},\n\t\tcost_br () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.cost_BR : 0);\n\t\t},\n\t\tweight_internal () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.weight_internal : 0);\n\t\t},\n\t\tweight_external () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.weight_external : 0);\n\t\t},\n\t\tisloaded () {\n\t\t\treturn (!!this.se_module.module_def)\n\t\t},\n\t\tstats () {\n\t\t\treturn this.isloaded ? this.se_module.stats : new ShipEngine.Statline(0);\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.isloaded ? this.se_module.cost_crew : new ShipEngine.Crewline(0);\n\t\t},\n\n\t\tvalid_types () {\n\t\t\treturn this.se_db.valid_module_types();\n\t\t},\n\t\tvalid_variants () {\n\t\t\treturn this.se_db.find_modules(this.se_module.module_type);\n\t\t},\n\t\tmodule_type: {\n\t\t\tget () {\n\t\t\t\treturn this.se_module.module_type;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_module.module_type = value;\n\t\t\t\tthis.se_module.module_variant = this.valid_variants[0]['Variant'];\n\t\t\t},\n\t\t},\n\t\tmodule_variant: {\n\t\t\tget () {\n\t\t\t\treturn this.se_module.module_variant;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.se_module.module_variant = value;\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tlog_parts() {\n\t\t\tconsole.log('\"' + this.part + '\"');\n\t\t\tconsole.log(this.valid_parts.map((part) => part['Name']))\n\t\t\tconsole.log(this.se_db.find_part(this.part));\n\t\t\tthis.part = this.part;\n\t\t},\n\t},\n}\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.module-tr {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n\n.hasloaderror {\n\tbackground: #faa;\n}\n\n.module-pair-span {\n\tdisplay: flex;\n}\n\n.module-pair-type {\n\tflex: 1 1 0;\n}\n\n.module-pair-variant {\n\tflex: 1 1 0;\n}\n\n.part-column-select {\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.module-tr[data-v-c0aaa36e] {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n.hasloaderror[data-v-c0aaa36e] {\n\tbackground: #faa;\n}\n.module-pair-span[data-v-c0aaa36e] {\n\tdisplay: flex;\n}\n.module-pair-type[data-v-c0aaa36e] {\n\tflex: 1 1 0;\n}\n.module-pair-variant[data-v-c0aaa36e] {\n\tflex: 1 1 0;\n}\n.part-column-select[data-v-c0aaa36e] {\n}\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/module.vue?4bd053f9"],"names":[],"mappings":";AAsIA;CACA,iBAAA;;CAEA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA","file":"module.vue","sourcesContent":["<template>\n  <tr class=\"module-tr\" v-bind:class=\"{ hasloaderror: !isloaded }\">\n\t<td class=\"name-column\" colspan=\"2\">Module</td>\n\n\t<td class=\"part-column\">\n\t  <span class=\"module-pair-span\">\n\t\t<span class=\"module-pair-type\"><select v-model=\"module_type\" class=\"part-column-select\">\n\t\t\t<option v-for=\"module_type_value in valid_types\">{{module_type_value}}</option>\n\t\t</select></span>\n\t\t<span class=\"module-pair-variant\"><select v-model=\"module_variant\" class=\"part-column-select\">\n\t\t\t<option v-for=\"module_variant_value in valid_variants\">{{module_variant_value['Variant']}}</option>\n\t\t</select></span>\n\t  </span>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t<td class=\"br-column\">{{cost_br}}</td>\n\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport ShipEngine from '../lib/shipengine.js';\n\nimport {\n\tpretty,\n\tfrac,\n} from './ui-functions.js'\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ModuleTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_module: Object,\n\t},\n\tcomputed: {\n\t\tbuild_time () {\n\t\t\treturn this.isloaded ? frac(this.se_module.build_time, 12) || '' : '';\n\t\t},\n\t\tpower_gen () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.power_generation : 0);\n\t\t},\n\t\tpower_cost () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.cost_power : 0);\n\t\t},\n\t\tcost_sr () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.cost_SR : 0);\n\t\t},\n\t\tcost_br () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.cost_BR : 0);\n\t\t},\n\t\tweight_internal () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.weight_internal : 0);\n\t\t},\n\t\tweight_external () {\n\t\t\treturn pretty(this.isloaded ? this.se_module.weight_external : 0);\n\t\t},\n\t\tisloaded () {\n\t\t\treturn (!!this.se_module.module_def)\n\t\t},\n\t\tstats () {\n\t\t\treturn this.isloaded ? this.se_module.stats : new ShipEngine.Statline(0);\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.isloaded ? this.se_module.cost_crew : new ShipEngine.Crewline(0);\n\t\t},\n\n\t\tvalid_types () {\n\t\t\treturn this.$store.getters.se_db.valid_module_types();\n\t\t},\n\t\tvalid_variants () {\n\t\t\treturn this.$store.getters.se_db.find_modules(this.se_module.module_type);\n\t\t},\n\t\tmodule_type: {\n\t\t\tget () {\n\t\t\t\treturn this.se_module.module_type;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_module_type', {\n\t\t\t\t\tse_db: this.$store.getters.se_db,\n\t\t\t\t\tmodule: this.se_module,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tmodule_variant: {\n\t\t\tget () {\n\t\t\t\treturn this.se_module.module_variant;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_module_variant', {\n\t\t\t\t\tmodule: this.se_module,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tlog_parts() {\n\t\t\tconsole.log('\"' + this.part + '\"');\n\t\t\tconsole.log(this.valid_parts.map((part) => part['Name']))\n\t\t\tconsole.log(this.$store.getters.se_db.find_part(this.part));\n\t\t\tthis.part = this.part;\n\t\t},\n\t},\n}\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.module-tr {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n\n.hasloaderror {\n\tbackground: #faa;\n}\n\n.module-pair-span {\n\tdisplay: flex;\n}\n\n.module-pair-type {\n\tflex: 1 1 0;\n}\n\n.module-pair-variant {\n\tflex: 1 1 0;\n}\n\n.part-column-select {\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 /* 653 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ui_functions_js__ = __webpack_require__(96);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__statline_cell_vue__ = __webpack_require__(97);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
 
+var _shipengine = __webpack_require__(38);
 
+var _shipengine2 = _interopRequireDefault(_shipengine);
 
+var _uiFunctions = __webpack_require__(97);
 
+var _statlineCell = __webpack_require__(98);
 
+var _statlineCell2 = _interopRequireDefault(_statlineCell);
 
-/* harmony default export */ __webpack_exports__["a"] = ({
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
 	name: 'ModuleTr',
 	components: {
-		StatlineCell: __WEBPACK_IMPORTED_MODULE_2__statline_cell_vue__["a" /* default */]
+		StatlineCell: _statlineCell2.default
 	},
 	props: {
-		se_db: Object,
 		se_module: Object
 	},
 	computed: {
-		build_time() {
-			return this.isloaded ? Object(__WEBPACK_IMPORTED_MODULE_1__ui_functions_js__["a" /* frac */])(this.se_module.build_time, 12) || '' : '';
+		build_time: function build_time() {
+			return this.isloaded ? (0, _uiFunctions.frac)(this.se_module.build_time, 12) || '' : '';
 		},
-		power_gen() {
-			return Object(__WEBPACK_IMPORTED_MODULE_1__ui_functions_js__["b" /* pretty */])(this.isloaded ? this.se_module.power_generation : 0);
+		power_gen: function power_gen() {
+			return (0, _uiFunctions.pretty)(this.isloaded ? this.se_module.power_generation : 0);
 		},
-		power_cost() {
-			return Object(__WEBPACK_IMPORTED_MODULE_1__ui_functions_js__["b" /* pretty */])(this.isloaded ? this.se_module.cost_power : 0);
+		power_cost: function power_cost() {
+			return (0, _uiFunctions.pretty)(this.isloaded ? this.se_module.cost_power : 0);
 		},
-		cost_sr() {
-			return Object(__WEBPACK_IMPORTED_MODULE_1__ui_functions_js__["b" /* pretty */])(this.isloaded ? this.se_module.cost_SR : 0);
+		cost_sr: function cost_sr() {
+			return (0, _uiFunctions.pretty)(this.isloaded ? this.se_module.cost_SR : 0);
 		},
-		cost_br() {
-			return Object(__WEBPACK_IMPORTED_MODULE_1__ui_functions_js__["b" /* pretty */])(this.isloaded ? this.se_module.cost_BR : 0);
+		cost_br: function cost_br() {
+			return (0, _uiFunctions.pretty)(this.isloaded ? this.se_module.cost_BR : 0);
 		},
-		weight_internal() {
-			return Object(__WEBPACK_IMPORTED_MODULE_1__ui_functions_js__["b" /* pretty */])(this.isloaded ? this.se_module.weight_internal : 0);
+		weight_internal: function weight_internal() {
+			return (0, _uiFunctions.pretty)(this.isloaded ? this.se_module.weight_internal : 0);
 		},
-		weight_external() {
-			return Object(__WEBPACK_IMPORTED_MODULE_1__ui_functions_js__["b" /* pretty */])(this.isloaded ? this.se_module.weight_external : 0);
+		weight_external: function weight_external() {
+			return (0, _uiFunctions.pretty)(this.isloaded ? this.se_module.weight_external : 0);
 		},
-		isloaded() {
+		isloaded: function isloaded() {
 			return !!this.se_module.module_def;
 		},
-		stats() {
-			return this.isloaded ? this.se_module.stats : new __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default.a.Statline(0);
+		stats: function stats() {
+			return this.isloaded ? this.se_module.stats : new _shipengine2.default.Statline(0);
 		},
-		crew() {
-			return this.isloaded ? this.se_module.cost_crew : new __WEBPACK_IMPORTED_MODULE_0__lib_shipengine_js___default.a.Crewline(0);
+		crew: function crew() {
+			return this.isloaded ? this.se_module.cost_crew : new _shipengine2.default.Crewline(0);
+		},
+		valid_types: function valid_types() {
+			return this.$store.getters.se_db.valid_module_types();
+		},
+		valid_variants: function valid_variants() {
+			return this.$store.getters.se_db.find_modules(this.se_module.module_type);
 		},
 
-		valid_types() {
-			return this.se_db.valid_module_types();
-		},
-		valid_variants() {
-			return this.se_db.find_modules(this.se_module.module_type);
-		},
 		module_type: {
-			get() {
+			get: function get() {
 				return this.se_module.module_type;
 			},
-			set(value) {
-				this.se_module.module_type = value;
-				this.se_module.module_variant = this.valid_variants[0]['Variant'];
+			set: function set(value) {
+				this.$store.commit('set_module_type', {
+					se_db: this.$store.getters.se_db,
+					module: this.se_module,
+					value: value
+				});
 			}
 		},
 		module_variant: {
-			get() {
+			get: function get() {
 				return this.se_module.module_variant;
 			},
-			set(value) {
-				this.se_module.module_variant = value;
+			set: function set(value) {
+				this.$store.commit('set_module_variant', {
+					module: this.se_module,
+					value: value
+				});
 			}
 		}
 	},
 	methods: {
-		log_parts() {
+		log_parts: function log_parts() {
 			console.log('"' + this.part + '"');
-			console.log(this.valid_parts.map(part => part['Name']));
-			console.log(this.se_db.find_part(this.part));
+			console.log(this.valid_parts.map(function (part) {
+				return part['Name'];
+			}));
+			console.log(this.$store.getters.se_db.find_part(this.part));
 			this.part = this.part;
 		}
 	}
-});
+}; //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /***/ }),
 /* 654 */
@@ -100133,13 +102120,9 @@ var render = function() {
         "tbody",
         { staticClass: "design-table-body" },
         [
-          _c("PrincipalFrameFinal", {
-            attrs: { se_db: _vm.se_db, se_design: _vm.se_design }
-          }),
+          _c("PrincipalFrameFinal"),
           _vm._v(" "),
-          _c("PrincipalFrameRaw", {
-            attrs: { se_db: _vm.se_db, se_design: _vm.se_design }
-          }),
+          _c("PrincipalFrameRaw"),
           _vm._v(" "),
           _vm._l(_vm.se_subsystems, function(se_subsystem) {
             return [
@@ -100147,31 +102130,25 @@ var render = function() {
                 _c("td", { attrs: { colspan: "100", height: "30px" } })
               ]),
               _vm._v(" "),
-              _c("SubsystemFrame", {
-                attrs: { se_db: _vm.se_db, se_subsystem: se_subsystem }
-              }),
+              _c("SubsystemFrame", { attrs: { se_subsystem: se_subsystem } }),
               _vm._v(" "),
-              _c("SubsystemSummary", {
-                attrs: { se_db: _vm.se_db, se_subsystem: se_subsystem }
-              }),
+              _c("SubsystemSummary", { attrs: { se_subsystem: se_subsystem } }),
               _vm._v(" "),
               _c("SubsystemSettings", {
-                attrs: { se_db: _vm.se_db, se_subsystem: se_subsystem }
+                attrs: { se_subsystem: se_subsystem }
               }),
               _vm._v(" "),
               _vm._l(se_subsystem.components, function(se_component) {
                 return [
-                  _c("ComponentTr", {
-                    attrs: { se_db: _vm.se_db, se_component: se_component }
-                  })
+                  _c("ComponentTr", { attrs: { se_component: se_component } })
                 ]
               })
             ]
           }),
           _vm._v(" "),
-          _c("ModuleTr", {
-            attrs: { se_db: _vm.se_db, se_module: _vm.se_design.module }
-          })
+          _vm._m(1),
+          _vm._v(" "),
+          _c("ModuleTr", { attrs: { se_module: _vm.se_design.module } })
         ],
         2
       )
@@ -100224,6 +102201,14 @@ var staticRenderFns = [
         _c("th", [_vm._v("Build Time")])
       ])
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", { staticClass: "subsystem-spacer-row" }, [
+      _c("td", { attrs: { colspan: "100", height: "30px" } })
+    ])
   }
 ]
 render._withStripped = true
@@ -100241,7 +102226,9 @@ if (false) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_import_export_vue__ = __webpack_require__(659);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_import_export_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_import_export_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_8a85d0ac_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_design_import_export_vue__ = __webpack_require__(660);
 var disposed = false
 function injectStyle (ssrContext) {
@@ -100260,7 +102247,7 @@ var __vue_scopeId__ = "data-v-8a85d0ac"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_import_export_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_import_export_vue___default.a,
   __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_8a85d0ac_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_design_import_export_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
@@ -100286,7 +102273,7 @@ if (false) {(function () {
   })
 })()}
 
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
 
 
 /***/ }),
@@ -100324,22 +102311,45 @@ exports = module.exports = __webpack_require__(13)(true);
 
 
 // module
-exports.push([module.i, "\n.design-import-export[data-v-8a85d0ac] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.design-import-export-status-message[data-v-8a85d0ac] {\n}\n.fade[data-v-8a85d0ac] {\n\tanimation: fadeanim-data-v-8a85d0ac 3s forwards;\n}\n@keyframes fadeanim-data-v-8a85d0ac {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/design-import-export.vue?c5233d32"],"names":[],"mappings":";AAgKA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n  <div class=\"design-import-export\">\n    <input id=\"design-import-export-blueprint-string\" v-model=\"design_json_string\">\n    <input type=\"button\"\n\t\t   class=\"clipboard-copy-button\"\n\t\t   data-clipboard-target=\"#design-import-export-blueprint-string\"\n\t\t   value=\"Copy\"></input>\n\n\t<span><a v-bind:href=\"'shipdesigner.html#' + design_json_url_encoded_string\">Link to this design</a></span>\n\n    <select v-model=\"selected_save_bp\">\n      <option v-for=\"blueprint in local_saves\">\n\t\t{{blueprint_save_name(blueprint)}}\n      </option>\n    </select>\n\n    <input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"></input>\n    <input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"></input>\n\n    <input type=\"button\" @click=\"local_saves_save_design\" value=\"Save current design\"></input>\n    <input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"></input>\n\n    <span\n\t  ref=\"status_message\"\n\t  class=\"design-import-export-status-message\"\n\t  @animationend=\"clear_status_message()\">{{ status_message }}</span>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\nimport Clipboard from 'clipboard';\nimport ShipEngine from '../lib/shipengine';\n\nnew Clipboard('.clipboard-copy-button');\n\nconst LOCAL_SAVES_KEY = 'local_saves';\nconst STATUS_DEFAULT_DURATION = 2000;\n\nconst comparison_slice = _.partial(_.pick, _, ['Name', 'Blueprint Date']);\n\nexport default {\n    name: 'DesignImportExport',\n    components: {\n    },\n    data () {\n\t\treturn {\n\t\t\t// local_saves is a straight array of blueprint objects,\n\t\t\t// exactly the same as the design_info.data object.\n\t\t\tlocal_saves: [],\n\t\t\t// the currently selected element of the local_saves\n\t\t\t// array. *not* the same as design_info.data! this is so\n\t\t\t// the user can work with the list of locally saved\n\t\t\t// blueprints without clobbering their current work.\n\t\t\tselected_save: null,\n\n\t\t\tstatus_message: \"\",\n\n\t\t\tstatus_message_timeout_id: null,\n\t\t};\n    },\n    props: {\n\t\tdesign_info: Object,\n\t\tse_db: Object,\n    },\n    computed: {\n\t\tselected_save_bp: {\n\t\t\tget () {\n\t\t\t\tif (this.selected_save) {\n\t\t\t\t\treturn this.blueprint_save_name(this.selected_save);\n\t\t\t\t} else {\n\t\t\t\t\t''\n\t\t\t\t};\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.selected_save = _.chain(this.local_saves).find(bp => this.blueprint_save_name(bp) === value).value();\n\t\t\t},\n\t\t},\n\t\tdesign_json_string: {\n\t\t\tget () {\n\t\t\t\treturn JSON.stringify(this.design_info.data);\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.design_info.data = JSON.parse(value);\n\t\t\t},\n\t\t},\n\t\tdesign_json_url_encoded_string () {\n\t\t\treturn encodeURI(this.design_json_string);\n\t\t},\n    },\n    mounted () {\n\t\tthis.local_saves_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_SAVES_KEY) {\n\t\t\t\tthis.local_saves_load_from_local_storage;\n\t\t\t};\n\t\t});\n    },\n    methods: {\n\t\tblueprint_save_name (bp) {\n\t\t\treturn bp['Name'] +\n\t\t\t\t' (' + (new Date(bp['Blueprint Date']).toLocaleString()) + ')' +\n\t\t\t\t' [' + (new ShipEngine.Design(this.se_db, bp).stats.toString()) + ']';\n\t\t},\n\t\tlocal_saves_delete_selected () {\n\t\t\t// remove the selected item\n\t\t\tthis.local_saves = _.chain(this.local_saves).reject(bp => {\n\t\t\t\treturn _.isEqual(comparison_slice(bp), comparison_slice(this.selected_save));\n\t\t\t}).value();\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message(\"Blueprint deleted.\");\n\t\t},\n\t\tlocal_saves_load_selected () {\n\t\t\tthis.design_info.data = this.selected_save;\n\t\t\tthis.display_status_message(\"Blueprint loaded.\");\n\t\t},\n\t\tlocal_saves_save_design () {\n\t\t\tlet timestamp = new Date();\n\t\t\ttimestamp.setMilliseconds(0);\n\t\t\tthis.design_info.data['Blueprint Date'] = timestamp.toISOString();\n\t\t\tthis.local_saves.push(_.cloneDeep(this.design_info.data));\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message(\"Blueprint saved.\");\n\t\t},\n\n\t\tlocal_saves_load_from_local_storage () {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_SAVES_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_saves = [];\n\t\t\t\tthis.display_status_message(\"No Blueprints to load\");\n\t\t\t} else {\n\t\t\t\tthis.local_saves = JSON.parse(loaded);\n\t\t\t\tthis.display_status_message(\"Blueprints loaded.\");\n\t\t\t};\n\t\t},\n\t\tlocal_saves_save_to_local_storage () {\n\t\t\tlocalStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(this.local_saves))\n\t\t},\n\n\t\tdisplay_status_message (status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'design-import-export-status-message';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = \"design-import-export-status-message fade\";\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message () {\n\t\t\tthis.status_message = null;\n\t\t}\n\t\t\n    },\n}\n</script>\n\n\n<style scoped>\n.design-import-export {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.design-import-export-status-message {\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.design-import-export[data-v-8a85d0ac] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.design-import-export-status-message[data-v-8a85d0ac] {\n}\n.fade[data-v-8a85d0ac] {\n\tanimation: fadeanim-data-v-8a85d0ac 3s forwards;\n}\n@keyframes fadeanim-data-v-8a85d0ac {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/design-import-export.vue?29804ed5"],"names":[],"mappings":";AAyKA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n  <div class=\"design-import-export\">\n\t<input type=\"button\"\n\t\t   class=\"undo-button\"\n\t\t   @click=\"dispatch_undo\"\n\t\t   value=\"<\"></input>\n\t<input type=\"button\"\n\t\t   class=\"redo-button\"\n\t\t   @click=\"dispatch_redo\"\n\t\t   value=\">\"></input>\n\n    <input id=\"design-import-export-blueprint-string\" v-model=\"design_json_string\">\n    <input type=\"button\"\n\t\t   class=\"clipboard-copy-button\"\n\t\t   data-clipboard-target=\"#design-import-export-blueprint-string\"\n\t\t   value=\"Copy\"></input>\n\n\t<span><a v-bind:href=\"'shipdesigner.html#' + design_json_url_encoded_string\">Link to this design</a></span>\n\n    <select v-model=\"selected_save_bp\">\n      <option v-for=\"blueprint in local_saves\">\n\t\t{{blueprint_save_name(blueprint)}}\n      </option>\n    </select>\n\n    <input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"></input>\n    <input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"></input>\n\n    <input type=\"button\" @click=\"local_saves_save_design\" value=\"Save current design\"></input>\n    <input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"></input>\n\n    <span\n\t  ref=\"status_message\"\n\t  class=\"design-import-export-status-message\"\n\t  @animationend=\"clear_status_message()\">{{ status_message }}</span>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\nimport Clipboard from 'clipboard';\nimport ShipEngine from '../lib/shipengine';\n\nnew Clipboard('.clipboard-copy-button');\n\nconst LOCAL_SAVES_KEY = 'local_saves';\nconst STATUS_DEFAULT_DURATION = 2000;\n\nconst comparison_slice = _.partial(_.pick, _, ['Name', 'Blueprint Date']);\n\nexport default {\n    name: 'DesignImportExport',\n    components: {\n    },\n    data () {\n\t\treturn {\n\t\t\t// local_saves is a straight array of blueprint objects,\n\t\t\t// exactly the same as the design_info.data object.\n\t\t\tlocal_saves: [],\n\t\t\t// the currently selected element of the local_saves\n\t\t\t// array. *not* the same as design_info.data! this is so\n\t\t\t// the user can work with the list of locally saved\n\t\t\t// blueprints without clobbering their current work.\n\t\t\tselected_save: null,\n\n\t\t\tstatus_message: \"\",\n\n\t\t\tstatus_message_timeout_id: null,\n\t\t};\n    },\n    computed: {\n\t\tselected_save_bp: {\n\t\t\tget () {\n\t\t\t\tif (this.selected_save) {\n\t\t\t\t\treturn this.blueprint_save_name(this.selected_save);\n\t\t\t\t} else {\n\t\t\t\t\t''\n\t\t\t\t};\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.selected_save = _.chain(this.local_saves).find(bp => this.blueprint_save_name(bp) === value).value();\n\t\t\t},\n\t\t},\n\t\tdesign_json_string: {\n\t\t\tget () {\n\t\t\t\treturn JSON.stringify(this.$store.state.design_info.data);\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_design_json', JSON.parse(value));\n\t\t\t},\n\t\t},\n\t\tdesign_json_url_encoded_string () {\n\t\t\treturn encodeURI(this.design_json_string);\n\t\t},\n    },\n    mounted () {\n\t\tthis.local_saves_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_SAVES_KEY) {\n\t\t\t\tthis.local_saves_load_from_local_storage();\n\t\t\t};\n\t\t}.bind(this));\n    },\n    methods: {\n\t\tdispatch_undo () {\n\t\t\tthis.$store.dispatch('undo');\n\t\t},\n\t\tdispatch_redo () {\n\t\t\tthis.$store.dispatch('redo');\n\t\t},\n\t\tblueprint_save_name (bp) {\n\t\t\treturn bp['Name'] +\n\t\t\t\t' (' + (new Date(bp['Blueprint Date']).toLocaleString()) + ')' +\n\t\t\t\t' [' + (new ShipEngine.Design(this.$store.getters.se_db, bp).stats.toString()) + ']';\n\t\t},\n\t\tlocal_saves_delete_selected () {\n\t\t\t// remove the selected item\n\t\t\tthis.local_saves = _.chain(this.local_saves).reject(bp => {\n\t\t\t\treturn _.isEqual(comparison_slice(bp), comparison_slice(this.selected_save));\n\t\t\t}).value();\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message(\"Blueprint deleted.\");\n\t\t},\n\t\tlocal_saves_load_selected () {\n\t\t\tthis.$store.commit('set_design_json', _.cloneDeep(this.selected_save));\n\t\t\tthis.display_status_message(\"Blueprint loaded.\");\n\t\t},\n\t\tlocal_saves_save_design () {\n\t\t\tthis.$store.commit('timestamp_design');\n\t\t\tthis.local_saves.push(_.cloneDeep(this.$store.state.design_info.data));\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message(\"Blueprint saved.\");\n\t\t},\n\n\t\tlocal_saves_load_from_local_storage () {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_SAVES_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_saves = [];\n\t\t\t\tthis.display_status_message(\"No Blueprints to load\");\n\t\t\t} else {\n\t\t\t\tthis.local_saves = JSON.parse(loaded);\n\t\t\t\tthis.display_status_message(\"Blueprints loaded.\");\n\t\t\t};\n\t\t},\n\t\tlocal_saves_save_to_local_storage () {\n\t\t\tlocalStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(this.local_saves))\n\t\t},\n\n\t\tdisplay_status_message (status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'design-import-export-status-message';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = \"design-import-export-status-message fade\";\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message () {\n\t\t\tthis.status_message = null;\n\t\t}\n\t\t\n    },\n}\n</script>\n\n\n<style scoped>\n.design-import-export {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.design-import-export-status-message {\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 /* 659 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(98);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_clipboard__ = __webpack_require__(569);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_clipboard___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_clipboard__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_shipengine__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_shipengine___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__lib_shipengine__);
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _lodash = __webpack_require__(99);
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _clipboard = __webpack_require__(570);
+
+var _clipboard2 = _interopRequireDefault(_clipboard);
+
+var _shipengine = __webpack_require__(38);
+
+var _shipengine2 = _interopRequireDefault(_shipengine);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+new _clipboard2.default('.clipboard-copy-button'); //
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -100372,21 +102382,15 @@ exports.push([module.i, "\n.design-import-export[data-v-8a85d0ac] {\n\tbackgroun
 //
 
 
+var LOCAL_SAVES_KEY = 'local_saves';
+var STATUS_DEFAULT_DURATION = 2000;
 
+var comparison_slice = _lodash2.default.partial(_lodash2.default.pick, _lodash2.default, ['Name', 'Blueprint Date']);
 
-
-
-new __WEBPACK_IMPORTED_MODULE_1_clipboard___default.a('.clipboard-copy-button');
-
-const LOCAL_SAVES_KEY = 'local_saves';
-const STATUS_DEFAULT_DURATION = 2000;
-
-const comparison_slice = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.partial(__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.pick, __WEBPACK_IMPORTED_MODULE_0_lodash___default.a, ['Name', 'Blueprint Date']);
-
-/* harmony default export */ __webpack_exports__["a"] = ({
+exports.default = {
 	name: 'DesignImportExport',
 	components: {},
-	data() {
+	data: function data() {
 		return {
 			// local_saves is a straight array of blueprint objects,
 			// exactly the same as the design_info.data object.
@@ -100402,70 +102406,77 @@ const comparison_slice = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.partial(
 			status_message_timeout_id: null
 		};
 	},
-	props: {
-		design_info: Object,
-		se_db: Object
-	},
+
 	computed: {
 		selected_save_bp: {
-			get() {
+			get: function get() {
 				if (this.selected_save) {
 					return this.blueprint_save_name(this.selected_save);
 				} else {
 					'';
 				};
 			},
-			set(value) {
-				this.selected_save = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.chain(this.local_saves).find(bp => this.blueprint_save_name(bp) === value).value();
+			set: function set(value) {
+				var _this = this;
+
+				this.selected_save = _lodash2.default.chain(this.local_saves).find(function (bp) {
+					return _this.blueprint_save_name(bp) === value;
+				}).value();
 			}
 		},
 		design_json_string: {
-			get() {
-				return JSON.stringify(this.design_info.data);
+			get: function get() {
+				return JSON.stringify(this.$store.state.design_info.data);
 			},
-			set(value) {
-				this.design_info.data = JSON.parse(value);
+			set: function set(value) {
+				this.$store.commit('set_design_json', JSON.parse(value));
 			}
 		},
-		design_json_url_encoded_string() {
+		design_json_url_encoded_string: function design_json_url_encoded_string() {
 			return encodeURI(this.design_json_string);
 		}
 	},
-	mounted() {
+	mounted: function mounted() {
 		this.local_saves_load_from_local_storage();
 		window.addEventListener('storage', function (ev) {
 			if (ev.key === LOCAL_SAVES_KEY) {
-				this.local_saves_load_from_local_storage;
+				this.local_saves_load_from_local_storage();
 			};
-		});
+		}.bind(this));
 	},
+
 	methods: {
-		blueprint_save_name(bp) {
-			return bp['Name'] + ' (' + new Date(bp['Blueprint Date']).toLocaleString() + ')' + ' [' + new __WEBPACK_IMPORTED_MODULE_2__lib_shipengine___default.a.Design(this.se_db, bp).stats.toString() + ']';
+		dispatch_undo: function dispatch_undo() {
+			this.$store.dispatch('undo');
 		},
-		local_saves_delete_selected() {
+		dispatch_redo: function dispatch_redo() {
+			this.$store.dispatch('redo');
+		},
+		blueprint_save_name: function blueprint_save_name(bp) {
+			return bp['Name'] + ' (' + new Date(bp['Blueprint Date']).toLocaleString() + ')' + ' [' + new _shipengine2.default.Design(this.$store.getters.se_db, bp).stats.toString() + ']';
+		},
+		local_saves_delete_selected: function local_saves_delete_selected() {
+			var _this2 = this;
+
 			// remove the selected item
-			this.local_saves = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.chain(this.local_saves).reject(bp => {
-				return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEqual(comparison_slice(bp), comparison_slice(this.selected_save));
+			this.local_saves = _lodash2.default.chain(this.local_saves).reject(function (bp) {
+				return _lodash2.default.isEqual(comparison_slice(bp), comparison_slice(_this2.selected_save));
 			}).value();
 			this.local_saves_save_to_local_storage();
 			this.display_status_message("Blueprint deleted.");
 		},
-		local_saves_load_selected() {
-			this.design_info.data = this.selected_save;
+		local_saves_load_selected: function local_saves_load_selected() {
+			this.$store.commit('set_design_json', _lodash2.default.cloneDeep(this.selected_save));
 			this.display_status_message("Blueprint loaded.");
 		},
-		local_saves_save_design() {
-			let timestamp = new Date();
-			timestamp.setMilliseconds(0);
-			this.design_info.data['Blueprint Date'] = timestamp.toISOString();
-			this.local_saves.push(__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.cloneDeep(this.design_info.data));
+		local_saves_save_design: function local_saves_save_design() {
+			this.$store.commit('timestamp_design');
+			this.local_saves.push(_lodash2.default.cloneDeep(this.$store.state.design_info.data));
 			this.local_saves_save_to_local_storage();
 			this.display_status_message("Blueprint saved.");
 		},
-
-		local_saves_load_from_local_storage() {
-			const loaded = localStorage.getItem(LOCAL_SAVES_KEY);
+		local_saves_load_from_local_storage: function local_saves_load_from_local_storage() {
+			var loaded = localStorage.getItem(LOCAL_SAVES_KEY);
 			if (loaded === null) {
 				this.local_saves = [];
 				this.display_status_message("No Blueprints to load");
@@ -100474,11 +102485,10 @@ const comparison_slice = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.partial(
 				this.display_status_message("Blueprints loaded.");
 			};
 		},
-		local_saves_save_to_local_storage() {
+		local_saves_save_to_local_storage: function local_saves_save_to_local_storage() {
 			localStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(this.local_saves));
 		},
-
-		display_status_message(status) {
+		display_status_message: function display_status_message(status) {
 			this.status_message = status;
 			this.$refs.status_message.className = 'design-import-export-status-message';
 			window.requestAnimationFrame(function (time) {
@@ -100487,12 +102497,11 @@ const comparison_slice = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.partial(
 				}.bind(this));
 			}.bind(this));
 		},
-		clear_status_message() {
+		clear_status_message: function clear_status_message() {
 			this.status_message = null;
 		}
-
 	}
-});
+};
 
 /***/ }),
 /* 660 */
@@ -100504,6 +102513,18 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "design-import-export" }, [
+    _c("input", {
+      staticClass: "undo-button",
+      attrs: { type: "button", value: "<" },
+      on: { click: _vm.dispatch_undo }
+    }),
+    _vm._v(" "),
+    _c("input", {
+      staticClass: "redo-button",
+      attrs: { type: "button", value: ">" },
+      on: { click: _vm.dispatch_redo }
+    }),
+    _vm._v(" "),
     _c("input", {
       directives: [
         {
@@ -100638,23 +102659,9 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "root" }, [
-    _c(
-      "div",
-      { staticClass: "header" },
-      [
-        _c("DesignSummary", {
-          attrs: { se_db: _vm.se_db, se_design: _vm.se_design }
-        })
-      ],
-      1
-    ),
+    _c("div", { staticClass: "header" }, [_c("DesignSummary")], 1),
     _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "design" },
-      [_c("Design", { attrs: { se_db: _vm.se_db, se_design: _vm.se_design } })],
-      1
-    ),
+    _c("div", { staticClass: "design" }, [_c("Design")], 1),
     _vm._v(" "),
     _c(
       "div",
@@ -100678,6 +102685,12 @@ if (false) {
      require("vue-hot-reload-api").rerender("data-v-5ae9c078", esExports)
   }
 }
+
+/***/ }),
+/* 662 */
+/***/ (function(module, exports) {
+
+module.exports = {"Subsystems":[{"Components":[{"Part":"[T2][L][C+] Type-I Block-A (40E) Warp Core","Quantity":2,"Name":"Warp Core Type"},{"Part":"[T2][L][R-C-] Luna-VI High-Efficiency M/AM System","Quantity":2,"Name":"M/AM Injectors"},{"Part":"[T2][L] Mk VIII Mod L Yoyodyne Coolant System","Quantity":2,"Name":"Coolant Systems"},{"Part":"[T3][M][R+] VSA-7 Pulse Injection Manifold","Quantity":3,"Name":"EPS Manifold System"},{"Part":"[T2] EngOS Monitoring - Anak-Krueger EM Rails","Quantity":1,"Name":"Eject System"}],"Settings":[{"Name":"Safety/Performance","Value":0}],"Sub-Frame":"[T2] Md Frigate Warp Core Suite","Name":"Warp Core"},{"Components":[{"Part":"[T2][M] Type-VI SIF","Quantity":2,"Name":"Structural Integrity Fields"},{"Part":"[T1][L] Modulated Graviton Beam Deflector Saucer-Only","Quantity":3,"Name":"Navigational Deflector"},{"Part":"[T1][L] 2 X Centaur-A Pattern Nacelle","Quantity":1,"Name":"Nacelle System"},{"Part":"[T2][M] S-Medical Mk VI Protein Synth","Quantity":1,"Name":"Replication Package"},{"Part":"[T2][L] 2310-Light Pattern Deuterium Tanks","Quantity":3,"Name":"Fuel & Matter Stores"}],"Settings":[],"Sub-Frame":"[T2][OET-SR-] Md Frigate Engineering Suite","Name":"Engineering"},{"Components":[{"Part":"[T2][L] Lt. Alloy-3 Duranium Hull","Quantity":1,"Name":"Hull System"}],"Settings":[],"Sub-Frame":"[T2] Sm Frigate Hull Suite","Name":"Hull"},{"Components":[{"Part":"[T2][H] Mark-VII-Heavy LR Sensor Array","Quantity":2,"Name":"Long-Range Sensors"},{"Part":"[T2][H] Mark-VII-Heavy Nav Array","Quantity":2,"Name":"Navigational Sensors"},{"Part":"No Survey Sensors","Quantity":0,"Name":"Survey Sensors"},{"Part":"[T2][H] Spock-C Pattern Lab","Quantity":2,"Name":"Science Labs"},{"Part":"[T1][L] Type-III-A Duotronic Core","Quantity":3,"Name":"Computer Core"},{"Part":"[T2] Majel 3.1 OS","Quantity":3,"Name":"Operating System"},{"Part":"No Core","Quantity":0,"Name":"Secondary Core"},{"Part":"[T1][M] Lwaxana '04 General Protocol","Quantity":2,"Name":"Diplomatic Package"},{"Part":"[T-1][M] 2260s Rec Space","Quantity":1,"Name":"Recreation Package"},{"Part":"[T2][H] T'Koren Pattern Large Sickbay","Quantity":3,"Name":"Sickbay"}],"Settings":[{"Name":"Isolinear?","Value":false}],"Sub-Frame":"[T2][OE--] Lg Frigate Operations Suite","Name":"Operations"},{"Components":[{"Part":"[T-1][L] Model 68 Phaser Bank","Quantity":2,"Name":"Primary Phasers"},{"Part":"No Phasers","Quantity":0,"Name":"Secondary Phasers"},{"Part":"No Torp","Quantity":0,"Name":"Torpedo System"},{"Part":"[T2][H] Mark-VI-Heavy SR Lateral Sensor Array","Quantity":2,"Name":"Short-Range Sensors"},{"Part":"No TCU","Quantity":1,"Name":"Targeting Computer"},{"Part":"[T2][L] Mk-V-E Shield Gens","Quantity":5,"Name":"Deflector Shields"},{"Part":"[T2][L] Mk-V-E Shield Gens","Quantity":5,"Name":"Backup Deflectors"},{"Part":"[T2][M] SDB-09 High-Power Impulse Drive Sys","Quantity":1,"Name":"Impulse Engine Pwr"}],"Settings":[{"Name":"Burst Launchers","Value":true},{"Name":"Phaser Arrays","Value":false}],"Sub-Frame":"[T1][SR+] Sm Frigate Tactical Suite","Name":"Tactical"}],"Module":{"Type":"No Module","Variant":"-"},"Principal Frame":"[T1] 900kt Frigate Frame","Blueprint Date":"2017-09-23T17:31+00:00","Name":"SWB Cheapish Kepler"}
 
 /***/ })
 /******/ ]);
