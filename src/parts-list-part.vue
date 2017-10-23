@@ -1,8 +1,7 @@
 <template>
   <tr class="part">
 	<PartsListCell
-	  v-on:partupdate="partupdate()"
-	  v-for="field in fields"
+	  v-for="field in selected_schema"
 	  v-bind:class="list_class(field)"
 	  :key="field.name"
 	  :part="part"
@@ -17,6 +16,8 @@
 
 import _ from 'lodash';
 
+import { mapState, mapGetters } from 'vuex';
+
 import PartsListCell from './parts-list-cell.vue';
 
 export default {
@@ -25,46 +26,36 @@ export default {
 		PartsListCell,
 	},
 	props: {
-		partslist: {
-			type: Array,
-		},
-		part: {
-			type: Object,
-		},
-		schema: {
-			type: Array,
-		},
+		part: Object,
 	},
 	computed: {
-		fields () {
-			return this.schema;
-		},
 		has_duplicate_name_error () {
 			const f = (part) => _.pick(part, ['Name', 'Variant', 'Type']);
 			const comp = (part) => _.isEqual(f(part), f(this.part))
-			return this.partslist.filter(comp).length > 1;
+			return this.selected_parts.filter(comp).length > 1;
 		},
+		list_class () {
+			return function (field) {
+				return {
+					['has-error']: (field.id === 'name') && (this.has_duplicate_name_error),
+				};
+			};
+		},
+		...mapGetters([
+			'selected_schema',
+			'selected_parts',
+		]),
 	},
 	methods: {
-		list_class (field) {
-			return {
-				['has-error']: (field.id === 'name') && (this.has_duplicate_name_error),
-			};
-		},
-		partupdate () {
-			this.$emit('partupdate');
-		},
 		delete_this_part () {
-			const idx = this.partslist.findIndex((part) => part['Name'] === this.part['Name']);
-			if (idx >= 0) {
-				this.partslist.splice(idx, 1);
-			};
+			this.$store.commit('delete_part', this.part['Name']);
 		},
 		copy_this_part () {
-			const idx = this.partslist.findIndex((part) => part['Name'] === this.part['Name']);
+			const idx = this.selected_parts.findIndex((part) => part['Name'] === this.part['Name']);
 			if (idx >= 0) {
 				let clone = _.cloneDeep(this.part);
-				this.partslist.splice(idx, 0, clone);
+				clone['Name'] += ' copy';
+				this.$store.commit('add_part', clone);
 			};
 		},
 	},

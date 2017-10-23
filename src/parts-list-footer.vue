@@ -1,41 +1,139 @@
 <template>
   <div class="footer">
-	<input id="partslist-import-export-string" v-model="data_json_string">
-	<input type="button" class="clipboard-copy-button" data-clipboard-target="#partslist-import-export-string" value="Copy"></input>
-	<input type="button" @click="reset_to_canon()" value="Reset to canon"></input>
+	<!-- <input id="partslist-import-export-string" v-model="data_json_string"> -->
+	<!-- <input type="button" class="clipboard-copy-button" data-clipboard-target="#partslist-import-export-string" value="Copy"></input> -->
+
+	<input v-model="parts_list_name">
+
+    <select v-model="selected_parts_list_name">
+      <option v-for="parts_list in all_parts_lists">
+		{{parts_list_save_name(parts_list)}}
+      </option>
+    </select>
+
+    <input type="button" @click="parts_lists_delete_selected" value="Delete saved parts"></input>
+    <input type="button" @click="parts_lists_load_selected" value="Load saved parts"></input>
+
+    <input type="button" @click="parts_lists_save_current" value="Save current parts"></input>
+    <input type="button" @click="parts_lists_load_from_local_storage" value="Refresh"></input>
+
+    <span
+	  ref="status_message"
+	  class="design-import-export-status-message"
+	  @animationend="clear_status_message()">{{ status_message }}</span>
+	
   </div>
 </template>
 
 <script>
 
-import Clipboard from 'clipboard';
+import { mapState, mapGetters } from 'vuex';
+
 import canon_parts from '../dist/parts_C8.csv';
 
-new Clipboard('.clipboard-copy-button');
+const LOCAL_PARTS_LISTS_KEY = 'parts_lists';
+const STATUS_DEFAULT_DURATION = 2000;
+
+const pl_comparison_slice = _.partial(_.pick, _, ['name', 'timestamp']);
 
 export default {
 	name: 'PartsListFooter',
 	components: {
 	},
-	props: {
-		data_wrapper: {
-			type: Object,
-		},
+	data () {
+		return {
+			status_message: "",
+			status_message_timeout_id: null,
+
+			local_parts_lists: [],
+			selected_parts_list: null,
+		};
 	},
 	computed: {
-		data_json_string: {
+		parts_list_name: {
 			get () {
-				return JSON.stringify(this.data_wrapper.data);
+				return this.$store.state.parts_list.name;
 			},
 			set (value) {
-				this.data_wrapper.data = JSON.parse(value);
+				this.$store.commit('set_parts_list_name', value);
 			},
 		},
+		selected_parts_list_name: {
+			get () {
+				if (this.selected_parts_list) {
+					return this.parts_list_save_name(this.selected_parts_list);
+				} else {
+					return null;
+				};
+			},
+			set (value) {
+				this.selected_parts_list = _
+					.chain(this.all_parts_lists)
+					.find(list => this.parts_list_save_name(list) === value)
+					.value();
+			},
+		},
+		all_parts_lists () {
+			return [...this.local_parts_lists, this.canon_parts_list];
+		},
+		...mapState([
+			'canon_parts_list',
+		]),
 	},
+    mounted () {
+		this.parts_lists_load_from_local_storage();
+		window.addEventListener('storage', function(ev) {
+			if (ev.key === LOCAL_PARTS_LISTS_KEY) {
+				this.parts_lists_load_from_local_storage();
+			};
+		}.bind(this));
+    },
 	methods: {
 		reset_to_canon () {
-			this.$emit('reset');
+			this.$store.commit('reset_to_canon')
 		},
+		parts_list_save_name (pl) {
+			// console.log(Object.keys(pl));
+			return pl.name + ' (' + (new Date(pl.timestamp).toLocaleString()) + ')';
+		},
+		parts_lists_load_from_local_storage () {
+			const loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);
+			if (loaded === null) {
+				this.local_parts_lists = [];
+				this.display_status_message("No parts lists to load");
+			} else {
+				this.local_parts_lists = JSON.parse(loaded);
+				this.display_status_message("Parts lists loaded.");
+			};
+		},
+		parts_lists_load_selected () {
+			this.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list));
+			this.display_status_message("Parts list loaded");
+		},
+		parts_lists_delete_selected () {
+		},
+		parts_lists_save_current () {
+			this.$store.commit('timestamp_parts_list');
+			this.local_parts_lists.push(_.cloneDeep(this.$store.state.parts_list));
+			this.parts_lists_save_to_local_storage();
+			this.display_status_message("Parts list saved.");
+		},
+		parts_lists_save_to_local_storage () {
+			localStorage.setItem(LOCAL_PARTS_LISTS_KEY, JSON.stringify(this.local_parts_lists))
+		},
+
+		display_status_message (status) {
+			this.status_message = status;
+			this.$refs.status_message.className = 'parts-list-footer-status-message';
+			window.requestAnimationFrame(function(time) {
+				window.requestAnimationFrame(function(time) {
+					this.$refs.status_message.className = "parts-list-footer-status-message fade";
+				}.bind(this));
+			}.bind(this));
+		},
+		clear_status_message () {
+			this.status_message = null;
+		}
 	},
 };
 </script>
@@ -46,6 +144,21 @@ export default {
 
 	width: 100%;
 	margin: 0px;
+}
+
+.parts-list-footer-status-message {
+}
+
+.fade {
+	animation: fadeanim 3s forwards;
+}
+
+@keyframes fadeanim {
+	from {
+	}
+	to {
+		color: transparent;
+	}
 }
 
 </style>

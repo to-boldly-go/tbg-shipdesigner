@@ -106,7 +106,6 @@ export default {
 					this.value_string = value;
 					break;
 				};
-				this.partupdate();
 			},
 		},
 		value_number: {
@@ -114,7 +113,11 @@ export default {
 				return Number(this.part[this.field.name]);
 			},
 			set (value) {
-				this.part[this.field.name] = Number(value.trim());
+				this.$store.commit('edit_part', {
+					part: this.part,
+					field: this.field.name,
+					value: Number(value.trim()),
+				});
 			},
 		},
 		value_string: {
@@ -122,14 +125,15 @@ export default {
 				return this.part[this.field.name];
 			},
 			set (value) {
-				this.part[this.field.name] = value;
+				this.$store.commit('edit_part', {
+					part: this.part,
+					field: this.field.name,
+					value: value,
+				});
 			},
 		},
 	},
 	methods: {
-		partupdate () {
-			this.$emit('partupdate');
-		},
 		on_keydown(ev) {
 			switch (ev.key){
 			case 'Enter':

@@ -10,6 +10,7 @@
     "scripts": {
         "load-ship": "node scripts/load-ship.js --parts dist/parts_C8.csv  --frames dist/frames_C8.csv --modules dist/modules_C8.csv",
         "import-ship": "node scripts/import-ship.js --parts dist/parts_C8.csv  --frames dist/frames_C8.csv --modules dist/modules_C8.csv",
+        "import-parts": "node scripts/import-parts.js",
         "webpack": "webpack",
         "watch": "webpack --progress --watch",
         "start": "webpack-dev-server",

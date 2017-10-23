@@ -9,12 +9,10 @@ Promise.longStackTraces();
 
 Vue.use(Vuex);
 
-import design_json_init from '../dist/swb_kepler_recreation.json';
-import canon_parts from '../dist/parts_C8.csv';
-import canon_modules from '../dist/modules_C8.csv';
-import canon_frames from '../dist/frames_C8.csv';
-
 import ShipEngine from '../lib/shipengine.js';
+
+import design_json_init from '../dist/swb_kepler_recreation.json';
+import canon_parts_list from '../dist/canon_parts_list.json';
 
 let design_json;
 let hash = new URL(location).hash;
@@ -24,16 +22,11 @@ if (hash) {
 	design_json = design_json_init;
 };
 
-const PARTS_KEY = 'working_parts_list';
-
 const store = new Vuex.Store({
 	state: {
 		design_json,
-		parts_info: {
-			parts: canon_parts,
-			modules: canon_modules,
-			frames: canon_frames,
-		},
+		parts_list: canon_parts_list,
+		canon_parts_list,
 		undo: {
 			current: -1,
 			history: [],
@@ -44,7 +37,11 @@ const store = new Vuex.Store({
 			return new ShipEngine.Design(getters.se_db, state.design_json);
 		},
 		se_db: (state, getters) => {
-			return new ShipEngine.DB(state.parts_info);
+			return new ShipEngine.DB({
+				parts: state.parts_list.parts.records,
+				modules: state.parts_list.modules.records,
+				frames: state.parts_list.frames.records,
+			});
 		},
 	},
 	actions: {
@@ -73,16 +70,10 @@ const store = new Vuex.Store({
 			timestamp.setMilliseconds(0);
 			state.design_json['Blueprint Date'] = timestamp.toISOString();
 		},
-		load_parts_from_storage (state, payload) {
-			const saved_parts = localStorage.getItem(PARTS_KEY);
-			if (saved_parts) {
-				const saved_parts_object = JSON.parse(saved_parts);
-				state.parts_info.parts = saved_parts_object.parts.records;
-				state.parts_info.modules = saved_parts_object.modules.records;
-				state.parts_info.frames = saved_parts_object.frames.records;
-			};
+		set_parts_list (state, payload) {
+			state.parts_list = payload;
 		},
-
+		
 
 		set_subsystem_frame (state, payload) {
 			let old_frame = payload.subsystem.sub_frame;
@@ -292,11 +283,6 @@ const store = new Vuex.Store({
 	},
 });
 
-window.addEventListener('storage', function(ev) {
-	if (ev.key === PARTS_KEY) {
-		store.commit('load_parts_from_storage');
-	};
-});
 window.addEventListener('keydown', function(ev) {
 	console.log(ev);
 	if (ev.key === 'z' && ev.ctrlKey) {

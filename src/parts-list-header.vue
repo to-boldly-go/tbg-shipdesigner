@@ -36,23 +36,9 @@ import _ from 'lodash';
 
 export default {
 	name: 'PartsListHeader',
-	components: {
-	},
-	props: {
-		partslist: {
-			type: Array,
-		},
-		schema: {
-			type: Array,
-		},
-		display: {
-			type: Object,
-		},
-	},
 	computed: {
 		types () {
-
-			let type_sort_map = _.chain(this.partslist)
+			let type_sort_map = _.chain(this.$store.getters.selected_parts)
 				.map((part) => { return { [part['Type']]: part['Type Sort'] }; })
 				.reduce(_.assign, {})
 				.value();
@@ -63,37 +49,41 @@ export default {
 				.map((elem) => elem['Type'])
 				.value();
 		},
+		tab_class_type () {
+			return function (type) {
+				return {
+					'type-tab-selected': this.$store.state.display.filter.types.includes(type),
+				};
+			};
+		},
+		tab_class_select () {
+			return function (select) {
+				return {
+					'select-tab-selected': this.$store.state.display.selected === select,
+				};
+			};
+		},
+		lamp_class_type () {
+			return function (type) {
+				return {
+					'indicator-lamp-selected': this.$store.state.display.filter.types.includes(type),
+				};
+			};
+		},
+		lamp_class_select () {
+			return function (select) {
+				return {
+					'indicator-lamp-selected': this.$store.state.display.selected === select,
+				};
+			};
+		},
 	},
 	methods: {
 		set_selection(select) {
-			this.display.selected = select;
+			this.$store.state.display.selected = select;
 		},
 		set_filter(type) {
-			if (this.display.filter.types.includes(type)) {
-				this.display.filter.types = _.filter(this.display.filter.types, (elem) => !(elem === type));
-			} else {
-				this.display.filter.types.push(type);
-			};
-		},
-		tab_class_type(type) {
-			return {
-				'type-tab-selected': this.display.filter.types.includes(type),
-			};
-		},
-		tab_class_select(select) {
-			return {
-				'select-tab-selected': this.display.selected === select,
-			};
-		},
-		lamp_class_type(type) {
-			return {
-				'indicator-lamp-selected': this.display.filter.types.includes(type),
-			};
-		},
-		lamp_class_select(select) {
-			return {
-				'indicator-lamp-selected': this.display.selected === select,
-			};
+			this.$store.commit('toggle_filter', type);
 		},
 	},
 };
