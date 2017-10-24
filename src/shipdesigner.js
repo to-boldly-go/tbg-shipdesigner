@@ -284,7 +284,6 @@ const store = new Vuex.Store({
 });
 
 window.addEventListener('keydown', function(ev) {
-	console.log(ev);
 	if (ev.key === 'z' && ev.ctrlKey) {
 		store.dispatch('undo');
 	};

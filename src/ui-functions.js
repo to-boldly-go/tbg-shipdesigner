@@ -1,7 +1,7 @@
 function frac(val, base, mixed) {
 	if (mixed === undefined || mixed) {
 		let integral = Math.floor(val);
-		let fractional = Math.ceil((val - integral) * base);
+		let fractional = Math.round((val - integral) * base);
 		while (fractional >= base) {
 			integral += 1;
 			fractional -= base;
