@@ -73,6 +73,30 @@ const store = new Vuex.Store({
 		set_parts_list (state, payload) {
 			state.parts_list = payload;
 		},
+
+
+		set_design_name (state, payload) {
+			let old_name = state.design_json['Name'];
+			state.design_json['Name'] = payload;
+			state.undo.current += 1;
+			state.undo.history.splice(state.undo.current);
+			state.undo.history[state.undo.current] = ({
+				undo: {
+					type: 'set_design_name_undo',
+					old_name,
+				},
+				redo: {
+					type: 'set_design_name_redo',
+					new_name: payload,
+				},
+			});
+		},
+		set_design_name_undo (state, payload) {
+			state.design_json['Name'] = payload.old_name;
+		},
+		set_design_name_redo (state, payload) {
+			state.design_json['Name'] = payload.new_name;
+		},
 		
 
 		set_subsystem_frame (state, payload) {
@@ -286,9 +310,11 @@ const store = new Vuex.Store({
 window.addEventListener('keydown', function(ev) {
 	if (ev.key === 'z' && ev.ctrlKey) {
 		store.dispatch('undo');
+		ev.preventDefault();
 	};
 	if (ev.key === 'y' && ev.ctrlKey) {
 		store.dispatch('redo');
+		ev.preventDefault();
 	};
 });
 

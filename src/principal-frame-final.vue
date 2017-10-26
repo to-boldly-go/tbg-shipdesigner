@@ -79,7 +79,7 @@ export default {
 				return this.$store.getters.se_design.json['Name'];
 			},
 			set (value) {
-				this.$store.getters.se_design.json['Name'] = value;
+				this.$store.commit('set_design_name', value);
 			}
 		},
 		...mapGetters([
