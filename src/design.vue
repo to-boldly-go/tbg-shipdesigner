@@ -22,6 +22,7 @@
 		  <th>E</th>
 		  <th>T</th>
 		  <th>Build Time</th>
+		  <th>Year Available</th>
 		</tr>
 	  </thead>
 	  <tbody class="design-table-body">

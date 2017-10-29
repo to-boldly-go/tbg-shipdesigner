@@ -27,6 +27,8 @@
 	</template>
 
 	<td class="build-time-column">{{build_time}}</td>
+
+	<td class="tech-year-column">{{tech_year}}</td>
   </tr>
 </template>
 
@@ -47,6 +49,9 @@ export default {
 		StatlineCell,
 	},
 	computed: {
+		tech_year () {
+			return this.$store.getters.se_design.tech_year;
+		},
 		power_final_title () {
 			if (this.has_power_error) {
 				return 'Error: Power cost greater than power generation.';

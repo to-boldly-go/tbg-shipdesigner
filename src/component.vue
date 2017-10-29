@@ -44,6 +44,11 @@
 	</template>
 
 	<td class="build-time-column"></td>
+
+	<td class="tech-year-column"
+		v-bind:class="{ ['has-warning']: is_limiting_tech_year }"
+		v-bind:title="tech_year_tooltip"
+		>{{tech_year}}</td>
   </tr>
 </template>
 
@@ -67,6 +72,19 @@ export default {
 		se_component: Object,
 	},
 	computed: {
+		tech_year_tooltip () {
+			if (this.is_limiting_tech_year) {
+				return 'This component is the latest-available part in the design.';
+			} else {
+				return false;
+			};
+		},
+		is_limiting_tech_year () {
+			return this.se_component.tech_year == this.se_component.subsystem.design.tech_year;
+		},
+		tech_year () {
+			return this.se_component.tech_year;
+		},
 		part_column_select_computed () {
 			return {
 				['has-error']: !this.is_valid_part,
@@ -193,6 +211,10 @@ export default {
 
 .has-error {
 	background: #faa;
+}
+
+.has-warning {
+	background: #ffa;
 }
 
 .quantity-column {

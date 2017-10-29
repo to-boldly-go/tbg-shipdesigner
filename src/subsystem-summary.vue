@@ -25,6 +25,8 @@
 	</template>
 
 	<td class="build-cost-column"></td>
+
+	<td class="tech-year-column"></td>
   </tr>
 
 </template>

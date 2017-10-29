@@ -26,6 +26,8 @@
 	</template>
 
 	<td class="build-time-column">{{build_time_frame}}</td>
+
+	<td class="tech-year-column"></td>
   </tr>
 </template>
 

@@ -27,6 +27,8 @@
 	</template>
 
 	<td class="build-time-column">{{build_time}}</td>
+
+	<td class="tech-year-column">{{tech_year}}</td>
   </tr>
 
 
@@ -52,6 +54,9 @@ export default {
 		se_subsystem: Object,
 	},
 	computed: {
+		tech_year () {
+			return this.se_subsystem.tech_year;
+		},
 		part_column_select_computed () {
 			return {
 				['has-error']: !this.is_valid_frame,
