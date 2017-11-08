@@ -17,11 +17,23 @@
     <input type="button" @click="parts_lists_save_current" value="Save current parts"></input>
     <input type="button" @click="parts_lists_load_from_local_storage" value="Refresh"></input>
 
+	<input type="button" @click="parts_lists_save_file" value="Save to file"></input>
+	<input type="button" @click="$refs.load_file_input.click()" value="Load from file"></input>
+
+    <input
+	  style="display:none"
+	  type="file"
+	  ref="load_file_input"
+	  @change="parts_lists_load_file"
+	  value="Load file"></input>
+
+	<a ref="save_file_a" style="display:none"></a>
+
     <span
 	  ref="status_message"
 	  class="design-import-export-status-message"
 	  @animationend="clear_status_message()">{{ status_message }}</span>
-	
+
   </div>
 </template>
 
@@ -111,6 +123,12 @@ export default {
 			this.display_status_message("Parts list loaded");
 		},
 		parts_lists_delete_selected () {
+			// remove the selected item
+			this.local_parts_lists = _.chain(this.local_parts_lists).reject(pl => {
+				return _.isEqual(pl_comparison_slice(pl), pl_comparison_slice(this.selected_parts_list));
+			}).value();
+			this.parts_lists_save_to_local_storage();
+			this.display_status_message("Parts list deleted.");
 		},
 		parts_lists_save_current () {
 			this.$store.commit('timestamp_parts_list');
@@ -120,6 +138,31 @@ export default {
 		},
 		parts_lists_save_to_local_storage () {
 			localStorage.setItem(LOCAL_PARTS_LISTS_KEY, JSON.stringify(this.local_parts_lists))
+		},
+
+		parts_lists_save_file() {
+			this.$store.commit('timestamp_parts_list');
+			const data = encodeURIComponent(JSON.stringify(this.$store.state.parts_list));
+			const filename = this.$store.state.parts_list.name + ' ' + this.$store.state.parts_list.timestamp + '.json';
+			let element = this.$refs.save_file_a;
+			element.setAttribute('href', 'data:text/plain;charset=utf-8,' + data);
+			element.setAttribute('download', filename);
+			element.click();
+		},
+		parts_lists_load_file() {
+			let load_f = this.$refs.load_file_input.files[0];
+			let reader = new FileReader();
+			reader.onload = function(event) {
+				if (reader.readyState === FileReader.DONE) {
+					let pl = JSON.parse(reader.result);
+					this.$store.commit('set_parts_list', _.cloneDeep(pl));
+					this.local_parts_lists.push(_.cloneDeep(pl));
+					this.parts_lists_save_to_local_storage();
+					this.selected_parts_list = this.parts_list_save_name(pl);
+					this.display_status_message("Parts list loaded from file.");
+				};
+			}.bind(this);
+			reader.readAsText(load_f)
 		},
 
 		display_status_message (status) {
