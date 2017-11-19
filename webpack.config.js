@@ -4,6 +4,7 @@ const config = {
 	entry: {
 		'shipdesigner': './src/shipdesigner.js',
 		'partbuilder': './src/partbuilder.js',
+		'csvimporter': './src/csvimporter.js',
 	},
 	output: {
 		path: path.resolve(__dirname, 'dist'),
