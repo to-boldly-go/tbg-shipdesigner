@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 653);
+/******/ 	return __webpack_require__(__webpack_require__.s = 697);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -26324,17 +26324,19 @@ module.exports = function listToStyles (parentId, list) {
 
 /***/ }),
 
-/***/ 653:
+/***/ 697:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _csvimporter = __webpack_require__(698);
 
-var _lodash = __webpack_require__(36);
+var _csvimporter2 = _interopRequireDefault(_csvimporter);
 
-var _lodash2 = _interopRequireDefault(_lodash);
+var _bluebird = __webpack_require__(72);
+
+var _bluebird2 = _interopRequireDefault(_bluebird);
 
 var _vue = __webpack_require__(61);
 
@@ -26344,21 +26346,7 @@ var _vuex = __webpack_require__(16);
 
 var _vuex2 = _interopRequireDefault(_vuex);
 
-var _partbuilder = __webpack_require__(654);
-
-var _partbuilder2 = _interopRequireDefault(_partbuilder);
-
-var _bluebird = __webpack_require__(72);
-
-var _bluebird2 = _interopRequireDefault(_bluebird);
-
-var _canon_parts_list = __webpack_require__(60);
-
-var _canon_parts_list2 = _interopRequireDefault(_canon_parts_list);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 _bluebird2.default.longStackTraces();
 
@@ -26366,97 +26354,17 @@ _vue2.default.use(_vuex2.default);
 
 var store = new _vuex2.default.Store({
 	state: {
-		parts_list: _lodash2.default.cloneDeep(_canon_parts_list2.default),
-		canon_parts_list: _canon_parts_list2.default,
-		display: {
-			filter: {
-				types: [].concat(_toConsumableArray((0, _lodash2.default)(_canon_parts_list2.default.modules.records).map(function (part) {
-					return part['Type'];
-				}).uniq()), [(0, _lodash2.default)(_canon_parts_list2.default.parts.records).minBy(function (part) {
-					return part['Type Sort'];
-				})['Type'], (0, _lodash2.default)(_canon_parts_list2.default.frames.records).minBy(function (part) {
-					return part['Type Sort'];
-				})['Type']])
-			},
-			current_sort: {
-				field: null,
-				ascending: true
-			},
-			selected: 'parts'
-		}
+		parts_list: {},
+		design_json: {}
 	},
-	getters: {
-		selected_parts: function selected_parts(state, getters) {
-			return state.parts_list[state.display.selected].records;
-		},
-		selected_schema: function selected_schema(state, getters) {
-			return state.parts_list[state.display.selected].schema;
-		}
-	},
+	getters: {},
 	actions: {},
 	mutations: {
-		set_parts_list_name: function set_parts_list_name(state, name) {
-			state.parts_list.name = name;
-		},
-		timestamp_parts_list: function timestamp_parts_list(state, payload) {
-			var timestamp = new Date();
-			timestamp.setMilliseconds(0);
-			state.parts_list.timestamp = timestamp.toISOString();
-		},
-		edit_part: function edit_part(state, payload) {
-			payload.part[payload.field] = payload.value;
-		},
-		sort_parts_list_by: function sort_parts_list_by(state, field) {
-			if (state.display.current_sort.field === field) {
-				state.display.current_sort.ascending = !state.display.current_sort.ascending;
-			} else {
-				state.display.current_sort.field = field;
-				state.display.current_sort.ascending = true;
-			};
-
-			var selected_parts = state.parts_list[state.display.selected].records;
-
-			switch (_typeof(selected_parts[0][field])) {
-				case 'number':
-					selected_parts.sort(function (a, b) {
-						var invert = state.display.current_sort.ascending ? 1 : -1;
-						return (a[field] - b[field]) * invert;
-					});
-					break;
-				case 'string':
-					selected_parts.sort(function (a, b) {
-						var invert = state.display.current_sort.ascending ? 1 : -1;
-						return a[field].localeCompare(b[field]) * invert;
-					});
-					break;
-			};
-		},
-		delete_part: function delete_part(state, payload) {
-			var selected_parts = state.parts_list[state.display.selected].records;
-			var idx = selected_parts.findIndex(function (part) {
-				return part['Name'] === payload;
-			});
-			if (idx >= 0) {
-				selected_parts.splice(idx, 1);
-			};
-		},
-		add_part: function add_part(state, payload) {
-			state.parts_list[state.display.selected].records.push(payload);
-		},
-		reset_to_canon: function reset_to_canon(state, payload) {
-			state.parts_list = _canon_parts_list2.default;
-		},
 		set_parts_list: function set_parts_list(state, payload) {
 			state.parts_list = payload;
 		},
-		toggle_filter: function toggle_filter(state, payload) {
-			if (state.display.filter.types.includes(payload)) {
-				state.display.filter.types = _lodash2.default.filter(state.display.filter.types, function (elem) {
-					return !(elem === payload);
-				});
-			} else {
-				state.display.filter.types.push(payload);
-			};
+		set_design_json: function set_design_json(state, payload) {
+			state.design_json = payload;
 		}
 	}
 });
@@ -26464,27 +26372,27 @@ var store = new _vuex2.default.Store({
 // create a root instance
 new _vue2.default({
 	el: '#app',
-	store: store,
 	render: function render(h) {
-		return h(_partbuilder2.default);
-	}
+		return h(_csvimporter2.default);
+	},
+	store: store
 });
 
 /***/ }),
 
-/***/ 654:
+/***/ 698:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_partbuilder_vue__ = __webpack_require__(659);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_partbuilder_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_partbuilder_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_65fa2a8a_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_partbuilder_vue__ = __webpack_require__(696);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_csvimporter_vue__ = __webpack_require__(703);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_csvimporter_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_csvimporter_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5b8a858b_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_csvimporter_vue__ = __webpack_require__(704);
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(655)
-  __webpack_require__(657)
+  __webpack_require__(699)
+  __webpack_require__(701)
 }
 var normalizeComponent = __webpack_require__(12)
 /* script */
@@ -26494,19 +26402,19 @@ var normalizeComponent = __webpack_require__(12)
 /* styles */
 var __vue_styles__ = injectStyle
 /* scopeId */
-var __vue_scopeId__ = "data-v-65fa2a8a"
+var __vue_scopeId__ = "data-v-5b8a858b"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_partbuilder_vue___default.a,
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_65fa2a8a_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_partbuilder_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_csvimporter_vue___default.a,
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5b8a858b_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_csvimporter_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/partbuilder.vue"
+Component.options.__file = "src/csvimporter.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] partbuilder.vue: functional components are not supported with templates, they should use render functions.")}
+if (Component.options.functional) {console.error("[vue-loader] csvimporter.vue: functional components are not supported with templates, they should use render functions.")}
 
 /* hot reload */
 if (false) {(function () {
@@ -26515,9 +26423,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-65fa2a8a", Component.options)
+    hotAPI.createRecord("data-v-5b8a858b", Component.options)
   } else {
-    hotAPI.reload("data-v-65fa2a8a", Component.options)
+    hotAPI.reload("data-v-5b8a858b", Component.options)
   }
   module.hot.dispose(function (data) {
     disposed = true
@@ -26529,23 +26437,23 @@ if (false) {(function () {
 
 /***/ }),
 
-/***/ 655:
+/***/ 699:
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(656);
+var content = __webpack_require__(700);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(5)("ff8539a6", content, false);
+var update = __webpack_require__(5)("4555fef2", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
  if(!content.locals) {
-   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-65fa2a8a\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./partbuilder.vue", function() {
-     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-65fa2a8a\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./partbuilder.vue");
+   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-5b8a858b\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./csvimporter.vue", function() {
+     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-5b8a858b\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./csvimporter.vue");
      if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
      update(newContent);
    });
@@ -26556,7 +26464,7 @@ if(false) {
 
 /***/ }),
 
-/***/ 656:
+/***/ 700:
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(4)(true);
@@ -26564,30 +26472,30 @@ exports = module.exports = __webpack_require__(4)(true);
 
 
 // module
-exports.push([module.i, "\n.root[data-v-65fa2a8a] {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\n\tfont-family: arial, sans-serif;\n\tfont-size: 13px;\n\tfont-stretch: 100%;\n\tfont-style: 100%;\n\tfont-variant-caps: normal;\n\tfont-variant-ligatures: normal;\n\tfont-variant-numeric: normal;\n\tfont-weight: 400;\n}\n.header[data-v-65fa2a8a] {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n.editor[data-v-65fa2a8a] {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n.footer[data-v-65fa2a8a] {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/partbuilder.vue?7b695ced"],"names":[],"mappings":";AA8DA;CACA,YAAA;CACA,aAAA;;CAEA,cAAA;CACA,uBAAA;CACA,kBAAA;;CAEA,+BAAA;CACA,gBAAA;CACA,mBAAA;CACA,iBAAA;CACA,0BAAA;CACA,+BAAA;CACA,6BAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,yBAAA;CACA;AAEA;CACA,eAAA;CACA,mBAAA,yCAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,sBAAA;CACA","file":"partbuilder.vue","sourcesContent":["<template>\n  <div class=\"root\">\n\t<div class=\"header\">\n\t  <PartsListHeader></PartsListHeader>\n\t</div>\n\t<div class=\"editor\">\n\t  <PartsListEditor></PartsListEditor>\n\t</div>\n\t<div class=\"footer\">\n\t  <PartsListFooter></PartsListFooter>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\n\nimport PartsListHeader from './parts-list-header.vue';\nimport PartsListFooter from './parts-list-footer.vue';\nimport PartsListEditor from './parts-list-editor.vue';\n\nimport canon_parts_list from '../dist/canon_parts_list.json';\n\nconst PARTS_KEY = 'working_parts_list';\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tPartsListHeader,\n\t\tPartsListFooter,\n\t\tPartsListEditor,\n\t},\n\tdata () {\n\t\treturn {\n\t\t};\n\t},\n\tmounted () {\n\t\tthis.load_parts_from_storage();\n\t},\n\tupdated () {\n\t\tthis.save_parts_to_storage();\n\t},\n\tmethods: {\n\t\tload_parts_from_storage () {\n\t\t\tconst saved_parts = localStorage.getItem(PARTS_KEY);\n\t\t\tif (saved_parts) {\n\t\t\t\tthis.data = JSON.parse(saved_parts);\n\t\t\t} else {\n\t\t\t\tlocalStorage.setItem(PARTS_KEY, JSON.stringify(this.data));\n\t\t\t};\n\t\t},\n\t\tsave_parts_to_storage () {\n\t\t\tlocalStorage.setItem(PARTS_KEY, JSON.stringify(this.data));\n\t\t},\n\t},\n};\n\n</script>\n\n<style scoped>\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\n\tfont-family: arial, sans-serif;\n\tfont-size: 13px;\n\tfont-stretch: 100%;\n\tfont-style: 100%;\n\tfont-variant-caps: normal;\n\tfont-variant-ligatures: normal;\n\tfont-variant-numeric: normal;\n\tfont-weight: 400;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.editor {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n\n<style>\n\nbutton, input, select, textarea {\n\tfont-family : inherit;\n\tfont-size   : 100%;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"csvimporter.vue","sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 
-/***/ 657:
+/***/ 701:
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(658);
+var content = __webpack_require__(702);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(5)("758da335", content, false);
+var update = __webpack_require__(5)("ea2fcf20", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
  if(!content.locals) {
-   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-65fa2a8a\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./partbuilder.vue", function() {
-     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-65fa2a8a\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./partbuilder.vue");
+   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-5b8a858b\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./csvimporter.vue", function() {
+     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-5b8a858b\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./csvimporter.vue");
      if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
      update(newContent);
    });
@@ -26598,7 +26506,7 @@ if(false) {
 
 /***/ }),
 
-/***/ 658:
+/***/ 702:
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(4)(true);
@@ -26606,14 +26514,14 @@ exports = module.exports = __webpack_require__(4)(true);
 
 
 // module
-exports.push([module.i, "\nbutton, input, select, textarea {\n\tfont-family : inherit;\n\tfont-size   : 100%;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/partbuilder.vue?7b695ced"],"names":[],"mappings":";AAoGA;CACA,sBAAA;CACA,mBAAA;CACA","file":"partbuilder.vue","sourcesContent":["<template>\n  <div class=\"root\">\n\t<div class=\"header\">\n\t  <PartsListHeader></PartsListHeader>\n\t</div>\n\t<div class=\"editor\">\n\t  <PartsListEditor></PartsListEditor>\n\t</div>\n\t<div class=\"footer\">\n\t  <PartsListFooter></PartsListFooter>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\n\nimport PartsListHeader from './parts-list-header.vue';\nimport PartsListFooter from './parts-list-footer.vue';\nimport PartsListEditor from './parts-list-editor.vue';\n\nimport canon_parts_list from '../dist/canon_parts_list.json';\n\nconst PARTS_KEY = 'working_parts_list';\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tPartsListHeader,\n\t\tPartsListFooter,\n\t\tPartsListEditor,\n\t},\n\tdata () {\n\t\treturn {\n\t\t};\n\t},\n\tmounted () {\n\t\tthis.load_parts_from_storage();\n\t},\n\tupdated () {\n\t\tthis.save_parts_to_storage();\n\t},\n\tmethods: {\n\t\tload_parts_from_storage () {\n\t\t\tconst saved_parts = localStorage.getItem(PARTS_KEY);\n\t\t\tif (saved_parts) {\n\t\t\t\tthis.data = JSON.parse(saved_parts);\n\t\t\t} else {\n\t\t\t\tlocalStorage.setItem(PARTS_KEY, JSON.stringify(this.data));\n\t\t\t};\n\t\t},\n\t\tsave_parts_to_storage () {\n\t\t\tlocalStorage.setItem(PARTS_KEY, JSON.stringify(this.data));\n\t\t},\n\t},\n};\n\n</script>\n\n<style scoped>\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\n\tfont-family: arial, sans-serif;\n\tfont-size: 13px;\n\tfont-stretch: 100%;\n\tfont-style: 100%;\n\tfont-variant-caps: normal;\n\tfont-variant-ligatures: normal;\n\tfont-variant-numeric: normal;\n\tfont-weight: 400;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.editor {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n\n<style>\n\nbutton, input, select, textarea {\n\tfont-family : inherit;\n\tfont-size   : 100%;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"csvimporter.vue","sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 
-/***/ 659:
+/***/ 703:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26622,238 +26530,80 @@ exports.push([module.i, "\nbutton, input, select, textarea {\n\tfont-family : in
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-
-var _lodash = __webpack_require__(36);
-
-var _lodash2 = _interopRequireDefault(_lodash);
-
-var _partsListHeader = __webpack_require__(660);
-
-var _partsListHeader2 = _interopRequireDefault(_partsListHeader);
-
-var _partsListFooter = __webpack_require__(667);
-
-var _partsListFooter2 = _interopRequireDefault(_partsListFooter);
-
-var _partsListEditor = __webpack_require__(675);
-
-var _partsListEditor2 = _interopRequireDefault(_partsListEditor);
 
 var _canon_parts_list = __webpack_require__(60);
 
 var _canon_parts_list2 = _interopRequireDefault(_canon_parts_list);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var PARTS_KEY = 'working_parts_list'; //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-exports.default = {
-	name: 'app',
-	components: {
-		PartsListHeader: _partsListHeader2.default,
-		PartsListFooter: _partsListFooter2.default,
-		PartsListEditor: _partsListEditor2.default
-	},
-	data: function data() {
-		return {};
-	},
-	mounted: function mounted() {
-		this.load_parts_from_storage();
-	},
-	updated: function updated() {
-		this.save_parts_to_storage();
-	},
-
-	methods: {
-		load_parts_from_storage: function load_parts_from_storage() {
-			var saved_parts = localStorage.getItem(PARTS_KEY);
-			if (saved_parts) {
-				this.data = JSON.parse(saved_parts);
-			} else {
-				localStorage.setItem(PARTS_KEY, JSON.stringify(this.data));
-			};
-		},
-		save_parts_to_storage: function save_parts_to_storage() {
-			localStorage.setItem(PARTS_KEY, JSON.stringify(this.data));
-		}
-	}
-};
-
-/***/ }),
-
-/***/ 660:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_header_vue__ = __webpack_require__(665);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_header_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_header_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_17d5f5e2_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_header_vue__ = __webpack_require__(666);
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(661)
-  __webpack_require__(663)
-}
-var normalizeComponent = __webpack_require__(12)
-/* script */
-
-/* template */
-
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-17d5f5e2"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_header_vue___default.a,
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_17d5f5e2_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_header_vue__["a" /* default */],
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "src/parts-list-header.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] parts-list-header.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-17d5f5e2", Component.options)
-  } else {
-    hotAPI.reload("data-v-17d5f5e2", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
-
-
-/***/ }),
-
-/***/ 661:
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(662);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(5)("2fb2b6e5", content, false);
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-17d5f5e2\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./parts-list-header.vue", function() {
-     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-17d5f5e2\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./parts-list-header.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-
-/***/ 662:
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(4)(true);
-// imports
-
-
-// module
-exports.push([module.i, "\n.header[data-v-17d5f5e2] {\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n}\n.select-tab-column[data-v-17d5f5e2] {\n\tflex: 0 0 auto;\n\tdisplay: flex;\n\tflex-direction: column;\n}\n.select-tab[data-v-17d5f5e2] {\n\tcursor: pointer;\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #33a;\n\tcolor: #fff;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n.select-tab[data-v-17d5f5e2]:active {\n\tbackground: #66e;\n\tborder-style: inset;\n}\n.select-tab-selected[data-v-17d5f5e2] {\n\tborder: 1px solid #eee;\n\tbackground: #44c;\n}\n.select-tab-text[data-v-17d5f5e2] {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n.spacer-tab[data-v-17d5f5e2] {\n\tflex: 0 0 30px;\n\tpadding: 4px;\n\tborder: 1 px outset #eee;\n\tbackground: #666;\n}\n.type-tab-column[data-v-17d5f5e2] {\n\tflex: 1 0 0;\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n\talign-items: flex-start;\n}\n.type-tab[data-v-17d5f5e2] {\n\tcursor: pointer;\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #666;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n.type-tab[data-v-17d5f5e2]:active {\n\tbackground: #aaa;\n\tborder-style: inset;\n}\n.type-tab-selected[data-v-17d5f5e2] {\n\tborder: 1px solid #eee;\n\tbackground: #999;\n}\n.type-tab-text[data-v-17d5f5e2] {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n.indicator-lamp-wrapper[data-v-17d5f5e2] {\n\tdisplay: flex;\n\tflex-direction: column;\n\n\theight: 100%;\n\n\tfloat: right;\n\tmargin-left: 4px;\n\tmargin-top: 0px;\n\tmargin-bottom: 0px;\n\tmargin-right: 0px;\n\t\n\twidth: 10px;\n}\n.indicator-lamp-spacer[data-v-17d5f5e2] {\n\tflex: 1 0 0;\n}\n.indicator-lamp[data-v-17d5f5e2] {\n\t/* width: 10px; */\n\tflex: 0 0 10px;\n\tbackground: black;\n}\n.indicator-lamp-selected[data-v-17d5f5e2] {\n\tbackground: #2f2;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/parts-list-header.vue?b295540c"],"names":[],"mappings":";AA6FA;CACA,cAAA;CACA,oBAAA;CACA,gBAAA;CACA,4BAAA;CACA;AAEA;CACA,eAAA;CACA,cAAA;CACA,uBAAA;CACA;AAEA;CACA,gBAAA;CACA,eAAA;CACA,aAAA;CACA,wBAAA;CACA,iBAAA;CACA,YAAA;;CAEA,oBAAA;CACA,0BAAA;CACA,kCAAA;CACA,wBAAA;CACA;AAEA;CACA,iBAAA;CACA,oBAAA;CACA;AAEA;CACA,uBAAA;CACA,iBAAA;CACA;AAEA;CACA,qBAAA;CACA,YAAA;CACA;AAEA;CACA,eAAA;CACA,aAAA;CACA,yBAAA;CACA,iBAAA;CACA;AAEA;CACA,YAAA;CACA,cAAA;CACA,oBAAA;CACA,gBAAA;CACA,4BAAA;CACA,wBAAA;CACA;AAEA;CACA,gBAAA;CACA,eAAA;CACA,aAAA;CACA,wBAAA;CACA,iBAAA;;CAEA,oBAAA;CACA,0BAAA;CACA,kCAAA;CACA,wBAAA;CACA;AAEA;CACA,iBAAA;CACA,oBAAA;CACA;AAEA;CACA,uBAAA;CACA,iBAAA;CACA;AAEA;CACA,qBAAA;CACA,YAAA;CACA;AAEA;CACA,cAAA;CACA,uBAAA;;CAEA,aAAA;;CAEA,aAAA;CACA,iBAAA;CACA,gBAAA;CACA,mBAAA;CACA,kBAAA;;CAEA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,kBAAA;CACA,eAAA;CACA,kBAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"parts-list-header.vue","sourcesContent":["<template>\n  <div class=\"header\">\n\t<div class=\"select-tab-column\">\n\t  <div class=\"select-tab\"\n\t\t   v-for=\"select in ['parts','modules','frames']\"\n\t\t   @click=\"set_selection(select)\"\n\t\t   v-bind:class=\"tab_class_select(select)\">\n\t\t<div class=\"select-tab-text\">{{select}}</div>\n\t\t<div class=\"indicator-lamp-wrapper\">\n\t\t  <div class=\"indicator-lamp-spacer\"></div>\n\t\t  <div class=\"indicator-lamp\" v-bind:class=\"lamp_class_select(select)\"></div>\n\t\t  <div class=\"indicator-lamp-spacer\"></div>\n\t\t</div>\n\t  </div>\n\t</div>\n\n\t<div class=\"type-tab-column\">\n\t  <div class=\"type-tab\"\n\t\t   v-for=\"type in types\"\n\t\t   @click=\"set_filter(type)\"\n\t\t   v-bind:class=\"tab_class_type(type)\">\n\t\t<div class=\"type-tab-text\">{{type}}</div>\n\t\t<div class=\"indicator-lamp-wrapper\">\n\t\t  <div class=\"indicator-lamp-spacer\"></div>\n\t\t  <div class=\"indicator-lamp\" v-bind:class=\"lamp_class_type(type)\"></div>\n\t\t  <div class=\"indicator-lamp-spacer\"></div>\n\t\t</div>\n\t  </div>\n\t</div>\n  </div>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nexport default {\n\tname: 'PartsListHeader',\n\tcomputed: {\n\t\ttypes () {\n\t\t\tlet type_sort_map = _.chain(this.$store.getters.selected_parts)\n\t\t\t\t.map((part) => { return { [part['Type']]: part['Type Sort'] }; })\n\t\t\t\t.reduce(_.assign, {})\n\t\t\t\t.value();\n\t\t\t\n\t\t\treturn _.chain(type_sort_map)\n\t\t\t\t.map((tsort, type) => { return { 'Type': type, 'Type Sort': tsort }; })\n\t\t\t\t.sortBy((elem) => elem['Type Sort'])\n\t\t\t\t.map((elem) => elem['Type'])\n\t\t\t\t.value();\n\t\t},\n\t\ttab_class_type () {\n\t\t\treturn function (type) {\n\t\t\t\treturn {\n\t\t\t\t\t'type-tab-selected': this.$store.state.display.filter.types.includes(type),\n\t\t\t\t};\n\t\t\t};\n\t\t},\n\t\ttab_class_select () {\n\t\t\treturn function (select) {\n\t\t\t\treturn {\n\t\t\t\t\t'select-tab-selected': this.$store.state.display.selected === select,\n\t\t\t\t};\n\t\t\t};\n\t\t},\n\t\tlamp_class_type () {\n\t\t\treturn function (type) {\n\t\t\t\treturn {\n\t\t\t\t\t'indicator-lamp-selected': this.$store.state.display.filter.types.includes(type),\n\t\t\t\t};\n\t\t\t};\n\t\t},\n\t\tlamp_class_select () {\n\t\t\treturn function (select) {\n\t\t\t\treturn {\n\t\t\t\t\t'indicator-lamp-selected': this.$store.state.display.selected === select,\n\t\t\t\t};\n\t\t\t};\n\t\t},\n\t},\n\tmethods: {\n\t\tset_selection(select) {\n\t\t\tthis.$store.state.display.selected = select;\n\t\t},\n\t\tset_filter(type) {\n\t\t\tthis.$store.commit('toggle_filter', type);\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.header {\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n}\n\n.select-tab-column {\n\tflex: 0 0 auto;\n\tdisplay: flex;\n\tflex-direction: column;\n}\n\n.select-tab {\n\tcursor: pointer;\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #33a;\n\tcolor: #fff;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n\n.select-tab:active {\n\tbackground: #66e;\n\tborder-style: inset;\n}\n\n.select-tab-selected {\n\tborder: 1px solid #eee;\n\tbackground: #44c;\n}\n\n.select-tab-text {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n\n.spacer-tab {\n\tflex: 0 0 30px;\n\tpadding: 4px;\n\tborder: 1 px outset #eee;\n\tbackground: #666;\n}\n\n.type-tab-column {\n\tflex: 1 0 0;\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n\talign-items: flex-start;\n}\n\n.type-tab {\n\tcursor: pointer;\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #666;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n\n.type-tab:active {\n\tbackground: #aaa;\n\tborder-style: inset;\n}\n\n.type-tab-selected {\n\tborder: 1px solid #eee;\n\tbackground: #999;\n}\n\n.type-tab-text {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n\n.indicator-lamp-wrapper {\n\tdisplay: flex;\n\tflex-direction: column;\n\n\theight: 100%;\n\n\tfloat: right;\n\tmargin-left: 4px;\n\tmargin-top: 0px;\n\tmargin-bottom: 0px;\n\tmargin-right: 0px;\n\t\n\twidth: 10px;\n}\n\n.indicator-lamp-spacer {\n\tflex: 1 0 0;\n}\n\n.indicator-lamp {\n\t/* width: 10px; */\n\tflex: 0 0 10px;\n\tbackground: black;\n}\n\n.indicator-lamp-selected {\n\tbackground: #2f2;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
-
-// exports
-
-
-/***/ }),
-
-/***/ 663:
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(664);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(5)("3508e3cf", content, false);
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-17d5f5e2\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./parts-list-header.vue", function() {
-     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-17d5f5e2\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./parts-list-header.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-
-/***/ 664:
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(4)(true);
-// imports
-
-
-// module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-header.vue","sourceRoot":""}]);
-
-// exports
-
-
-/***/ }),
-
-/***/ 665:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
 var _lodash = __webpack_require__(36);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
+var _papaparse = __webpack_require__(88);
+
+var _papaparse2 = _interopRequireDefault(_papaparse);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; } //
+var LOCAL_PARTS_LISTS_KEY = 'parts_lists'; //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -26887,502 +26637,178 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 
 
-exports.default = {
-	name: 'PartsListHeader',
-	computed: {
-		types: function types() {
-			var type_sort_map = _lodash2.default.chain(this.$store.getters.selected_parts).map(function (part) {
-				return _defineProperty({}, part['Type'], part['Type Sort']);
-			}).reduce(_lodash2.default.assign, {}).value();
-
-			return _lodash2.default.chain(type_sort_map).map(function (tsort, type) {
-				return { 'Type': type, 'Type Sort': tsort };
-			}).sortBy(function (elem) {
-				return elem['Type Sort'];
-			}).map(function (elem) {
-				return elem['Type'];
-			}).value();
-		},
-		tab_class_type: function tab_class_type() {
-			return function (type) {
-				return {
-					'type-tab-selected': this.$store.state.display.filter.types.includes(type)
-				};
-			};
-		},
-		tab_class_select: function tab_class_select() {
-			return function (select) {
-				return {
-					'select-tab-selected': this.$store.state.display.selected === select
-				};
-			};
-		},
-		lamp_class_type: function lamp_class_type() {
-			return function (type) {
-				return {
-					'indicator-lamp-selected': this.$store.state.display.filter.types.includes(type)
-				};
-			};
-		},
-		lamp_class_select: function lamp_class_select() {
-			return function (select) {
-				return {
-					'indicator-lamp-selected': this.$store.state.display.selected === select
-				};
-			};
-		}
-	},
-	methods: {
-		set_selection: function set_selection(select) {
-			this.$store.state.display.selected = select;
-		},
-		set_filter: function set_filter(type) {
-			this.$store.commit('toggle_filter', type);
-		}
-	}
+var csv_parse_config = {
+	header: true,
+	dynamicTyping: true
 };
 
-/***/ }),
-
-/***/ 666:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "header" }, [
-    _c(
-      "div",
-      { staticClass: "select-tab-column" },
-      _vm._l(["parts", "modules", "frames"], function(select) {
-        return _c(
-          "div",
-          {
-            staticClass: "select-tab",
-            class: _vm.tab_class_select(select),
-            on: {
-              click: function($event) {
-                _vm.set_selection(select)
-              }
-            }
-          },
-          [
-            _c("div", { staticClass: "select-tab-text" }, [
-              _vm._v(_vm._s(select))
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "indicator-lamp-wrapper" }, [
-              _c("div", { staticClass: "indicator-lamp-spacer" }),
-              _vm._v(" "),
-              _c("div", {
-                staticClass: "indicator-lamp",
-                class: _vm.lamp_class_select(select)
-              }),
-              _vm._v(" "),
-              _c("div", { staticClass: "indicator-lamp-spacer" })
-            ])
-          ]
-        )
-      })
-    ),
-    _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "type-tab-column" },
-      _vm._l(_vm.types, function(type) {
-        return _c(
-          "div",
-          {
-            staticClass: "type-tab",
-            class: _vm.tab_class_type(type),
-            on: {
-              click: function($event) {
-                _vm.set_filter(type)
-              }
-            }
-          },
-          [
-            _c("div", { staticClass: "type-tab-text" }, [_vm._v(_vm._s(type))]),
-            _vm._v(" "),
-            _c("div", { staticClass: "indicator-lamp-wrapper" }, [
-              _c("div", { staticClass: "indicator-lamp-spacer" }),
-              _vm._v(" "),
-              _c("div", {
-                staticClass: "indicator-lamp",
-                class: _vm.lamp_class_type(type)
-              }),
-              _vm._v(" "),
-              _c("div", { staticClass: "indicator-lamp-spacer" })
-            ])
-          ]
-        )
-      })
-    )
-  ])
-}
-var staticRenderFns = []
-render._withStripped = true
-var esExports = { render: render, staticRenderFns: staticRenderFns }
-/* harmony default export */ __webpack_exports__["a"] = (esExports);
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-17d5f5e2", esExports)
-  }
-}
-
-/***/ }),
-
-/***/ 667:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_footer_vue__ = __webpack_require__(672);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_footer_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_footer_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_12b8dc20_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_footer_vue__ = __webpack_require__(674);
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(668)
-  __webpack_require__(670)
-}
-var normalizeComponent = __webpack_require__(12)
-/* script */
-
-/* template */
-
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-12b8dc20"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_footer_vue___default.a,
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_12b8dc20_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_footer_vue__["a" /* default */],
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "src/parts-list-footer.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] parts-list-footer.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-12b8dc20", Component.options)
-  } else {
-    hotAPI.reload("data-v-12b8dc20", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
-
-
-/***/ }),
-
-/***/ 668:
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(669);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(5)("63dc1276", content, false);
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-12b8dc20\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./parts-list-footer.vue", function() {
-     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-12b8dc20\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./parts-list-footer.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-
-/***/ 669:
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(4)(true);
-// imports
-
-
-// module
-exports.push([module.i, "\n.footer[data-v-12b8dc20] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n}\n.parts-list-footer-status-message[data-v-12b8dc20] {\n}\n.fade[data-v-12b8dc20] {\n\tanimation: fadeanim-data-v-12b8dc20 3s forwards;\n}\n@keyframes fadeanim-data-v-12b8dc20 {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/parts-list-footer.vue?8f1cead6"],"names":[],"mappings":";AAwLA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;CACA;AAEA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"parts-list-footer.vue","sourcesContent":["<template>\n  <div class=\"footer\">\n\t<!-- <input id=\"partslist-import-export-string\" v-model=\"data_json_string\"> -->\n\t<!-- <input type=\"button\" class=\"clipboard-copy-button\" data-clipboard-target=\"#partslist-import-export-string\" value=\"Copy\"></input> -->\n\n\t<input v-model=\"parts_list_name\">\n\n    <select v-model=\"selected_parts_list_name\">\n      <option v-for=\"parts_list in all_parts_lists\">\n\t\t{{parts_list_save_name(parts_list)}}\n      </option>\n    </select>\n\n    <input type=\"button\" @click=\"parts_lists_delete_selected\" value=\"Delete saved parts\"></input>\n    <input type=\"button\" @click=\"parts_lists_load_selected\" value=\"Load saved parts\"></input>\n\n    <input type=\"button\" @click=\"parts_lists_save_current\" value=\"Save current parts\"></input>\n    <input type=\"button\" @click=\"parts_lists_load_from_local_storage\" value=\"Refresh\"></input>\n\n\t<input type=\"button\" @click=\"parts_lists_save_file\" value=\"Save to file\"></input>\n\t<input type=\"button\" @click=\"$refs.load_file_input.click()\" value=\"Load from file\"></input>\n\n    <input\n\t  style=\"display:none\"\n\t  type=\"file\"\n\t  ref=\"load_file_input\"\n\t  @change=\"parts_lists_load_file\"\n\t  value=\"Load file\"></input>\n\n\t<a ref=\"save_file_a\" style=\"display:none\"></a>\n\n    <span\n\t  ref=\"status_message\"\n\t  class=\"design-import-export-status-message\"\n\t  @animationend=\"clear_status_message()\">{{ status_message }}</span>\n\n  </div>\n</template>\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport canon_parts from '../dist/parts_C8.csv';\n\nconst LOCAL_PARTS_LISTS_KEY = 'parts_lists';\nconst STATUS_DEFAULT_DURATION = 2000;\n\nconst pl_comparison_slice = _.partial(_.pick, _, ['name', 'timestamp']);\n\nexport default {\n\tname: 'PartsListFooter',\n\tcomponents: {\n\t},\n\tdata () {\n\t\treturn {\n\t\t\tstatus_message: \"\",\n\t\t\tstatus_message_timeout_id: null,\n\n\t\t\tlocal_parts_lists: [],\n\t\t\tselected_parts_list: null,\n\t\t};\n\t},\n\tcomputed: {\n\t\tparts_list_name: {\n\t\t\tget () {\n\t\t\t\treturn this.$store.state.parts_list.name;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_parts_list_name', value);\n\t\t\t},\n\t\t},\n\t\tselected_parts_list_name: {\n\t\t\tget () {\n\t\t\t\tif (this.selected_parts_list) {\n\t\t\t\t\treturn this.parts_list_save_name(this.selected_parts_list);\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t};\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.selected_parts_list = _\n\t\t\t\t\t.chain(this.all_parts_lists)\n\t\t\t\t\t.find(list => this.parts_list_save_name(list) === value)\n\t\t\t\t\t.value();\n\t\t\t},\n\t\t},\n\t\tall_parts_lists () {\n\t\t\treturn [...this.local_parts_lists, this.canon_parts_list];\n\t\t},\n\t\t...mapState([\n\t\t\t'canon_parts_list',\n\t\t]),\n\t},\n    mounted () {\n\t\tthis.parts_lists_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_PARTS_LISTS_KEY) {\n\t\t\t\tthis.parts_lists_load_from_local_storage();\n\t\t\t};\n\t\t}.bind(this));\n    },\n\tmethods: {\n\t\treset_to_canon () {\n\t\t\tthis.$store.commit('reset_to_canon')\n\t\t},\n\t\tparts_list_save_name (pl) {\n\t\t\t// console.log(Object.keys(pl));\n\t\t\treturn pl.name + ' (' + (new Date(pl.timestamp).toLocaleString()) + ')';\n\t\t},\n\t\tparts_lists_load_from_local_storage () {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_parts_lists = [];\n\t\t\t\tthis.display_status_message(\"No parts lists to load\");\n\t\t\t} else {\n\t\t\t\tthis.local_parts_lists = JSON.parse(loaded);\n\t\t\t\tthis.display_status_message(\"Parts lists loaded.\");\n\t\t\t};\n\t\t},\n\t\tparts_lists_load_selected () {\n\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list));\n\t\t\tthis.display_status_message(\"Parts list loaded\");\n\t\t},\n\t\tparts_lists_delete_selected () {\n\t\t\t// remove the selected item\n\t\t\tthis.local_parts_lists = _.chain(this.local_parts_lists).reject(pl => {\n\t\t\t\treturn _.isEqual(pl_comparison_slice(pl), pl_comparison_slice(this.selected_parts_list));\n\t\t\t}).value();\n\t\t\tthis.parts_lists_save_to_local_storage();\n\t\t\tthis.display_status_message(\"Parts list deleted.\");\n\t\t},\n\t\tparts_lists_save_current () {\n\t\t\tthis.$store.commit('timestamp_parts_list');\n\t\t\tthis.local_parts_lists.push(_.cloneDeep(this.$store.state.parts_list));\n\t\t\tthis.parts_lists_save_to_local_storage();\n\t\t\tthis.display_status_message(\"Parts list saved.\");\n\t\t},\n\t\tparts_lists_save_to_local_storage () {\n\t\t\tlocalStorage.setItem(LOCAL_PARTS_LISTS_KEY, JSON.stringify(this.local_parts_lists))\n\t\t},\n\n\t\tparts_lists_save_file() {\n\t\t\tthis.$store.commit('timestamp_parts_list');\n\t\t\tconst data = encodeURIComponent(JSON.stringify(this.$store.state.parts_list));\n\t\t\tconst filename = this.$store.state.parts_list.name + ' ' + this.$store.state.parts_list.timestamp + '.json';\n\t\t\tlet element = this.$refs.save_file_a;\n\t\t\telement.setAttribute('href', 'data:text/plain;charset=utf-8,' + data);\n\t\t\telement.setAttribute('download', filename);\n\t\t\telement.click();\n\t\t},\n\t\tparts_lists_load_file() {\n\t\t\tlet load_f = this.$refs.load_file_input.files[0];\n\t\t\tlet reader = new FileReader();\n\t\t\treader.onload = function(event) {\n\t\t\t\tif (reader.readyState === FileReader.DONE) {\n\t\t\t\t\tlet pl = JSON.parse(reader.result);\n\t\t\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(pl));\n\t\t\t\t\tthis.local_parts_lists.push(_.cloneDeep(pl));\n\t\t\t\t\tthis.parts_lists_save_to_local_storage();\n\t\t\t\t\tthis.selected_parts_list = this.parts_list_save_name(pl);\n\t\t\t\t\tthis.display_status_message(\"Parts list loaded from file.\");\n\t\t\t\t};\n\t\t\t}.bind(this);\n\t\t\treader.readAsText(load_f)\n\t\t},\n\n\t\tdisplay_status_message (status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'parts-list-footer-status-message';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = \"parts-list-footer-status-message fade\";\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message () {\n\t\t\tthis.status_message = null;\n\t\t}\n\t},\n};\n</script>\n\n<style scoped>\n.footer {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n.parts-list-footer-status-message {\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
-
-// exports
-
-
-/***/ }),
-
-/***/ 670:
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(671);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(5)("1f1a0f82", content, false);
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-12b8dc20\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./parts-list-footer.vue", function() {
-     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-12b8dc20\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./parts-list-footer.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-
-/***/ 671:
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(4)(true);
-// imports
-
-
-// module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-footer.vue","sourceRoot":""}]);
-
-// exports
-
-
-/***/ }),
-
-/***/ 672:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-var _vuex = __webpack_require__(16);
-
-var _parts_C = __webpack_require__(673);
-
-var _parts_C2 = _interopRequireDefault(_parts_C);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var LOCAL_PARTS_LISTS_KEY = 'parts_lists';
-var STATUS_DEFAULT_DURATION = 2000;
-
-var pl_comparison_slice = _.partial(_.pick, _, ['name', 'timestamp']);
-
 exports.default = {
-	name: 'PartsListFooter',
+	name: 'CsvImporter',
 	components: {},
+	props: {},
 	data: function data() {
 		return {
-			status_message: "",
-			status_message_timeout_id: null,
-
-			local_parts_lists: [],
-			selected_parts_list: null
+			modules_result: {},
+			parts_result: {},
+			frames_result: {},
+			name: '',
+			success: null
 		};
 	},
 
-	computed: _extends({
-		parts_list_name: {
+	computed: {
+		name_computed: {
 			get: function get() {
-				return this.$store.state.parts_list.name;
+				return this.name;
 			},
 			set: function set(value) {
-				this.$store.commit('set_parts_list_name', value);
+				this.success = false;
+				this.name = value;
 			}
 		},
-		selected_parts_list_name: {
-			get: function get() {
-				if (this.selected_parts_list) {
-					return this.parts_list_save_name(this.selected_parts_list);
-				} else {
-					return null;
-				};
-			},
-			set: function set(value) {
-				var _this = this;
-
-				this.selected_parts_list = _.chain(this.all_parts_lists).find(function (list) {
-					return _this.parts_list_save_name(list) === value;
-				}).value();
-			}
-		},
-		all_parts_lists: function all_parts_lists() {
-			return [].concat(_toConsumableArray(this.local_parts_lists), [this.canon_parts_list]);
-		}
-	}, (0, _vuex.mapState)(['canon_parts_list'])),
-	mounted: function mounted() {
-		this.parts_lists_load_from_local_storage();
-		window.addEventListener('storage', function (ev) {
-			if (ev.key === LOCAL_PARTS_LISTS_KEY) {
-				this.parts_lists_load_from_local_storage();
-			};
-		}.bind(this));
-	},
-
-	methods: {
-		reset_to_canon: function reset_to_canon() {
-			this.$store.commit('reset_to_canon');
-		},
-		parts_list_save_name: function parts_list_save_name(pl) {
-			// console.log(Object.keys(pl));
-			return pl.name + ' (' + new Date(pl.timestamp).toLocaleString() + ')';
-		},
-		parts_lists_load_from_local_storage: function parts_lists_load_from_local_storage() {
-			var loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);
-			if (loaded === null) {
-				this.local_parts_lists = [];
-				this.display_status_message("No parts lists to load");
+		modules_error_messages: function modules_error_messages() {
+			if (this.has_modules_errors) {
+				return this.modules_result.errors.map(function (er) {
+					if (er.row) {
+						return "Row " + er.row.toString() + ": " + er.message;
+					} else {
+						return er.message;
+					};
+				});
 			} else {
-				this.local_parts_lists = JSON.parse(loaded);
-				this.display_status_message("Parts lists loaded.");
+				return [];
 			};
 		},
-		parts_lists_load_selected: function parts_lists_load_selected() {
-			this.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list));
-			this.display_status_message("Parts list loaded");
+		frames_error_messages: function frames_error_messages() {
+			if (this.has_frames_errors) {
+				return this.frames_result.errors.map(function (er) {
+					if (er.row) {
+						return "Row " + er.row.toString() + ": " + er.message;
+					} else {
+						return er.message;
+					};
+				});
+			} else {
+				return [];
+			};
 		},
-		parts_lists_delete_selected: function parts_lists_delete_selected() {
-			var _this2 = this;
-
-			// remove the selected item
-			this.local_parts_lists = _.chain(this.local_parts_lists).reject(function (pl) {
-				return _.isEqual(pl_comparison_slice(pl), pl_comparison_slice(_this2.selected_parts_list));
-			}).value();
-			this.parts_lists_save_to_local_storage();
-			this.display_status_message("Parts list deleted.");
+		parts_error_messages: function parts_error_messages() {
+			if (this.has_parts_errors) {
+				console.log(this.parts_result.errors);
+				return this.parts_result.errors.map(function (er) {
+					if (er.row) {
+						return "Row " + er.row.toString() + ": " + er.message;
+					} else {
+						return er.message;
+					};
+				});
+			} else {
+				return [];
+			};
 		},
-		parts_lists_save_current: function parts_lists_save_current() {
-			this.$store.commit('timestamp_parts_list');
-			this.local_parts_lists.push(_.cloneDeep(this.$store.state.parts_list));
-			this.parts_lists_save_to_local_storage();
-			this.display_status_message("Parts list saved.");
+		name_error_messages: function name_error_messages() {
+			if (!this.name.length) {
+				return ["No name specified"];
+			};
 		},
-		parts_lists_save_to_local_storage: function parts_lists_save_to_local_storage() {
-			localStorage.setItem(LOCAL_PARTS_LISTS_KEY, JSON.stringify(this.local_parts_lists));
+		can_import: function can_import() {
+			return !this.has_errors && this.name.length && this.parts_result.data && this.parts_result.data.length && this.frames_result.data && this.frames_result.data.length && this.modules_result.data && this.modules_result.data.length;
 		},
-		parts_lists_save_file: function parts_lists_save_file() {
-			this.$store.commit('timestamp_parts_list');
-			var data = encodeURIComponent(JSON.stringify(this.$store.state.parts_list));
-			var filename = this.$store.state.parts_list.name + ' ' + this.$store.state.parts_list.timestamp + '.json';
-			var element = this.$refs.save_file_a;
-			element.setAttribute('href', 'data:text/plain;charset=utf-8,' + data);
-			element.setAttribute('download', filename);
-			element.click();
+		has_errors: function has_errors() {
+			return this.has_name_errors || this.has_parts_errors || this.has_frames_errors || this.has_modules_errors;
 		},
-		parts_lists_load_file: function parts_lists_load_file() {
-			var load_f = this.$refs.load_file_input.files[0];
+		has_name_errors: function has_name_errors() {
+			return !this.name.length;
+		},
+		has_parts_errors: function has_parts_errors() {
+			return this.parts_result.errors && this.parts_result.errors.length;
+		},
+		has_frames_errors: function has_frames_errors() {
+			return this.frames_result.errors && this.frames_result.errors.length;
+		},
+		has_modules_errors: function has_modules_errors() {
+			return this.modules_result.errors && this.modules_result.errors.length;
+		}
+	},
+	methods: {
+		load_file_parts: function load_file_parts() {
+			this.success = false;
+			var load_f = this.$refs.load_parts_file_input.files[0];
 			var reader = new FileReader();
 			reader.onload = function (event) {
 				if (reader.readyState === FileReader.DONE) {
-					var pl = JSON.parse(reader.result);
-					this.$store.commit('set_parts_list', _.cloneDeep(pl));
-					this.local_parts_lists.push(_.cloneDeep(pl));
-					this.parts_lists_save_to_local_storage();
-					this.selected_parts_list = this.parts_list_save_name(pl);
-					this.display_status_message("Parts list loaded from file.");
+					this.parts_result = _papaparse2.default.parse(reader.result, csv_parse_config);
 				};
 			}.bind(this);
 			reader.readAsText(load_f);
 		},
-		display_status_message: function display_status_message(status) {
-			this.status_message = status;
-			this.$refs.status_message.className = 'parts-list-footer-status-message';
-			window.requestAnimationFrame(function (time) {
-				window.requestAnimationFrame(function (time) {
-					this.$refs.status_message.className = "parts-list-footer-status-message fade";
-				}.bind(this));
-			}.bind(this));
+		load_file_modules: function load_file_modules() {
+			this.success = false;
+			var load_f = this.$refs.load_modules_file_input.files[0];
+			var reader = new FileReader();
+			reader.onload = function (event) {
+				if (reader.readyState === FileReader.DONE) {
+					this.modules_result = _papaparse2.default.parse(reader.result, csv_parse_config);
+				};
+			}.bind(this);
+			reader.readAsText(load_f);
 		},
-		clear_status_message: function clear_status_message() {
-			this.status_message = null;
+		load_file_frames: function load_file_frames() {
+			this.success = false;
+			var load_f = this.$refs.load_frames_file_input.files[0];
+			var reader = new FileReader();
+			reader.onload = function (event) {
+				if (reader.readyState === FileReader.DONE) {
+					this.frames_result = _papaparse2.default.parse(reader.result, csv_parse_config);
+				};
+			}.bind(this);
+			reader.readAsText(load_f);
+		},
+		import_parts_list: function import_parts_list() {
+			if (this.has_errors) {
+				return;
+			};
+
+			this.$store.commit('set_parts_list', {
+				name: this.name,
+				timestamp: new Date().toISOString(),
+				parts: {
+					records: this.parts_result.data.filter(function (row) {
+						return _lodash2.default.size(row) > 2;
+					}),
+					schema: _canon_parts_list2.default.parts.schema
+				},
+				modules: {
+					records: this.modules_result.data.filter(function (row) {
+						return _lodash2.default.size(row) > 2;
+					}),
+					schema: _canon_parts_list2.default.modules.schema
+				},
+				frames: {
+					records: this.frames_result.data.filter(function (row) {
+						return _lodash2.default.size(row) > 2;
+					}),
+					schema: _canon_parts_list2.default.frames.schema
+				}
+			});
+
+			var loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);
+			var local_parts_lists = void 0;
+			if (loaded === null) {
+				local_parts_lists = [];
+			} else {
+				local_parts_lists = JSON.parse(loaded);
+			};
+			local_parts_lists.push(_lodash2.default.cloneDeep(this.$store.state.parts_list));
+			localStorage.setItem(LOCAL_PARTS_LISTS_KEY, JSON.stringify(local_parts_lists));
+			this.success = "Successfully saved parts list!";
 		}
 	}
 };
 
 /***/ }),
 
-/***/ 673:
-/***/ (function(module, exports) {
-
-module.exports = [{"Type Sort":1,"Type":"Phasers","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Phasers","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"Size Filter","Full Tier List":"Tier Filter"},{"Type Sort":1,"Type":"Phasers","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Model 31 Phaser Bank","Effect":0.28,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0.6,"Scale Pwr":0.8,"Unit Power":1.5,"O":0.18,"E":0.2,"T":0.03,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"Light","Full Tier List":"T-3"},{"Type Sort":1,"Type":"Phasers","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Model 28 Twin Phaser Bank","Effect":0.425,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0.8,"Unit Power":1.8,"O":0.35,"E":0.35,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"Medium","Full Tier List":"T-2"},{"Type Sort":1,"Type":"Phasers","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Model 47 Phaser Bank","Effect":0.32,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0.6,"Scale Pwr":0.8,"Unit Power":1.5,"O":0.18,"E":0.2,"T":0.03,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"Heavy","Full Tier List":"T-1"},{"Type Sort":1,"Type":"Phasers","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Model 44 Twin Phaser Bank","Effect":0.5,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0.8,"Unit Power":1.8,"O":0.35,"E":0.35,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":"T0"},{"Type Sort":1,"Type":"Phasers","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Model 68 Phaser Bank","Effect":0.36,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0.6,"Scale Pwr":0.8,"Unit Power":1.5,"O":0.18,"E":0.2,"T":0.03,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":"T1"},{"Type Sort":1,"Type":"Phasers","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Model 62 Twin Phaser Bank","Effect":0.625,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0.8,"Unit Power":1.8,"O":0.35,"E":0.35,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":"T2"},{"Type Sort":1,"Type":"Phasers","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Model 83 Phaser Bank","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.085,"Pwr O/H":0.65,"Scale Pwr":0.8,"Unit Power":1.1,"O":0.18,"E":0.2,"T":0.02,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":"T3"},{"Type Sort":1,"Type":"Phasers","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Model 83 Twin Phaser Bank","Effect":0.75,"Weight O/H":8,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.08,"Pwr O/H":1,"Scale Pwr":0.8,"Unit Power":2,"O":0.34,"E":0.34,"T":0.01,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":"T4"},{"Type Sort":1,"Type":"Phasers","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type IV Single Phaser Bank","Effect":0.44,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.065,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.18,"E":0.2,"T":0.02,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-IV Twin Phaser Bank","Effect":0.825,"Weight O/H":8,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.33,"E":0.33,"T":0.01,"Reliability":0.99995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type V Single Phaser Bank","Effect":0.48,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.065,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.175,"E":0.19,"T":0.02,"Reliability":0.995,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Type-V Twin Phaser Bank","Effect":0.9,"Weight O/H":8,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.32,"E":0.32,"T":0.01,"Reliability":0.99995,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type VI Single Phaser Bank","Effect":0.52,"Weight O/H":4,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.065,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.175,"E":0.19,"T":0.02,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Type-VI Twin Phaser Bank","Effect":0.975,"Weight O/H":8,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.32,"E":0.32,"T":0.01,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Type IX Experimental Phaser Array Mid Bank","Effect":0.8,"Weight O/H":8,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.13,"Pwr O/H":3,"Scale Pwr":3,"Unit Power":2,"O":0.225,"E":0.25,"T":0.025,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Type-IX Experimental Phaser Array Full Bank","Effect":1.2,"Weight O/H":12,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.16,"Pwr O/H":5,"Scale Pwr":2.5,"Unit Power":1.75,"O":0.35,"E":0.35,"T":0.02,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":1,"Type":"Phasers","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T-2] Type 48 Phaser Bank","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":0.995,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Torp","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] TSF-2 Torpedo System","Effect":0.4,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.035,"Pwr O/H":2.5,"Scale Pwr":0.1,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mod 3a Battery System","Effect":0.4,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.07,"Pwr O/H":5,"Scale Pwr":0.05,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] TSF-3 Torpedo System","Effect":0.45,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.035,"Pwr O/H":2.5,"Scale Pwr":0.1,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mod 4 Battery System","Effect":0.45,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.07,"Pwr O/H":5,"Scale Pwr":0.05,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mk-I Torpedo System","Effect":0.5,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.035,"Pwr O/H":2.5,"Scale Pwr":0.1,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Type-I Auto System","Effect":0.5,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.07,"Pwr O/H":5,"Scale Pwr":0.05,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mk-II LW Torpedo System","Effect":0.55,"Weight O/H":8,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.08,"Pwr O/H":5,"Scale Pwr":0.3,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mk-II Torpedo System","Effect":0.55,"Weight O/H":12,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.045,"Pwr O/H":2.5,"Scale Pwr":0.2,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.99995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-II Auto System","Effect":0.55,"Weight O/H":16,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.09,"Pwr O/H":5,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mk-III LW Torpedo System","Effect":0.6,"Weight O/H":8,"Scale Weight":0,"Unit Weight":9.5,"SR Cost x":0.085,"Pwr O/H":4.5,"Scale Pwr":0.25,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mk-III Torpedo System","Effect":0.6,"Weight O/H":12,"Scale Weight":0,"Unit Weight":9.5,"SR Cost x":0.0475,"Pwr O/H":2.25,"Scale Pwr":0.175,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.9998,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-III Auto System","Effect":0.6,"Weight O/H":15.5,"Scale Weight":0,"Unit Weight":10.5,"SR Cost x":0.095,"Pwr O/H":4.5,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mk-IV LW Torpedo System","Effect":0.65,"Weight O/H":8,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.09,"Pwr O/H":4,"Scale Pwr":0.2,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][SR-] Mk-IV Torpedo System","Effect":0.65,"Weight O/H":12,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.05,"Pwr O/H":2,"Scale Pwr":0.15,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.9998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][C-] Type-IV Auto System","Effect":0.65,"Weight O/H":15,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":4,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mk-V LW Torpedo System","Effect":0.7,"Weight O/H":8,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.09,"Pwr O/H":4,"Scale Pwr":0.2,"Unit Power":1,"O":0.18,"E":0.18,"T":0,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][SR-] Mk-V Torpedo System","Effect":0.7,"Weight O/H":12,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.05,"Pwr O/H":2,"Scale Pwr":0.15,"Unit Power":0.75,"O":0.2,"E":0.2,"T":0,"Reliability":0.9998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":2,"Type":"Torpedoes","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][C-] Type-V Auto System","Effect":0.7,"Weight O/H":15,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":4,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.15,"E":0.15,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sensor","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mark-I-Light LR Sensor Array","Effect":0.15,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Mark-I-Heavy LR Sensors","Effect":0.225,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12.5,"SR Cost x":0.06,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.06,"E":0.16,"T":0.3,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-II-Heavy LR Sensor Array","Effect":0.4,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.13,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Mark-II-Light LR Sensor Array","Effect":0.175,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Mark-II-Heavy LR Sensors","Effect":0.25,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12.5,"SR Cost x":0.06,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.06,"E":0.16,"T":0.3,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-III-Heavy LR Sensor Array","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.13,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Mark-III-Light LR Sensor Array","Effect":0.2,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mark-III-Heavy LR Sensors","Effect":0.275,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12.5,"SR Cost x":0.06,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.06,"E":0.16,"T":0.3,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mark-IV-Heavy LR Sensor Array","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.13,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Grade LR Sensor Array","Effect":0.1,"Weight O/H":0.5,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":0.5,"O":0.05,"E":0.04,"T":0.06,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mark-V-Light LR Sensor Array","Effect":0.225,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mark-V LR Sensor Array","Effect":0.3,"Weight O/H":2,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.11,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Mark-V-Heavy LR Sensor Array","Effect":0.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mark-VI-Light LR Sensor Array","Effect":0.225,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.75,"SR Cost x":0.18,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mark-VI LR Sensor Array","Effect":0.325,"Weight O/H":2,"Scale Weight":0,"Unit Weight":9.5,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mark-VI-Heavy LR Sensor Array","Effect":0.525,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mark-VII-Light LR Sensor Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.25,"SR Cost x":0.18,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mark-VII LR Sensor Array","Effect":0.35,"Weight O/H":2,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mark-VII-Heavy LR Sensor Array","Effect":0.55,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mark-VIII-Light LR Sensor Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.18,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mark-VIII LR Sensor Array","Effect":0.375,"Weight O/H":2,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.06,"E":0.15,"T":0.15,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mark-VIII-Heavy LR Sensor Array","Effect":0.575,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Subspace Flux Detector *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Subspace Pulse Scanner *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Subspace Phased Array Scanner *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":3,"Type":"Long-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Subspace Interferometry Suite *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sensor","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mark-I-Light SR Lateral Sensor Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Mark-I-Medium SR Lateral Sensor Array","Effect":0.375,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-I-Heavy SR Lateral Sensor Array","Effect":0.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21.5,"SR Cost x":0.05,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":"No","Size Class":"Light","Name":"[T-2][L] Mark-III-Light SR Lateral Sensor Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Mark-III-Medium SR Lateral Sensor Array","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-III-Heavy SR Lateral Sensor Array","Effect":0.55,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21.5,"SR Cost x":0.05,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Grade SR Lateral Sensor","Effect":0.1,"Weight O/H":0.5,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.1,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":0.5,"O":0.02,"E":0.04,"T":0.06,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mark-IV SR Lateral Sensor Array","Effect":0.3,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.02,"E":0.06,"T":0.09,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mark-IV-Heavy SR Lateral Sensor Array","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.1,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Mark-V-Heavy SR Lateral Sensor Array","Effect":0.65,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21.5,"SR Cost x":0.06,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.025,"E":0.06,"T":0.105,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mark-VB-Light SR Lateral Sensor Array","Effect":0.2375,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.75,"SR Cost x":0.1,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.15,"O":0.025,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mark-VB SR Lateral Sensor Array","Effect":0.335,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.75,"SR Cost x":0.1,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.15,"O":0.025,"E":0.06,"T":0.105,"Reliability":0.99999,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mark-VB-Heavy SR Lateral Sensor Array","Effect":0.7,"Weight O/H":5,"Scale Weight":0,"Unit Weight":21,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.15,"O":0.05,"E":0.1,"T":0.135,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mark-VI-Light SR Lateral Sensor Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.6,"SR Cost x":0.12,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.025,"E":0.1,"T":0.135,"Reliability":0.9995,"Year Available (SF)":2312,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mark-VI SR Lateral Sensor Array","Effect":0.35,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.6,"SR Cost x":0.1,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.06,"E":0.12,"T":0.15,"Reliability":0.99999,"Year Available (SF)":2312,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mark-VI-Heavy SR Lateral Sensor Array","Effect":0.75,"Weight O/H":5,"Scale Weight":0,"Unit Weight":20.75,"SR Cost x":0.06,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.05,"E":0.1,"T":0.135,"Reliability":1,"Year Available (SF)":2312,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mark-VII-Light SR Lateral Sensor Array","Effect":0.2675,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.7,"SR Cost x":0.125,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.115,"T":0.1425,"Reliability":0.9995,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mark-VII SR Lateral Sensor Array","Effect":0.365,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.8,"SR Cost x":0.115,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.0065,"E":0.125,"T":0.1725,"Reliability":0.99999,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mark-VII-Heavy SR Lateral Sensor Array","Effect":0.8,"Weight O/H":6.5,"Scale Weight":0,"Unit Weight":21.25,"SR Cost x":0.07,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.055,"E":0.105,"T":0.1425,"Reliability":1,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Mark-VII-Light SR Lateral Sensor Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7.7,"SR Cost x":0.125,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.03,"E":0.115,"T":0.1425,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Mark-VII SR Lateral Sensor Array","Effect":0.38,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":11.8,"SR Cost x":0.115,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.0065,"E":0.125,"T":0.1725,"Reliability":0.99999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Mark-VII-Heavy SR Lateral Sensor Array","Effect":0.85,"Weight O/H":6.5,"Scale Weight":0,"Unit Weight":21.25,"SR Cost x":0.07,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.055,"E":0.105,"T":0.1425,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":4,"Type":"Short-Range Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Full Spectrum Sensor Array","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sensor","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mark-I-Light Nav Sensors","Effect":0.15,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-I-Heavy Nav Sensors","Effect":0.4,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mark-II-Heavy Nav Array","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Mark-II-Light Nav Sensors","Effect":0.175,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-II-Heavy Nav Sensors","Effect":0.45,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mark-III-Heavy Nav Array","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Mark-III-Light Nav Sensors","Effect":0.2,"Weight O/H":1,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.08,"Pwr O/H":0.5,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.08,"T":0.12,"Reliability":0.9995,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mark-III-Heavy Nav Sensors","Effect":0.475,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1,"O":0.04,"E":0.12,"T":0.225,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mark-IV-Heavy Nav Array","Effect":0.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":19,"SR Cost x":0.11,"Pwr O/H":0.45,"Scale Pwr":0,"Unit Power":1.1,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mark-V Nav Sensors","Effect":0.3,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.1,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.2,"O":0.05,"E":0.07,"T":0.12,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mark-VI-Light Nav Array","Effect":0.225,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.75,"SR Cost x":0.15,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.3,"O":0.02,"E":0.15,"T":0.2475,"Reliability":0.9995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mark-VI Nav Array","Effect":0.325,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":9.75,"SR Cost x":0.11,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.3,"O":0.04,"E":0.15,"T":0.2625,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mark-VI-Heavy Nav Array","Effect":0.525,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18.5,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.3,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mark-VII-Light Nav Array","Effect":0.25,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.6,"SR Cost x":0.15,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.4,"O":0.02,"E":0.15,"T":0.2475,"Reliability":0.9995,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mark-VII Nav Array","Effect":0.35,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":9.6,"SR Cost x":0.11,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.15,"T":0.2625,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mark-VII-Heavy Nav Array","Effect":0.55,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18.25,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mark-VIII-Light Nav Array","Effect":0.275,"Weight O/H":1,"Scale Weight":0,"Unit Weight":6.6,"SR Cost x":0.15,"Pwr O/H":0.7,"Scale Pwr":0,"Unit Power":1.4,"O":0.02,"E":0.15,"T":0.2475,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mark-VIII Nav Array","Effect":0.375,"Weight O/H":1.5,"Scale Weight":0,"Unit Weight":9.6,"SR Cost x":0.11,"Pwr O/H":0.8,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.15,"T":0.2625,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mark-VIII-Heavy Nav Array","Effect":0.575,"Weight O/H":5,"Scale Weight":0,"Unit Weight":18.25,"SR Cost x":0.08,"Pwr O/H":0.6,"Scale Pwr":0,"Unit Power":1.4,"O":0.04,"E":0.125,"T":0.225,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Basic Nav Sensor Package","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Mass Detector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Gaseous Anomaly Detector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Subspace Gradient Analytics","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":5,"Type":"Navigational Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Astrometric Course Optimizer","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Survey Sensors","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Basic Survey Sensor Package","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Basic Survey Sensor Package *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] EM/Subspace Heterodyne Circuit *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Ground-Penetrating Spectroscope *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Stellar Core Imager *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":6,"Type":"Survey Sensors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T5] Polycyclic Subspace Tomograph *","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Science","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Pattern U Compact Lab","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.06,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Pattern V Lab","Effect":0.475,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0.25,"Unit Power":0.25,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Pattern S Lab","Effect":0.6,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.06,"Pwr O/H":1,"Scale Pwr":0.35,"Unit Power":0.25,"O":0.25,"E":0.2,"T":0.25,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Pattern W Compact Lab","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.06,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Pattern X Lab","Effect":0.525,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0.25,"Unit Power":0.25,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Pattern Y Lab","Effect":0.7,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.06,"Pwr O/H":1,"Scale Pwr":0.35,"Unit Power":0.25,"O":0.25,"E":0.2,"T":0.25,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Pattern D Compact Lab","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.06,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Pattern C Lab","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":0.7,"Scale Pwr":0.25,"Unit Power":0.25,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Pattern E Lab","Effect":0.8,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.06,"Pwr O/H":1,"Scale Pwr":0.35,"Unit Power":0.25,"O":0.25,"E":0.2,"T":0.25,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Pattern-K Compact Lab","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.08,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Pattern C2 Lab","Effect":0.675,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.08,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.1875,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Spock-Pattern Lab","Effect":0.9,"Weight O/H":3,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.05,"E":0.05,"T":0.22,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Pattern-K2 Compact Lab","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":14.667,"SR Cost x":0.09,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Cruiser Pattern Lab","Effect":0.75,"Weight O/H":0,"Scale Weight":0,"Unit Weight":29.333,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.06,"E":0.1,"T":0.25,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Spock-B Pattern Lab","Effect":1,"Weight O/H":3,"Scale Weight":0,"Unit Weight":44,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.055,"E":0.055,"T":0.23,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Pattern-K3 Compact Lab","Effect":0.55,"Weight O/H":0,"Scale Weight":0,"Unit Weight":14.333,"SR Cost x":0.09,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Cruiser-2 Pattern Lab","Effect":0.825,"Weight O/H":0,"Scale Weight":0,"Unit Weight":28.667,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.06,"E":0.1,"T":0.25,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Spock-C Pattern Lab","Effect":1.1,"Weight O/H":3,"Scale Weight":0,"Unit Weight":43,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.055,"E":0.055,"T":0.23,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Pattern-K4 Compact Lab","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":14,"SR Cost x":0.09,"Pwr O/H":0.75,"Scale Pwr":0.3,"Unit Power":0.3,"O":0.05,"E":0.1,"T":0.125,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Cruiser-3 Pattern Lab","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":28,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.06,"E":0.1,"T":0.25,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":7,"Type":"Science Labs","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Spock-D Pattern Lab","Effect":1.2,"Weight O/H":3,"Scale Weight":0,"Unit Weight":42,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.425,"Unit Power":0.65,"O":0.055,"E":0.055,"T":0.23,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Core","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Mkv V Monotronic Core","Effect":0.325,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.04,"T":0.18,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mk V-B Monotronic Core","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.225,"Pwr O/H":4.12,"Scale Pwr":2.5,"Unit Power":0,"O":0.1,"E":0.03,"T":0.125,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] SFA Mk1 Duotronic Core","Effect":0.375,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.04,"T":0.18,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] SFA MkI-B Duotronic Core","Effect":0.45,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.225,"Pwr O/H":4.12,"Scale Pwr":2.5,"Unit Power":0,"O":0.1,"E":0.03,"T":0.125,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Type-I Duotronic Core","Effect":0.425,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.04,"T":0.18,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Type-I-B Duotronic Core","Effect":0.475,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.225,"Pwr O/H":4.12,"Scale Pwr":2.5,"Unit Power":0,"O":0.1,"E":0.03,"T":0.125,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Generic Monotronic Civilian Core","Effect":0.2,"Weight O/H":10,"Scale Weight":0,"Unit Weight":3.5,"SR Cost x":0.145,"Pwr O/H":3.8,"Scale Pwr":0.7,"Unit Power":0,"O":0,"E":0.02,"T":0.09,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Type-II Duotronic Core","Effect":0.475,"Weight O/H":20,"Scale Weight":0,"Unit Weight":3.25,"SR Cost x":0.2,"Pwr O/H":6.5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0.02,"T":0.135,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Type-III Duotronic Core","Effect":0.5,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":5.2,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.09,"Reliability":0.998,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-II Heavy Duotronic Core","Effect":0.525,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.2,"Pwr O/H":6.5,"Scale Pwr":2,"Unit Power":0,"O":0.1,"E":0.02,"T":0.08,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type-III-A Duotronic Core","Effect":0.6,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":1,"Unit Power":0,"O":0,"E":0.02,"T":0.1,"Reliability":0.9999,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Type-IV Duotronic Core","Effect":0.625,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.998,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-IV Heavy Duotronic Core","Effect":0.66,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type-IV-B Duotronic Core","Effect":0.64,"Weight O/H":10,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.4,"Pwr O/H":7,"Scale Pwr":0.5,"Unit Power":0,"O":0,"E":0.02,"T":0.11,"Reliability":0.998,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Type-IV-A Duotronic Core","Effect":0.68,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":7,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.9999,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Type-IV-C Heavy Duotronic Core","Effect":0.7,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type-V Compact Duotronic Core","Effect":0.68,"Weight O/H":10,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.4,"Pwr O/H":7,"Scale Pwr":0.5,"Unit Power":0,"O":0,"E":0.02,"T":0.11,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Type-V Duotronic Core","Effect":0.72,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":7,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.9999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Type-V Heavy Duotronic Core","Effect":0.76,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Type-VI Compact Duotronic Core","Effect":0.72,"Weight O/H":10,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.4,"Pwr O/H":7,"Scale Pwr":0.5,"Unit Power":0,"O":0,"E":0.02,"T":0.11,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Type-VI Duotronic Core","Effect":0.79,"Weight O/H":20,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.25,"Pwr O/H":7,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0.12,"Reliability":0.9999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":8,"Type":"Computer Cores","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Type-VI Heavy Duotronic Core","Effect":0.9,"Weight O/H":40,"Scale Weight":0,"Unit Weight":1.75,"SR Cost x":0.25,"Pwr O/H":6.5,"Scale Pwr":1,"Unit Power":0,"O":0.1,"E":0.02,"T":0,"Reliability":0.99995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No OS","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-3,"Size Sort":-99,"Size Class":"N/A","Name":"[T-3] Majel OS","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Majel 1.5 OS","Effect":0.475,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-1,"Size Sort":-99,"Size Class":"N/A","Name":"[T-1] Majel 2.0 OS","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Civilian OS","Effect":0.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.5,"Scale Pwr":0.1,"Unit Power":0.25,"O":0.0125,"E":0.0075,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":0,"Size Sort":-99,"Size Class":"N/A","Name":"[T0] Majel 2.1 OS","Effect":0.525,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0.85,"Scale Pwr":0.125,"Unit Power":0.4,"O":0.025,"E":0.015,"T":0.02,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":1,"Size Sort":-99,"Size Class":"N/A","Name":"[T1] Majel 3.0 OS","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.2,"Unit Power":1,"O":0.1375,"E":0.0825,"T":0.11,"Reliability":0.9998,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":2,"Size Sort":-99,"Size Class":"N/A","Name":"[T2] Majel 3.1 Explorer OS","Effect":1.05,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":5,"Scale Pwr":0.1,"Unit Power":0.5,"O":0.1,"E":0.06,"T":0.08,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":2,"Size Sort":-99,"Size Class":"N/A","Name":"[T2] Majel 3.1 OS","Effect":1.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.25,"Unit Power":1.1,"O":0.13125,"E":0.07875,"T":0.105,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":3,"Size Sort":-99,"Size Class":"N/A","Name":"[T3] Majel 3.5 OS","Effect":1.2,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.25,"Unit Power":1.1,"O":0.125,"E":0.075,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":9,"Type":"Operating System","Tier":4,"Size Sort":-99,"Size Class":"N/A","Name":"[T4] Majel 4.0 OS","Effect":1.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":1,"Scale Pwr":0.25,"Unit Power":1.1,"O":0.125,"E":0.075,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No TCU","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Model 17 Light TCU","Effect":0.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Model 31 Advanced TCU","Effect":0.325,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Model 20 Heavy TCU","Effect":0.375,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Model 37 Light TCU","Effect":0.275,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Model 42 Advanced TCU","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Model 39 Heavy TCU","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Model 57 Light TCU","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Model 64 Advanced TCU","Effect":0.375,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Model 57 Heavy TCU","Effect":0.425,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian TCU","Effect":0.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.045,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":1,"O":0.1,"E":0.1,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Type-I Duotronic TCU","Effect":0.325,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Type-1 TCU","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-1-A 'Seeker' TCU","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.065,"Pwr O/H":0.8,"Scale Pwr":0.45,"Unit Power":1.8,"O":0.1,"E":0.05,"T":0.05,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type-II Duotronic TCU","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.95,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Type-2 TCU","Effect":0.425,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2.05,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] 'Dauntless' Tracking System","Effect":0.575,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.1,"Pwr O/H":1.2,"Scale Pwr":0.6,"Unit Power":2.2,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.9992,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type-III Duotronic TCU","Effect":0.375,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.975,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Type-3 TCU","Effect":0.475,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2.1,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] DI-4 Predictive Targeting Array","Effect":0.675,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.098,"Pwr O/H":1.15,"Scale Pwr":0.575,"Unit Power":2.3,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.9999,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type-IV Duotronic TCU","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.48,"Unit Power":0.975,"O":0.1,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Type-4 TCU","Effect":0.525,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.1,"Pwr O/H":1,"Scale Pwr":0.5,"Unit Power":2.1,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":10,"Type":"Targeting Computers","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] TH-5 Rangemaster Unit","Effect":0.775,"Weight O/H":0,"Scale Weight":0,"Unit Weight":37,"SR Cost x":0.098,"Pwr O/H":1.15,"Scale Pwr":0.575,"Unit Power":2.3,"O":0.1,"E":0.05,"T":0.05,"Reliability":0.9999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Diplomacy","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Escort Diplomatic Package '24","Effect":0.7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.035,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.015,"E":0,"T":0.015,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Cruiser Diplomatic Package '20","Effect":0.85,"Weight O/H":14,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.07,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.03,"E":0.02,"T":0.03,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Explorer Diplomatic Package '28","Effect":1.1,"Weight O/H":45,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.2,"Scale Pwr":0.4,"Unit Power":2.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Escort Diplomatic Package '41","Effect":0.75,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.035,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.015,"E":0,"T":0.015,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Cruiser Diplomatic Package '39","Effect":0.9,"Weight O/H":14,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.07,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.03,"E":0.02,"T":0.03,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Explorer Diplomatic Package '45","Effect":1.35,"Weight O/H":45,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.2,"Scale Pwr":0.4,"Unit Power":2.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Escort Diplomatic Package '61","Effect":0.8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.035,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.015,"E":0,"T":0.015,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Cruiser Diplomatic Package '61","Effect":1,"Weight O/H":14,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.07,"Pwr O/H":1.2,"Scale Pwr":0.3,"Unit Power":0.2,"O":0.03,"E":0.02,"T":0.03,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Explorer Diplomatic Package '67","Effect":1.5,"Weight O/H":45,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.2,"Scale Pwr":0.4,"Unit Power":2.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Escort Diplomatic Package '85","Effect":0.85,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.075,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":3,"O":0.02,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Explorer Diplomatic Package '85","Effect":1.6,"Weight O/H":50,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":3.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Lwaxana '04 Escort Protocol","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.08,"Pwr O/H":2,"Scale Pwr":0.5,"Unit Power":2.75,"O":0.06,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2309,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Lwaxana '04 General Protocol","Effect":1.2,"Weight O/H":16,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.105,"Pwr O/H":2,"Scale Pwr":0.5,"Unit Power":3.25,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2309,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Lwaxana '04 Explorer Protocol","Effect":1.75,"Weight O/H":60,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":0.5,"Unit Power":3.75,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":2309,"Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Lwaxana '12 Escort Protocol","Effect":1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.08,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3,"O":0.06,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Lwaxana '12 General Protocol","Effect":1.3,"Weight O/H":16,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.105,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Lwaxana '12 Explorer Protocol","Effect":2,"Weight O/H":64,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.12,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":4,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Lwaxana '21 Escort Protocol","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.08,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3,"O":0.06,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Lwaxana '21 General Protocol","Effect":1.425,"Weight O/H":16,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.105,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":3.5,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":11,"Type":"Diplomatic Packages","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Lwaxana '21 Explorer Protocol","Effect":2.25,"Weight O/H":64,"Scale Weight":0,"Unit Weight":32,"SR Cost x":0.12,"Pwr O/H":3,"Scale Pwr":0.5,"Unit Power":4,"O":0.1,"E":0.015,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Onboard Recreation","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] 2260s Rec Space","Effect":0.3,"Weight O/H":4,"Scale Weight":0,"Unit Weight":17.5,"SR Cost x":0.03,"Pwr O/H":1,"Scale Pwr":0.4,"Unit Power":2,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] 2280s Rec Space","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":4,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] 2300s Compact Rec Space","Effect":0.2,"Weight O/H":6,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.04,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":4,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] 2300s Rec Space","Effect":0.6,"Weight O/H":8,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":8,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] 2310s Compact Rec Space","Effect":0.275,"Weight O/H":6,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.04,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":4,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":12,"Type":"Recreation Packages","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] 2310s Rec Space","Effect":0.725,"Weight O/H":8,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.06,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":8,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Sickbay","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] S-Medical '24 Standard Sickbay","Effect":0.2,"Weight O/H":0,"Scale Weight":0,"Unit Weight":13,"SR Cost x":0.04,"Pwr O/H":0.5,"Scale Pwr":0.27,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] S-Medical '25 Explorer Sickbay","Effect":0.3,"Weight O/H":10,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] S-Medical '42 Standard Sickbay","Effect":0.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":13,"SR Cost x":0.04,"Pwr O/H":0.5,"Scale Pwr":0.27,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] S-Medical '46 Explorer Sickbay","Effect":0.35,"Weight O/H":10,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] S-Medical '61 Standard Sickbay","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":13,"SR Cost x":0.04,"Pwr O/H":0.5,"Scale Pwr":0.27,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] S-Medical '68 Explorer Sickbay","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.08,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] S-Medical '84 Pattern Sickbay","Effect":0.5,"Weight O/H":10,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.06,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] S-Medical '04 Pattern Sickbay","Effect":0.6,"Weight O/H":10,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.18,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] T'Koren Pattern Small Sickbay","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.045,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] T'Koren Pattern Large Sickbay","Effect":0.7,"Weight O/H":10,"Scale Weight":0,"Unit Weight":22,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2316,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] T'Koren-B Pattern Small Sickbay","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.045,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.18,"O":0.05,"E":0,"T":0.12,"Reliability":1,"Year Available (SF)":2319,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] T'Koren-B Pattern Large Sickbay","Effect":0.8,"Weight O/H":10,"Scale Weight":0,"Unit Weight":22,"SR Cost x":0.09,"Pwr O/H":1.5,"Scale Pwr":0.4,"Unit Power":0.45,"O":0.15,"E":0,"T":0.25,"Reliability":1,"Year Available (SF)":2319,"Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] T'Koren-B Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] T'Koren-C Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T5] T'Koren-D Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":13,"Type":"Sickbays","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T6] Pulaski Pattern Sickbay","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Single Alloy-2 Duranium Hull","Effect":0.33,"Weight O/H":0,"Scale Weight":15,"Unit Weight":0,"SR Cost x":0.011,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.25,"T":0.04,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Double Alloy-2 Duranium Hull","Effect":0.62,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.014,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.02,"E":0.4,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Duranium w/ Bartridium Rebar","Effect":0.725,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.0375,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.2,"E":0.5,"T":0.2,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Single Alloy-4 Duranium Hull","Effect":0.34,"Weight O/H":0,"Scale Weight":14,"Unit Weight":0,"SR Cost x":0.011,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.25,"T":0.04,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Double Alloy-4 Duranium Hull","Effect":0.66,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.014,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.02,"E":0.4,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Duranium w/ Bartridium Rebar","Effect":0.775,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.0375,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.2,"E":0.5,"T":0.2,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Single Duranium Hull","Effect":0.35,"Weight O/H":0,"Scale Weight":13,"Unit Weight":0,"SR Cost x":0.011,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.25,"T":0.04,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Double Duranium Hull","Effect":0.7,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.014,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.02,"E":0.4,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Duranium w/ Exotic Rebar","Effect":0.8,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.0375,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.2,"E":0.5,"T":0.2,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Grade","Effect":0.25,"Weight O/H":0,"Scale Weight":11.5,"Unit Weight":0,"SR Cost x":0.001,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Lt. Alloy-1 Duranium Hull","Effect":0.36,"Weight O/H":0,"Scale Weight":12.5,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Duranium-335 Alloy Hull","Effect":0.74,"Weight O/H":35,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.05,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Duranium-447 Alloy Hull","Effect":0.85,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.016,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Lt. Alloy-2 Duranium Hull","Effect":0.37,"Weight O/H":0,"Scale Weight":12,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Med. Alloy-2 Duranium Hull","Effect":0.78,"Weight O/H":35,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.015,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.075,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Hvy. Alloy-2 Duranium Hull","Effect":0.9,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.018,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Lt. Alloy-3 Duranium Hull","Effect":0.38,"Weight O/H":0,"Scale Weight":11.5,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Med. Alloy-3 Duranium Hull","Effect":0.82,"Weight O/H":35,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.015,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.075,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Hvy. Alloy-3 Duranium Hull","Effect":0.95,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.018,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Lt. Alloy-4 Duranium Hull","Effect":0.4,"Weight O/H":0,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.012,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.15,"T":0.075,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Med. Alloy-4 Duranium Hull","Effect":0.86,"Weight O/H":35,"Scale Weight":11,"Unit Weight":0,"SR Cost x":0.015,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.2,"T":0.075,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":14,"Type":"Hull System","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Hvy. Alloy-4 Duranium Hull","Effect":1,"Weight O/H":80,"Scale Weight":8,"Unit Weight":0,"SR Cost x":0.018,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.3,"T":0.035,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No SIF","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Type-I-L SIF","Effect":0.215,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Type-I SIF","Effect":0.375,"Weight O/H":10,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.05,"E":0.35,"T":0.05,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Mars-III Special SIF","Effect":0.5,"Weight O/H":27,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.22,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.08,"E":0.4,"T":0.075,"Reliability":0.998,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Type-II-L SIF","Effect":0.25,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Type-II SIF","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.05,"E":0.35,"T":0.05,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Mars-IV Special SIF","Effect":0.6,"Weight O/H":27,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.22,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.08,"E":0.4,"T":0.075,"Reliability":0.998,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Type-III-L SIF","Effect":0.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Type-III SIF","Effect":0.45,"Weight O/H":10,"Scale Weight":0,"Unit Weight":9,"SR Cost x":0.06,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.05,"E":0.35,"T":0.05,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mars-V Special SIF","Effect":0.7,"Weight O/H":27,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.22,"Pwr O/H":0,"Scale Pwr":0.68,"Unit Power":0.68,"O":0.08,"E":0.4,"T":0.075,"Reliability":0.998,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Type-IV-L SIF","Effect":0.6,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.3,"T":0.07,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Type-IV SIF","Effect":0.75,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Type-IV-H SIF","Effect":0.9,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Type-V-L SIF","Effect":0.65,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Type-V SIF","Effect":0.8,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Type-V-H SIF","Effect":0.95,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Type-VI-L SIF","Effect":0.675,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Type-VI SIF","Effect":0.825,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Type-VI-H SIF","Effect":0.975,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Type-VII-L SIF","Effect":0.7,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Type-VII SIF","Effect":0.85,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Type-VII-H SIF","Effect":1,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L] Type-VIII-L SIF","Effect":0.725,"Weight O/H":10,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.25,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Type-VIII SIF","Effect":0.9,"Weight O/H":20,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0.7,"Unit Power":1.2,"O":0.01,"E":0.25,"T":0.07,"Reliability":0.999,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":15,"Type":"Structural Integrity Fields","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] Type-VIII-H SIF","Effect":1.1,"Weight O/H":34,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.115,"Pwr O/H":0,"Scale Pwr":0.72,"Unit Power":0.74,"O":0.02,"E":0.15,"T":0.06,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Shields","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] AAE-L Monophasic Escort Pattern","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":2,"Unit Power":1.5,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] AAE-M Cyclic Monophasic","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.1,"E":0.005,"T":0.14,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] AAE-H Monophasic Heavy Pattern","Effect":0.8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.175,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] AAE-B-L Monophasic Escort Pattern","Effect":0.7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":2,"Unit Power":1.5,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] AAE-B-M Cyclic Monophasic","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.1,"E":0.005,"T":0.14,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] AAE-B-H Monophasic Heavy Pattern","Effect":1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.175,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Mk1 Monophasic Escort Pattern","Effect":0.8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.13,"Pwr O/H":1.5,"Scale Pwr":2,"Unit Power":1.5,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mk1 Cyclic Monophasic E-Type","Effect":1.05,"Weight O/H":0,"Scale Weight":0,"Unit Weight":12,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.1,"E":0.005,"T":0.14,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Mk1 Monophasic Heavy Pattern","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.175,"Pwr O/H":1.45,"Scale Pwr":1.9,"Unit Power":1.45,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mk-III-E Shield Gens","Effect":0.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] Mk-III-H Shield Gens","Effect":1.15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":4,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Mk-III-SH Shield Gens","Effect":1.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.135,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":4,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mk-IV-E Shield Gens","Effect":0.95,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Mk-IV-H Shield Gens","Effect":1.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":4.5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mk-V-E Shield Gens","Effect":1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mk-V-H Shield Gens","Effect":1.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":16,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Mk-V-SH Shield Gens","Effect":1.9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":30,"SR Cost x":0.135,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mk-VI-E Shield Gens","Effect":1.1,"Weight O/H":0,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.2,"Pwr O/H":1.45,"Scale Pwr":2,"Unit Power":1.8,"O":0.005,"E":0.005,"T":0.08,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mk-VI-H Shield Gens","Effect":1.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.15,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Mk-VI-SH Shield Gens","Effect":2.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.135,"Pwr O/H":1.45,"Scale Pwr":2.2,"Unit Power":5,"O":0.02,"E":0.005,"T":0.1,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Monophasic Shields (2260s DS)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Biphasic Shields (DS I)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Detuned Ellipsoidal Shields (DS II)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Polyphasic Shields (DS III)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":16,"Type":"Deflector Shields","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Self-Integrating Shields (DS IV)","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"xNo Nav Deflector","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] Saucer-Only Polyphasic Deflector","Effect":0.2,"Weight O/H":2,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.04,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Polyphasic Deflector","Effect":0.25,"Weight O/H":4,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.06,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] Advanced Polyphasic Deflector","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.08,"E":0.075,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Saucer-Only Gravitic Deflector","Effect":0.25,"Weight O/H":2,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.04,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Gravitic Deflector","Effect":0.3,"Weight O/H":4,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.06,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] Advanced Gravitic Deflector","Effect":0.5,"Weight O/H":4,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.08,"E":0.075,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] Saucer-Only Graviton Deflector","Effect":0.3,"Weight O/H":2,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.04,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Graviton Deflector","Effect":0.4,"Weight O/H":4,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.06,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] Advanced Graviton Deflector","Effect":0.6,"Weight O/H":4,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.12,"Pwr O/H":2,"Scale Pwr":1,"Unit Power":0,"O":0.08,"E":0.075,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Graviton Beam Deflector Saucer-Only","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.11,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] Advanced Graviton Beam Deflector","Effect":0.65,"Weight O/H":8,"Scale Weight":0,"Unit Weight":8,"SR Cost x":0.11,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Modulated Graviton Beam Deflector Saucer-Only","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.11,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] Modulated Graviton Beam Deflector","Effect":0.7,"Weight O/H":7.5,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.11,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":2307,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Graviton Wavefront Deflector Saucer-Only","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.1,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":2317,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] Graviton Wavefront Deflector","Effect":0.75,"Weight O/H":7.5,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.1,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":2317,"Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Shaped Wavefront Deflector Saucer-Only","Effect":0.45,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.1,"Pwr O/H":2.2,"Scale Pwr":1.1,"Unit Power":0,"O":0.05,"E":0.05,"T":0.01,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] Shaped Wavefront Deflector","Effect":0.825,"Weight O/H":7.5,"Scale Weight":0,"Unit Weight":7.5,"SR Cost x":0.1,"Pwr O/H":3,"Scale Pwr":1.25,"Unit Power":0,"O":0.06,"E":0.06,"T":0.01,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Graviton Beam Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Modulated Graviton Beam Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T2] Graviton Wavefront Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T3] Shaped Wavefront Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":17,"Type":"Navigational Deflectors","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T4] Astrodynamic Wavefront Deflector","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] SDB-26 Std Impulse","Effect":0.18,"Weight O/H":5,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.17,"Unit Power":0.35,"O":0,"E":0.1,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] SDB R-Type Heavy Impulse","Effect":0.45,"Weight O/H":35,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.09,"Pwr O/H":0.1,"Scale Pwr":0.12,"Unit Power":0.25,"O":0.1,"E":0.045,"T":0.045,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] SDB-44 Std Impulse","Effect":0.2,"Weight O/H":5,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.17,"Unit Power":0.35,"O":0,"E":0.1,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] SDB C-Type Heavy Impulse","Effect":0.55,"Weight O/H":35,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.09,"Pwr O/H":0.1,"Scale Pwr":0.12,"Unit Power":0.25,"O":0.1,"E":0.045,"T":0.045,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] SDB-65 Std Impulse","Effect":0.22,"Weight O/H":5,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.17,"Unit Power":0.35,"O":0,"E":0.1,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] SDB E-Type Heavy Impulse","Effect":0.65,"Weight O/H":35,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.09,"Pwr O/H":0.1,"Scale Pwr":0.12,"Unit Power":0.25,"O":0.1,"E":0.045,"T":0.045,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] Civilian Basic Impulse","Effect":0.2,"Weight O/H":10,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.02,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.2,"O":0,"E":0.1,"T":0.1,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] SDB-86 Impulse Drive Sys","Effect":0.26,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] SDB-97 High-Power Impulse Drive Sys","Effect":0.3,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] SDB-97 High-Efficiency Impulse Drive Sys","Effect":0.75,"Weight O/H":45,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.025,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2305,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] SDB-09 High-Power Impulse Drive Sys","Effect":0.36,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] SDB-09 High-Efficiency Impulse Drive Sys","Effect":0.85,"Weight O/H":45,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.025,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] SDB-09 High-Power Impulse Drive Sys","Effect":0.42,"Weight O/H":8,"Scale Weight":0,"Unit Weight":25,"SR Cost x":0.06,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":18,"Type":"Impulse Engine Power","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] SDB-09 High-Efficiency Impulse Drive Sys","Effect":0.95,"Weight O/H":45,"Scale Weight":0,"Unit Weight":35,"SR Cost x":0.025,"Pwr O/H":0.1,"Scale Pwr":0.15,"Unit Power":0.3,"O":0.06,"E":0.04,"T":0.04,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Warp Drive","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] 2 X Saladin Nacelles","Effect":0.77,"Weight O/H":5,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] 2 X Ranger Heavy Nacelles","Effect":1.1,"Weight O/H":10,"Scale Weight":0,"Unit Weight":85,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] 2 X Soyuz Nacelles","Effect":0.89,"Weight O/H":5,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] 2 X Constitution Heavy Nacelles","Effect":1.4,"Weight O/H":10,"Scale Weight":0,"Unit Weight":85,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] 2 X Miranda Nacelles","Effect":1.084,"Weight O/H":5,"Scale Weight":0,"Unit Weight":45,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] 4 X Constellation Nacelles","Effect":1.088,"Weight O/H":5,"Scale Weight":0,"Unit Weight":55,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] 2 X Constitution-A Heavy Nacelles","Effect":1.626,"Weight O/H":10,"Scale Weight":0,"Unit Weight":85,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] 2 X Centaur Nacelles","Effect":1.174,"Weight O/H":5,"Scale Weight":0,"Unit Weight":65,"SR Cost x":0.12,"Pwr O/H":5,"Scale Pwr":5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] 2 X Excelsior Pattern Nacelles","Effect":2.457,"Weight O/H":20,"Scale Weight":0,"Unit Weight":120,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] 2 X Centaur-A Pattern Nacelle","Effect":1.536,"Weight O/H":5,"Scale Weight":0,"Unit Weight":50,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":4,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] 2 X 2305 Cruiser Nacelle","Effect":2.16,"Weight O/H":10,"Scale Weight":0,"Unit Weight":80,"SR Cost x":0.15,"Pwr O/H":5,"Scale Pwr":3.5,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] 2 X Excelsior Type-II Pattern Nacelles","Effect":2.52,"Weight O/H":20,"Scale Weight":0,"Unit Weight":135,"SR Cost x":0.16,"Pwr O/H":5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] 2 X New Orleans Pattern Nacelles","Effect":1.85,"Weight O/H":5.25,"Scale Weight":0,"Unit Weight":52,"SR Cost x":0.15,"Pwr O/H":6,"Scale Pwr":6,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] 2 X Ambassador Pattern Nacelles","Effect":2.64,"Weight O/H":20,"Scale Weight":0,"Unit Weight":125,"SR Cost x":0.16,"Pwr O/H":5,"Scale Pwr":2,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T-1] Constitution-A Pattern Nacelles","Effect":1.25,"Weight O/H":10,"Scale Weight":0,"Unit Weight":55,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":3,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":19,"Type":"Nacelles","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Dual Layer Field Effect Coils","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Onboard Industry","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] S-Medical Mk I Protein Synth","Effect":0.1,"Weight O/H":7,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] S-Medical Mk I High-Endurance Protein Synth","Effect":0.2,"Weight O/H":7,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] S-Medical Mk II Protein Synth","Effect":0.15,"Weight O/H":7,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] S-Medical Mk II High-Endurance Protein Synth","Effect":0.25,"Weight O/H":7,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] S-Medical Mk III Protein Synth","Effect":0.2,"Weight O/H":7,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] S-Medical Mk III High-Endurance Protein Synth","Effect":0.375,"Weight O/H":7,"Scale Weight":0,"Unit Weight":15,"SR Cost x":0.002,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.05,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] S-Medical Mk IV Protein Synth","Effect":0.3,"Weight O/H":7,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] S-Medical Mk IV High-Endurance Protein Synth","Effect":0.5,"Weight O/H":7,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] S-Medical Mk V Protein Synth","Effect":0.4,"Weight O/H":7,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] S-Medical Mk V High-Endurance Protein Synth","Effect":0.625,"Weight O/H":7,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] S-Medical Mk VI Protein Synth","Effect":0.5,"Weight O/H":7,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":20,"Type":"Replication Packages","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] S-Medical Mk VI High-Endurance Protein Synth","Effect":0.75,"Weight O/H":7,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.01,"Pwr O/H":0,"Scale Pwr":0.5,"Unit Power":0.5,"O":0,"E":0,"T":0.025,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Fuel","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L] 2220-Light Pattern Deuterium Tanks","Effect":0.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] 2220-Heavy Pattern Deuterium Tanks","Effect":0.4,"Weight O/H":30,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H] 2220-Large Ship Pattern Deuterium Tanks","Effect":0.8,"Weight O/H":80,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.0675,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L] 2240-Light Pattern Deuterium Tanks","Effect":0.3,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] 2240-Heavy Pattern Deuterium Tanks","Effect":0.55,"Weight O/H":30,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H] 2240-Large Ship Pattern Deuterium Tanks","Effect":0.9,"Weight O/H":80,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.0675,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L] 2260-Light Pattern Deuterium Tanks","Effect":0.35,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] 2260-Heavy Pattern Deuterium Tanks","Effect":0.7,"Weight O/H":30,"Scale Weight":0,"Unit Weight":5,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H] 2260-Large Ship Pattern Deuterium Tanks","Effect":1,"Weight O/H":80,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.0675,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] 2295-Light Pattern Deuterium Tanks","Effect":0.4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H] 2285-Super-Heavy Pattern Deuterium","Effect":1.2,"Weight O/H":85,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] 2305-Light Pattern Deuterium Tanks","Effect":0.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2304,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] 2305-Heavy Pattern Deuterium Tanks","Effect":1.1,"Weight O/H":40,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2304,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H] 2305-Super-Heavy Pattern Deuterium","Effect":1.4,"Weight O/H":85,"Scale Weight":0,"Unit Weight":3,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2304,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] 2310-Light Pattern Deuterium Tanks","Effect":0.6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] 2310-Heavy Pattern Deuterium Tanks","Effect":1.25,"Weight O/H":40,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] 2310-Super-Heavy Pattern Deuterium","Effect":1.6,"Weight O/H":85,"Scale Weight":0,"Unit Weight":3,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] 2310-Light Pattern Deuterium Tanks","Effect":0.7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.065,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] 2310-Heavy Pattern Deuterium Tanks","Effect":1.4,"Weight O/H":40,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.05,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] 2310-Super-Heavy Pattern Deuterium","Effect":1.8,"Weight O/H":85,"Scale Weight":0,"Unit Weight":3,"SR Cost x":0.055,"Pwr O/H":0,"Scale Pwr":0.25,"Unit Power":0.25,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":21,"Type":"Fuel & Matter Stores","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Mk1 Antimatter Containment Tank","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Yoyodyne Pulse Fusion (Fusion Only)","Effect":10,"Weight O/H":8,"Scale Weight":0,"Unit Weight":18,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.05,"T":0.05,"Reliability":1,"Year Available (SF)":2120,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][C+] Delta Vega-12 Warp Core","Effect":26,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][R+C+] Venus-I C-Layout Warp Core","Effect":34,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][C-SR+] YYD-VI Heavy Core","Effect":34,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][C+] Delta Vega-12 Warp Core","Effect":28,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][R+C+] Venus-II C-Layout Warp Core","Effect":36,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][C-SR+] Type-E Block-1 Automated Core","Effect":36,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][C+] Delta Vega-24 Warp Core","Effect":29,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][R+C+] Venus-III C-Layout Warp Core","Effect":38,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.2,"T":0.1,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][C-SR+] Type-E Block-2 Automated Core","Effect":38,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][R-C-SR+] Delta Vega-28 Automated Core","Effect":30,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.025,"T":0.05,"Reliability":0.995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][C+] Delta Vega-26 Warp Core","Effect":30,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][R+C+] Venus-IV C-Layout Warp Core","Effect":40,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][C-SR+] Type-E Block-3 Automated Core","Effect":40,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R---C+] Type-I Experimental (40E) Warp Core","Effect":40,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.98,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R---C+] Type-II Experimental (Venus) Warp Core","Effect":50,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.13,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.98,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R+C-] Type-E Block-4 Automated Core","Effect":42,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.07,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.035,"T":0.07,"Reliability":0.999,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R--C-SR+] ONA-III-L Experimental","Effect":41,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.16,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.065,"T":0.05,"Reliability":0.99,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][C+] Type-I Block-A (40E) Warp Core","Effect":41,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.997,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R--C-SR+] ONA-III-M Experimental","Effect":51,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.06,"E":0.075,"T":0.06,"Reliability":0.99,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R-C+] Type-III Block-A (YYD) Warp Core","Effect":51,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.11,"E":0.16,"T":0.11,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R--C-SR+] ONA-III-H Experimental","Effect":61,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.085,"T":0.07,"Reliability":0.99,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][C+] Type-II Block-A (Venus) Warp Core","Effect":61,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.12,"E":0.17,"T":0.12,"Reliability":0.997,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R-C-SR+] ONA-IV-L Standard","Effect":42,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.14,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.05,"E":0.065,"T":0.05,"Reliability":0.995,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R+C+] Type-I Block-B (40E) Warp Core","Effect":42,"Weight O/H":0,"Scale Weight":0,"Unit Weight":20,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0.15,"T":0.1,"Reliability":0.999,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][R-C-SR+] ONA-IV-M Standard","Effect":52,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.16,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.06,"E":0.075,"T":0.06,"Reliability":0.995,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][C+] Type-III Block-B (YYD) Warp Core","Effect":52,"Weight O/H":0,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.11,"E":0.16,"T":0.11,"Reliability":0.997,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R-C-SR+] ONA-IV-H Standard","Effect":62,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.16,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.07,"E":0.085,"T":0.07,"Reliability":0.995,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":22,"Type":"Warp Core Types","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R+C+] Type-II Block-B (Venus) Warp Core","Effect":62,"Weight O/H":20,"Scale Weight":0,"Unit Weight":27.5,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.12,"E":0.17,"T":0.12,"Reliability":0.999,"Year Available (SF)":2318,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2][R--]Integrated Injectors","Effect":-4,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":0.99,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][C-] Luna-I High-Efficiency M/AM System","Effect":6,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M][R+] Mk IV M/AM System","Effect":9,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.5,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][C+SR+] Mk IV High Volume M/AM System","Effect":13.5,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.5,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][C-] Luna-II High-Efficiency M/AM System","Effect":7,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M][R+] Mk V M/AM System","Effect":10.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.5,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][C+SR+] Mk V High Volume M/AM System","Effect":15.75,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.5,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][C-] Luna-III High-Efficiency M/AM System","Effect":8,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M][R+] Mk VI M/AM System","Effect":12,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.5,"SR Cost x":0.095,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][C+SR+] Mk VI High Volume M/AM System","Effect":18,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.5,"SR Cost x":0.15,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][C-] Luna-IV High-Efficiency M/AM System","Effect":9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.2,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M][R+] Mk VII Sublimator-Compressor","Effect":13.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":13.77,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][C+SR+] Mk VII Complex Sublimator-Compressor","Effect":20.25,"Weight O/H":12,"Scale Weight":0,"Unit Weight":15.81,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R-C-] Luna-V High-Efficiency M/AM System","Effect":10,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] Mk VIII Sublimator-Compressor","Effect":15,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.04,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R-C+SR+] Mk VIII High Volume Compressor","Effect":22.5,"Weight O/H":12,"Scale Weight":0,"Unit Weight":16.12,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R-C-] Luna-VI High-Efficiency M/AM System","Effect":11,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.6,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M] Mk IX Sublimator-Compressor","Effect":16.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.31,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R-C+SR+] Mk IX High Volume Compressor","Effect":24.75,"Weight O/H":12,"Scale Weight":0,"Unit Weight":16.43,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":2313,"Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R-C-] Luna-VII High-Efficiency M/AM System","Effect":12,"Weight O/H":0,"Scale Weight":0,"Unit Weight":10.8,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M] Mk X Sublimator-Compressor","Effect":18,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.58,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R-C+SR+] Mk X High Volume Compressor","Effect":27,"Weight O/H":12,"Scale Weight":0,"Unit Weight":16.74,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L][R-C-] Luna-VIII High-Efficiency M/AM System","Effect":13,"Weight O/H":0,"Scale Weight":0,"Unit Weight":11,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.025,"E":0.025,"T":0.025,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M] Mk XI Sublimator-Compressor","Effect":19.5,"Weight O/H":5,"Scale Weight":0,"Unit Weight":14.85,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.08,"E":0.04,"T":0.08,"Reliability":0.997,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":23,"Type":"Matter/Anti-Matter Injectors","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H][R-C+SR+] Mk XI High Volume Compressor","Effect":29.25,"Weight O/H":12,"Scale Weight":0,"Unit Weight":17.05,"SR Cost x":0.18,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.16,"E":0.12,"T":0.16,"Reliability":0.995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2][R-SR-] Integrated Coolant","Effect":-15,"Weight O/H":0,"Scale Weight":0,"Unit Weight":7,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":1,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][R-] Mk IV Mod L Coolant System","Effect":-14.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M] Mk IV Yoyodyne Coolant System","Effect":-11,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][R-] Mk V Mod L Coolant System","Effect":-14,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M] Mk V Yoyodyne Coolant System","Effect":-10.25,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][R-] Mk V Mod L Coolant System","Effect":-13,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M] Mk V Yoyodyne Coolant System","Effect":-10,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][R-SR-] VSA-12-L Efficient Coolant System","Effect":-12.1875,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.03,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L] Mk VI Mod L Yoyodyne Coolant System","Effect":-9.75,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][SR-] SBD-VI Efficient Coolant System","Effect":-4.875,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][R+] Mk VI Mod H Yoyodyne Coolant System","Effect":-3.9,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R-SR-] VSA-13-L Efficient Coolant System","Effect":-11.875,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L] Mk VII Mod L Yoyodyne Coolant System","Effect":-9.5,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][SR-] SBD-VII Efficient Coolant System","Effect":-4.75,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":1,"Size Sort":3,"Size Class":"Heavy","Name":"[T1][H][R+] Mk VII Mod H Yoyodyne Coolant System","Effect":-3.8,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R-SR-] VSA-14-L Efficient Coolant System","Effect":-11.5625,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L] Mk VIII Mod L Yoyodyne Coolant System","Effect":-9.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R+SR+] Mars-8 Experimental Coolant System","Effect":-7.4,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.0125,"E":0.0125,"T":0.0125,"Reliability":1.005,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][SR-] SBD-VIII Efficient Coolant System","Effect":-4.625,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R+] Mk VIII Mod H Yododyne SBD Coolant System","Effect":-3.7,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R-SR-] VSA-15-L Efficient Coolant System","Effect":-11.25,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.001,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L] Mk IX Mod L Yoyodyne Coolant System","Effect":-9,"Weight O/H":0,"Scale Weight":0,"Unit Weight":4,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][R+SR+] Mars-9 Experimental Coolant System","Effect":-7.2,"Weight O/H":5,"Scale Weight":0,"Unit Weight":4.8,"SR Cost x":0.12,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.0125,"E":0.0125,"T":0.0125,"Reliability":1.005,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][SR-] SBD-IX Efficient Coolant System","Effect":-4.5,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.02,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.003,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R+] Mk IX Mod H Yoyodyne Coolant System","Effect":-3.6,"Weight O/H":15,"Scale Weight":0,"Unit Weight":6,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.01,"E":0.01,"T":0.01,"Reliability":1.005,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T-1] Constitution Coolant System","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Basic Plasma Intercooler","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":24,"Type":"Coolant Systems","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Mk II Plasma Intercooler","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"xNo EPS Manifold","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-3,"Size Sort":1,"Size Class":"Light","Name":"[T-3][L][R+] Tellar HIG-63 Pulse Injection Manifold","Effect":7,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-3,"Size Sort":2,"Size Class":"Medium","Name":"[T-3][M][R++E+] VSA-1 Plasma Manifold","Effect":10.25,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-3,"Size Sort":3,"Size Class":"Heavy","Name":"[T-3][H][R++O+] YYD-M3 Manifold","Effect":13,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0,"T":0.01,"Reliability":1,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-2,"Size Sort":1,"Size Class":"Light","Name":"[T-2][L][R+] Tellar HIG-76 Pulse Injection Manifold","Effect":8,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-2,"Size Sort":2,"Size Class":"Medium","Name":"[T-2][M][R++E+] VSA-2 Plasma Manifold","Effect":11.5,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-2,"Size Sort":3,"Size Class":"Heavy","Name":"[T-2][H][R++O+] YYD-M4 Manifold","Effect":14,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0,"T":0.01,"Reliability":1,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-1,"Size Sort":1,"Size Class":"Light","Name":"[T-1][L][R+] Tellar HIG-84 Pulse Injection Manifold","Effect":9,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-1,"Size Sort":2,"Size Class":"Medium","Name":"[T-1][M][R++E+] VSA-3 Plasma Manifold","Effect":13,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.1,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":-1,"Size Sort":3,"Size Class":"Heavy","Name":"[T-1][H][R++O+] SBD-1 Manifold","Effect":15.5,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.08,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0.1,"E":0,"T":0.01,"Reliability":1,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":0,"Size Sort":1,"Size Class":"Light","Name":"[T0][L][R+] Tellar HIG-92 Pulse Injection Manifold","Effect":10,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":0,"Size Sort":2,"Size Class":"Medium","Name":"[T0][M] VSA-4 Pulse Injection Manifold","Effect":14,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.997,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":0,"Size Sort":3,"Size Class":"Heavy","Name":"[T0][H][R-] SF-V Performance Manifold","Effect":17,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.09,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.995,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":1,"Size Sort":1,"Size Class":"Light","Name":"[T1][L][R+] Tellar HIG-103 Pulse Injection Manifold","Effect":11,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":1,"Size Sort":2,"Size Class":"Medium","Name":"[T1][M] VSA-5 Pulse Injection Manifold","Effect":15.25,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2,"SR Cost x":0.1,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2306,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][SR-] 40EA-I Industrial Injection Manifold","Effect":9,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":1,"Size Class":"Light","Name":"[T2][L][R+] Tellar HIG-110 Pulse Injection Manifold","Effect":12,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][SR-] SBD-A Efficient Manifold","Effect":12.375,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.997,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":2,"Size Class":"Medium","Name":"[T2][M][R+] VSA-6 Pulse Injection Manifold","Effect":16.5,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.999,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H][R-SR-] YYD-4 Performance Manifold","Effect":15,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.995,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":2,"Size Sort":3,"Size Class":"Heavy","Name":"[T2][H] SF-VII Performance Manifold","Effect":20,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.997,"Year Available (SF)":2311,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][SR-] 40EA-II Industrial Injection Manifold","Effect":9.75,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.998,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":1,"Size Class":"Light","Name":"[T3][L][R+] Tellar HIG-117 Pulse Injection Manifold","Effect":13,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9995,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][SR-] SBD-B Efficient Manifold","Effect":13.3125,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":2,"Size Class":"Medium","Name":"[T3][M][R+] VSA-7 Pulse Injection Manifold","Effect":17.75,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H][R-SR-] YYD-5 Performance Manifold","Effect":16.125,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.996,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":3,"Size Sort":3,"Size Class":"Heavy","Name":"[T3][H] SF-VIII Performance Manifold","Effect":21.5,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L][SR-] 40EA-III Industrial Injection Manifold","Effect":10.5,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.998,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":1,"Size Class":"Light","Name":"[T4][L][R+] Tellar HIG-122 Pulse Injection Manifold","Effect":14,"Weight O/H":8,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9995,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M][SR-] SBD-C Efficient Manifold","Effect":14.25,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":2,"Size Class":"Medium","Name":"[T4][M][R+] VSA-8 Pulse Injection Manifold","Effect":19,"Weight O/H":14,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.99925,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H][R-SR-] YYD-7 Performance Manifold","Effect":17.25,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.04,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.996,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":4,"Size Sort":3,"Size Class":"Heavy","Name":"[T4][H] SF-IX Performance Manifold","Effect":23,"Weight O/H":20,"Scale Weight":0,"Unit Weight":2.2,"SR Cost x":0.11,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0.01,"T":0.01,"Reliability":0.9975,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Ion Distributor","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T0] Pulse Injection Manifold","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":25,"Type":"EPS Manifold System","Tier":99,"Size Sort":99,"Size Class":"","Name":"x[T1] Phased Injection Manifold","Effect":"","Weight O/H":"","Scale Weight":"","Unit Weight":"","SR Cost x":"","Pwr O/H":"","Scale Pwr":"","Unit Power":"","O":"","E":"","T":"","Reliability":"","Year Available (SF)":"","Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-99,"Size Sort":-99,"Size Class":"N/A","Name":"No Eject","Effect":0,"Weight O/H":0,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0,"Reliability":0.7,"Year Available (SF)":0,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-3,"Size Sort":-99,"Size Class":"N/A","Name":"[T-3] Manual Ejection - Early Mechanical","Effect":0,"Weight O/H":15,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.65,"Year Available (SF)":2230,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-2,"Size Sort":-99,"Size Class":"N/A","Name":"[T-2] Manual Ejection - Mechanical","Effect":0,"Weight O/H":15,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":0,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.6,"Year Available (SF)":2250,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":-1,"Size Sort":-99,"Size Class":"N/A","Name":"[T-1] Manual Ejection - Basic EM Rails","Effect":0,"Weight O/H":10,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":1,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.5,"Year Available (SF)":2270,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":0,"Size Sort":-99,"Size Class":"N/A","Name":"[T0] EngOS Monitoring - Heavy EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.45,"Year Available (SF)":2290,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":1,"Size Sort":-99,"Size Class":"N/A","Name":"[T1] EngOS Monitoring - Super Heavy EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.375,"Year Available (SF)":2310,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":2,"Size Sort":-99,"Size Class":"N/A","Name":"[T2] EngOS Monitoring - Anak-Krueger EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.365,"Year Available (SF)":2315,"Size Class List":"","Full Tier List":""},{"Type Sort":26,"Type":"Eject System","Tier":3,"Size Sort":-99,"Size Class":"N/A","Name":"[T3] EngOS 3.1 Monitoring - YYD-Emergency VI EM Rails","Effect":0,"Weight O/H":5,"Scale Weight":0,"Unit Weight":0,"SR Cost x":0.2,"Pwr O/H":5,"Scale Pwr":0,"Unit Power":0,"O":0,"E":0,"T":0.01,"Reliability":0.36,"Year Available (SF)":"*","Size Class List":"","Full Tier List":""}]
-
-/***/ }),
-
-/***/ 674:
+/***/ 704:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -27390,1125 +26816,196 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "footer" }, [
-    _c("input", {
-      directives: [
-        {
-          name: "model",
-          rawName: "v-model",
-          value: _vm.parts_list_name,
-          expression: "parts_list_name"
-        }
-      ],
-      domProps: { value: _vm.parts_list_name },
-      on: {
-        input: function($event) {
-          if ($event.target.composing) {
-            return
-          }
-          _vm.parts_list_name = $event.target.value
-        }
-      }
-    }),
+  return _c("div", [
+    _vm._m(0),
     _vm._v(" "),
-    _c(
-      "select",
-      {
+    _c("div", [
+      _c("span", [_vm._v("Parts list name:")]),
+      _vm._v(" "),
+      _c("input", {
         directives: [
           {
             name: "model",
             rawName: "v-model",
-            value: _vm.selected_parts_list_name,
-            expression: "selected_parts_list_name"
+            value: _vm.name_computed,
+            expression: "name_computed"
           }
         ],
+        domProps: { value: _vm.name_computed },
         on: {
-          change: function($event) {
-            var $$selectedVal = Array.prototype.filter
-              .call($event.target.options, function(o) {
-                return o.selected
-              })
-              .map(function(o) {
-                var val = "_value" in o ? o._value : o.value
-                return val
-              })
-            _vm.selected_parts_list_name = $event.target.multiple
-              ? $$selectedVal
-              : $$selectedVal[0]
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.name_computed = $event.target.value
           }
         }
-      },
-      _vm._l(_vm.all_parts_lists, function(parts_list) {
-        return _c("option", [
-          _vm._v(
-            "\n\t\t" + _vm._s(_vm.parts_list_save_name(parts_list)) + "\n      "
-          )
-        ])
       })
-    ),
-    _vm._v(" "),
-    _c("input", {
-      attrs: { type: "button", value: "Delete saved parts" },
-      on: { click: _vm.parts_lists_delete_selected }
-    }),
-    _vm._v(" "),
-    _c("input", {
-      attrs: { type: "button", value: "Load saved parts" },
-      on: { click: _vm.parts_lists_load_selected }
-    }),
-    _vm._v(" "),
-    _c("input", {
-      attrs: { type: "button", value: "Save current parts" },
-      on: { click: _vm.parts_lists_save_current }
-    }),
-    _vm._v(" "),
-    _c("input", {
-      attrs: { type: "button", value: "Refresh" },
-      on: { click: _vm.parts_lists_load_from_local_storage }
-    }),
-    _vm._v(" "),
-    _c("input", {
-      attrs: { type: "button", value: "Save to file" },
-      on: { click: _vm.parts_lists_save_file }
-    }),
-    _vm._v(" "),
-    _c("input", {
-      attrs: { type: "button", value: "Load from file" },
-      on: {
-        click: function($event) {
-          _vm.$refs.load_file_input.click()
-        }
-      }
-    }),
-    _vm._v(" "),
-    _c("input", {
-      ref: "load_file_input",
-      staticStyle: { display: "none" },
-      attrs: { type: "file", value: "Load file" },
-      on: { change: _vm.parts_lists_load_file }
-    }),
-    _vm._v(" "),
-    _c("a", { ref: "save_file_a", staticStyle: { display: "none" } }),
-    _vm._v(" "),
-    _c(
-      "span",
-      {
-        ref: "status_message",
-        staticClass: "design-import-export-status-message",
-        on: {
-          animationend: function($event) {
-            _vm.clear_status_message()
-          }
-        }
-      },
-      [_vm._v(_vm._s(_vm.status_message))]
-    )
-  ])
-}
-var staticRenderFns = []
-render._withStripped = true
-var esExports = { render: render, staticRenderFns: staticRenderFns }
-/* harmony default export */ __webpack_exports__["a"] = (esExports);
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-12b8dc20", esExports)
-  }
-}
-
-/***/ }),
-
-/***/ 675:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_editor_vue__ = __webpack_require__(680);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_editor_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_editor_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_4532c4c2_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_editor_vue__ = __webpack_require__(695);
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(676)
-  __webpack_require__(678)
-}
-var normalizeComponent = __webpack_require__(12)
-/* script */
-
-/* template */
-
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-4532c4c2"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_editor_vue___default.a,
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_4532c4c2_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_editor_vue__["a" /* default */],
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "src/parts-list-editor.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] parts-list-editor.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-4532c4c2", Component.options)
-  } else {
-    hotAPI.reload("data-v-4532c4c2", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
-
-
-/***/ }),
-
-/***/ 676:
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(677);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(5)("1343e218", content, false);
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-4532c4c2\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./parts-list-editor.vue", function() {
-     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-4532c4c2\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./parts-list-editor.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-
-/***/ 677:
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(4)(true);
-// imports
-
-
-// module
-exports.push([module.i, "\n.editor[data-v-4532c4c2] {\n\t/* width: 1500px; */\n\ttable-layout: fixed;\n\tborder-collapse: collapse;\n}\n.column-header[data-v-4532c4c2] {\n\tcursor: pointer;\n\tborder: 1px solid #eee;\n}\n.delete-column[data-v-4532c4c2] {\n\twidth: 30px;\n}\n.new-part-button[data-v-4532c4c2] {\n\tmargin: 5px;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/parts-list-editor.vue?441ad13a"],"names":[],"mappings":";AAyEA;CACA,oBAAA;CACA,oBAAA;CACA,0BAAA;CACA;AAEA;CACA,gBAAA;CACA,uBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA","file":"parts-list-editor.vue","sourcesContent":["<template>\n  <div width=\"100%\" height=\"100%\">\n  <table class=\"editor\">\n\t<thead>\n\t  <th v-for=\"field in selected_schema\"\n\t\t  @click=\"sort_list(field.name)\"\n\t\t  class=\"column-header\"\n\t\t  v-bind:style=\"header_style(field)\">{{field.name}}</th>\n\t  <th class=\"column-header delete-column\"></th>\n\t</thead>\n\t<tbody>\n\t  <PartsListPart v-for=\"part in displayed_parts\" key=\"part.name\" :part=\"part\"></PartsListPart>\n\t</tbody>\n  </table>\n  <input type=\"button\" value=\"Add new part\" @click=\"add_new_part\" class=\"new-part-button\">\n  </div>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport PartsListPart from './parts-list-part.vue';\n\nexport default {\n\tname: 'PartsListEditor',\n\tcomponents: {\n\t\tPartsListPart,\n\t},\n\tdata () {\n\t\treturn {\n\t\t};\n\t},\n\tcomputed: {\n\t\tdisplayed_parts () {\n\t\t\treturn _(this.selected_parts)\n\t\t\t\t.filter((part) => this.$store.state.display.filter.types.includes(part['Type'])).value();\n\t\t},\n\t\theader_style () {\n\t\t\treturn function (field) {\n\t\t\t\treturn {\n\t\t\t\t\twidth: field.width.toString() + 'px',\n\t\t\t\t};\n\t\t\t};\n\t\t},\n\t\t...mapGetters([\n\t\t\t'selected_schema',\n\t\t\t'selected_parts',\n\t\t]),\n\t},\n\tmethods: {\n\t\tadd_new_part () {\n\t\t\tlet new_part = _.chain(this.fields)\n\t\t\t\t.map((field) => [field.name, null])\n\t\t\t\t.fromPairs()\n\t\t\t\t.value();\n\n\t\t\tconst last_part = this.displayed_parts[this.displayed_parts.length - 1];\n\t\t\tnew_part['Type'] = last_part['Type'];\n\t\t\tnew_part['Type Sort'] = last_part['Type Sort'];\n\t\t\tthis.$store.commit('add_part', new_part);\n\t\t},\n\t\tsort_list (field) {\n\t\t\tthis.$store.commit('sort_parts_list_by', field);\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.editor {\n\t/* width: 1500px; */\n\ttable-layout: fixed;\n\tborder-collapse: collapse;\n}\n\n.column-header {\n\tcursor: pointer;\n\tborder: 1px solid #eee;\n}\n\n.delete-column {\n\twidth: 30px;\n}\n\n.new-part-button {\n\tmargin: 5px;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
-
-// exports
-
-
-/***/ }),
-
-/***/ 678:
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(679);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(5)("0f14d588", content, false);
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-4532c4c2\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./parts-list-editor.vue", function() {
-     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-4532c4c2\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./parts-list-editor.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-
-/***/ 679:
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(4)(true);
-// imports
-
-
-// module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-editor.vue","sourceRoot":""}]);
-
-// exports
-
-
-/***/ }),
-
-/***/ 680:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-var _lodash = __webpack_require__(36);
-
-var _lodash2 = _interopRequireDefault(_lodash);
-
-var _vuex = __webpack_require__(16);
-
-var _partsListPart = __webpack_require__(681);
-
-var _partsListPart2 = _interopRequireDefault(_partsListPart);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = {
-	name: 'PartsListEditor',
-	components: {
-		PartsListPart: _partsListPart2.default
-	},
-	data: function data() {
-		return {};
-	},
-
-	computed: _extends({
-		displayed_parts: function displayed_parts() {
-			var _this = this;
-
-			return (0, _lodash2.default)(this.selected_parts).filter(function (part) {
-				return _this.$store.state.display.filter.types.includes(part['Type']);
-			}).value();
-		},
-		header_style: function header_style() {
-			return function (field) {
-				return {
-					width: field.width.toString() + 'px'
-				};
-			};
-		}
-	}, (0, _vuex.mapGetters)(['selected_schema', 'selected_parts'])),
-	methods: {
-		add_new_part: function add_new_part() {
-			var new_part = _lodash2.default.chain(this.fields).map(function (field) {
-				return [field.name, null];
-			}).fromPairs().value();
-
-			var last_part = this.displayed_parts[this.displayed_parts.length - 1];
-			new_part['Type'] = last_part['Type'];
-			new_part['Type Sort'] = last_part['Type Sort'];
-			this.$store.commit('add_part', new_part);
-		},
-		sort_list: function sort_list(field) {
-			this.$store.commit('sort_parts_list_by', field);
-		}
-	}
-};
-
-/***/ }),
-
-/***/ 681:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_part_vue__ = __webpack_require__(686);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_part_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_part_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_0da6ff88_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_part_vue__ = __webpack_require__(694);
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(682)
-  __webpack_require__(684)
-}
-var normalizeComponent = __webpack_require__(12)
-/* script */
-
-/* template */
-
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-0da6ff88"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_part_vue___default.a,
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_0da6ff88_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_part_vue__["a" /* default */],
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "src/parts-list-part.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] parts-list-part.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-0da6ff88", Component.options)
-  } else {
-    hotAPI.reload("data-v-0da6ff88", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
-
-
-/***/ }),
-
-/***/ 682:
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(683);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(5)("912d946e", content, false);
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-0da6ff88\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./parts-list-part.vue", function() {
-     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-0da6ff88\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./parts-list-part.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-
-/***/ 683:
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(4)(true);
-// imports
-
-
-// module
-exports.push([module.i, "\n.part[data-v-0da6ff88] {\n}\n.has-error[data-v-0da6ff88] {\n\tbackground: #faa;\n}\n.delete-cell[data-v-0da6ff88] {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n.delete-button[data-v-0da6ff88] {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n.copy-cell[data-v-0da6ff88] {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n.copy-button[data-v-0da6ff88] {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/parts-list-part.vue?687253e3"],"names":[],"mappings":";AAkEA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,YAAA;CACA,uBAAA;CACA;AAEA;CACA,WAAA;CACA,gBAAA;;CAEA,YAAA;IACA,uBAAA;CACA;AAEA;CACA,YAAA;CACA,uBAAA;CACA;AAEA;CACA,WAAA;CACA,gBAAA;;CAEA,YAAA;IACA,uBAAA;CACA","file":"parts-list-part.vue","sourcesContent":["<template>\n  <tr class=\"part\">\n\t<PartsListCell\n\t  v-for=\"field in selected_schema\"\n\t  v-bind:class=\"list_class(field)\"\n\t  :key=\"field.name\"\n\t  :part=\"part\"\n\t  :field=\"field\">\n\t</PartsListCell>\n\t<td class=\"delete-cell\"><input type=\"button\" class=\"delete-button\" value=\"X\" @click=\"delete_this_part\"></td>\n\t<td class=\"copy-cell\"><input type=\"button\" class=\"copy-button\" value=\"+\" @click=\"copy_this_part\"></td>\n  </tr>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport PartsListCell from './parts-list-cell.vue';\n\nexport default {\n\tname: 'PartsListPart',\n\tcomponents: {\n\t\tPartsListCell,\n\t},\n\tprops: {\n\t\tpart: Object,\n\t},\n\tcomputed: {\n\t\thas_duplicate_name_error () {\n\t\t\tconst f = (part) => _.pick(part, ['Name', 'Variant', 'Type']);\n\t\t\tconst comp = (part) => _.isEqual(f(part), f(this.part))\n\t\t\treturn this.selected_parts.filter(comp).length > 1;\n\t\t},\n\t\tlist_class () {\n\t\t\treturn function (field) {\n\t\t\t\treturn {\n\t\t\t\t\t['has-error']: (field.id === 'name') && (this.has_duplicate_name_error),\n\t\t\t\t};\n\t\t\t};\n\t\t},\n\t\t...mapGetters([\n\t\t\t'selected_schema',\n\t\t\t'selected_parts',\n\t\t]),\n\t},\n\tmethods: {\n\t\tdelete_this_part () {\n\t\t\tthis.$store.commit('delete_part', this.part['Name']);\n\t\t},\n\t\tcopy_this_part () {\n\t\t\tconst idx = this.selected_parts.findIndex((part) => part['Name'] === this.part['Name']);\n\t\t\tif (idx >= 0) {\n\t\t\t\tlet clone = _.cloneDeep(this.part);\n\t\t\t\tclone['Name'] += ' copy';\n\t\t\t\tthis.$store.commit('add_part', clone);\n\t\t\t};\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.part {\n}\n\n.has-error {\n\tbackground: #faa;\n}\n\n.delete-cell {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n\n.delete-button {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n.copy-cell {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n\n.copy-button {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
-
-// exports
-
-
-/***/ }),
-
-/***/ 684:
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(685);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(5)("6632695f", content, false);
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-0da6ff88\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./parts-list-part.vue", function() {
-     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-0da6ff88\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./parts-list-part.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-
-/***/ 685:
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(4)(true);
-// imports
-
-
-// module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-part.vue","sourceRoot":""}]);
-
-// exports
-
-
-/***/ }),
-
-/***/ 686:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-var _lodash = __webpack_require__(36);
-
-var _lodash2 = _interopRequireDefault(_lodash);
-
-var _vuex = __webpack_require__(16);
-
-var _partsListCell = __webpack_require__(687);
-
-var _partsListCell2 = _interopRequireDefault(_partsListCell);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-exports.default = {
-	name: 'PartsListPart',
-	components: {
-		PartsListCell: _partsListCell2.default
-	},
-	props: {
-		part: Object
-	},
-	computed: _extends({
-		has_duplicate_name_error: function has_duplicate_name_error() {
-			var _this = this;
-
-			var f = function f(part) {
-				return _lodash2.default.pick(part, ['Name', 'Variant', 'Type']);
-			};
-			var comp = function comp(part) {
-				return _lodash2.default.isEqual(f(part), f(_this.part));
-			};
-			return this.selected_parts.filter(comp).length > 1;
-		},
-		list_class: function list_class() {
-			return function (field) {
-				return _defineProperty({}, 'has-error', field.id === 'name' && this.has_duplicate_name_error);
-			};
-		}
-	}, (0, _vuex.mapGetters)(['selected_schema', 'selected_parts'])),
-	methods: {
-		delete_this_part: function delete_this_part() {
-			this.$store.commit('delete_part', this.part['Name']);
-		},
-		copy_this_part: function copy_this_part() {
-			var _this2 = this;
-
-			var idx = this.selected_parts.findIndex(function (part) {
-				return part['Name'] === _this2.part['Name'];
-			});
-			if (idx >= 0) {
-				var clone = _lodash2.default.cloneDeep(this.part);
-				clone['Name'] += ' copy';
-				this.$store.commit('add_part', clone);
-			};
-		}
-	}
-};
-
-/***/ }),
-
-/***/ 687:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_cell_vue__ = __webpack_require__(692);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_cell_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_cell_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_dfba5512_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_cell_vue__ = __webpack_require__(693);
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(688)
-  __webpack_require__(690)
-}
-var normalizeComponent = __webpack_require__(12)
-/* script */
-
-/* template */
-
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-dfba5512"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_parts_list_cell_vue___default.a,
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_dfba5512_hasScoped_true_node_modules_vue_loader_lib_selector_type_template_index_0_parts_list_cell_vue__["a" /* default */],
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "src/parts-list-cell.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] parts-list-cell.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-dfba5512", Component.options)
-  } else {
-    hotAPI.reload("data-v-dfba5512", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
-
-
-/***/ }),
-
-/***/ 688:
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(689);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(5)("e8d2a9fe", content, false);
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-dfba5512\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./parts-list-cell.vue", function() {
-     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-dfba5512\",\"scoped\":true,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./parts-list-cell.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-
-/***/ 689:
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(4)(true);
-// imports
-
-
-// module
-exports.push([module.i, "\ninput[type=\"number\"][data-v-dfba5512]::-webkit-outer-spin-button,\ninput[type=\"number\"][data-v-dfba5512]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\ninput[type=\"number\"][data-v-dfba5512] {\n    -moz-appearance: textfield;\n}\n.cell[data-v-dfba5512] {\n\tborder: 1px solid #eee;\n\tcursor: cell;\n}\n.display-span[data-v-dfba5512] {\n\twidth: 100%;\n\twhite-space: pre;\n}\n.edit-input[data-v-dfba5512] {\n\tpadding: 0px;\n\tborder-width: 0;\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n\n", "", {"version":3,"sources":["/home/saul/src/projects/tbg/tbg-shipbuilder/src/parts-list-cell.vue?8ba1df22"],"names":[],"mappings":";AAqKA;;IAEA,yBAAA;IACA,UAAA;CACA;AACA;IACA,2BAAA;CACA;AAEA;CACA,uBAAA;CACA,aAAA;CACA;AAEA;CACA,YAAA;CACA,iBAAA;CACA;AAEA;CACA,aAAA;CACA,gBAAA;CACA,YAAA;IACA,uBAAA;CACA","file":"parts-list-cell.vue","sourcesContent":["<template>\n  <td class=\"cell\"\n\t  @click=\"edit_cell\"\n\t  @focus=\"edit_cell\"\n\t  tabindex=\"0\"\n\t  v-bind:style=\"computed_style\">\n\n\t<span\n\t  class=\"display-span\"\n\t  v-show=\"!is_editing\">{{display_value}}</span>\n\t\n\t<input\n\t  v-if=\"is_editing\"\n\t  class=\"edit-input\"\n\t  ref=\"input\"\n\t  type=\"text\"\n\t  @blur=\"commit_edit\"\n\t  @keydown=\"on_keydown\"\n\t  v-focus\n\t  v-model=\"temp_value\"></input>\n  </td>\n</template>\n\n<script>\n\nexport default {\n\tname: 'PartsListCell',\n\tcomponents: {\n\t},\n\tdirectives: {\n\t\tfocus: {\n\t\t\tinserted (el) {\n\t\t\t\tel.focus();\n\t\t\t},\n\t\t},\n\t},\n\tprops: {\n\t\tpart: {\n\t\t\ttype: Object,\n\t\t},\n\t\tfield: {\n\t\t\ttype: Object,\n\t\t},\n\t},\n\tdata () {\n\t\treturn {\n\t\t\tis_editing: false,\n\t\t\ttemp_value: null,\n\t\t};\n\t},\n\tcomputed: {\n\t\tcomputed_style () {\n\t\t\treturn Object.assign({\n\t\t\t\t'width': this.field.width.toString() + 'px',\n\t\t\t\t'text-align': this.field.align,\n\t\t\t}, this.computed_font);\n\t\t},\n\t\tcomputed_font () {\n\t\t\tswitch (this.field.style) {\n\t\t\tcase 'fixed':\n\t\t\t\treturn {\n\t\t\t\t\t['font-family']: \"'Roboto Mono', monospace\",\n\t\t\t\t\t['font-size']: '12px',\n\t\t\t\t};\n\t\t\t\tbreak;\n\t\t\tcase 'variable':\n\t\t\tdefault:\n\t\t\t\treturn {};\n\t\t\t\tbreak;\n\t\t\t};\n\t\t},\n\t\tdisplay_value () {\n\t\t\tswitch (this.field.edit_type) {\n\t\t\tcase 'number':\n\t\t\t\t// return this.part[this.field.name];\n\t\t\t\tconst v = this.part[this.field.name];\n\t\t\t\tif (typeof(v) == 'number') {\n\t\t\t\t\tconst f = v.toFixed(this.field.fixed);\n\t\t\t\t\treturn f.replace(/(\\..*?)(0+)$/, (match, p1, p2) => p1 + ' '.repeat(p2.length));\n\t\t\t\t} else {\n\t\t\t\t\treturn v;\n\t\t\t\t};\n\t\t\t\tbreak;\n\t\t\tcase 'string':\n\t\t\t\treturn this.part[this.field.name];\n\t\t\t\tbreak;\n\t\t\t};\n\t\t},\n\t\tvalue: {\n\t\t\tget () {\n\t\t\t\tswitch (this.field.edit_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\treturn this.value_number;\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'string':\n\t\t\t\t\treturn this.value_string;\n\t\t\t\t\tbreak;\n\t\t\t\t};\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tswitch (this.field.edit_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\tthis.value_number = value;\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'string':\n\t\t\t\t\tthis.value_string = value;\n\t\t\t\t\tbreak;\n\t\t\t\t};\n\t\t\t},\n\t\t},\n\t\tvalue_number: {\n\t\t\tget () {\n\t\t\t\treturn Number(this.part[this.field.name]);\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('edit_part', {\n\t\t\t\t\tpart: this.part,\n\t\t\t\t\tfield: this.field.name,\n\t\t\t\t\tvalue: Number(value.trim()),\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tvalue_string: {\n\t\t\tget () {\n\t\t\t\treturn this.part[this.field.name];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('edit_part', {\n\t\t\t\t\tpart: this.part,\n\t\t\t\t\tfield: this.field.name,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\ton_keydown(ev) {\n\t\t\tswitch (ev.key){\n\t\t\tcase 'Enter':\n\t\t\t\t// leave focus and let the app save changes\n\t\t\t\tthis.commit_edit();\n\t\t\t\tbreak;\n\t\t\tcase 'Escape':\n\t\t\t\tthis.abort_edit();\n\t\t\t\tbreak;\n\t\t\t};\n\t\t},\n\t\tabort_edit () {\n\t\t\tthis.temp_value = this.value;\n\t\t\tthis.is_editing = false;\n\t\t},\n\t\tedit_cell (ev) {\n\t\t\tthis.is_editing = true;\n\t\t\tthis.temp_value = this.value;\n\t\t},\n\t\tcommit_edit (ev) {\n\t\t\tthis.is_editing = false;\n\t\t\tthis.value = this.temp_value;\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\ninput[type=\"number\"]::-webkit-outer-spin-button,\ninput[type=\"number\"]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\ninput[type=\"number\"] {\n    -moz-appearance: textfield;\n}\n\n.cell {\n\tborder: 1px solid #eee;\n\tcursor: cell;\n}\n\n.display-span {\n\twidth: 100%;\n\twhite-space: pre;\n}\n\n.edit-input {\n\tpadding: 0px;\n\tborder-width: 0;\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
-
-// exports
-
-
-/***/ }),
-
-/***/ 690:
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(691);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(5)("11d46ce9", content, false);
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-dfba5512\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./parts-list-cell.vue", function() {
-     var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-dfba5512\",\"scoped\":false,\"hasInlineConfig\":false}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./parts-list-cell.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-
-/***/ 691:
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(4)(true);
-// imports
-
-
-// module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-cell.vue","sourceRoot":""}]);
-
-// exports
-
-
-/***/ }),
-
-/***/ 692:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-exports.default = {
-	name: 'PartsListCell',
-	components: {},
-	directives: {
-		focus: {
-			inserted: function inserted(el) {
-				el.focus();
-			}
-		}
-	},
-	props: {
-		part: {
-			type: Object
-		},
-		field: {
-			type: Object
-		}
-	},
-	data: function data() {
-		return {
-			is_editing: false,
-			temp_value: null
-		};
-	},
-
-	computed: {
-		computed_style: function computed_style() {
-			return Object.assign({
-				'width': this.field.width.toString() + 'px',
-				'text-align': this.field.align
-			}, this.computed_font);
-		},
-		computed_font: function computed_font() {
-			var _ref;
-
-			switch (this.field.style) {
-				case 'fixed':
-					return _ref = {}, _defineProperty(_ref, 'font-family', "'Roboto Mono', monospace"), _defineProperty(_ref, 'font-size', '12px'), _ref;
-					break;
-				case 'variable':
-				default:
-					return {};
-					break;
-			};
-		},
-		display_value: function display_value() {
-			switch (this.field.edit_type) {
-				case 'number':
-					// return this.part[this.field.name];
-					var v = this.part[this.field.name];
-					if (typeof v == 'number') {
-						var f = v.toFixed(this.field.fixed);
-						return f.replace(/(\..*?)(0+)$/, function (match, p1, p2) {
-							return p1 + ' '.repeat(p2.length);
-						});
-					} else {
-						return v;
-					};
-					break;
-				case 'string':
-					return this.part[this.field.name];
-					break;
-			};
-		},
-
-		value: {
-			get: function get() {
-				switch (this.field.edit_type) {
-					case 'number':
-						return this.value_number;
-						break;
-					case 'string':
-						return this.value_string;
-						break;
-				};
-			},
-			set: function set(value) {
-				switch (this.field.edit_type) {
-					case 'number':
-						this.value_number = value;
-						break;
-					case 'string':
-						this.value_string = value;
-						break;
-				};
-			}
-		},
-		value_number: {
-			get: function get() {
-				return Number(this.part[this.field.name]);
-			},
-			set: function set(value) {
-				this.$store.commit('edit_part', {
-					part: this.part,
-					field: this.field.name,
-					value: Number(value.trim())
-				});
-			}
-		},
-		value_string: {
-			get: function get() {
-				return this.part[this.field.name];
-			},
-			set: function set(value) {
-				this.$store.commit('edit_part', {
-					part: this.part,
-					field: this.field.name,
-					value: value
-				});
-			}
-		}
-	},
-	methods: {
-		on_keydown: function on_keydown(ev) {
-			switch (ev.key) {
-				case 'Enter':
-					// leave focus and let the app save changes
-					this.commit_edit();
-					break;
-				case 'Escape':
-					this.abort_edit();
-					break;
-			};
-		},
-		abort_edit: function abort_edit() {
-			this.temp_value = this.value;
-			this.is_editing = false;
-		},
-		edit_cell: function edit_cell(ev) {
-			this.is_editing = true;
-			this.temp_value = this.value;
-		},
-		commit_edit: function commit_edit(ev) {
-			this.is_editing = false;
-			this.value = this.temp_value;
-		}
-	}
-};
-
-/***/ }),
-
-/***/ 693:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "td",
-    {
-      staticClass: "cell",
-      style: _vm.computed_style,
-      attrs: { tabindex: "0" },
-      on: { click: _vm.edit_cell, focus: _vm.edit_cell }
-    },
-    [
-      _c(
-        "span",
-        {
-          directives: [
-            {
-              name: "show",
-              rawName: "v-show",
-              value: !_vm.is_editing,
-              expression: "!is_editing"
-            }
-          ],
-          staticClass: "display-span"
-        },
-        [_vm._v(_vm._s(_vm.display_value))]
-      ),
-      _vm._v(" "),
-      _vm.is_editing
-        ? _c("input", {
-            directives: [
-              { name: "focus", rawName: "v-focus" },
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.temp_value,
-                expression: "temp_value"
-              }
-            ],
-            ref: "input",
-            staticClass: "edit-input",
-            attrs: { type: "text" },
-            domProps: { value: _vm.temp_value },
-            on: {
-              blur: _vm.commit_edit,
-              keydown: _vm.on_keydown,
-              input: function($event) {
-                if ($event.target.composing) {
-                  return
-                }
-                _vm.temp_value = $event.target.value
-              }
-            }
-          })
-        : _vm._e()
-    ]
-  )
-}
-var staticRenderFns = []
-render._withStripped = true
-var esExports = { render: render, staticRenderFns: staticRenderFns }
-/* harmony default export */ __webpack_exports__["a"] = (esExports);
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-dfba5512", esExports)
-  }
-}
-
-/***/ }),
-
-/***/ 694:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "tr",
-    { staticClass: "part" },
-    [
-      _vm._l(_vm.selected_schema, function(field) {
-        return _c("PartsListCell", {
-          key: field.name,
-          class: _vm.list_class(field),
-          attrs: { part: _vm.part, field: field }
-        })
-      }),
-      _vm._v(" "),
-      _c("td", { staticClass: "delete-cell" }, [
-        _c("input", {
-          staticClass: "delete-button",
-          attrs: { type: "button", value: "X" },
-          on: { click: _vm.delete_this_part }
-        })
-      ]),
-      _vm._v(" "),
-      _c("td", { staticClass: "copy-cell" }, [
-        _c("input", {
-          staticClass: "copy-button",
-          attrs: { type: "button", value: "+" },
-          on: { click: _vm.copy_this_part }
-        })
-      ])
-    ],
-    2
-  )
-}
-var staticRenderFns = []
-render._withStripped = true
-var esExports = { render: render, staticRenderFns: staticRenderFns }
-/* harmony default export */ __webpack_exports__["a"] = (esExports);
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-0da6ff88", esExports)
-  }
-}
-
-/***/ }),
-
-/***/ 695:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", { attrs: { width: "100%", height: "100%" } }, [
-    _c("table", { staticClass: "editor" }, [
-      _c(
-        "thead",
-        [
-          _vm._l(_vm.selected_schema, function(field) {
-            return _c(
-              "th",
-              {
-                staticClass: "column-header",
-                style: _vm.header_style(field),
-                on: {
-                  click: function($event) {
-                    _vm.sort_list(field.name)
-                  }
-                }
-              },
-              [_vm._v(_vm._s(field.name))]
-            )
-          }),
-          _vm._v(" "),
-          _c("th", { staticClass: "column-header delete-column" })
-        ],
-        2
-      ),
-      _vm._v(" "),
-      _c(
-        "tbody",
-        _vm._l(_vm.displayed_parts, function(part) {
-          return _c("PartsListPart", {
-            key: "part.name",
-            attrs: { part: part }
-          })
-        })
-      )
     ]),
     _vm._v(" "),
-    _c("input", {
-      staticClass: "new-part-button",
-      attrs: { type: "button", value: "Add new part" },
-      on: { click: _vm.add_new_part }
-    })
+    _c("div", [
+      _c("span", [_vm._v("Parts CSV:")]),
+      _vm._v(" "),
+      _c("input", {
+        ref: "load_parts_file_input",
+        attrs: { type: "file", value: "Load parts csv" },
+        on: { change: _vm.load_file_parts }
+      })
+    ]),
+    _vm._v(" "),
+    _c("div", [
+      _c("span", [_vm._v("Frames CSV:")]),
+      _vm._v(" "),
+      _c("input", {
+        ref: "load_frames_file_input",
+        attrs: { type: "file", value: "Load frames csv" },
+        on: { change: _vm.load_file_frames }
+      })
+    ]),
+    _vm._v(" "),
+    _c("div", [
+      _c("span", [_vm._v("Modules CSV:")]),
+      _vm._v(" "),
+      _c("input", {
+        ref: "load_modules_file_input",
+        attrs: { type: "file", value: "Load modules csv" },
+        on: { change: _vm.load_file_modules }
+      })
+    ]),
+    _vm._v(" "),
+    _vm.can_import
+      ? _c("div", [
+          _c("input", {
+            attrs: { type: "button", value: "Import parts list" },
+            on: { click: _vm.import_parts_list }
+          })
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.success
+      ? _c("div", [_c("span", [_vm._v(_vm._s(_vm.success))])])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.has_errors
+      ? _c("div", [
+          _c("div", [_vm._v("Errors present, cannot import:")]),
+          _vm._v(" "),
+          _c("ul", [
+            _vm.has_name_errors
+              ? _c("li", [
+                  _vm._v("Name:\n  \t\t  "),
+                  _c(
+                    "ol",
+                    _vm._l(_vm.name_error_messages, function(er) {
+                      return _c("li", [_vm._v(_vm._s(er))])
+                    })
+                  )
+                ])
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.has_parts_errors
+              ? _c("li", [
+                  _vm._v("Parts file:\n  \t\t  "),
+                  _c(
+                    "ol",
+                    _vm._l(_vm.parts_error_messages, function(er) {
+                      return _c("li", [_vm._v(_vm._s(er))])
+                    })
+                  )
+                ])
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.has_frames_errors
+              ? _c("li", [
+                  _vm._v("Frames file:\n  \t\t  "),
+                  _c(
+                    "ol",
+                    _vm._l(_vm.frames_error_messages, function(er) {
+                      return _c("li", [_vm._v(_vm._s(er))])
+                    })
+                  )
+                ])
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.has_modules_errors
+              ? _c("li", [
+                  _vm._v("Modules file:\n  \t\t  "),
+                  _c(
+                    "ol",
+                    _vm._l(_vm.modules_error_messages, function(er) {
+                      return _c("li", [_vm._v(_vm._s(er))])
+                    })
+                  )
+                ])
+              : _vm._e()
+          ])
+        ])
+      : _vm._e()
   ])
 }
-var staticRenderFns = []
-render._withStripped = true
-var esExports = { render: render, staticRenderFns: staticRenderFns }
-/* harmony default export */ __webpack_exports__["a"] = (esExports);
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-4532c4c2", esExports)
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", [
+      _c("h2", [_vm._v("Instructions:")]),
+      _vm._v(" "),
+      _c("ol", [
+        _c("li", [
+          _vm._v(
+            "In google docs, open the sheet with the parts that you want to transfer."
+          )
+        ]),
+        _vm._v(" "),
+        _c("li", [
+          _vm._v(
+            "Click File -> Download as -> Comma-separated values (.csv, current sheet)."
+          )
+        ]),
+        _vm._v(" "),
+        _c("li", [
+          _vm._v(
+            "Open the sheet for the modules and repeat (download current sheet as csv)."
+          )
+        ]),
+        _vm._v(" "),
+        _c("li", [
+          _vm._v(
+            "Open the sheet for the frames and repeat (download current sheet as csv)."
+          )
+        ]),
+        _vm._v(" "),
+        _c("li", [
+          _vm._v(
+            'Use the "Choose File" buttons on this tool to load the csv files that were created.'
+          )
+        ]),
+        _vm._v(" "),
+        _c("li", [_vm._v("Name the parts list.")]),
+        _vm._v(" "),
+        _c("li", [
+          _vm._v(
+            "If there are errors and you can't fix them, report an error in the sdb-informatics channel."
+          )
+        ]),
+        _vm._v(" "),
+        _c("li", [
+          _vm._v(
+            'Click "Import parts list". The parts you uploaded will be immediately available in the ship designer and parts builder.'
+          )
+        ])
+      ])
+    ])
   }
-}
-
-/***/ }),
-
-/***/ 696:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "root" }, [
-    _c("div", { staticClass: "header" }, [_c("PartsListHeader")], 1),
-    _vm._v(" "),
-    _c("div", { staticClass: "editor" }, [_c("PartsListEditor")], 1),
-    _vm._v(" "),
-    _c("div", { staticClass: "footer" }, [_c("PartsListFooter")], 1)
-  ])
-}
-var staticRenderFns = []
+]
 render._withStripped = true
 var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-65fa2a8a", esExports)
+     require("vue-hot-reload-api").rerender("data-v-5b8a858b", esExports)
   }
 }
 
@@ -34421,7 +32918,1606 @@ exports.clearImmediate = clearImmediate;
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17), __webpack_require__(20)))
 
+/***/ }),
+
+/***/ 88:
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	Papa Parse
+	v4.3.6
+	https://github.com/mholt/PapaParse
+	License: MIT
+*/
+(function(root, factory)
+{
+	if (true)
+	{
+		// AMD. Register as an anonymous module.
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	}
+	else if (typeof module === 'object' && typeof exports !== 'undefined')
+	{
+		// Node. Does not work with strict CommonJS, but
+		// only CommonJS-like environments that support module.exports,
+		// like Node.
+		module.exports = factory();
+	}
+	else
+	{
+		// Browser globals (root is window)
+		root.Papa = factory();
+	}
+}(this, function()
+{
+	'use strict';
+
+	var global = (function () {
+		// alternative method, similar to `Function('return this')()`
+		// but without using `eval` (which is disabled when
+		// using Content Security Policy).
+
+		if (typeof self !== 'undefined') { return self; }
+		if (typeof window !== 'undefined') { return window; }
+		if (typeof global !== 'undefined') { return global; }
+
+		// When running tests none of the above have been defined
+		return {};
+	})();
+
+
+	var IS_WORKER = !global.document && !!global.postMessage,
+		IS_PAPA_WORKER = IS_WORKER && /(\?|&)papaworker(=|&|$)/.test(global.location.search),
+		LOADED_SYNC = false, AUTO_SCRIPT_PATH;
+	var workers = {}, workerIdCounter = 0;
+
+	var Papa = {};
+
+	Papa.parse = CsvToJson;
+	Papa.unparse = JsonToCsv;
+
+	Papa.RECORD_SEP = String.fromCharCode(30);
+	Papa.UNIT_SEP = String.fromCharCode(31);
+	Papa.BYTE_ORDER_MARK = '\ufeff';
+	Papa.BAD_DELIMITERS = ['\r', '\n', '"', Papa.BYTE_ORDER_MARK];
+	Papa.WORKERS_SUPPORTED = !IS_WORKER && !!global.Worker;
+	Papa.SCRIPT_PATH = null;	// Must be set by your code if you use workers and this lib is loaded asynchronously
+
+	// Configurable chunk sizes for local and remote files, respectively
+	Papa.LocalChunkSize = 1024 * 1024 * 10;	// 10 MB
+	Papa.RemoteChunkSize = 1024 * 1024 * 5;	// 5 MB
+	Papa.DefaultDelimiter = ',';			// Used if not specified and detection fails
+
+	// Exposed for testing and development only
+	Papa.Parser = Parser;
+	Papa.ParserHandle = ParserHandle;
+	Papa.NetworkStreamer = NetworkStreamer;
+	Papa.FileStreamer = FileStreamer;
+	Papa.StringStreamer = StringStreamer;
+	Papa.ReadableStreamStreamer = ReadableStreamStreamer;
+
+	if (global.jQuery)
+	{
+		var $ = global.jQuery;
+		$.fn.parse = function(options)
+		{
+			var config = options.config || {};
+			var queue = [];
+
+			this.each(function(idx)
+			{
+				var supported = $(this).prop('tagName').toUpperCase() === 'INPUT'
+								&& $(this).attr('type').toLowerCase() === 'file'
+								&& global.FileReader;
+
+				if (!supported || !this.files || this.files.length === 0)
+					return true;	// continue to next input element
+
+				for (var i = 0; i < this.files.length; i++)
+				{
+					queue.push({
+						file: this.files[i],
+						inputElem: this,
+						instanceConfig: $.extend({}, config)
+					});
+				}
+			});
+
+			parseNextFile();	// begin parsing
+			return this;		// maintains chainability
+
+
+			function parseNextFile()
+			{
+				if (queue.length === 0)
+				{
+					if (isFunction(options.complete))
+						options.complete();
+					return;
+				}
+
+				var f = queue[0];
+
+				if (isFunction(options.before))
+				{
+					var returned = options.before(f.file, f.inputElem);
+
+					if (typeof returned === 'object')
+					{
+						if (returned.action === 'abort')
+						{
+							error('AbortError', f.file, f.inputElem, returned.reason);
+							return;	// Aborts all queued files immediately
+						}
+						else if (returned.action === 'skip')
+						{
+							fileComplete();	// parse the next file in the queue, if any
+							return;
+						}
+						else if (typeof returned.config === 'object')
+							f.instanceConfig = $.extend(f.instanceConfig, returned.config);
+					}
+					else if (returned === 'skip')
+					{
+						fileComplete();	// parse the next file in the queue, if any
+						return;
+					}
+				}
+
+				// Wrap up the user's complete callback, if any, so that ours also gets executed
+				var userCompleteFunc = f.instanceConfig.complete;
+				f.instanceConfig.complete = function(results)
+				{
+					if (isFunction(userCompleteFunc))
+						userCompleteFunc(results, f.file, f.inputElem);
+					fileComplete();
+				};
+
+				Papa.parse(f.file, f.instanceConfig);
+			}
+
+			function error(name, file, elem, reason)
+			{
+				if (isFunction(options.error))
+					options.error({name: name}, file, elem, reason);
+			}
+
+			function fileComplete()
+			{
+				queue.splice(0, 1);
+				parseNextFile();
+			}
+		}
+	}
+
+
+	if (IS_PAPA_WORKER)
+	{
+		global.onmessage = workerThreadReceivedMessage;
+	}
+	else if (Papa.WORKERS_SUPPORTED)
+	{
+		AUTO_SCRIPT_PATH = getScriptPath();
+
+		// Check if the script was loaded synchronously
+		if (!document.body)
+		{
+			// Body doesn't exist yet, must be synchronous
+			LOADED_SYNC = true;
+		}
+		else
+		{
+			document.addEventListener('DOMContentLoaded', function () {
+				LOADED_SYNC = true;
+			}, true);
+		}
+	}
+
+
+
+
+	function CsvToJson(_input, _config)
+	{
+		_config = _config || {};
+		var dynamicTyping = _config.dynamicTyping || false;
+		if (isFunction(dynamicTyping)) {
+			_config.dynamicTypingFunction = dynamicTyping;
+			// Will be filled on first row call
+			dynamicTyping = {};
+		}
+		_config.dynamicTyping = dynamicTyping;
+
+		if (_config.worker && Papa.WORKERS_SUPPORTED)
+		{
+			var w = newWorker();
+
+			w.userStep = _config.step;
+			w.userChunk = _config.chunk;
+			w.userComplete = _config.complete;
+			w.userError = _config.error;
+
+			_config.step = isFunction(_config.step);
+			_config.chunk = isFunction(_config.chunk);
+			_config.complete = isFunction(_config.complete);
+			_config.error = isFunction(_config.error);
+			delete _config.worker;	// prevent infinite loop
+
+			w.postMessage({
+				input: _input,
+				config: _config,
+				workerId: w.id
+			});
+
+			return;
+		}
+
+		var streamer = null;
+		if (typeof _input === 'string')
+		{
+			if (_config.download)
+				streamer = new NetworkStreamer(_config);
+			else
+				streamer = new StringStreamer(_config);
+		}
+		else if (_input.readable === true && isFunction(_input.read) && isFunction(_input.on))
+		{
+			streamer = new ReadableStreamStreamer(_config);
+		}
+		else if ((global.File && _input instanceof File) || _input instanceof Object)	// ...Safari. (see issue #106)
+			streamer = new FileStreamer(_config);
+
+		return streamer.stream(_input);
+	}
+
+
+
+
+
+
+	function JsonToCsv(_input, _config)
+	{
+		var _output = '';
+		var _fields = [];
+
+		// Default configuration
+
+		/** whether to surround every datum with quotes */
+		var _quotes = false;
+
+		/** whether to write headers */
+		var _writeHeader = true;
+
+		/** delimiting character */
+		var _delimiter = ',';
+
+		/** newline character(s) */
+		var _newline = '\r\n';
+
+		/** quote character */
+		var _quoteChar = '"';
+
+		unpackConfig();
+
+		var quoteCharRegex = new RegExp(_quoteChar, 'g');
+
+		if (typeof _input === 'string')
+			_input = JSON.parse(_input);
+
+		if (_input instanceof Array)
+		{
+			if (!_input.length || _input[0] instanceof Array)
+				return serialize(null, _input);
+			else if (typeof _input[0] === 'object')
+				return serialize(objectKeys(_input[0]), _input);
+		}
+		else if (typeof _input === 'object')
+		{
+			if (typeof _input.data === 'string')
+				_input.data = JSON.parse(_input.data);
+
+			if (_input.data instanceof Array)
+			{
+				if (!_input.fields)
+					_input.fields =  _input.meta && _input.meta.fields;
+
+				if (!_input.fields)
+					_input.fields =  _input.data[0] instanceof Array
+									? _input.fields
+									: objectKeys(_input.data[0]);
+
+				if (!(_input.data[0] instanceof Array) && typeof _input.data[0] !== 'object')
+					_input.data = [_input.data];	// handles input like [1,2,3] or ['asdf']
+			}
+
+			return serialize(_input.fields || [], _input.data || []);
+		}
+
+		// Default (any valid paths should return before this)
+		throw 'exception: Unable to serialize unrecognized input';
+
+
+		function unpackConfig()
+		{
+			if (typeof _config !== 'object')
+				return;
+
+			if (typeof _config.delimiter === 'string'
+				&& _config.delimiter.length === 1
+				&& Papa.BAD_DELIMITERS.indexOf(_config.delimiter) === -1)
+			{
+				_delimiter = _config.delimiter;
+			}
+
+			if (typeof _config.quotes === 'boolean'
+				|| _config.quotes instanceof Array)
+				_quotes = _config.quotes;
+
+			if (typeof _config.newline === 'string')
+				_newline = _config.newline;
+
+			if (typeof _config.quoteChar === 'string')
+				_quoteChar = _config.quoteChar;
+
+			if (typeof _config.header === 'boolean')
+				_writeHeader = _config.header;
+		}
+
+
+		/** Turns an object's keys into an array */
+		function objectKeys(obj)
+		{
+			if (typeof obj !== 'object')
+				return [];
+			var keys = [];
+			for (var key in obj)
+				keys.push(key);
+			return keys;
+		}
+
+		/** The double for loop that iterates the data and writes out a CSV string including header row */
+		function serialize(fields, data)
+		{
+			var csv = '';
+
+			if (typeof fields === 'string')
+				fields = JSON.parse(fields);
+			if (typeof data === 'string')
+				data = JSON.parse(data);
+
+			var hasHeader = fields instanceof Array && fields.length > 0;
+			var dataKeyedByField = !(data[0] instanceof Array);
+
+			// If there a header row, write it first
+			if (hasHeader && _writeHeader)
+			{
+				for (var i = 0; i < fields.length; i++)
+				{
+					if (i > 0)
+						csv += _delimiter;
+					csv += safe(fields[i], i);
+				}
+				if (data.length > 0)
+					csv += _newline;
+			}
+
+			// Then write out the data
+			for (var row = 0; row < data.length; row++)
+			{
+				var maxCol = hasHeader ? fields.length : data[row].length;
+
+				for (var col = 0; col < maxCol; col++)
+				{
+					if (col > 0)
+						csv += _delimiter;
+					var colIdx = hasHeader && dataKeyedByField ? fields[col] : col;
+					csv += safe(data[row][colIdx], col);
+				}
+
+				if (row < data.length - 1)
+					csv += _newline;
+			}
+
+			return csv;
+		}
+
+		/** Encloses a value around quotes if needed (makes a value safe for CSV insertion) */
+		function safe(str, col)
+		{
+			if (typeof str === 'undefined' || str === null)
+				return '';
+
+			str = str.toString().replace(quoteCharRegex, _quoteChar+_quoteChar);
+
+			var needsQuotes = (typeof _quotes === 'boolean' && _quotes)
+							|| (_quotes instanceof Array && _quotes[col])
+							|| hasAny(str, Papa.BAD_DELIMITERS)
+							|| str.indexOf(_delimiter) > -1
+							|| str.charAt(0) === ' '
+							|| str.charAt(str.length - 1) === ' ';
+
+			return needsQuotes ? _quoteChar + str + _quoteChar : str;
+		}
+
+		function hasAny(str, substrings)
+		{
+			for (var i = 0; i < substrings.length; i++)
+				if (str.indexOf(substrings[i]) > -1)
+					return true;
+			return false;
+		}
+	}
+
+	/** ChunkStreamer is the base prototype for various streamer implementations. */
+	function ChunkStreamer(config)
+	{
+		this._handle = null;
+		this._paused = false;
+		this._finished = false;
+		this._input = null;
+		this._baseIndex = 0;
+		this._partialLine = '';
+		this._rowCount = 0;
+		this._start = 0;
+		this._nextChunk = null;
+		this.isFirstChunk = true;
+		this._completeResults = {
+			data: [],
+			errors: [],
+			meta: {}
+		};
+		replaceConfig.call(this, config);
+
+		this.parseChunk = function(chunk)
+		{
+			// First chunk pre-processing
+			if (this.isFirstChunk && isFunction(this._config.beforeFirstChunk))
+			{
+				var modifiedChunk = this._config.beforeFirstChunk(chunk);
+				if (modifiedChunk !== undefined)
+					chunk = modifiedChunk;
+			}
+			this.isFirstChunk = false;
+
+			// Rejoin the line we likely just split in two by chunking the file
+			var aggregate = this._partialLine + chunk;
+			this._partialLine = '';
+
+			var results = this._handle.parse(aggregate, this._baseIndex, !this._finished);
+
+			if (this._handle.paused() || this._handle.aborted())
+				return;
+
+			var lastIndex = results.meta.cursor;
+
+			if (!this._finished)
+			{
+				this._partialLine = aggregate.substring(lastIndex - this._baseIndex);
+				this._baseIndex = lastIndex;
+			}
+
+			if (results && results.data)
+				this._rowCount += results.data.length;
+
+			var finishedIncludingPreview = this._finished || (this._config.preview && this._rowCount >= this._config.preview);
+
+			if (IS_PAPA_WORKER)
+			{
+				global.postMessage({
+					results: results,
+					workerId: Papa.WORKER_ID,
+					finished: finishedIncludingPreview
+				});
+			}
+			else if (isFunction(this._config.chunk))
+			{
+				this._config.chunk(results, this._handle);
+				if (this._paused)
+					return;
+				results = undefined;
+				this._completeResults = undefined;
+			}
+
+			if (!this._config.step && !this._config.chunk) {
+				this._completeResults.data = this._completeResults.data.concat(results.data);
+				this._completeResults.errors = this._completeResults.errors.concat(results.errors);
+				this._completeResults.meta = results.meta;
+			}
+
+			if (finishedIncludingPreview && isFunction(this._config.complete) && (!results || !results.meta.aborted))
+				this._config.complete(this._completeResults, this._input);
+
+			if (!finishedIncludingPreview && (!results || !results.meta.paused))
+				this._nextChunk();
+
+			return results;
+		};
+
+		this._sendError = function(error)
+		{
+			if (isFunction(this._config.error))
+				this._config.error(error);
+			else if (IS_PAPA_WORKER && this._config.error)
+			{
+				global.postMessage({
+					workerId: Papa.WORKER_ID,
+					error: error,
+					finished: false
+				});
+			}
+		};
+
+		function replaceConfig(config)
+		{
+			// Deep-copy the config so we can edit it
+			var configCopy = copy(config);
+			configCopy.chunkSize = parseInt(configCopy.chunkSize);	// parseInt VERY important so we don't concatenate strings!
+			if (!config.step && !config.chunk)
+				configCopy.chunkSize = null;  // disable Range header if not streaming; bad values break IIS - see issue #196
+			this._handle = new ParserHandle(configCopy);
+			this._handle.streamer = this;
+			this._config = configCopy;	// persist the copy to the caller
+		}
+	}
+
+
+	function NetworkStreamer(config)
+	{
+		config = config || {};
+		if (!config.chunkSize)
+			config.chunkSize = Papa.RemoteChunkSize;
+		ChunkStreamer.call(this, config);
+
+		var xhr;
+
+		if (IS_WORKER)
+		{
+			this._nextChunk = function()
+			{
+				this._readChunk();
+				this._chunkLoaded();
+			};
+		}
+		else
+		{
+			this._nextChunk = function()
+			{
+				this._readChunk();
+			};
+		}
+
+		this.stream = function(url)
+		{
+			this._input = url;
+			this._nextChunk();	// Starts streaming
+		};
+
+		this._readChunk = function()
+		{
+			if (this._finished)
+			{
+				this._chunkLoaded();
+				return;
+			}
+
+			xhr = new XMLHttpRequest();
+
+			if (this._config.withCredentials)
+			{
+				xhr.withCredentials = this._config.withCredentials;
+			}
+
+			if (!IS_WORKER)
+			{
+				xhr.onload = bindFunction(this._chunkLoaded, this);
+				xhr.onerror = bindFunction(this._chunkError, this);
+			}
+
+			xhr.open('GET', this._input, !IS_WORKER);
+			// Headers can only be set when once the request state is OPENED
+			if (this._config.downloadRequestHeaders)
+			{
+				var headers = this._config.downloadRequestHeaders;
+
+				for (var headerName in headers)
+				{
+					xhr.setRequestHeader(headerName, headers[headerName]);
+				}
+			}
+
+			if (this._config.chunkSize)
+			{
+				var end = this._start + this._config.chunkSize - 1;	// minus one because byte range is inclusive
+				xhr.setRequestHeader('Range', 'bytes='+this._start+'-'+end);
+				xhr.setRequestHeader('If-None-Match', 'webkit-no-cache'); // https://bugs.webkit.org/show_bug.cgi?id=82672
+			}
+
+			try {
+				xhr.send();
+			}
+			catch (err) {
+				this._chunkError(err.message);
+			}
+
+			if (IS_WORKER && xhr.status === 0)
+				this._chunkError();
+			else
+				this._start += this._config.chunkSize;
+		}
+
+		this._chunkLoaded = function()
+		{
+			if (xhr.readyState != 4)
+				return;
+
+			if (xhr.status < 200 || xhr.status >= 400)
+			{
+				this._chunkError();
+				return;
+			}
+
+			this._finished = !this._config.chunkSize || this._start > getFileSize(xhr);
+			this.parseChunk(xhr.responseText);
+		}
+
+		this._chunkError = function(errorMessage)
+		{
+			var errorText = xhr.statusText || errorMessage;
+			this._sendError(errorText);
+		}
+
+		function getFileSize(xhr)
+		{
+			var contentRange = xhr.getResponseHeader('Content-Range');
+			if (contentRange === null) { // no content range, then finish!
+					return -1;
+					}
+			return parseInt(contentRange.substr(contentRange.lastIndexOf('/') + 1));
+		}
+	}
+	NetworkStreamer.prototype = Object.create(ChunkStreamer.prototype);
+	NetworkStreamer.prototype.constructor = NetworkStreamer;
+
+
+	function FileStreamer(config)
+	{
+		config = config || {};
+		if (!config.chunkSize)
+			config.chunkSize = Papa.LocalChunkSize;
+		ChunkStreamer.call(this, config);
+
+		var reader, slice;
+
+		// FileReader is better than FileReaderSync (even in worker) - see http://stackoverflow.com/q/24708649/1048862
+		// But Firefox is a pill, too - see issue #76: https://github.com/mholt/PapaParse/issues/76
+		var usingAsyncReader = typeof FileReader !== 'undefined';	// Safari doesn't consider it a function - see issue #105
+
+		this.stream = function(file)
+		{
+			this._input = file;
+			slice = file.slice || file.webkitSlice || file.mozSlice;
+
+			if (usingAsyncReader)
+			{
+				reader = new FileReader();		// Preferred method of reading files, even in workers
+				reader.onload = bindFunction(this._chunkLoaded, this);
+				reader.onerror = bindFunction(this._chunkError, this);
+			}
+			else
+				reader = new FileReaderSync();	// Hack for running in a web worker in Firefox
+
+			this._nextChunk();	// Starts streaming
+		};
+
+		this._nextChunk = function()
+		{
+			if (!this._finished && (!this._config.preview || this._rowCount < this._config.preview))
+				this._readChunk();
+		}
+
+		this._readChunk = function()
+		{
+			var input = this._input;
+			if (this._config.chunkSize)
+			{
+				var end = Math.min(this._start + this._config.chunkSize, this._input.size);
+				input = slice.call(input, this._start, end);
+			}
+			var txt = reader.readAsText(input, this._config.encoding);
+			if (!usingAsyncReader)
+				this._chunkLoaded({ target: { result: txt } });	// mimic the async signature
+		}
+
+		this._chunkLoaded = function(event)
+		{
+			// Very important to increment start each time before handling results
+			this._start += this._config.chunkSize;
+			this._finished = !this._config.chunkSize || this._start >= this._input.size;
+			this.parseChunk(event.target.result);
+		}
+
+		this._chunkError = function()
+		{
+			this._sendError(reader.error);
+		}
+
+	}
+	FileStreamer.prototype = Object.create(ChunkStreamer.prototype);
+	FileStreamer.prototype.constructor = FileStreamer;
+
+
+	function StringStreamer(config)
+	{
+		config = config || {};
+		ChunkStreamer.call(this, config);
+
+		var string;
+		var remaining;
+		this.stream = function(s)
+		{
+			string = s;
+			remaining = s;
+			return this._nextChunk();
+		}
+		this._nextChunk = function()
+		{
+			if (this._finished) return;
+			var size = this._config.chunkSize;
+			var chunk = size ? remaining.substr(0, size) : remaining;
+			remaining = size ? remaining.substr(size) : '';
+			this._finished = !remaining;
+			return this.parseChunk(chunk);
+		}
+	}
+	StringStreamer.prototype = Object.create(StringStreamer.prototype);
+	StringStreamer.prototype.constructor = StringStreamer;
+
+
+	function ReadableStreamStreamer(config)
+	{
+		config = config || {};
+
+		ChunkStreamer.call(this, config);
+
+		var queue = [];
+		var parseOnData = true;
+
+		this.stream = function(stream)
+		{
+			this._input = stream;
+
+			this._input.on('data', this._streamData);
+			this._input.on('end', this._streamEnd);
+			this._input.on('error', this._streamError);
+		}
+
+		this._nextChunk = function()
+		{
+			if (queue.length)
+			{
+				this.parseChunk(queue.shift());
+			}
+			else
+			{
+				parseOnData = true;
+			}
+		}
+
+		this._streamData = bindFunction(function(chunk)
+		{
+			try
+			{
+				queue.push(typeof chunk === 'string' ? chunk : chunk.toString(this._config.encoding));
+
+				if (parseOnData)
+				{
+					parseOnData = false;
+					this.parseChunk(queue.shift());
+				}
+			}
+			catch (error)
+			{
+				this._streamError(error);
+			}
+		}, this);
+
+		this._streamError = bindFunction(function(error)
+		{
+			this._streamCleanUp();
+			this._sendError(error.message);
+		}, this);
+
+		this._streamEnd = bindFunction(function()
+		{
+			this._streamCleanUp();
+			this._finished = true;
+			this._streamData('');
+		}, this);
+
+		this._streamCleanUp = bindFunction(function()
+		{
+			this._input.removeListener('data', this._streamData);
+			this._input.removeListener('end', this._streamEnd);
+			this._input.removeListener('error', this._streamError);
+		}, this);
+	}
+	ReadableStreamStreamer.prototype = Object.create(ChunkStreamer.prototype);
+	ReadableStreamStreamer.prototype.constructor = ReadableStreamStreamer;
+
+
+	// Use one ParserHandle per entire CSV file or string
+	function ParserHandle(_config)
+	{
+		// One goal is to minimize the use of regular expressions...
+		var FLOAT = /^\s*-?(\d*\.?\d+|\d+\.?\d*)(e[-+]?\d+)?\s*$/i;
+
+		var self = this;
+		var _stepCounter = 0;	// Number of times step was called (number of rows parsed)
+		var _input;				// The input being parsed
+		var _parser;			// The core parser being used
+		var _paused = false;	// Whether we are paused or not
+		var _aborted = false;	// Whether the parser has aborted or not
+		var _delimiterError;	// Temporary state between delimiter detection and processing results
+		var _fields = [];		// Fields are from the header row of the input, if there is one
+		var _results = {		// The last results returned from the parser
+			data: [],
+			errors: [],
+			meta: {}
+		};
+
+		if (isFunction(_config.step))
+		{
+			var userStep = _config.step;
+			_config.step = function(results)
+			{
+				_results = results;
+
+				if (needsHeaderRow())
+					processResults();
+				else	// only call user's step function after header row
+				{
+					processResults();
+
+					// It's possbile that this line was empty and there's no row here after all
+					if (_results.data.length === 0)
+						return;
+
+					_stepCounter += results.data.length;
+					if (_config.preview && _stepCounter > _config.preview)
+						_parser.abort();
+					else
+						userStep(_results, self);
+				}
+			};
+		}
+
+		/**
+		 * Parses input. Most users won't need, and shouldn't mess with, the baseIndex
+		 * and ignoreLastRow parameters. They are used by streamers (wrapper functions)
+		 * when an input comes in multiple chunks, like from a file.
+		 */
+		this.parse = function(input, baseIndex, ignoreLastRow)
+		{
+			if (!_config.newline)
+				_config.newline = guessLineEndings(input);
+
+			_delimiterError = false;
+			if (!_config.delimiter)
+			{
+				var delimGuess = guessDelimiter(input, _config.newline, _config.skipEmptyLines);
+				if (delimGuess.successful)
+					_config.delimiter = delimGuess.bestDelimiter;
+				else
+				{
+					_delimiterError = true;	// add error after parsing (otherwise it would be overwritten)
+					_config.delimiter = Papa.DefaultDelimiter;
+				}
+				_results.meta.delimiter = _config.delimiter;
+			}
+			else if(isFunction(_config.delimiter))
+			{
+				_config.delimiter = _config.delimiter(input);
+				_results.meta.delimiter = _config.delimiter;
+			}
+
+			var parserConfig = copy(_config);
+			if (_config.preview && _config.header)
+				parserConfig.preview++;	// to compensate for header row
+
+			_input = input;
+			_parser = new Parser(parserConfig);
+			_results = _parser.parse(_input, baseIndex, ignoreLastRow);
+			processResults();
+			return _paused ? { meta: { paused: true } } : (_results || { meta: { paused: false } });
+		};
+
+		this.paused = function()
+		{
+			return _paused;
+		};
+
+		this.pause = function()
+		{
+			_paused = true;
+			_parser.abort();
+			_input = _input.substr(_parser.getCharIndex());
+		};
+
+		this.resume = function()
+		{
+			_paused = false;
+			self.streamer.parseChunk(_input);
+		};
+
+		this.aborted = function ()
+		{
+			return _aborted;
+		};
+
+		this.abort = function()
+		{
+			_aborted = true;
+			_parser.abort();
+			_results.meta.aborted = true;
+			if (isFunction(_config.complete))
+				_config.complete(_results);
+			_input = '';
+		};
+
+		function processResults()
+		{
+			if (_results && _delimiterError)
+			{
+				addError('Delimiter', 'UndetectableDelimiter', 'Unable to auto-detect delimiting character; defaulted to \''+Papa.DefaultDelimiter+'\'');
+				_delimiterError = false;
+			}
+
+			if (_config.skipEmptyLines)
+			{
+				for (var i = 0; i < _results.data.length; i++)
+					if (_results.data[i].length === 1 && _results.data[i][0] === '')
+						_results.data.splice(i--, 1);
+			}
+
+			if (needsHeaderRow())
+				fillHeaderFields();
+
+			return applyHeaderAndDynamicTyping();
+		}
+
+		function needsHeaderRow()
+		{
+			return _config.header && _fields.length === 0;
+		}
+
+		function fillHeaderFields()
+		{
+			if (!_results)
+				return;
+			for (var i = 0; needsHeaderRow() && i < _results.data.length; i++)
+				for (var j = 0; j < _results.data[i].length; j++)
+					_fields.push(_results.data[i][j]);
+			_results.data.splice(0, 1);
+		}
+
+		function shouldApplyDynamicTyping(field) {
+			// Cache function values to avoid calling it for each row
+			if (_config.dynamicTypingFunction && _config.dynamicTyping[field] === undefined) {
+				_config.dynamicTyping[field] = _config.dynamicTypingFunction(field);
+			}
+			return (_config.dynamicTyping[field] || _config.dynamicTyping) === true
+		}
+
+		function parseDynamic(field, value)
+		{
+			if (shouldApplyDynamicTyping(field))
+			{
+				if (value === 'true' || value === 'TRUE')
+					return true;
+				else if (value === 'false' || value === 'FALSE')
+					return false;
+				else
+					return tryParseFloat(value);
+			}
+			return value;
+		}
+
+		function applyHeaderAndDynamicTyping()
+		{
+			if (!_results || (!_config.header && !_config.dynamicTyping))
+				return _results;
+
+			for (var i = 0; i < _results.data.length; i++)
+			{
+				var row = _config.header ? {} : [];
+
+				for (var j = 0; j < _results.data[i].length; j++)
+				{
+					var field = j;
+					var value = _results.data[i][j];
+
+					if (_config.header)
+						field = j >= _fields.length ? '__parsed_extra' : _fields[j];
+
+					value = parseDynamic(field, value);
+
+					if (field === '__parsed_extra')
+					{
+						row[field] = row[field] || [];
+						row[field].push(value);
+					}
+					else
+						row[field] = value;
+				}
+
+				_results.data[i] = row;
+
+				if (_config.header)
+				{
+					if (j > _fields.length)
+						addError('FieldMismatch', 'TooManyFields', 'Too many fields: expected ' + _fields.length + ' fields but parsed ' + j, i);
+					else if (j < _fields.length)
+						addError('FieldMismatch', 'TooFewFields', 'Too few fields: expected ' + _fields.length + ' fields but parsed ' + j, i);
+				}
+			}
+
+			if (_config.header && _results.meta)
+				_results.meta.fields = _fields;
+			return _results;
+		}
+
+		function guessDelimiter(input, newline, skipEmptyLines)
+		{
+			var delimChoices = [',', '\t', '|', ';', Papa.RECORD_SEP, Papa.UNIT_SEP];
+			var bestDelim, bestDelta, fieldCountPrevRow;
+
+			for (var i = 0; i < delimChoices.length; i++)
+			{
+				var delim = delimChoices[i];
+				var delta = 0, avgFieldCount = 0, emptyLinesCount = 0;
+				fieldCountPrevRow = undefined;
+
+				var preview = new Parser({
+					delimiter: delim,
+					newline: newline,
+					preview: 10
+				}).parse(input);
+
+				for (var j = 0; j < preview.data.length; j++)
+				{
+					if (skipEmptyLines && preview.data[j].length === 1 && preview.data[j][0].length === 0) {
+						emptyLinesCount++
+						continue
+					}
+					var fieldCount = preview.data[j].length;
+					avgFieldCount += fieldCount;
+
+					if (typeof fieldCountPrevRow === 'undefined')
+					{
+						fieldCountPrevRow = fieldCount;
+						continue;
+					}
+					else if (fieldCount > 1)
+					{
+						delta += Math.abs(fieldCount - fieldCountPrevRow);
+						fieldCountPrevRow = fieldCount;
+					}
+				}
+
+				if (preview.data.length > 0)
+					avgFieldCount /= (preview.data.length - emptyLinesCount);
+
+				if ((typeof bestDelta === 'undefined' || delta < bestDelta)
+					&& avgFieldCount > 1.99)
+				{
+					bestDelta = delta;
+					bestDelim = delim;
+				}
+			}
+
+			_config.delimiter = bestDelim;
+
+			return {
+				successful: !!bestDelim,
+				bestDelimiter: bestDelim
+			}
+		}
+
+		function guessLineEndings(input)
+		{
+			input = input.substr(0, 1024*1024);	// max length 1 MB
+
+			var r = input.split('\r');
+
+			var n = input.split('\n');
+
+			var nAppearsFirst = (n.length > 1 && n[0].length < r[0].length);
+
+			if (r.length === 1 || nAppearsFirst)
+				return '\n';
+
+			var numWithN = 0;
+			for (var i = 0; i < r.length; i++)
+			{
+				if (r[i][0] === '\n')
+					numWithN++;
+			}
+
+			return numWithN >= r.length / 2 ? '\r\n' : '\r';
+		}
+
+		function tryParseFloat(val)
+		{
+			var isNumber = FLOAT.test(val);
+			return isNumber ? parseFloat(val) : val;
+		}
+
+		function addError(type, code, msg, row)
+		{
+			_results.errors.push({
+				type: type,
+				code: code,
+				message: msg,
+				row: row
+			});
+		}
+	}
+
+
+
+
+
+	/** The core parser implements speedy and correct CSV parsing */
+	function Parser(config)
+	{
+		// Unpack the config object
+		config = config || {};
+		var delim = config.delimiter;
+		var newline = config.newline;
+		var comments = config.comments;
+		var step = config.step;
+		var preview = config.preview;
+		var fastMode = config.fastMode;
+		var quoteChar = config.quoteChar || '"';
+
+		// Delimiter must be valid
+		if (typeof delim !== 'string'
+			|| Papa.BAD_DELIMITERS.indexOf(delim) > -1)
+			delim = ',';
+
+		// Comment character must be valid
+		if (comments === delim)
+			throw 'Comment character same as delimiter';
+		else if (comments === true)
+			comments = '#';
+		else if (typeof comments !== 'string'
+			|| Papa.BAD_DELIMITERS.indexOf(comments) > -1)
+			comments = false;
+
+		// Newline must be valid: \r, \n, or \r\n
+		if (newline != '\n' && newline != '\r' && newline != '\r\n')
+			newline = '\n';
+
+		// We're gonna need these at the Parser scope
+		var cursor = 0;
+		var aborted = false;
+
+		this.parse = function(input, baseIndex, ignoreLastRow)
+		{
+			// For some reason, in Chrome, this speeds things up (!?)
+			if (typeof input !== 'string')
+				throw 'Input must be a string';
+
+			// We don't need to compute some of these every time parse() is called,
+			// but having them in a more local scope seems to perform better
+			var inputLen = input.length,
+				delimLen = delim.length,
+				newlineLen = newline.length,
+				commentsLen = comments.length;
+			var stepIsFunction = isFunction(step);
+
+			// Establish starting state
+			cursor = 0;
+			var data = [], errors = [], row = [], lastCursor = 0;
+
+			if (!input)
+				return returnable();
+
+			if (fastMode || (fastMode !== false && input.indexOf(quoteChar) === -1))
+			{
+				var rows = input.split(newline);
+				for (var i = 0; i < rows.length; i++)
+				{
+					var row = rows[i];
+					cursor += row.length;
+					if (i !== rows.length - 1)
+						cursor += newline.length;
+					else if (ignoreLastRow)
+						return returnable();
+					if (comments && row.substr(0, commentsLen) === comments)
+						continue;
+					if (stepIsFunction)
+					{
+						data = [];
+						pushRow(row.split(delim));
+						doStep();
+						if (aborted)
+							return returnable();
+					}
+					else
+						pushRow(row.split(delim));
+					if (preview && i >= preview)
+					{
+						data = data.slice(0, preview);
+						return returnable(true);
+					}
+				}
+				return returnable();
+			}
+
+			var nextDelim = input.indexOf(delim, cursor);
+			var nextNewline = input.indexOf(newline, cursor);
+			var quoteCharRegex = new RegExp(quoteChar+quoteChar, 'g');
+
+			// Parser loop
+			for (;;)
+			{
+				// Field has opening quote
+				if (input[cursor] === quoteChar)
+				{
+					// Start our search for the closing quote where the cursor is
+					var quoteSearch = cursor;
+
+					// Skip the opening quote
+					cursor++;
+
+					for (;;)
+					{
+						// Find closing quote
+						var quoteSearch = input.indexOf(quoteChar, quoteSearch+1);
+
+						//No other quotes are found - no other delimiters
+						if (quoteSearch === -1)
+						{
+							if (!ignoreLastRow) {
+								// No closing quote... what a pity
+								errors.push({
+									type: 'Quotes',
+									code: 'MissingQuotes',
+									message: 'Quoted field unterminated',
+									row: data.length,	// row has yet to be inserted
+									index: cursor
+								});
+							}
+							return finish();
+						}
+
+						// Closing quote at EOF
+						if (quoteSearch === inputLen-1)
+						{
+							var value = input.substring(cursor, quoteSearch).replace(quoteCharRegex, quoteChar);
+							return finish(value);
+						}
+
+						// If this quote is escaped, it's part of the data; skip it
+						if (input[quoteSearch+1] === quoteChar)
+						{
+							quoteSearch++;
+							continue;
+						}
+
+						// Closing quote followed by delimiter
+						if (input[quoteSearch+1] === delim)
+						{
+							row.push(input.substring(cursor, quoteSearch).replace(quoteCharRegex, quoteChar));
+							cursor = quoteSearch + 1 + delimLen;
+							nextDelim = input.indexOf(delim, cursor);
+							nextNewline = input.indexOf(newline, cursor);
+							break;
+						}
+
+						// Closing quote followed by newline
+						if (input.substr(quoteSearch+1, newlineLen) === newline)
+						{
+							row.push(input.substring(cursor, quoteSearch).replace(quoteCharRegex, quoteChar));
+							saveRow(quoteSearch + 1 + newlineLen);
+							nextDelim = input.indexOf(delim, cursor);	// because we may have skipped the nextDelim in the quoted field
+
+							if (stepIsFunction)
+							{
+								doStep();
+								if (aborted)
+									return returnable();
+							}
+
+							if (preview && data.length >= preview)
+								return returnable(true);
+
+							break;
+						}
+
+
+						// Checks for valid closing quotes are complete (escaped quotes or quote followed by EOF/delimiter/newline) -- assume these quotes are part of an invalid text string
+						errors.push({
+							type: 'Quotes',
+							code: 'InvalidQuotes',
+							message: 'Trailing quote on quoted field is malformed',
+							row: data.length,	// row has yet to be inserted
+							index: cursor
+						});
+
+						quoteSearch++;
+						continue;
+
+					}
+
+					continue;
+				}
+
+				// Comment found at start of new line
+				if (comments && row.length === 0 && input.substr(cursor, commentsLen) === comments)
+				{
+					if (nextNewline === -1)	// Comment ends at EOF
+						return returnable();
+					cursor = nextNewline + newlineLen;
+					nextNewline = input.indexOf(newline, cursor);
+					nextDelim = input.indexOf(delim, cursor);
+					continue;
+				}
+
+				// Next delimiter comes before next newline, so we've reached end of field
+				if (nextDelim !== -1 && (nextDelim < nextNewline || nextNewline === -1))
+				{
+					row.push(input.substring(cursor, nextDelim));
+					cursor = nextDelim + delimLen;
+					nextDelim = input.indexOf(delim, cursor);
+					continue;
+				}
+
+				// End of row
+				if (nextNewline !== -1)
+				{
+					row.push(input.substring(cursor, nextNewline));
+					saveRow(nextNewline + newlineLen);
+
+					if (stepIsFunction)
+					{
+						doStep();
+						if (aborted)
+							return returnable();
+					}
+
+					if (preview && data.length >= preview)
+						return returnable(true);
+
+					continue;
+				}
+
+				break;
+			}
+
+
+			return finish();
+
+
+			function pushRow(row)
+			{
+				data.push(row);
+				lastCursor = cursor;
+			}
+
+			/**
+			 * Appends the remaining input from cursor to the end into
+			 * row, saves the row, calls step, and returns the results.
+			 */
+			function finish(value)
+			{
+				if (ignoreLastRow)
+					return returnable();
+				if (typeof value === 'undefined')
+					value = input.substr(cursor);
+				row.push(value);
+				cursor = inputLen;	// important in case parsing is paused
+				pushRow(row);
+				if (stepIsFunction)
+					doStep();
+				return returnable();
+			}
+
+			/**
+			 * Appends the current row to the results. It sets the cursor
+			 * to newCursor and finds the nextNewline. The caller should
+			 * take care to execute user's step function and check for
+			 * preview and end parsing if necessary.
+			 */
+			function saveRow(newCursor)
+			{
+				cursor = newCursor;
+				pushRow(row);
+				row = [];
+				nextNewline = input.indexOf(newline, cursor);
+			}
+
+			/** Returns an object with the results, errors, and meta. */
+			function returnable(stopped)
+			{
+				return {
+					data: data,
+					errors: errors,
+					meta: {
+						delimiter: delim,
+						linebreak: newline,
+						aborted: aborted,
+						truncated: !!stopped,
+						cursor: lastCursor + (baseIndex || 0)
+					}
+				};
+			}
+
+			/** Executes the user's step function and resets data & errors. */
+			function doStep()
+			{
+				step(returnable());
+				data = [], errors = [];
+			}
+		};
+
+		/** Sets the abort flag */
+		this.abort = function()
+		{
+			aborted = true;
+		};
+
+		/** Gets the cursor position */
+		this.getCharIndex = function()
+		{
+			return cursor;
+		};
+	}
+
+
+	// If you need to load Papa Parse asynchronously and you also need worker threads, hard-code
+	// the script path here. See: https://github.com/mholt/PapaParse/issues/87#issuecomment-57885358
+	function getScriptPath()
+	{
+		var scripts = document.getElementsByTagName('script');
+		return scripts.length ? scripts[scripts.length - 1].src : '';
+	}
+
+	function newWorker()
+	{
+		if (!Papa.WORKERS_SUPPORTED)
+			return false;
+		if (!LOADED_SYNC && Papa.SCRIPT_PATH === null)
+			throw new Error(
+				'Script path cannot be determined automatically when Papa Parse is loaded asynchronously. ' +
+				'You need to set Papa.SCRIPT_PATH manually.'
+			);
+		var workerUrl = Papa.SCRIPT_PATH || AUTO_SCRIPT_PATH;
+		// Append 'papaworker' to the search string to tell papaparse that this is our worker.
+		workerUrl += (workerUrl.indexOf('?') !== -1 ? '&' : '?') + 'papaworker';
+		var w = new global.Worker(workerUrl);
+		w.onmessage = mainThreadReceivedMessage;
+		w.id = workerIdCounter++;
+		workers[w.id] = w;
+		return w;
+	}
+
+	/** Callback when main thread receives a message */
+	function mainThreadReceivedMessage(e)
+	{
+		var msg = e.data;
+		var worker = workers[msg.workerId];
+		var aborted = false;
+
+		if (msg.error)
+			worker.userError(msg.error, msg.file);
+		else if (msg.results && msg.results.data)
+		{
+			var abort = function() {
+				aborted = true;
+				completeWorker(msg.workerId, { data: [], errors: [], meta: { aborted: true } });
+			};
+
+			var handle = {
+				abort: abort,
+				pause: notImplemented,
+				resume: notImplemented
+			};
+
+			if (isFunction(worker.userStep))
+			{
+				for (var i = 0; i < msg.results.data.length; i++)
+				{
+					worker.userStep({
+						data: [msg.results.data[i]],
+						errors: msg.results.errors,
+						meta: msg.results.meta
+					}, handle);
+					if (aborted)
+						break;
+				}
+				delete msg.results;	// free memory ASAP
+			}
+			else if (isFunction(worker.userChunk))
+			{
+				worker.userChunk(msg.results, handle, msg.file);
+				delete msg.results;
+			}
+		}
+
+		if (msg.finished && !aborted)
+			completeWorker(msg.workerId, msg.results);
+	}
+
+	function completeWorker(workerId, results) {
+		var worker = workers[workerId];
+		if (isFunction(worker.userComplete))
+			worker.userComplete(results);
+		worker.terminate();
+		delete workers[workerId];
+	}
+
+	function notImplemented() {
+		throw 'Not implemented.';
+	}
+
+	/** Callback when worker thread receives a message */
+	function workerThreadReceivedMessage(e)
+	{
+		var msg = e.data;
+
+		if (typeof Papa.WORKER_ID === 'undefined' && msg)
+			Papa.WORKER_ID = msg.workerId;
+
+		if (typeof msg.input === 'string')
+		{
+			global.postMessage({
+				workerId: Papa.WORKER_ID,
+				results: Papa.parse(msg.input, msg.config),
+				finished: true
+			});
+		}
+		else if ((global.File && msg.input instanceof File) || msg.input instanceof Object)	// thank you, Safari (see issue #106)
+		{
+			var results = Papa.parse(msg.input, msg.config);
+			if (results)
+				global.postMessage({
+					workerId: Papa.WORKER_ID,
+					results: results,
+					finished: true
+				});
+		}
+	}
+
+	/** Makes a deep copy of an array or object (mostly) */
+	function copy(obj)
+	{
+		if (typeof obj !== 'object')
+			return obj;
+		var cpy = obj instanceof Array ? [] : {};
+		for (var key in obj)
+			cpy[key] = copy(obj[key]);
+		return cpy;
+	}
+
+	function bindFunction(f, self)
+	{
+		return function() { f.apply(self, arguments); };
+	}
+
+	function isFunction(func)
+	{
+		return typeof func === 'function';
+	}
+
+	return Papa;
+}));
+
+
 /***/ })
 
 /******/ });
-//# sourceMappingURL=partbuilder.js.map
+//# sourceMappingURL=csvimporter.js.map
