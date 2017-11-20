@@ -194,10 +194,17 @@ export default {
 				this.display_status_message("No Blueprints to load");
 			} else {
 				this.local_saves = JSON.parse(loaded).map((design_json) => {
-					const db = this.all_parts_lists.find(
-						ShipEngine.DB.find_by_design_json(design_json)
-					);
-					const wrong_db = db === undefined;
+					let db;
+					let wrong_db;
+					if (design_json['Parts List']) {
+						db = this.all_parts_lists.find(
+							ShipEngine.DB.find_by_design_json(design_json)
+						);
+						wrong_db = db === undefined;
+					} else {
+						db = this.se_db;
+						wrong_db = false;
+					};
 					return new ShipEngine.Design(db || this.se_db, design_json, wrong_db);
 				});
 				this.display_status_message("Blueprints loaded.");
