@@ -37,11 +37,10 @@ const store = new Vuex.Store({
 			return new ShipEngine.Design(getters.se_db, state.design_json);
 		},
 		se_db: (state, getters) => {
-			return new ShipEngine.DB({
-				parts: state.parts_list.parts.records,
-				modules: state.parts_list.modules.records,
-				frames: state.parts_list.frames.records,
-			});
+			return new ShipEngine.DB(state.parts_list);
+		},
+		canon_se_db: (state, getters) => {
+			return new ShipEngine.DB(state.canon_parts_list);
 		},
 	},
 	actions: {
@@ -72,6 +71,12 @@ const store = new Vuex.Store({
 		},
 		set_parts_list (state, payload) {
 			state.parts_list = payload;
+		},
+		set_design_parts_list (state, payload) {
+			state.design_json['Parts List'] = {
+				name: state.parts_list.name,
+				timestamp: state.parts_list.timestamp,
+			};
 		},
 
 
