@@ -62,7 +62,7 @@ export default {
 			};
 		},
 		has_power_error () {
-			return this.$store.getters.se_design.cost_power > this.$store.getters.se_design.power_generation;
+			return this.$store.getters.se_design.power_error;
 		},
 		principal_frame () {
 			return this.$store.getters.se_design.json['Principal Frame'];

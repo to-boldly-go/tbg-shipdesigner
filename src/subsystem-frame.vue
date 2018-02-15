@@ -60,9 +60,7 @@ export default {
 			};
 		},
 		is_valid_frame () {
-			return this.valid_frames
-				.map((frame) => frame['Name'])
-				.includes(this.sub_frame);
+			return !this.se_subsystem.invalid_frame_error;
 		},
 		valid_frames () {
 			return this.se_subsystem.valid_frames;

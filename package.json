@@ -15,7 +15,8 @@
         "watch": "webpack --progress --watch",
         "start": "webpack-dev-server",
         "deploy-gh-pages": "git subtree push --prefix dist origin gh-pages",
-        "test": "mocha-webpack 'test/**/*.spec.js'"
+        "test": "mocha-webpack 'test/**/*.spec.js'",
+		"optimize": "node scripts/optimize.js"
     },
     "license": "MIT",
     "version": "1.0.0",

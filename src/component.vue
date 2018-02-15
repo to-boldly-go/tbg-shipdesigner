@@ -1,14 +1,14 @@
 <template>
-  <tr class="component-tr" v-bind:class="{ ['has-error']: !isloaded }">
+  <tr class="component-tr" v-bind:class="component_tr_computed_style">
 	<td class="name-column">{{se_component.name}}</td>
 
-	<td class="quantity-column" v-bind:class="{ ['has-error']: has_quantity_error }">
+	<td class="quantity-column" v-bind:class="quantity_column_computed_style">
 	  <select
 		v-if="quantity_configurable"
 		class="quantity-column-select"
 		v-model="quantity"
 		v-on:wheel="quantity_select_wheel_event"
-		v-bind:class="{ ['has-error']: has_quantity_error }">
+		v-bind:class="quantity_column_computed_style">
 
 		<option v-if="!valid_quantities.includes(quantity)">{{quantity}}</option>
 		<option v-for="valid_quantity in valid_quantities">{{valid_quantity}}</option>
@@ -16,13 +16,13 @@
 	  <span v-if="!quantity_configurable">{{quantity_pretty}}</span>
 	</td>
 
-	<td class="part-column" v-bind:class="part_column_select_computed">
+	<td class="part-column" v-bind:class="part_column_computed_style">
 	  <select
 		v-model="part"
-		v-bind:class="part_column_select_computed"
+		v-bind:class="part_column_computed_style"
 		class="part-column-select">
 		<option v-for="part_value in valid_parts">{{part_value['Name']}}</option>
-		<option v-if="!is_valid_part">{{part}}</option>
+		<option v-if="valid_part_error">{{part}}</option>
 	  </select>
 	</td>
 
@@ -46,7 +46,7 @@
 	<td class="build-time-column"></td>
 
 	<td class="tech-year-column"
-		v-bind:class="{ ['has-warning']: is_limiting_tech_year }"
+		v-bind:class="tech_year_column_computed_style"
 		v-bind:title="tech_year_tooltip"
 		>{{tech_year}}</td>
   </tr>
@@ -80,23 +80,36 @@ export default {
 			};
 		},
 		is_limiting_tech_year () {
-			return this.se_component.tech_year == this.se_component.subsystem.design.tech_year;
+			return this.isloaded ? this.se_component.tech_year_warning : null;
 		},
 		tech_year () {
-			return this.se_component.tech_year;
+			return this.isloaded ? this.se_component.tech_year : null;
 		},
-		part_column_select_computed () {
+		tech_year_column_computed_style () {
 			return {
-				['has-error']: !this.is_valid_part,
+				['has-warning']: this.is_limiting_tech_year,
 			};
 		},
-		is_valid_part () {
-			return this.valid_parts
-				.map((part) => part['Name'])
-				.includes(this.part);
+		component_tr_computed_style () {
+			return {
+				['has-error']: !this.isloaded,
+			};
+		},
+		quantity_column_computed_style () {
+			return {
+				['has-error']: this.has_quantity_error,
+			};
+		},
+		part_column_computed_style () {
+			return {
+				['has-error']: this.valid_part_error,
+			};
+		},
+		valid_part_error () {
+			return this.isloaded ? this.se_component.valid_part_error : false;
 		},
 		has_quantity_error () {
-			return this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));
+			return this.isloaded ? this.se_component.quantity_error : false;
 		},
 		power_gen () {
 			return pretty(this.isloaded ? this.se_component.power_generation : 0);
@@ -117,7 +130,7 @@ export default {
 			return pretty(this.isloaded ? this.se_component.weight_external : 0);
 		},
 		isloaded () {
-			return (!!this.se_component.part_def)
+			return this.se_component.is_loaded;
 		},
 		valid_parts () {
 			return this.isloaded ? this.se_component.valid_parts : [];
@@ -165,10 +178,7 @@ export default {
 		},
 		is_quantity_valid () {
 			return function (hypothesis) {
-				return this
-					.valid_quantities
-					.map((elem) => (elem === hypothesis))
-					.reduce((acc, elem) => acc || elem);
+				return this.se_component.test_quantity_valid(hypothesis);
 			}
 		},
 	},

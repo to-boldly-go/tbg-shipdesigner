@@ -54,7 +54,7 @@ export default {
 			};
 		},
 		has_weight_error () {
-			return this.$store.getters.se_design.weight_internal > this.$store.getters.se_design.frame_max_size_raw;
+			return this.$store.getters.se_design.weight_error;
 		},
 		principal_frame: {
 			get () {
