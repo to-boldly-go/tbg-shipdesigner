@@ -11,8 +11,11 @@ const assert = require('assert');
 
 Promise.longStackTraces();
 
+const NamedVector = require('../lib/namedvector').NamedVector
 const ShipEngine = require('../lib/shipengine');
 const ShipImporter = require('../lib/shipimporter');
+const Opt = require('../lib/optimization');
+const CLI = require('../lib/cli');
 
 let parser = new ArgumentParser({
 	version: '0.0.1',
@@ -43,98 +46,19 @@ parser.addArgument(
 
 let args = parser.parseArgs();
 
-function readFile(filename, enc) {
-	return new Promise(function(complete, error) {
-		fs.readFile(filename, enc, function(err, result) {
-			if (err) {
-				error(err);
-			} else {
-				complete(result);
-			};
-		});
-	});
-};
-
-function parseJSON(data) {
-	return new Promise(function(complete, error) {
-		complete(JSON.parse(data));
-	});
-};
-
-
-function random_increment_or_decrement_quantity(design) {
-	const comp = _.sample(
-		_
-			.flatMap(design.subsystems, (ss) => ss.components)
-			.filter((comp) => comp.is_quantity_configurable)
-	);
-	const old_quant = comp.quantity;
-	const new_quant = _.sample([old_quant - 1, old_quant + 1]);
-	comp.quantity = new_quant;
-	return [comp, 'quantity_inc/dec', old_quant, new_quant];
-};
-
-const target_date = args.year ? new Number(args.year) : 2500;
-function parts_filter(part) {
-	const converted_year_avail = new Number(part['Year Available (SF)']);
-	if (converted_year_avail == Number.NaN) {
-		return true;
-	} else {
-		return converted_year_avail <= target_date;
-	};
-};
-
-function frames_filter(part) {
-	const converted_year_avail = new Number(part['Year Available (SF)']);
-	if (converted_year_avail == Number.NaN) {
-		return true;
-	} else {
-		return converted_year_avail <= target_date;
-	};
-};
-
-function random_new_part(design) {
-	const comp = _.sample(
-		_
-			.flatMap(design.subsystems, (ss) => ss.components)
-	);
-	const old_part = comp.part;
-	const valid_parts = comp
-		  .valid_parts
-		  .filter(parts_filter);
-	const new_part = _.sample(valid_parts)['Name'];
-	comp.part = new_part;
-	return [comp, 'part_swap', old_part, new_part];
-};
-
-function random_new_subframe(design) {
-	const ss = _.sample(design.subsystems)
-	const old_frame = ss.sub_frame;
-	const valid_frames = ss
-		  .valid_frames
-		  .filter(frames_filter);
-	const new_part = _.sample(valid_parts)['Name'];
-	comp.part = new_part;
-	return [comp, 'part_swap', old_part, new_part];
-};
-
-
-function objective(design) {
-	const nerrors = design.errors.length;
-	const stats_error = design.stats_raw - args.stats
-};
-
+const target_year = args.year ? new Number(args.year) : 2500;
 
 Promise.all([
-	readFile(args.parts, 'utf8').then(parseJSON),
-	readFile(args.start, 'utf8').then(parseJSON),
+	CLI.readFile(args.parts, 'utf8').then(CLI.parseJSON),
+	CLI.readFile(args.start, 'utf8').then(CLI.parseJSON),
 ]).then(
 	function ([parts_json, start_design_json]) {
 		const se_db = new ShipEngine.DB(parts_json);
 		let se_design = new ShipEngine.Design(se_db, start_design_json);
 
 		let best = _.cloneDeep(se_design.json);
-		let best_stats = se_design.stats_raw;
+		let best_obj = Opt.objective(se_design);
+		let orig_obj = Opt.objective(se_design);
 
 		let current = _.cloneDeep(se_design.json);
 
@@ -142,41 +66,56 @@ Promise.all([
 
 		while(true) {
 			it += 1;
-			if (it % 10 == 0) {
-				current = best;
-			};
-			
-			let comp, change_type, old_value, new_value;
-			do {
-				se_design = new ShipEngine.Design(se_db, _.cloneDeep(current));
-				let f = _.sample([
-					random_increment_or_decrement_quantity,
-					random_new_part,
-					
+
+			se_design = new ShipEngine.Design(se_db, _.cloneDeep(current));
+
+			let f;
+			if (it % 100 == 0) {
+				f = Opt.randomize_parts;
+			} else {
+				f = _.sample([
+					Opt.random_change_quantity,
+					Opt.random_change_quantity,
+					Opt.random_change_quantity,
+					Opt.random_change_quantity,
+					Opt.random_new_part,
 				]);
-				[comp, change_type, old_value, new_value] = f(se_design);
-			} while(se_design.is_invalid);
-			current = se_design.json;
+			}
+
+			let [change_type, data] = f(se_design, target_year);
 
 			if (se_design.errors.length) {
-				console.log("Error!");
-				console.log(se_design.errors);
-				console.log(se_design.subsystem('Operations').weight_error);
-				console.log(se_design.subsystem('Hull').component('Hull System').valid_quantities);
-				process.exit(1);
+				// console.log("Error!");
+				// console.log(se_design.errors);
+				// console.log(se_design.subsystem('Operations').weight_error);
+				// console.log(se_design.subsystem('Hull').component('Hull System').valid_quantities);
+				// process.exit(1);
+				if (Math.random() < 0.1) {
+					current = se_design.json;
+				}
+			} else {
+				current = se_design.json;
 			};
 
-			const delta_stats = se_design.stats_raw.sub(best_stats);
-			const net_stats = delta_stats.names.reduce((acc, name) => acc + delta_stats[name], 0);
+			const obj = Opt.objective(se_design);
 
-			if (net_stats > 0) {
-				console.log("New best: " + se_design.stats_raw.toFixed(2));
-				console.log("    Delta: " + se_design.stats_raw.sub(best_stats).toFixed(2));
-				best = _.cloneDeep(se_design.json);
-				best_stats = se_design.stats_raw;
-
-				fs.writeFileSync("best_design.json", JSON.stringify(se_design.json));
+			if (se_design.is_valid && obj.dominates(best_obj) || best_obj.dominates(obj)) {
+				const delta_obj = obj.sub(best_obj);
+				console.log(obj.toFixed(2));
+				console.log(delta_obj.toFixed(2));
+				console.log("obj dominates: ", obj.dominates(best_obj));
+				console.log("best dominates: ", best_obj.dominates(obj));
+				console.log("errors: ", se_design.errors);
+				fs.writeFileSync("best_design." + it + ".json", JSON.stringify(se_design.json));
+				// process.exit(0)
 			};
+			// if (net_stats > 0) {
+			// 	console.log("New ship: " + se_design.stats_raw.toFixed(2));
+			// 	console.log(" vs orig: " + se_design.stats_raw.sub(orig_stats).toFixed(2));
+			// 	// best = _.cloneDeep(se_design.json);
+			// 	// best_stats = se_design.stats_raw;
+
+			// };
 		};
 	}
 );

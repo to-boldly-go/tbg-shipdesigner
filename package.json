@@ -1,7 +1,9 @@
 {
     "dependencies": {
+        "ansi": "^0.3.1",
         "argparse": "^1.0.9",
         "bluebird": "^3.5.0",
+        "chalk": "^2.3.2",
         "lodash": "^4.17.4",
         "papaparse": "^4.3.6",
         "pretty-data": "^0.40.0",
@@ -16,7 +18,7 @@
         "start": "webpack-dev-server",
         "deploy-gh-pages": "git subtree push --prefix dist origin gh-pages",
         "test": "mocha-webpack 'test/**/*.spec.js'",
-		"optimize": "node scripts/optimize.js"
+        "optimize": "node scripts/optimize.js ./optimize.json ./dist/canon_parts_list.json ./dist/swb_kepler_recreation.json"
     },
     "license": "MIT",
     "version": "1.0.0",

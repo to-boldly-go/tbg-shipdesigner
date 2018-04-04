@@ -10,6 +10,7 @@ const Promise = require('bluebird');
 Promise.longStackTraces();
 
 const ShipEngine = require('../lib/shipengine');
+const CLI = require('../lib/cli');
 
 let parser = new ArgumentParser({
 	version: '0.0.1',
@@ -47,39 +48,10 @@ parser.addArgument(
 
 let args = parser.parseArgs();
 
-Papa.parsePromise = function(file) {
-	return new Promise(function(complete, error) {
-		Papa.parse(file, {
-			header: true,
-			dynamicTyping: true,
-			complete,
-			error
-		});
-	});
-};
-
-function readFile(filename, enc) {
-	return new Promise(function(complete, error) {
-		fs.readFile(filename, enc, function(err, result) {
-			if (err) {
-				error(err);
-			} else {
-				complete(result);
-			};
-		});
-	});
-};
-
-function parseJSON(data) {
-	return new Promise(function(complete, error) {
-		complete(JSON.parse(data));
-	});
-};
-
-Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
-			 readFile(args.frames, 'utf8').then(Papa.parsePromise),
-			 readFile(args.modules, 'utf8').then(Papa.parsePromise),
-			 readFile(args.design, 'utf8').then(parseJSON)])
+Promise.all([CLI.readFile(args.parts, 'utf8').then(CLI.parseCSV),
+			 CLI.readFile(args.frames, 'utf8').then(CLI.parseCSV),
+			 CLI.readFile(args.modules, 'utf8').then(CLI.parseCSV),
+			 CLI.readFile(args.design, 'utf8').then(CLI.parseJSON)])
 	.then(([parts, frames, modules, design]) => {
 		let se_DB = new ShipEngine.DB({
 			parts: parts.data,
