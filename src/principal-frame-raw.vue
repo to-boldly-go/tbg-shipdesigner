@@ -104,6 +104,36 @@ export default {
 
 .name-column {
 	text-align: right;
+	padding-right: 0.2em;
+}
+
+/* override global value for this one */
+.stat-column {
+	text-align: center;
+}
+
+.weight-internal-column {
+	text-align: center;
+}
+
+.weight-external-column {
+	text-align: center;
+}
+
+.br-column {
+	text-align: center;
+}
+
+.sr-column {
+	text-align: center;
+}
+
+.power-gen-column {
+	text-align: center;
+}
+
+.power-cost-column {
+	text-align: center;
 }
 
 .has-error {

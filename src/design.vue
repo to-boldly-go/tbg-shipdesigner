@@ -159,7 +159,11 @@ export default {
 }
 
 .build-time-column {
-	text-align: right;
+	text-align: center;
+}
+
+.tech-year-column {
+	text-align: center;
 }
 
 .design-table-head {

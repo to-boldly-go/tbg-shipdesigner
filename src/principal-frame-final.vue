@@ -120,10 +120,6 @@ export default {
 }
 
 /* override global value for this one */
-.build-time-column {
-	text-align: center;
-}
-
 .stat-column {
 	text-align: center;
 }
