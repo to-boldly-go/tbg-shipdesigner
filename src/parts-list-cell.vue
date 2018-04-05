@@ -76,7 +76,7 @@ export default {
 				const v = this.part[this.field.name];
 				if (typeof(v) == 'number') {
 					const f = v.toFixed(this.field.fixed);
-					return f.replace(/(\..*?)(0+)$/, (match, p1, p2) => p1 + ' '.repeat(p2.length));
+					return f.replace(/(\..*?)(0+)$/, (match, p1, p2) => p1 + ' '.repeat(p2.length)).replace(/\. ( *)/, ".0$1");
 				} else {
 					return v;
 				};
@@ -113,7 +113,7 @@ export default {
 				return Number(this.part[this.field.name]);
 			},
 			set (value) {
-				let new_value = Number(value.trim());
+				let new_value = Number(typeof (value) === 'string' ? value.trim() : 0);
 				if (this.value_number !== new_value) {
 					this.$store.commit('edit_part', {
 						part: this.part,
