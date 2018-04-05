@@ -113,11 +113,14 @@ export default {
 				return Number(this.part[this.field.name]);
 			},
 			set (value) {
-				this.$store.commit('edit_part', {
-					part: this.part,
-					field: this.field.name,
-					value: Number(value.trim()),
-				});
+				let new_value = Number(value.trim());
+				if (this.value_number !== new_value) {
+					this.$store.commit('edit_part', {
+						part: this.part,
+						field: this.field.name,
+						value: new_value,
+					});
+				}
 			},
 		},
 		value_string: {
@@ -125,11 +128,13 @@ export default {
 				return this.part[this.field.name];
 			},
 			set (value) {
-				this.$store.commit('edit_part', {
-					part: this.part,
-					field: this.field.name,
-					value: value,
-				});
+				if (this.value_string !== value) {
+					this.$store.commit('edit_part', {
+						part: this.part,
+						field: this.field.name,
+						value: value,
+					});
+				}
 			},
 		},
 	},
