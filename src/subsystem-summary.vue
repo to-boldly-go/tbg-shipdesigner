@@ -3,7 +3,7 @@
   <tr class="subsystem-summary">
 	<td class="name-column"
 		:class="weight_summary_class"
-		colspan="2">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>
+		colspan="2">{{is_valid_frame ? se_subsystem.weight_internal.toFixed(2) : '?'}}/{{is_valid_frame ? se_subsystem.weight_cap.toFixed(2) : '?'}}</td>
 
 	<td class="part-column"></td>
 
@@ -11,11 +11,11 @@
 	  <StatlineCell :key="name" :stats="stats" :name="name"></StatlineCell>
 	</template>
 
-	<td class="weight-internal-column" :class="weight_summary_class">{{se_subsystem.weight_internal.toFixed(2)}}</td>
+	<td class="weight-internal-column" :class="weight_summary_class">{{is_valid_frame ? se_subsystem.weight_internal.toFixed(2) : '?'}}</td>
 	<td class="weight-external-column">{{se_subsystem.weight_external.toFixed(2)}}</td>
 
-	<td class="br-column">{{se_subsystem.cost_BR.toFixed(2)}}</td>
-	<td class="sr-column">{{se_subsystem.cost_SR.toFixed(2)}}</td>
+	<td class="br-column">{{is_valid_frame ? se_subsystem.cost_BR.toFixed(2) : '?'}}</td>
+	<td class="sr-column">{{is_valid_frame ? se_subsystem.cost_SR.toFixed(2) : '?'}}</td>
 
 	<td class="power-cost-column">{{se_subsystem.cost_power.toFixed(2)}}</td>
 	<td class="power-gen-column">{{se_subsystem.power_generation.toFixed(2)}}</td>
@@ -51,13 +51,16 @@ export default {
 		se_subsystem: Object,
 	},
 	computed: {
+		is_valid_frame () {
+			return !!this.se_subsystem.sub_frame_def;
+		},
 		weight_summary_class () {
 			return {
 				'has-error': this.has_weight_error,
 			};
 		},
 		has_weight_error () {
-			return this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;
+			return !this.is_valid_frame || this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;
 		},
 		se_components () {
 			return this.se_subsystem.components;
@@ -66,13 +69,13 @@ export default {
 			return this.se_subsystem.stats;
 		},
 		crew() {
-			return this.se_subsystem.cost_crew;
+			return this.is_valid_frame ? this.se_subsystem.cost_crew : new ShipEngine.Crewline(0);
 		},
 		build_time () {
-			return frac(this.se_subsystem.build_time, 12);
+			return this.is_valid_frame ? frac(this.se_subsystem.build_time, 12) : '?';
 		},
 		tech_year () {
-			return this.se_subsystem.tech_year_max;
+			return this.is_valid_frame ? this.se_subsystem.tech_year_max : '?';
 		},
 	},
 	methods: {

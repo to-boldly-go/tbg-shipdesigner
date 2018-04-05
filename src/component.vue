@@ -1,5 +1,5 @@
 <template>
-  <tr class="component-tr" :class="{ 'has-error': !isloaded }">
+  <tr class="component-tr" :class="{ 'has-error': !is_loaded }">
 	<td class="name-column">{{se_component.name}}</td>
 
 	<td class="quantity-column" :class="{ 'has-error': has_quantity_error }">
@@ -16,13 +16,12 @@
 	  <span v-if="!quantity_configurable">{{quantity_pretty}}</span>
 	</td>
 
-	<td class="part-column" :class="part_column_select_computed">
+	<td class="part-column">
 	  <select
 		v-model="part"
-		:class="part_column_select_computed"
 		class="part-column-select">
 		<option v-for="part_value in valid_parts" :key="part_value['Name']">{{part_value['Name']}}</option>
-		<option v-if="!is_valid_part">{{part}}</option>
+		<option v-if="!is_valid_part" class="has-error">{{part}}</option>
 	  </select>
 	</td>
 
@@ -80,15 +79,10 @@ export default {
 			};
 		},
 		is_limiting_tech_year () {
-			return this.se_component.tech_year == this.se_component.subsystem.design.tech_year;
+			return this.is_loaded ? this.se_component.tech_year == this.se_component.subsystem.design.tech_year : false;
 		},
 		tech_year () {
-			return this.se_component.tech_year;
-		},
-		part_column_select_computed () {
-			return {
-				'has-error': !this.is_valid_part,
-			};
+			return this.is_loaded ? this.se_component.tech_year : "";
 		},
 		is_valid_part () {
 			return this.valid_parts
@@ -99,28 +93,28 @@ export default {
 			return this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));
 		},
 		power_gen () {
-			return pretty(this.isloaded ? this.se_component.power_generation : 0);
+			return pretty(this.is_loaded ? this.se_component.power_generation : 0);
 		},
 		power_cost () {
-			return pretty(this.isloaded ? this.se_component.cost_power : 0);
+			return pretty(this.is_loaded ? this.se_component.cost_power : 0);
 		},
 		cost_sr () {
-			return pretty(this.isloaded ? this.se_component.cost_SR : 0);
+			return pretty(this.is_loaded ? this.se_component.cost_SR : 0);
 		},
 		cost_br () {
-			return pretty(this.isloaded ? this.se_component.cost_BR : 0);
+			return pretty(this.is_loaded ? this.se_component.cost_BR : 0);
 		},
 		weight_internal () {
-			return pretty(this.isloaded ? this.se_component.weight_internal : 0);
+			return pretty(this.is_loaded ? this.se_component.weight_internal : 0);
 		},
 		weight_external () {
-			return pretty(this.isloaded ? this.se_component.weight_external : 0);
+			return pretty(this.is_loaded ? this.se_component.weight_external : 0);
 		},
-		isloaded () {
-			return (!!this.se_component.part_def)
+		is_loaded () {
+			return this.se_component.is_loaded;
 		},
 		valid_parts () {
-			return this.isloaded ? this.se_component.valid_parts : [];
+			return this.se_component.valid_parts;
 		},
 		quantity_configurable () {
 			return this.se_component.is_quantity_configurable;
@@ -147,10 +141,10 @@ export default {
 			return this.se_component.valid_quantities;
 		},
 		stats () {
-			return this.isloaded ? this.se_component.stats : new ShipEngine.Statline(0);
+			return this.is_loaded ? this.se_component.stats : new ShipEngine.Statline(0);
 		},
 		crew() {
-			return this.isloaded ? this.se_component.cost_crew : new ShipEngine.Crewline(0);
+			return this.is_loaded ? this.se_component.cost_crew : new ShipEngine.Crewline(0);
 		},
 		part: {
 			get () {

@@ -1,7 +1,7 @@
 <template>
   <div class="design-summary">
 	<div>
-	  <span>{{se_design.name}} | {{se_design.pretty_miscstats}}</span>
+	  <span>{{se_design.name}} | {{is_valid_frame ? se_design.pretty_miscstats : '?'}}</span>
 	  <span> | </span>
 	  <span
 		:class="{'has-error': has_parts_list_load_error}"
@@ -12,30 +12,30 @@
 	</div>
 
 	<div>
-	  <span>{{se_design.stats_raw.toFixed(2)}}</span>
+	  <span>{{is_valid_frame ? se_design.stats_raw.toFixed(2) : '?'}}</span>
 	  <span> | </span>
-	  <span>[{{se_design.cost_BR_raw.toFixed(2)}}]br</span>
-	  <span>[{{se_design.cost_SR_raw.toFixed(2)}}]sr</span>
+	  <span>[{{is_valid_frame ? se_design.cost_BR_raw.toFixed(2) : '?'}}]br</span>
+	  <span>[{{is_valid_frame ? se_design.cost_SR_raw.toFixed(2) : '?'}}]sr</span>
 	  <span> | </span>
-	  <span>{{se_design.cost_crew_raw.toFixed(2)}}</span>
+	  <span>{{is_valid_frame ? se_design.cost_crew_raw.toFixed(2) : '?'}}</span>
 	  <span> | </span>
 	  <span>[{{build_time}}]years</span>
 	</div>
 	<div>
 	  <span
 		class="design-power-summary"
-		:class="{'has-error': se_design.cost_power > se_design.power_generation}"
-		>Power[{{se_design.cost_power_raw.toFixed(2)}}/{{se_design.power_generation_raw.toFixed(2)}}]</span>
+		:class="{'has-error': !is_valid_frame || se_design.cost_power > se_design.power_generation}"
+		>Power[{{is_valid_frame ? se_design.cost_power_raw.toFixed(2) : '?'}}/{{is_valid_frame ? se_design.power_generation_raw.toFixed(2) : '?'}}]</span>
 	  <span
 		class="design-weight-summary"
-		:class="{'has-error': se_design.weight_internal > se_design.frame_max_size_raw}"
-		>Internal[{{se_design.weight_internal.toFixed(2)}}/{{se_design.frame_max_size_raw.toFixed(2)}}]</span>
+		:class="{'has-error': !is_valid_frame || se_design.weight_internal > se_design.frame_max_size_raw}"
+		>Internal[{{is_valid_frame ? se_design.weight_internal.toFixed(2) : '?'}}/{{is_valid_frame ? se_design.frame_max_size_raw.toFixed(2) : '?'}}]</span>
 	  <span
 		class="subsystem-weight-summary"
 		v-for="ss in se_design.subsystems"
 		:key="ss.name"
-		:class="{'has-error': ss.weight_internal > ss.weight_cap}"
-		>{{ss.name}}[{{ss.weight_internal.toFixed(2)}}/{{ss.weight_cap.toFixed(2)}}] </span>
+		:class="{'has-error': !is_valid_frame || !ss.is_loaded || ss.weight_internal > ss.weight_cap}"
+		>{{ss.name}}[{{is_valid_frame && ss.is_loaded ? ss.weight_internal.toFixed(2) : '?'}}/{{is_valid_frame && ss.is_loaded ? ss.weight_cap.toFixed(2) : '?'}}] </span>
 	</div>
   </div>
 </template>
@@ -52,6 +52,9 @@ import { frac } from './ui-functions.js';
 export default {
 	name: 'DesignSummary',
 	computed: {
+		is_valid_frame () {
+			return !!this.se_design.princ_frame_def;
+		},
 		parts_list_name () {
 			return this.se_design.parts_list_pretty_name;
 		},
@@ -66,7 +69,7 @@ export default {
 			return !this.se_design.matches_parts_list(this.se_db);
 		},
 		build_time () {
-			return frac(this.$store.getters.se_design.build_time, 12);
+			return this.is_valid_frame ? frac(this.$store.getters.se_design.build_time, 12) : "?";
 		},
 		...mapGetters([
 			'se_design',
