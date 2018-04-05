@@ -6,6 +6,12 @@ const config = {
 		'partbuilder': './src/partbuilder.js',
 		'csvimporter': './src/csvimporter.js',
 	},
+	resolve: {
+		modules: [
+			path.resolve('./src'),
+			path.resolve('./node_modules'),
+		],
+	},
 	output: {
 		path: path.resolve(__dirname, 'dist'),
 		filename: '[name].js',
