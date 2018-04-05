@@ -24,9 +24,9 @@
 	  <StatlineCell :stats="crew" :name="name"></StatlineCell>
 	</template>
 
-	<td class="build-cost-column"></td>
+	<td class="build-time-column">{{build_time}}</td>
 
-	<td class="tech-year-column"></td>
+	<td class="tech-year-column">{{tech_year}}</td>
   </tr>
 
 </template>
@@ -39,6 +39,8 @@ import { mapState, mapGetters } from 'vuex';
 import ShipEngine from '../lib/shipengine.js';
 
 import StatlineCell from './statline-cell.vue';
+
+import { frac } from './ui-functions.js';
 
 export default {
 	name: 'SubsystemSummary',
@@ -65,6 +67,12 @@ export default {
 		},
 		crew() {
 			return this.se_subsystem.cost_crew;
+		},
+		build_time () {
+			return frac(this.se_subsystem.build_time, 12);
+		},
+		tech_year () {
+			return this.se_subsystem.tech_year_max;
 		},
 	},
 	methods: {

@@ -49,9 +49,6 @@ export default {
 		StatlineCell,
 	},
 	computed: {
-		tech_year () {
-			return this.$store.getters.se_design.tech_year;
-		},
 		power_final_title () {
 			if (this.has_power_error) {
 				return 'Error: Power cost greater than power generation.';
@@ -78,6 +75,9 @@ export default {
 		},
 		build_time () {
 			return frac(this.$store.getters.se_design.build_time, 12, true);
+		},
+		tech_year () {
+			return this.$store.getters.se_design.tech_year_max;
 		},
 		ship_name: {
 			get () {

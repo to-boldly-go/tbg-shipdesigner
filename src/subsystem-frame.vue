@@ -28,7 +28,7 @@
 
 	<td class="build-time-column">{{build_time}}</td>
 
-	<td class="tech-year-column">{{tech_year}}</td>
+	<td class="tech-year-column">{{tech_year}} (Frame)</td>
   </tr>
 
 
@@ -54,9 +54,6 @@ export default {
 		se_subsystem: Object,
 	},
 	computed: {
-		tech_year () {
-			return this.se_subsystem.tech_year;
-		},
 		part_column_select_computed () {
 			return {
 				['has-error']: !this.is_valid_frame,
@@ -87,6 +84,9 @@ export default {
 		},
 		build_time () {
 			return frac(this.se_subsystem.build_time, 12);
+		},
+		tech_year () {
+			return this.se_subsystem.tech_year_frame;
 		},
 		sub_frame: {
 			get () {

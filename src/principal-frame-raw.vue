@@ -27,7 +27,7 @@
 
 	<td class="build-time-column">{{build_time_frame}}</td>
 
-	<td class="tech-year-column"></td>
+	<td class="tech-year-column">{{tech_year_frame}} (Frame)</td>
   </tr>
 </template>
 
@@ -72,6 +72,9 @@ export default {
 		},
 		build_time_frame () {
 			return frac(this.$store.getters.se_design.build_time_frame, 12);
+		},
+		tech_year_frame () {
+			return this.$store.getters.se_design.tech_year_frame;
 		},
 		frame_size () {
 			return this.$store.getters.se_design.frame_size;
