@@ -41,12 +41,33 @@
 
 import { mapState, mapGetters } from 'vuex';
 
-import canon_parts from '../dist/parts_C8.csv';
-
 const LOCAL_PARTS_LISTS_KEY = 'parts_lists';
 const STATUS_DEFAULT_DURATION = 2000;
 
 const pl_comparison_slice = _.partial(_.pick, _, ['name', 'timestamp']);
+
+function applyAnyMissingSchema(parts, canon_parts) {
+	for (let part_type in parts) {
+		let schema_list = parts[part_type].schema;
+		if (schema_list) {
+			let canon_schema_list = canon_parts[part_type].schema;
+			let schema_map = new Map(schema_list.map(schema => [schema.name, schema]));
+			let canon_schema_map = new Map(canon_schema_list.map(schema => [schema.name, schema]));
+			for (let [schema_name, canon_schema] of canon_schema_map) {
+				let schema = schema_map.get(schema_name);
+				if (schema) {
+					for (let prop in canon_schema) {
+						if (!schema.hasOwnProperty(prop)) {
+							schema[prop] = canon_schema[prop];
+						}
+					}
+				} else {
+					schema_list.push(Object.assign({}, canon_schema));
+				}
+			}
+		}
+	}
+}
 
 export default {
 	name: 'PartsListFooter',
@@ -114,7 +135,9 @@ export default {
 				this.local_parts_lists = [];
 				this.display_status_message("No parts lists to load");
 			} else {
-				this.local_parts_lists = JSON.parse(loaded);
+				let local_parts_lists = JSON.parse(loaded);
+				local_parts_lists.forEach(local_parts => applyAnyMissingSchema(local_parts, this.canon_parts_list));
+				this.local_parts_lists = local_parts_lists;
 				this.display_status_message("Parts lists loaded.");
 			};
 		},
@@ -154,11 +177,12 @@ export default {
 			let reader = new FileReader();
 			reader.onload = function(event) {
 				if (reader.readyState === FileReader.DONE) {
-					let pl = JSON.parse(reader.result);
-					this.$store.commit('set_parts_list', _.cloneDeep(pl));
-					this.local_parts_lists.push(_.cloneDeep(pl));
+					let local_parts = JSON.parse(reader.result);
+					applyAnyMissingSchema(local_parts, this.canon_parts_list);
+					this.$store.commit('set_parts_list', _.cloneDeep(local_parts));
+					this.local_parts_lists.push(_.cloneDeep(local_parts));
 					this.parts_lists_save_to_local_storage();
-					this.selected_parts_list = this.parts_list_save_name(pl);
+					this.selected_parts_list = this.parts_list_save_name(local_parts);
 					this.display_status_message("Parts list loaded from file.");
 				};
 			}.bind(this);
