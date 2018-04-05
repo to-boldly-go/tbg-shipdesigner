@@ -56,7 +56,11 @@ export default {
 			}, this.computed_font);
 		},
 		computed_font () {
-			switch (this.field.style) {
+			var style = this.field.style;
+			if (!style && this.field.fixed) {
+				style = 'fixed';
+			}
+			switch (style) {
 			case 'fixed':
 				return {
 					['font-family']: "'Roboto Mono', monospace",
