@@ -47,11 +47,7 @@ const STATUS_DEFAULT_DURATION = 2000;
 const pl_comparison_slice = _.partial(_.pick, _, ['name', 'timestamp']);
 
 function applyAnyMissingSchema(parts, canon_parts) {
-	console.log(parts);
 	for (let part_type in parts) {
-		console.log('part_type: ' + part_type);
-		console.log(parts[part_type]);
-		console.log(canon_parts[part_type]);
 		let schema_list = parts[part_type].schema;
 		if (schema_list) {
 			let canon_schema_list = canon_parts[part_type].schema;
