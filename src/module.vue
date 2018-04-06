@@ -39,7 +39,7 @@
 
 <script>
 
-import ShipEngine from '../lib/shipengine.js';
+import * as ShipEngine from '../lib/shipengine.js';
 
 import {
 	pretty,

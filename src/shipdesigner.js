@@ -9,7 +9,7 @@ Promise.longStackTraces();
 
 Vue.use(Vuex);
 
-import ShipEngine from '../lib/shipengine.js';
+import * as ShipEngine from '../lib/shipengine.js';
 
 import design_json_init from '../dist/swb_kepler_recreation.json';
 import canon_parts_list from '../dist/canon_parts_list.json';

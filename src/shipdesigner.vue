@@ -17,8 +17,6 @@
 
 import { mapState, mapGetters } from 'vuex';
 
-import ShipImporter from '../lib/shipimporter';
-
 import DesignSummary from './design-summary.vue';
 import Design from './design.vue';
 import DesignImportExport from './design-import-export.vue';

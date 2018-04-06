@@ -51,7 +51,7 @@
 
 import { mapState, mapGetters } from 'vuex';
 
-import ShipEngine from '../lib/shipengine.js';
+import * as ShipEngine from '../lib/shipengine.js';
 
 import PrincipalFrameRaw from './principal-frame-raw.vue';
 import PrincipalFrameFinal from './principal-frame-final.vue';

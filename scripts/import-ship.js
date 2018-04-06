@@ -1,16 +1,12 @@
-#!/usr/bin/env node
-
-'use strict';
-
-const ArgumentParser = require('argparse').ArgumentParser;
-const Papa = require('papaparse');
-const fs = require('fs');
-const Promise = require('bluebird');
+import { ArgumentParser } from 'argparse';
+import Papa from 'papaparse';
+import fs from 'fs';
+import Promise from 'bluebird';
 
 Promise.longStackTraces();
 
-const ShipEngine = require('../lib/shipengine');
-const ShipImporter = require('../lib/shipimporter');
+import * as ShipEngine from '../lib/shipengine.js';
+import * as ShipImporter from '../lib/shipimporter';
 
 let parser = new ArgumentParser({
 	version: '0.0.1',

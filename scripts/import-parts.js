@@ -1,12 +1,8 @@
-#!/usr/bin/env node
-
-'use strict';
-
-const _ = require('lodash');
-const ArgumentParser = require('argparse').ArgumentParser;
-const Papa = require('papaparse');
-const fs = require('fs');
-const Promise = require('bluebird');
+import _ from 'lodash';
+import { ArgumentParser } from 'argparse';
+import Papa from 'papaparse';
+import fs from 'fs';
+import Promise from 'bluebird';
 
 Promise.longStackTraces();
 
