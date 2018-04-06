@@ -1,12 +1,12 @@
 <template>
 
-  <tr class="subsystem-frame">
+  <tr class="subsystem-frame" v-bind:class="{ 'has-error': !is_valid_frame }">
 	<td class="name-column" colspan="2">{{se_subsystem.name}}</td>
 
 	<td class="part-column">
-	  <select v-model="sub_frame" class="part-column-select" :class="part_column_select_computed">
+	  <select v-model="sub_frame" class="part-column-select">
 		<option v-for="sub_frame_value in se_subsystem.valid_frames" :key="sub_frame_value['Name']">{{sub_frame_value['Name']}}</option>
-		<option v-if="!is_valid_frame">{{sub_frame}}</option>
+		<option v-if="!is_valid_frame" class="has-error">{{sub_frame}}</option>
 	  </select>
 	</td>
 
@@ -14,10 +14,10 @@
 	  <td :key="name" class="stat-column">{{stats_multiplier_pretty}}</td>
 	</template>
 
-	<td class="weight-internal-column" colspan="2">{{se_subsystem.weight_cap.toFixed(2)}}</td>
+	<td class="weight-internal-column" colspan="2">{{is_valid_frame ? se_subsystem.weight_cap.toFixed(2) : '?'}}</td>
 
-	<td class="br-column">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>
-	<td class="sr-column">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>
+	<td class="br-column">{{is_valid_frame ? se_subsystem.cost_BR_frame.toFixed(2) : '?'}}</td>
+	<td class="sr-column">{{is_valid_frame ? se_subsystem.cost_SR_mult.toFixed(2) : '?'}}x</td>
 
 	<td class="power-cost-column"></td>
 	<td class="power-gen-column"></td>
@@ -54,15 +54,8 @@ export default {
 		se_subsystem: Object,
 	},
 	computed: {
-		part_column_select_computed () {
-			return {
-				'has-error': !this.is_valid_frame,
-			};
-		},
 		is_valid_frame () {
-			return this.valid_frames
-				.map((frame) => frame['Name'])
-				.includes(this.sub_frame);
+			return !!this.se_subsystem.sub_frame_def;
 		},
 		valid_frames () {
 			return this.se_subsystem.valid_frames;
@@ -74,19 +67,19 @@ export default {
 			return this.se_subsystem.stats;
 		},
 		stats_multiplier_pretty() {
-			return this.se_subsystem.stats_multiplier.toFixed(2) + 'x';
+			return this.is_valid_frame ? this.se_subsystem.stats_multiplier.toFixed(2) + 'x' : '?';
 		},
 		crew() {
-			return this.se_subsystem.cost_crew;
+			return this.is_valid_frame ? this.se_subsystem.cost_crew : new ShipEngine.Crewline(0);
 		},
 		crew_mult_pretty() {
-			return this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');
+			return this.is_valid_frame ? this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x') : new ShipEngine.Crewline(0).apply(val => '?');
 		},
 		build_time () {
-			return frac(this.se_subsystem.build_time, 12);
+			return this.is_valid_frame ? frac(this.se_subsystem.build_time, 12) : '?';
 		},
 		tech_year () {
-			return this.se_subsystem.tech_year_frame;
+			return this.is_valid_frame ? this.se_subsystem.tech_year_frame : '?';
 		},
 		sub_frame: {
 			get () {
