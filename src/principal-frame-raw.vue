@@ -4,15 +4,15 @@
 
 	<td class="part-column">
 	  <select v-model="principal_frame" class="part-column-select">
-		<option v-for="princ_frame_value in se_design.valid_frames">{{princ_frame_value['Name']}}</option>
+		<option v-for="princ_frame_value in se_design.valid_frames" :key="princ_frame_value['Name']">{{princ_frame_value['Name']}}</option>
 	  </select>
 	</td>
 
 	<template v-for="name in stats_raw.names">
-	  <StatlineCell :stats="stats_raw" :name="name"></StatlineCell>
+	  <StatlineCell :key="name" :stats="stats_raw" :name="name"></StatlineCell>
 	</template>
 	
-	<td class="weight-internal-column" v-bind:class="weight_summary_class">{{se_design.weight_internal.toFixed(2)}}</td>
+	<td class="weight-internal-column" :class="weight_summary_class">{{se_design.weight_internal.toFixed(2)}}</td>
 	<td class="weight-external-column">{{se_design.weight_external.toFixed(2)}}</td>
 
 	<td class="br-column">{{se_design.cost_BR_raw.toFixed(2)}}</td>
@@ -22,7 +22,7 @@
 	<td class="power-gen-column">{{se_design.power_generation_raw.toFixed(2)}}</td>
 
 	<template v-for="name in crew_raw.names">
-	  <StatlineCell :stats="crew_raw" :name="name"></StatlineCell>
+	  <StatlineCell :key="name" :stats="crew_raw" :name="name"></StatlineCell>
 	</template>
 
 	<td class="build-time-column">{{build_time_frame}}</td>
@@ -50,7 +50,7 @@ export default {
 	computed: {
 		weight_summary_class () {
 			return {
-				['has-error']: this.has_weight_error,
+				'has-error': this.has_weight_error,
 			};
 		},
 		has_weight_error () {

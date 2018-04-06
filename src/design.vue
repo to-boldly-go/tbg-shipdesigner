@@ -29,13 +29,13 @@
 		<PrincipalFrameFinal></PrincipalFrameFinal>
 		<PrincipalFrameRaw></PrincipalFrameRaw>
 		<template v-for="se_subsystem in se_subsystems">
-		  <tr class="subsystem-spacer-row"><td colspan="100" height="30px"></td></tr>	<!-- empty line for spacing -->
-		  <SubsystemFrame :se_subsystem="se_subsystem"></SubsystemFrame>
-		  <SubsystemSummary :se_subsystem="se_subsystem"></SubsystemSummary>
-		  <SubsystemSettings :se_subsystem="se_subsystem"></SubsystemSettings>
+		  <tr :key="se_subsystem.name" class="subsystem-spacer-row"><td colspan="100" height="30px"></td></tr>	<!-- empty line for spacing -->
+		  <SubsystemFrame :key="se_subsystem.name + '-frame'" :se_subsystem="se_subsystem"></SubsystemFrame>
+		  <SubsystemSummary :key="se_subsystem.name + '-summary'" :se_subsystem="se_subsystem"></SubsystemSummary>
+		  <SubsystemSettings :key="se_subsystem.name + '-settings'" :se_subsystem="se_subsystem"></SubsystemSettings>
 
 		  <template v-for="se_component in se_subsystem.components">
-			<ComponentTr :se_component="se_component"></ComponentTr>
+			<ComponentTr :key="se_component.name" :se_component="se_component"></ComponentTr>
 		  </template>
 		</template>
 

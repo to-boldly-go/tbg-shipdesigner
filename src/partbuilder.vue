@@ -47,12 +47,14 @@ export default {
 			const saved_parts = localStorage.getItem(PARTS_KEY);
 			if (saved_parts) {
 				this.data = JSON.parse(saved_parts);
-			} else {
+			} else if (this.data) {
 				localStorage.setItem(PARTS_KEY, JSON.stringify(this.data));
 			};
 		},
 		save_parts_to_storage () {
-			localStorage.setItem(PARTS_KEY, JSON.stringify(this.data));
+			if (this.data) {
+				localStorage.setItem(PARTS_KEY, JSON.stringify(this.data));
+			}
 		},
 	},
 };

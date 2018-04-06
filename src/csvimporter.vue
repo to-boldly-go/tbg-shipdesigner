@@ -17,7 +17,7 @@
 
   	<div>
   	  <span>Parts list name:</span>
-  	  <input v-model="name_computed"></input>
+  	  <input v-model="name_computed"/>
   	</div>
 	
   	<div>
@@ -26,7 +26,7 @@
   		type="file"
   		ref="load_parts_file_input"
   		@change="load_file_parts"
-  		value="Load parts csv"></input>
+  		value="Load parts csv"/>
   	</div>
 
   	<div>
@@ -35,7 +35,7 @@
   		type="file"
   		ref="load_frames_file_input"
   		@change="load_file_frames"
-  		value="Load frames csv"></input>
+  		value="Load frames csv"/>
   	</div>
 
   	<div>
@@ -44,14 +44,14 @@
   		type="file"
   		ref="load_modules_file_input"
   		@change="load_file_modules"
-  		value="Load modules csv"></input>
+  		value="Load modules csv"/>
   	</div>
 
   	<div v-if="can_import">
   	  <input
   		type="button"
   		@click="import_parts_list"
-  		value="Import parts list"></input>
+  		value="Import parts list"/>
   	</div>
 
 	<div v-if="success">
@@ -63,22 +63,22 @@
   	  <ul>
   		<li v-if="has_name_errors">Name:
   		  <ol>
-  			<li v-for="er in name_error_messages">{{er}}</li>
+  			<li v-for="(er, index) in name_error_messages" :key="index">{{er}}</li>
   		  </ol>
   		</li>
   		<li v-if="has_parts_errors">Parts file:
   		  <ol>
-  			<li v-for="er in parts_error_messages">{{er}}</li>
+  			<li v-for="(er, index) in parts_error_messages" :key="index">{{er}}</li>
   		  </ol>
   		</li>
   		<li v-if="has_frames_errors">Frames file:
   		  <ol>
-  			<li v-for="er in frames_error_messages">{{er}}</li>
+  			<li v-for="(er, index) in frames_error_messages" :key="index">{{er}}</li>
   		  </ol>
   		</li>
   		<li v-if="has_modules_errors">Modules file:
   		  <ol>
-  			<li v-for="er in modules_error_messages">{{er}}</li>
+  			<li v-for="(er, index) in modules_error_messages" :key="index">{{er}}</li>
   		  </ol>
   		</li>
   	  </ul>

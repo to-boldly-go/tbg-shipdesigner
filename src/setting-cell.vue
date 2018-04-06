@@ -7,7 +7,7 @@
 	  class="setting-input-number"
 	  type="number"
 	  v-model="setting_value">
-	  <option v-for="num in valid_numbers">{{num}}</option>
+	  <option v-for="num in valid_numbers" :key="num">{{num}}</option>
 	</select>
 
 	<input

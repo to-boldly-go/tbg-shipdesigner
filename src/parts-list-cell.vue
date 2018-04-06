@@ -3,7 +3,7 @@
 	  @click="edit_cell"
 	  @focus="edit_cell"
 	  tabindex="0"
-	  v-bind:style="computed_style">
+	  :style="computed_style">
 
 	<span
 	  class="display-span"
@@ -17,7 +17,7 @@
 	  @blur="commit_edit"
 	  @keydown="on_keydown"
 	  v-focus
-	  v-model="temp_value"></input>
+	  v-model="temp_value"/>
   </td>
 </template>
 
