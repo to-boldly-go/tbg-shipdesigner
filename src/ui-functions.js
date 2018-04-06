@@ -20,6 +20,17 @@ function frac(val, base, mixed) {
 	}
 }
 
+function from_frac(str) {
+	let m = /(\d+ )?(\d+)\/(\d+)/.exec(str);
+	if (!m) {
+		return null;
+	}
+	let whole = m[1] ? Number.parseInt(m[1]) : 0;
+	let numer = Number.parseInt(m[2]);
+	let denom = Number.parseInt(m[3]);
+	return whole + numer / denom;
+}
+
 function pretty(val, n) {
 	if (Math.abs(val) > 0) {
 		return val.toFixed(2);
@@ -31,4 +42,5 @@ function pretty(val, n) {
 export {
 	pretty,
 	frac,
+	from_frac,
 }

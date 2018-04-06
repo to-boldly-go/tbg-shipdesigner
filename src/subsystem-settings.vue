@@ -10,7 +10,7 @@
 
 import { mapState, mapGetters } from 'vuex';
 
-import ShipEngine from '../lib/shipengine.js';
+import * as ShipEngine from '../lib/shipengine.js';
 
 import SettingCell from './setting-cell.vue'
 

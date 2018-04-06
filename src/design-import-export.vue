@@ -42,7 +42,7 @@
 <script>
 
 import _ from 'lodash';
-import ShipEngine from '../lib/shipengine';
+import * as ShipEngine from '../lib/shipengine';
 
 import { mapState, mapGetters } from 'vuex';
 
