@@ -24,7 +24,7 @@
 	<div>
 	  <span
 		class="design-power-summary"
-		:class="{'has-error': !is_valid_frame || se_design.cost_power > se_design.power_generation}"
+		:class="{'has-error': !is_valid_frame || se_design.cost_power_raw > se_design.power_generation_raw}"
 		>Power[{{is_valid_frame ? se_design.cost_power_raw.toFixed(2) : '?'}}/{{is_valid_frame ? se_design.power_generation_raw.toFixed(2) : '?'}}]</span>
 	  <span
 		class="design-weight-summary"

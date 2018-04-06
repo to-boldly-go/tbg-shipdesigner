@@ -65,7 +65,7 @@ export default {
 			};
 		},
 		has_power_error () {
-			return !this.is_valid_frame || this.$store.getters.se_design.cost_power > this.$store.getters.se_design.power_generation;
+			return !this.is_valid_frame || this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;
 		},
 		principal_frame () {
 			return this.$store.getters.se_design.json['Principal Frame'];
