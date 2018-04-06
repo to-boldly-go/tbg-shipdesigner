@@ -1,20 +1,20 @@
 <template>
-  <tr class="module-tr" v-bind:class="{ hasloaderror: !isloaded }">
+  <tr class="module-tr" :class="{ hasloaderror: !isloaded }">
 	<td class="name-column" colspan="2">Module</td>
 
 	<td class="part-column">
 	  <span class="module-pair-span">
 		<span class="module-pair-type"><select v-model="module_type" class="part-column-select">
-			<option v-for="module_type_value in valid_types">{{module_type_value}}</option>
+			<option v-for="module_type_value in valid_types" :key="module_type_value">{{module_type_value}}</option>
 		</select></span>
 		<span class="module-pair-variant"><select v-model="module_variant" class="part-column-select">
-			<option v-for="module_variant_value in valid_variants">{{module_variant_value['Variant']}}</option>
+			<option v-for="module_variant_value in valid_variants" :key="module_variant_value['Variant']">{{module_variant_value['Variant']}}</option>
 		</select></span>
 	  </span>
 	</td>
 
 	<template v-for="name in stats.names">
-	  <StatlineCell :stats="stats" :name="name"></StatlineCell>
+	  <StatlineCell :key="name" :stats="stats" :name="name"></StatlineCell>
 	</template>
 
 	<td class="weight-internal-column">{{weight_internal}}</td>
@@ -27,7 +27,7 @@
 	<td class="power-gen-column">{{power_gen}}</td>
 
 	<template v-for="name in crew.names">
-	  <StatlineCell :stats="crew" :name="name"></StatlineCell>
+	  <StatlineCell :key="name" :stats="crew" :name="name"></StatlineCell>
 	</template>
 
 	<td class="build-time-column">{{build_time}}</td>

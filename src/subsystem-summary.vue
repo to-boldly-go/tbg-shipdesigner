@@ -2,16 +2,16 @@
 
   <tr class="subsystem-summary">
 	<td class="name-column"
-		v-bind:class="weight_summary_class"
+		:class="weight_summary_class"
 		colspan="2">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>
 
 	<td class="part-column"></td>
 
 	<template v-for="name in stats.names">
-	  <StatlineCell :stats="stats" :name="name"></StatlineCell>
+	  <StatlineCell :key="name" :stats="stats" :name="name"></StatlineCell>
 	</template>
 
-	<td class="weight-internal-column" v-bind:class="weight_summary_class">{{se_subsystem.weight_internal.toFixed(2)}}</td>
+	<td class="weight-internal-column" :class="weight_summary_class">{{se_subsystem.weight_internal.toFixed(2)}}</td>
 	<td class="weight-external-column">{{se_subsystem.weight_external.toFixed(2)}}</td>
 
 	<td class="br-column">{{se_subsystem.cost_BR.toFixed(2)}}</td>
@@ -21,7 +21,7 @@
 	<td class="power-gen-column">{{se_subsystem.power_generation.toFixed(2)}}</td>
 
 	<template v-for="name in crew.names">
-	  <StatlineCell :stats="crew" :name="name"></StatlineCell>
+	  <StatlineCell :key="name" :stats="crew" :name="name"></StatlineCell>
 	</template>
 
 	<td class="build-time-column">{{build_time}}</td>
@@ -53,7 +53,7 @@ export default {
 	computed: {
 		weight_summary_class () {
 			return {
-				['has-error']: this.has_weight_error,
+				'has-error': this.has_weight_error,
 			};
 		},
 		has_weight_error () {

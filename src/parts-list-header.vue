@@ -3,12 +3,13 @@
 	<div class="select-tab-column">
 	  <div class="select-tab"
 		   v-for="select in ['parts','modules','frames']"
+		   :key="select"
 		   @click="set_selection(select)"
-		   v-bind:class="tab_class_select(select)">
+		   :class="tab_class_select(select)">
 		<div class="select-tab-text">{{select}}</div>
 		<div class="indicator-lamp-wrapper">
 		  <div class="indicator-lamp-spacer"></div>
-		  <div class="indicator-lamp" v-bind:class="lamp_class_select(select)"></div>
+		  <div class="indicator-lamp" :class="lamp_class_select(select)"></div>
 		  <div class="indicator-lamp-spacer"></div>
 		</div>
 	  </div>
@@ -17,12 +18,13 @@
 	<div class="type-tab-column">
 	  <div class="type-tab"
 		   v-for="type in types"
+		   :key="type"
 		   @click="set_filter(type)"
-		   v-bind:class="tab_class_type(type)">
+		   :class="tab_class_type(type)">
 		<div class="type-tab-text">{{type}}</div>
 		<div class="indicator-lamp-wrapper">
 		  <div class="indicator-lamp-spacer"></div>
-		  <div class="indicator-lamp" v-bind:class="lamp_class_type(type)"></div>
+		  <div class="indicator-lamp" :class="lamp_class_type(type)"></div>
 		  <div class="indicator-lamp-spacer"></div>
 		</div>
 	  </div>

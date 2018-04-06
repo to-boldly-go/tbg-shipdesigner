@@ -4,11 +4,11 @@
 	  <span>{{se_design.name}} | {{se_design.pretty_miscstats}}</span>
 	  <span> | </span>
 	  <span
-		v-bind:class="{['has-error']: has_parts_list_load_error}"
-		v-bind:title="parts_list_load_title">Parts: {{parts_list_name}}</span>
+		:class="{'has-error': has_parts_list_load_error}"
+		:title="parts_list_load_title">Parts: {{parts_list_name}}</span>
 	  <span
 		v-if="has_parts_list_load_error"
-		v-bind:class="{['has-error']: has_parts_list_load_error}"> (WRONG PARTS LIST! EVERYTHING MAY BE INVALID!)</span>
+		:class="{'has-error': has_parts_list_load_error}"> (WRONG PARTS LIST! EVERYTHING MAY BE INVALID!)</span>
 	</div>
 
 	<div>
@@ -24,16 +24,17 @@
 	<div>
 	  <span
 		class="design-power-summary"
-		v-bind:class="{['has-error']: se_design.cost_power > se_design.power_generation}"
+		:class="{'has-error': se_design.cost_power > se_design.power_generation}"
 		>Power[{{se_design.cost_power_raw.toFixed(2)}}/{{se_design.power_generation_raw.toFixed(2)}}]</span>
 	  <span
 		class="design-weight-summary"
-		v-bind:class="{['has-error']: se_design.weight_internal > se_design.frame_max_size_raw}"
+		:class="{'has-error': se_design.weight_internal > se_design.frame_max_size_raw}"
 		>Internal[{{se_design.weight_internal.toFixed(2)}}/{{se_design.frame_max_size_raw.toFixed(2)}}]</span>
 	  <span
 		class="subsystem-weight-summary"
 		v-for="ss in se_design.subsystems"
-		v-bind:class="{['has-error']: ss.weight_internal > ss.weight_cap}"
+		:key="ss.name"
+		:class="{'has-error': ss.weight_internal > ss.weight_cap}"
 		>{{ss.name}}[{{ss.weight_internal.toFixed(2)}}/{{ss.weight_cap.toFixed(2)}}] </span>
 	</div>
   </div>

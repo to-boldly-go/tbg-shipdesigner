@@ -1,33 +1,33 @@
 <template>
-  <tr class="component-tr" v-bind:class="{ ['has-error']: !isloaded }">
+  <tr class="component-tr" :class="{ 'has-error': !isloaded }">
 	<td class="name-column">{{se_component.name}}</td>
 
-	<td class="quantity-column" v-bind:class="{ ['has-error']: has_quantity_error }">
+	<td class="quantity-column" :class="{ 'has-error': has_quantity_error }">
 	  <select
 		v-if="quantity_configurable"
 		class="quantity-column-select"
 		v-model="quantity"
 		v-on:wheel="quantity_select_wheel_event"
-		v-bind:class="{ ['has-error']: has_quantity_error }">
+		:class="{ 'has-error': has_quantity_error }">
 
 		<option v-if="!valid_quantities.includes(quantity)">{{quantity}}</option>
-		<option v-for="valid_quantity in valid_quantities">{{valid_quantity}}</option>
+		<option v-for="valid_quantity in valid_quantities" :key="valid_quantity">{{valid_quantity}}</option>
 	  </select>
 	  <span v-if="!quantity_configurable">{{quantity_pretty}}</span>
 	</td>
 
-	<td class="part-column" v-bind:class="part_column_select_computed">
+	<td class="part-column" :class="part_column_select_computed">
 	  <select
 		v-model="part"
-		v-bind:class="part_column_select_computed"
+		:class="part_column_select_computed"
 		class="part-column-select">
-		<option v-for="part_value in valid_parts">{{part_value['Name']}}</option>
+		<option v-for="part_value in valid_parts" :key="part_value['Name']">{{part_value['Name']}}</option>
 		<option v-if="!is_valid_part">{{part}}</option>
 	  </select>
 	</td>
 
 	<template v-for="name in stats.names">
-	  <StatlineCell :stats="stats" :name="name"></StatlineCell>
+	  <StatlineCell :key="name" :stats="stats" :name="name"></StatlineCell>
 	</template>
 
 	<td class="weight-internal-column">{{weight_internal}}</td>
@@ -40,14 +40,14 @@
 	<td class="power-gen-column">{{power_gen}}</td>
 
 	<template v-for="name in crew.names">
-	  <StatlineCell :stats="crew" :name="name"></StatlineCell>
+	  <StatlineCell :key="name" :stats="crew" :name="name"></StatlineCell>
 	</template>
 
 	<td class="build-time-column"></td>
 
 	<td class="tech-year-column"
-		v-bind:class="{ ['has-warning']: is_limiting_tech_year }"
-		v-bind:title="tech_year_tooltip"
+		:class="{ ['has-warning']: is_limiting_tech_year }"
+		:title="tech_year_tooltip"
 		>{{tech_year}}</td>
   </tr>
 </template>
@@ -87,7 +87,7 @@ export default {
 		},
 		part_column_select_computed () {
 			return {
-				['has-error']: !this.is_valid_part,
+				'has-error': !this.is_valid_part,
 			};
 		},
 		is_valid_part () {

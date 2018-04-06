@@ -7,7 +7,7 @@
 	<td class="part-column">{{principal_frame}}</td>
 
 	<template v-for="name in stats.names">
-	  <StatlineCell :stats="stats" :name="name" :fixed="0"></StatlineCell>
+	  <StatlineCell :key="name" :stats="stats" :name="name" :fixed="0"></StatlineCell>
 	</template>
 	
 	<td class="weight-internal-column" colspan="2">{{se_design.weight_total}}</td>
@@ -16,14 +16,14 @@
 	<td class="sr-column">{{se_design.cost_SR}}</td>
 
 	<td class="power-cost-column"
-		v-bind:title="power_final_title"
-		v-bind:class="power_final_class">{{se_design.cost_power}}</td>
+		:title="power_final_title"
+		:class="power_final_class">{{se_design.cost_power}}</td>
 	<td class="power-gen-column"
-		v-bind:title="power_final_title"
-		v-bind:class="power_final_class">{{se_design.power_generation}}</td>
+		:title="power_final_title"
+		:class="power_final_class">{{se_design.power_generation}}</td>
 
 	<template v-for="name in crew.names">
-	  <StatlineCell :stats="crew" :name="name" :fixed="0"></StatlineCell>
+	  <StatlineCell :key="name" :stats="crew" :name="name" :fixed="0"></StatlineCell>
 	</template>
 
 	<td class="build-time-column">{{build_time}}</td>
@@ -58,7 +58,7 @@ export default {
 		},
 		power_final_class () {
 			return {
-				['has-error']: this.has_power_error,
+				'has-error': this.has_power_error,
 			};
 		},
 		has_power_error () {

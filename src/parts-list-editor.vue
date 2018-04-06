@@ -3,13 +3,14 @@
   <table class="editor">
 	<thead>
 	  <th v-for="field in selected_schema"
+		  :key="field.name"
 		  @click="sort_list(field.name)"
 		  class="column-header"
-		  v-bind:style="header_style(field)">{{field.name}}</th>
+		  :style="header_style(field)">{{field.name}}</th>
 	  <th class="column-header delete-column"></th>
 	</thead>
 	<tbody>
-	  <PartsListPart v-for="part in displayed_parts" key="part.name" :part="part"></PartsListPart>
+	  <PartsListPart v-for="part in displayed_parts" :key="part.name" :part="part"></PartsListPart>
 	</tbody>
   </table>
   <input type="button" value="Add new part" @click="add_new_part" class="new-part-button">

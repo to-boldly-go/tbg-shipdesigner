@@ -6,26 +6,26 @@
 	<input v-model="parts_list_name">
 
     <select v-model="selected_parts_list_name">
-      <option v-for="parts_list in all_parts_lists">
+      <option v-for="parts_list in all_parts_lists" :key="parts_list_save_name(parts_list)">
 		{{parts_list_save_name(parts_list)}}
       </option>
     </select>
 
-    <input type="button" @click="parts_lists_delete_selected" value="Delete saved parts"></input>
-    <input type="button" @click="parts_lists_load_selected" value="Load saved parts"></input>
+    <input type="button" @click="parts_lists_delete_selected" value="Delete saved parts"/>
+    <input type="button" @click="parts_lists_load_selected" value="Load saved parts"/>
 
-    <input type="button" @click="parts_lists_save_current" value="Save current parts"></input>
-    <input type="button" @click="parts_lists_load_from_local_storage" value="Refresh"></input>
+    <input type="button" @click="parts_lists_save_current" value="Save current parts"/>
+    <input type="button" @click="parts_lists_load_from_local_storage" value="Refresh"/>
 
-	<input type="button" @click="parts_lists_save_file" value="Save to file"></input>
-	<input type="button" @click="$refs.load_file_input.click()" value="Load from file"></input>
+	<input type="button" @click="parts_lists_save_file" value="Save to file"/>
+	<input type="button" @click="$refs.load_file_input.click()" value="Load from file"/>
 
     <input
 	  style="display:none"
 	  type="file"
 	  ref="load_file_input"
 	  @change="parts_lists_load_file"
-	  value="Load file"></input>
+	  value="Load file"/>
 
 	<a ref="save_file_a" style="display:none"></a>
 

@@ -3,33 +3,33 @@
 	<input type="button"
 		   class="undo-button"
 		   @click="dispatch_undo"
-		   value="<"></input>
+		   value="<"/>
 	<input type="button"
 		   class="redo-button"
 		   @click="dispatch_redo"
-		   value=">"></input>
+		   value=">"/>
 
     <select v-model="selected_parts_list_name">
-      <option v-for="parts_list in all_parts_lists">
+      <option v-for="parts_list in all_parts_lists" :key="parts_list.pretty_name">
 		{{parts_list.pretty_name}}
       </option>
     </select>
 
-    <input type="button" @click="parts_lists_load_selected" value="Load parts list"></input>
+    <input type="button" @click="parts_lists_load_selected" value="Load parts list"/>
 
-	<span><a v-bind:href="'shipdesigner.html#' + design_json_url_encoded_string">Link to this design</a></span>
+	<span><a :href="'shipdesigner.html#' + design_json_url_encoded_string">Link to this design</a></span>
 
     <select v-model="selected_design_name">
-      <option v-for="blueprint in local_saves">
+      <option v-for="blueprint in local_saves" :key="blueprint.pretty_name">
 		{{blueprint.pretty_name}}
       </option>
     </select>
 
-    <input type="button" @click="local_saves_delete_selected" value="Delete save"></input>
-    <input type="button" @click="local_saves_load_selected" value="Load save"></input>
+    <input type="button" @click="local_saves_delete_selected" value="Delete save"/>
+    <input type="button" @click="local_saves_load_selected" value="Load save"/>
 
-    <input type="button" @click="local_saves_save_design" value="Save current design"></input>
-    <input type="button" @click="local_saves_load_from_local_storage" value="Refresh"></input>
+    <input type="button" @click="local_saves_save_design" value="Save current design"/>
+    <input type="button" @click="local_saves_load_from_local_storage" value="Refresh"/>
 
     <span
 	  ref="status_message"

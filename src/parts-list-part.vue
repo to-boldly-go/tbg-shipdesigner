@@ -2,7 +2,7 @@
   <tr class="part">
 	<PartsListCell
 	  v-for="field in selected_schema"
-	  v-bind:class="list_class(field)"
+	  :class="list_class(field)"
 	  :key="field.name"
 	  :part="part"
 	  :field="field">
@@ -37,7 +37,7 @@ export default {
 		list_class () {
 			return function (field) {
 				return {
-					['has-error']: (field.id === 'name') && (this.has_duplicate_name_error),
+					'has-error': (field.id === 'name') && (this.has_duplicate_name_error),
 				};
 			};
 		},
