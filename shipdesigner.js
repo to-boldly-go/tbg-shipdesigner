@@ -708,7 +708,11 @@ var DesignComponent = function () {
 							return false;
 						},
 						get: function get() {
-							return _this3.subsystem.component('Warp Core Type').quantity;
+							var warp_core_type = _this3.subsystem.component('Warp Core Type');
+							if (!warp_core_type || !warp_core_type.is_loaded) {
+								return 0;
+							}
+							return warp_core_type.quantity;
 						}
 					};
 					break;
@@ -890,22 +894,27 @@ var DesignComponent = function () {
 	}, {
 		key: 'power_generation',
 		get: function get() {
+			if (this.name === 'Warp Core Type') {
+				// CD79
+				// CD is effect
+				return this.effect;
+			}
+			var warp_core_type = this.subsystem.component('Warp Core Type');
+			if (!warp_core_type || !warp_core_type.is_loaded) {
+				return 0;
+			}
 			switch (this.name) {
-				case "Warp Core Type":
-					// CD79
-					// CD is effect
-					return this.effect;
 				case "M/AM Injectors":
 					// =1 + (CD81 / 100 * CO$79)
 					// CD is effect
 					// CD$79 is the effect for the "Warp Core Type" component
-					return 1 + this.effect * this.subsystem.component('Warp Core Type').effect / 100.0;
+					return 1 + this.effect * warp_core_type.effect / 100.0;
 				case "Coolant Systems":
 					// =1 + (CD82 / 100 * CO$79)
-					return 1 + this.effect * this.subsystem.component('Warp Core Type').effect / 100.0;
+					return 1 + this.effect * warp_core_type.effect / 100.0;
 				case "EPS Manifold System":
 					// =1 + (CD83 / 100 * CO$79)
-					return 1 + this.effect * this.subsystem.component('Warp Core Type').effect / 100.0;
+					return 1 + this.effect * warp_core_type.effect / 100.0;
 				default:
 					return 0;
 			};
@@ -1501,7 +1510,11 @@ var DesignSubsystem = function () {
 			// =-BK80 * POWER(2,(ABS(BK80)/2)) / 100 * CO$79
 			// BK80 is D80 is Safety/Performance slider value
 			// CD$79 is warp core effect
-			return -this.get_setting('Safety/Performance') * this.component('Warp Core Type').effect * Math.pow(2.0, Math.abs(this.get_setting('Safety/Performance')) / 2.0) / 100.0;
+			var warp_core_type = this.component('Warp Core Type');
+			if (!warp_core_type || !warp_core_type.is_loaded) {
+				return 0;
+			}
+			return -this.get_setting('Safety/Performance') * warp_core_type.effect * Math.pow(2.0, Math.abs(this.get_setting('Safety/Performance')) / 2.0) / 100.0;
 		}
 	}, {
 		key: 'cost_power',
