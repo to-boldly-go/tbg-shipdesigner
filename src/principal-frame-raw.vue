@@ -19,8 +19,8 @@
 	<td class="br-column">{{is_valid_frame ? se_design.cost_BR_raw.toFixed(2) : '?'}}</td>
 	<td class="sr-column">{{is_valid_frame ? se_design.cost_SR_raw.toFixed(2) : '?'}}</td>
 
-	<td class="power-cost-column">{{is_valid_frame ? se_design.cost_power_raw.toFixed(2) : '?'}}</td>
-	<td class="power-gen-column">{{is_valid_frame ? se_design.power_generation_raw.toFixed(2) : '?'}}</td>
+	<td class="power-cost-column" :title="power_final_title" :class="power_final_class">{{is_valid_frame ? se_design.cost_power_raw.toFixed(2) : '?'}}</td>
+	<td class="power-gen-column" :title="power_final_title" :class="power_final_class">{{is_valid_frame ? se_design.power_generation_raw.toFixed(2) : '?'}}</td>
 
 	<template v-for="name in crew_raw.names">
 	  <StatlineCell :key="name" :stats="crew_raw" :name="name"></StatlineCell>
@@ -51,6 +51,21 @@ export default {
 	computed: {
 		is_valid_frame () {
 			return !!this.se_design.princ_frame_def;
+		},
+		power_final_title () {
+			if (this.has_power_error) {
+				return 'Error: Power cost greater than power generation.';
+			} else {
+				return '';
+			};
+		},
+		power_final_class () {
+			return {
+				'has-error': this.has_power_error,
+			};
+		},
+		has_power_error () {
+			return !this.is_valid_frame || this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;
 		},
 		weight_summary_class () {
 			return {
