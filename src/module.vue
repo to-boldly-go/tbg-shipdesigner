@@ -1,5 +1,5 @@
 <template>
-  <tr class="module-tr" :class="{ hasloaderror: !isloaded }">
+  <tr class="module-tr" :class="{ hasloaderror: !is_loaded }">
 	<td class="name-column" colspan="2">Module</td>
 
 	<td class="part-column">
@@ -58,34 +58,34 @@ export default {
 	},
 	computed: {
 		build_time () {
-			return this.isloaded ? frac(this.se_module.build_time, 12) || '' : '';
+			return this.is_loaded ? frac(this.se_module.build_time, 12) || '' : '';
 		},
 		power_gen () {
-			return pretty(this.isloaded ? this.se_module.power_generation : 0);
+			return pretty(this.is_loaded ? this.se_module.power_generation : 0);
 		},
 		power_cost () {
-			return pretty(this.isloaded ? this.se_module.cost_power : 0);
+			return pretty(this.is_loaded ? this.se_module.cost_power : 0);
 		},
 		cost_sr () {
-			return pretty(this.isloaded ? this.se_module.cost_SR : 0);
+			return pretty(this.is_loaded ? this.se_module.cost_SR : 0);
 		},
 		cost_br () {
-			return pretty(this.isloaded ? this.se_module.cost_BR : 0);
+			return pretty(this.is_loaded ? this.se_module.cost_BR : 0);
 		},
 		weight_internal () {
-			return pretty(this.isloaded ? this.se_module.weight_internal : 0);
+			return pretty(this.is_loaded ? this.se_module.weight_internal : 0);
 		},
 		weight_external () {
-			return pretty(this.isloaded ? this.se_module.weight_external : 0);
+			return pretty(this.is_loaded ? this.se_module.weight_external : 0);
 		},
-		isloaded () {
-			return (!!this.se_module.module_def)
+		is_loaded () {
+			return this.se_module.is_loaded;
 		},
 		stats () {
-			return this.isloaded ? this.se_module.stats : new ShipEngine.Statline(0);
+			return this.is_loaded ? this.se_module.stats : new ShipEngine.Statline(0);
 		},
 		crew() {
-			return this.isloaded ? this.se_module.cost_crew : new ShipEngine.Crewline(0);
+			return this.is_loaded ? this.se_module.cost_crew : new ShipEngine.Crewline(0);
 		},
 
 		valid_types () {

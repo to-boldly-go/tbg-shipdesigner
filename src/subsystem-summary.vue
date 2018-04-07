@@ -52,7 +52,7 @@ export default {
 	},
 	computed: {
 		is_valid_frame () {
-			return !!this.se_subsystem.sub_frame_def;
+			return this.se_subsystem.is_valid_frame;
 		},
 		weight_summary_class () {
 			return {
