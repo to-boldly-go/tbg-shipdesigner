@@ -50,7 +50,7 @@ export default {
 	},
 	computed: {
 		is_valid_frame () {
-			return !!this.se_design.princ_frame_def;
+			return this.se_design.is_valid_frame;
 		},
 		power_final_title () {
 			if (this.has_power_error) {

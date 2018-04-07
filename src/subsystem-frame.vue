@@ -55,7 +55,7 @@ export default {
 	},
 	computed: {
 		is_valid_frame () {
-			return !!this.se_subsystem.sub_frame_def;
+			return this.se_subsystem.is_valid_frame;
 		},
 		valid_frames () {
 			return this.se_subsystem.valid_frames;

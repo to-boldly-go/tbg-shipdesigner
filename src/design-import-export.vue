@@ -28,7 +28,7 @@
     <input type="button" @click="local_saves_delete_selected" value="Delete save"/>
     <input type="button" @click="local_saves_load_selected" value="Load save"/>
 
-    <input type="button" @click="local_saves_save_design" value="Save current design"/>
+    <input type="button" @click="local_saves_save_design" :value="save_design_error ? save_design_error : 'Save current design'" :disabled="save_design_error !== null"/>
     <input type="button" @click="local_saves_load_from_local_storage" value="Refresh"/>
 
     <span
@@ -74,6 +74,15 @@ export default {
 		};
     },
     computed: {
+		save_design_error () {
+			if (!this.se_design.matches_parts_list(this.se_db)) {
+				return "Save disabled: unset parts list";
+			}
+			if (!this.se_design.is_loaded) {
+				return "Save disabled: Unknown parts/frames";
+			}
+			return null;
+		},
 		selected_parts_list_name: {
 			get () {
 				if (this.selected_parts_list) {
@@ -178,6 +187,13 @@ export default {
 			this.display_status_message("Blueprint loaded.");
 		},
 		local_saves_save_design () {
+			// If there's an error with the design, the save design button should be disabled,
+			// but if that's somehow bypassed, this check ensures an invalid design is not saved.
+			let error = this.save_design_error;
+			if (error) {
+				this.display_status_message(error);
+				return;
+			}
 			this.$store.commit('set_design_parts_list');
 			this.$store.commit('timestamp_design');
 			const new_save = new ShipEngine.Design(this.se_db, _.cloneDeep(this.$store.state.design_json));
