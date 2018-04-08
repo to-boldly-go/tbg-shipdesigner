@@ -9,7 +9,7 @@
         "vuex": "^3.0.1"
     },
     "scripts": {
-        "import-parts": "babel-node scripts/import-parts.js --parts dist/parts_C8.csv --frames dist/frames_C8.csv --modules dist/modules_C8.csv 'Starfleet Canon C8'",
+        "import-parts": "babel-node scripts/import-parts.js",
         "webpack": "webpack",
         "watch": "webpack --progress --watch",
         "start": "webpack-dev-server",

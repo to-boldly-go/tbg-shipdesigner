@@ -60,3 +60,5 @@ typings/
 # VS Code workspace folder
 .vscode
 
+dist/*.js.map
+dist/*.js
