@@ -235,46 +235,46 @@ exports.default = {
 			if (this.has_modules_errors) {
 				return this.modules_result.errors.map(function (er) {
 					if (er.row) {
-						return "Row " + er.row.toString() + ": " + er.message;
+						return 'Row ' + er.row.toString() + ': ' + er.message;
 					} else {
 						return er.message;
-					};
+					}
 				});
 			} else {
 				return [];
-			};
+			}
 		},
 		frames_error_messages: function frames_error_messages() {
 			if (this.has_frames_errors) {
 				return this.frames_result.errors.map(function (er) {
 					if (er.row) {
-						return "Row " + er.row.toString() + ": " + er.message;
+						return 'Row ' + er.row.toString() + ': ' + er.message;
 					} else {
 						return er.message;
-					};
+					}
 				});
 			} else {
 				return [];
-			};
+			}
 		},
 		parts_error_messages: function parts_error_messages() {
 			if (this.has_parts_errors) {
 				console.log(this.parts_result.errors);
 				return this.parts_result.errors.map(function (er) {
 					if (er.row) {
-						return "Row " + er.row.toString() + ": " + er.message;
+						return 'Row ' + er.row.toString() + ': ' + er.message;
 					} else {
 						return er.message;
-					};
+					}
 				});
 			} else {
 				return [];
-			};
+			}
 		},
 		name_error_messages: function name_error_messages() {
 			if (!this.name.length) {
-				return ["No name specified"];
-			};
+				return ['No name specified'];
+			}
 		},
 		can_import: function can_import() {
 			return !this.has_errors && this.name.length && this.parts_result.data && this.parts_result.data.length && this.frames_result.data && this.frames_result.data.length && this.modules_result.data && this.modules_result.data.length;
@@ -303,7 +303,7 @@ exports.default = {
 			reader.onload = function (event) {
 				if (reader.readyState === FileReader.DONE) {
 					this.parts_result = _papaparse2.default.parse(reader.result, csv_parse_config);
-				};
+				}
 			}.bind(this);
 			reader.readAsText(load_f);
 		},
@@ -314,7 +314,7 @@ exports.default = {
 			reader.onload = function (event) {
 				if (reader.readyState === FileReader.DONE) {
 					this.modules_result = _papaparse2.default.parse(reader.result, csv_parse_config);
-				};
+				}
 			}.bind(this);
 			reader.readAsText(load_f);
 		},
@@ -325,14 +325,14 @@ exports.default = {
 			reader.onload = function (event) {
 				if (reader.readyState === FileReader.DONE) {
 					this.frames_result = _papaparse2.default.parse(reader.result, csv_parse_config);
-				};
+				}
 			}.bind(this);
 			reader.readAsText(load_f);
 		},
 		import_parts_list: function import_parts_list() {
 			if (this.has_errors) {
 				return;
-			};
+			}
 
 			this.$store.commit('set_parts_list', {
 				name: this.name,
@@ -363,10 +363,10 @@ exports.default = {
 				local_parts_lists = [];
 			} else {
 				local_parts_lists = JSON.parse(loaded);
-			};
+			}
 			local_parts_lists.push(_lodash2.default.cloneDeep(this.$store.state.parts_list));
 			localStorage.setItem(LOCAL_PARTS_LISTS_KEY, JSON.stringify(local_parts_lists));
-			this.success = "Successfully saved parts list!";
+			this.success = 'Successfully saved parts list!';
 		}
 	}
 };
@@ -25181,7 +25181,7 @@ var render = function() {
           _c("ul", [
             _vm.has_name_errors
               ? _c("li", [
-                  _vm._v("Name:\n  \t\t  "),
+                  _vm._v("Name:\n\t\t\t\t"),
                   _c(
                     "ol",
                     _vm._l(_vm.name_error_messages, function(er, index) {
@@ -25193,7 +25193,7 @@ var render = function() {
             _vm._v(" "),
             _vm.has_parts_errors
               ? _c("li", [
-                  _vm._v("Parts file:\n  \t\t  "),
+                  _vm._v("Parts file:\n\t\t\t\t"),
                   _c(
                     "ol",
                     _vm._l(_vm.parts_error_messages, function(er, index) {
@@ -25205,7 +25205,7 @@ var render = function() {
             _vm._v(" "),
             _vm.has_frames_errors
               ? _c("li", [
-                  _vm._v("Frames file:\n  \t\t  "),
+                  _vm._v("Frames file:\n\t\t\t\t"),
                   _c(
                     "ol",
                     _vm._l(_vm.frames_error_messages, function(er, index) {
@@ -25217,7 +25217,7 @@ var render = function() {
             _vm._v(" "),
             _vm.has_modules_errors
               ? _c("li", [
-                  _vm._v("Modules file:\n  \t\t  "),
+                  _vm._v("Modules file:\n\t\t\t\t"),
                   _c(
                     "ol",
                     _vm._l(_vm.modules_error_messages, function(er, index) {

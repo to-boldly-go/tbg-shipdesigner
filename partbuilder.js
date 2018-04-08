@@ -96,10 +96,6 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-
-var _lodash2 = _interopRequireDefault(_lodash);
-
 var _partsListHeader = __webpack_require__(/*! ./parts-list-header.vue */ "./src/parts-list-header.vue");
 
 var _partsListHeader2 = _interopRequireDefault(_partsListHeader);
@@ -111,10 +107,6 @@ var _partsListFooter2 = _interopRequireDefault(_partsListFooter);
 var _partsListEditor = __webpack_require__(/*! ./parts-list-editor.vue */ "./src/parts-list-editor.vue");
 
 var _partsListEditor2 = _interopRequireDefault(_partsListEditor);
-
-var _canon_parts_list = __webpack_require__(/*! ../dist/canon_parts_list.json */ "./dist/canon_parts_list.json");
-
-var _canon_parts_list2 = _interopRequireDefault(_canon_parts_list);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -159,7 +151,7 @@ exports.default = {
 				this.data = JSON.parse(saved_parts);
 			} else if (this.data) {
 				localStorage.setItem(PARTS_KEY, JSON.stringify(this.data));
-			};
+			}
 		},
 		save_parts_to_storage: function save_parts_to_storage() {
 			if (this.data) {
@@ -254,31 +246,29 @@ exports.default = {
 			switch (style) {
 				case 'fixed':
 					return _ref = {}, _defineProperty(_ref, 'font-family', "'Roboto Mono', monospace"), _defineProperty(_ref, 'font-size', '12px'), _ref;
-					break;
 				case 'variable':
 				default:
 					return {};
-					break;
-			};
+			}
 		},
 		display_value: function display_value() {
 			switch (this.field.edit_type) {
 				case 'number':
-					// return this.part[this.field.name];
-					var v = this.part[this.field.name];
-					if (typeof v == 'number') {
-						var f = v.toFixed(this.field.fixed);
-						return f.replace(/(\..*?)(0+)$/, function (match, p1, p2) {
-							return p1 + ' '.repeat(p2.length);
-						}).replace(/\. ( *)/, ".0$1");
-					} else {
-						return v;
-					};
-					break;
+					{
+						// return this.part[this.field.name];
+						var v = this.part[this.field.name];
+						if (typeof v === 'number') {
+							var f = v.toFixed(this.field.fixed);
+							return f.replace(/(\..*?)(0+)$/, function (match, p1, p2) {
+								return p1 + ' '.repeat(p2.length);
+							}).replace(/\. ( *)/, '.0$1');
+						} else {
+							return v;
+						}
+					}
 				case 'string':
 					return this.part[this.field.name];
-					break;
-			};
+			}
 		},
 
 		value: {
@@ -286,11 +276,9 @@ exports.default = {
 				switch (this.field.edit_type) {
 					case 'number':
 						return this.value_number;
-						break;
 					case 'string':
 						return this.value_string;
-						break;
-				};
+				}
 			},
 			set: function set(value) {
 				switch (this.field.edit_type) {
@@ -300,7 +288,7 @@ exports.default = {
 					case 'string':
 						this.value_string = value;
 						break;
-				};
+				}
 			}
 		},
 		value_number: {
@@ -343,7 +331,7 @@ exports.default = {
 				case 'Escape':
 					this.abort_edit();
 					break;
-			};
+			}
 		},
 		abort_edit: function abort_edit() {
 			this.temp_value = this.value;
@@ -510,63 +498,89 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 //
 
 
+var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
 var _vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var LOCAL_PARTS_LISTS_KEY = 'parts_lists';
-var STATUS_DEFAULT_DURATION = 2000;
 
-var pl_comparison_slice = _.partial(_.pick, _, ['name', 'timestamp']);
+var pl_comparison_slice = _lodash2.default.partial(_lodash2.default.pick, _lodash2.default, ['name', 'timestamp']);
 
 function applyAnyMissingSchema(parts, canon_parts) {
-	for (var part_type in parts) {
-		var schema_list = parts[part_type].schema;
-		if (schema_list) {
-			var canon_schema_list = canon_parts[part_type].schema;
-			var schema_map = new Map(schema_list.map(function (schema) {
-				return [schema.name, schema];
-			}));
-			var canon_schema_map = new Map(canon_schema_list.map(function (schema) {
-				return [schema.name, schema];
-			}));
-			var _iteratorNormalCompletion = true;
-			var _didIteratorError = false;
-			var _iteratorError = undefined;
+	var _iteratorNormalCompletion = true;
+	var _didIteratorError = false;
+	var _iteratorError = undefined;
 
-			try {
-				for (var _iterator = canon_schema_map[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-					var _ref = _step.value;
+	try {
+		for (var _iterator = Object.keys(parts)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+			var part_type = _step.value;
 
-					var _ref2 = _slicedToArray(_ref, 2);
+			var schema_list = parts[part_type].schema;
+			if (schema_list) {
+				var canon_schema_list = canon_parts[part_type].schema;
+				var schema_map = new Map(schema_list.map(function (schema) {
+					return [schema.name, schema];
+				}));
+				var canon_schema_map = new Map(canon_schema_list.map(function (schema) {
+					return [schema.name, schema];
+				}));
+				var _iteratorNormalCompletion2 = true;
+				var _didIteratorError2 = false;
+				var _iteratorError2 = undefined;
 
-					var schema_name = _ref2[0];
-					var canon_schema = _ref2[1];
-
-					var schema = schema_map.get(schema_name);
-					if (schema) {
-						for (var prop in canon_schema) {
-							if (!schema.hasOwnProperty(prop)) {
-								schema[prop] = canon_schema[prop];
-							}
-						}
-					} else {
-						schema_list.push(Object.assign({}, canon_schema));
-					}
-				}
-			} catch (err) {
-				_didIteratorError = true;
-				_iteratorError = err;
-			} finally {
 				try {
-					if (!_iteratorNormalCompletion && _iterator.return) {
-						_iterator.return();
+					for (var _iterator2 = canon_schema_map[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+						var _ref = _step2.value;
+
+						var _ref2 = _slicedToArray(_ref, 2);
+
+						var schema_name = _ref2[0];
+						var canon_schema = _ref2[1];
+
+						var schema = schema_map.get(schema_name);
+						if (schema) {
+							for (var prop in canon_schema) {
+								if (!schema.hasOwnProperty(prop)) {
+									schema[prop] = canon_schema[prop];
+								}
+							}
+						} else {
+							schema_list.push(Object.assign({}, canon_schema));
+						}
 					}
+				} catch (err) {
+					_didIteratorError2 = true;
+					_iteratorError2 = err;
 				} finally {
-					if (_didIteratorError) {
-						throw _iteratorError;
+					try {
+						if (!_iteratorNormalCompletion2 && _iterator2.return) {
+							_iterator2.return();
+						}
+					} finally {
+						if (_didIteratorError2) {
+							throw _iteratorError2;
+						}
 					}
 				}
+			}
+		}
+	} catch (err) {
+		_didIteratorError = true;
+		_iteratorError = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion && _iterator.return) {
+				_iterator.return();
+			}
+		} finally {
+			if (_didIteratorError) {
+				throw _iteratorError;
 			}
 		}
 	}
@@ -577,7 +591,7 @@ exports.default = {
 	components: {},
 	data: function data() {
 		return {
-			status_message: "",
+			status_message: '',
 			status_message_timeout_id: null,
 
 			local_parts_lists: [],
@@ -600,12 +614,12 @@ exports.default = {
 					return this.parts_list_save_name(this.selected_parts_list);
 				} else {
 					return null;
-				};
+				}
 			},
 			set: function set(value) {
 				var _this = this;
 
-				this.selected_parts_list = _.chain(this.all_parts_lists).find(function (list) {
+				this.selected_parts_list = _lodash2.default.chain(this.all_parts_lists).find(function (list) {
 					return _this.parts_list_save_name(list) === value;
 				}).value();
 			}
@@ -619,7 +633,7 @@ exports.default = {
 		window.addEventListener('storage', function (ev) {
 			if (ev.key === LOCAL_PARTS_LISTS_KEY) {
 				this.parts_lists_load_from_local_storage();
-			};
+			}
 		}.bind(this));
 	},
 
@@ -637,35 +651,35 @@ exports.default = {
 			var loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);
 			if (loaded === null) {
 				this.local_parts_lists = [];
-				this.display_status_message("No parts lists to load");
+				this.display_status_message('No parts lists to load');
 			} else {
 				var local_parts_lists = JSON.parse(loaded);
 				local_parts_lists.forEach(function (local_parts) {
 					return applyAnyMissingSchema(local_parts, _this2.canon_parts_list);
 				});
 				this.local_parts_lists = local_parts_lists;
-				this.display_status_message("Parts lists loaded.");
-			};
+				this.display_status_message('Parts lists loaded');
+			}
 		},
 		parts_lists_load_selected: function parts_lists_load_selected() {
-			this.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list));
-			this.display_status_message("Parts list loaded");
+			this.$store.commit('set_parts_list', _lodash2.default.cloneDeep(this.selected_parts_list));
+			this.display_status_message('Parts list loaded');
 		},
 		parts_lists_delete_selected: function parts_lists_delete_selected() {
 			var _this3 = this;
 
 			// remove the selected item
-			this.local_parts_lists = _.chain(this.local_parts_lists).reject(function (pl) {
-				return _.isEqual(pl_comparison_slice(pl), pl_comparison_slice(_this3.selected_parts_list));
+			this.local_parts_lists = _lodash2.default.chain(this.local_parts_lists).reject(function (pl) {
+				return _lodash2.default.isEqual(pl_comparison_slice(pl), pl_comparison_slice(_this3.selected_parts_list));
 			}).value();
 			this.parts_lists_save_to_local_storage();
-			this.display_status_message("Parts list deleted.");
+			this.display_status_message('Parts list deleted');
 		},
 		parts_lists_save_current: function parts_lists_save_current() {
 			this.$store.commit('timestamp_parts_list');
-			this.local_parts_lists.push(_.cloneDeep(this.$store.state.parts_list));
+			this.local_parts_lists.push(_lodash2.default.cloneDeep(this.$store.state.parts_list));
 			this.parts_lists_save_to_local_storage();
-			this.display_status_message("Parts list saved.");
+			this.display_status_message('Parts list saved');
 		},
 		parts_lists_save_to_local_storage: function parts_lists_save_to_local_storage() {
 			localStorage.setItem(LOCAL_PARTS_LISTS_KEY, JSON.stringify(this.local_parts_lists));
@@ -686,12 +700,12 @@ exports.default = {
 				if (reader.readyState === FileReader.DONE) {
 					var local_parts = JSON.parse(reader.result);
 					applyAnyMissingSchema(local_parts, this.canon_parts_list);
-					this.$store.commit('set_parts_list', _.cloneDeep(local_parts));
-					this.local_parts_lists.push(_.cloneDeep(local_parts));
+					this.$store.commit('set_parts_list', _lodash2.default.cloneDeep(local_parts));
+					this.local_parts_lists.push(_lodash2.default.cloneDeep(local_parts));
 					this.parts_lists_save_to_local_storage();
 					this.selected_parts_list = this.parts_list_save_name(local_parts);
-					this.display_status_message("Parts list loaded from file.");
-				};
+					this.display_status_message('Parts list loaded from file');
+				}
 			}.bind(this);
 			reader.readAsText(load_f);
 		},
@@ -700,7 +714,7 @@ exports.default = {
 			this.$refs.status_message.className = 'parts-list-footer-status-message';
 			window.requestAnimationFrame(function (time) {
 				window.requestAnimationFrame(function (time) {
-					this.$refs.status_message.className = "parts-list-footer-status-message fade";
+					this.$refs.status_message.className = 'parts-list-footer-status-message fade';
 				}.bind(this));
 			}.bind(this));
 		},
@@ -785,30 +799,38 @@ exports.default = {
 			}).value();
 		},
 		tab_class_type: function tab_class_type() {
+			var _this = this;
+
 			return function (type) {
 				return {
-					'type-tab-selected': this.$store.state.display.filter.types.includes(type)
+					'type-tab-selected': _this.$store.state.display.filter.types.includes(type)
 				};
 			};
 		},
 		tab_class_select: function tab_class_select() {
+			var _this2 = this;
+
 			return function (select) {
 				return {
-					'select-tab-selected': this.$store.state.display.selected === select
+					'select-tab-selected': _this2.$store.state.display.selected === select
 				};
 			};
 		},
 		lamp_class_type: function lamp_class_type() {
+			var _this3 = this;
+
 			return function (type) {
 				return {
-					'indicator-lamp-selected': this.$store.state.display.filter.types.includes(type)
+					'indicator-lamp-selected': _this3.$store.state.display.filter.types.includes(type)
 				};
 			};
 		},
 		lamp_class_select: function lamp_class_select() {
+			var _this4 = this;
+
 			return function (select) {
 				return {
-					'indicator-lamp-selected': this.$store.state.display.selected === select
+					'indicator-lamp-selected': _this4.$store.state.display.selected === select
 				};
 			};
 		}
@@ -888,9 +910,11 @@ exports.default = {
 			return this.selected_parts.filter(comp).length > 1;
 		},
 		list_class: function list_class() {
+			var _this2 = this;
+
 			return function (field) {
 				return {
-					'has-error': field.id === 'name' && this.has_duplicate_name_error
+					'has-error': field.id === 'name' && _this2.has_duplicate_name_error
 				};
 			};
 		}
@@ -900,16 +924,16 @@ exports.default = {
 			this.$store.commit('delete_part', this.part['Name']);
 		},
 		copy_this_part: function copy_this_part() {
-			var _this2 = this;
+			var _this3 = this;
 
 			var idx = this.selected_parts.findIndex(function (part) {
-				return part['Name'] === _this2.part['Name'];
+				return part['Name'] === _this3.part['Name'];
 			});
 			if (idx >= 0) {
 				var clone = _lodash2.default.cloneDeep(this.part);
 				clone['Name'] += ' copy';
 				this.$store.commit('add_part', clone);
-			};
+			}
 		}
 	}
 };
@@ -6241,7 +6265,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\ninput[type=\"number\"][data-v-0ae701bb]::-webkit-outer-spin-button,\ninput[type=\"number\"][data-v-0ae701bb]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\ninput[type=\"number\"][data-v-0ae701bb] {\n    -moz-appearance: textfield;\n}\n.cell[data-v-0ae701bb] {\n\tborder: 1px solid #eee;\n\tcursor: cell;\n}\n.display-span[data-v-0ae701bb] {\n\twidth: 100%;\n\twhite-space: pre;\n}\n.edit-input[data-v-0ae701bb] {\n\tpadding: 0px;\n\tborder-width: 0;\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/parts-list-cell.vue"],"names":[],"mappings":";AA8KA;;IAEA,yBAAA;IACA,UAAA;CACA;AACA;IACA,2BAAA;CACA;AAEA;CACA,uBAAA;CACA,aAAA;CACA;AAEA;CACA,YAAA;CACA,iBAAA;CACA;AAEA;CACA,aAAA;CACA,gBAAA;CACA,YAAA;IACA,uBAAA;CACA","file":"parts-list-cell.vue","sourcesContent":["<template>\n  <td class=\"cell\"\n\t  @click=\"edit_cell\"\n\t  @focus=\"edit_cell\"\n\t  tabindex=\"0\"\n\t  :style=\"computed_style\">\n\n\t<span\n\t  class=\"display-span\"\n\t  v-show=\"!is_editing\">{{display_value}}</span>\n\t\n\t<input\n\t  v-if=\"is_editing\"\n\t  class=\"edit-input\"\n\t  ref=\"input\"\n\t  type=\"text\"\n\t  @blur=\"commit_edit\"\n\t  @keydown=\"on_keydown\"\n\t  v-focus\n\t  v-model=\"temp_value\"/>\n  </td>\n</template>\n\n<script>\n\nexport default {\n\tname: 'PartsListCell',\n\tcomponents: {\n\t},\n\tdirectives: {\n\t\tfocus: {\n\t\t\tinserted (el) {\n\t\t\t\tel.focus();\n\t\t\t},\n\t\t},\n\t},\n\tprops: {\n\t\tpart: {\n\t\t\ttype: Object,\n\t\t},\n\t\tfield: {\n\t\t\ttype: Object,\n\t\t},\n\t},\n\tdata () {\n\t\treturn {\n\t\t\tis_editing: false,\n\t\t\ttemp_value: null,\n\t\t};\n\t},\n\tcomputed: {\n\t\tcomputed_style () {\n\t\t\treturn Object.assign({\n\t\t\t\t'width': this.field.width.toString() + 'px',\n\t\t\t\t'text-align': this.field.align,\n\t\t\t}, this.computed_font);\n\t\t},\n\t\tcomputed_font () {\n\t\t\tvar style = this.field.style;\n\t\t\tif (!style && this.field.fixed) {\n\t\t\t\tstyle = 'fixed';\n\t\t\t}\n\t\t\tswitch (style) {\n\t\t\tcase 'fixed':\n\t\t\t\treturn {\n\t\t\t\t\t['font-family']: \"'Roboto Mono', monospace\",\n\t\t\t\t\t['font-size']: '12px',\n\t\t\t\t};\n\t\t\t\tbreak;\n\t\t\tcase 'variable':\n\t\t\tdefault:\n\t\t\t\treturn {};\n\t\t\t\tbreak;\n\t\t\t};\n\t\t},\n\t\tdisplay_value () {\n\t\t\tswitch (this.field.edit_type) {\n\t\t\tcase 'number':\n\t\t\t\t// return this.part[this.field.name];\n\t\t\t\tconst v = this.part[this.field.name];\n\t\t\t\tif (typeof(v) == 'number') {\n\t\t\t\t\tconst f = v.toFixed(this.field.fixed);\n\t\t\t\t\treturn f.replace(/(\\..*?)(0+)$/, (match, p1, p2) => p1 + ' '.repeat(p2.length)).replace(/\\. ( *)/, \".0$1\");\n\t\t\t\t} else {\n\t\t\t\t\treturn v;\n\t\t\t\t};\n\t\t\t\tbreak;\n\t\t\tcase 'string':\n\t\t\t\treturn this.part[this.field.name];\n\t\t\t\tbreak;\n\t\t\t};\n\t\t},\n\t\tvalue: {\n\t\t\tget () {\n\t\t\t\tswitch (this.field.edit_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\treturn this.value_number;\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'string':\n\t\t\t\t\treturn this.value_string;\n\t\t\t\t\tbreak;\n\t\t\t\t};\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tswitch (this.field.edit_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\tthis.value_number = value;\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'string':\n\t\t\t\t\tthis.value_string = value;\n\t\t\t\t\tbreak;\n\t\t\t\t};\n\t\t\t},\n\t\t},\n\t\tvalue_number: {\n\t\t\tget () {\n\t\t\t\treturn Number(this.part[this.field.name]);\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tlet new_value = Number(typeof (value) === 'string' ? value.trim() : 0);\n\t\t\t\tif (this.value_number !== new_value) {\n\t\t\t\t\tthis.$store.commit('edit_part', {\n\t\t\t\t\t\tpart: this.part,\n\t\t\t\t\t\tfield: this.field.name,\n\t\t\t\t\t\tvalue: new_value,\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t},\n\t\t},\n\t\tvalue_string: {\n\t\t\tget () {\n\t\t\t\treturn this.part[this.field.name];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tif (this.value_string !== value) {\n\t\t\t\t\tthis.$store.commit('edit_part', {\n\t\t\t\t\t\tpart: this.part,\n\t\t\t\t\t\tfield: this.field.name,\n\t\t\t\t\t\tvalue: value,\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\ton_keydown(ev) {\n\t\t\tswitch (ev.key){\n\t\t\tcase 'Enter':\n\t\t\t\t// leave focus and let the app save changes\n\t\t\t\tthis.commit_edit();\n\t\t\t\tbreak;\n\t\t\tcase 'Escape':\n\t\t\t\tthis.abort_edit();\n\t\t\t\tbreak;\n\t\t\t};\n\t\t},\n\t\tabort_edit () {\n\t\t\tthis.temp_value = this.value;\n\t\t\tthis.is_editing = false;\n\t\t},\n\t\tedit_cell (ev) {\n\t\t\tthis.is_editing = true;\n\t\t\tthis.temp_value = this.value;\n\t\t},\n\t\tcommit_edit (ev) {\n\t\t\tthis.is_editing = false;\n\t\t\tthis.value = this.temp_value;\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\ninput[type=\"number\"]::-webkit-outer-spin-button,\ninput[type=\"number\"]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\ninput[type=\"number\"] {\n    -moz-appearance: textfield;\n}\n\n.cell {\n\tborder: 1px solid #eee;\n\tcursor: cell;\n}\n\n.display-span {\n\twidth: 100%;\n\twhite-space: pre;\n}\n\n.edit-input {\n\tpadding: 0px;\n\tborder-width: 0;\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\ninput[type=\"number\"][data-v-0ae701bb]::-webkit-outer-spin-button,\ninput[type=\"number\"][data-v-0ae701bb]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\ninput[type=\"number\"][data-v-0ae701bb] {\n    -moz-appearance: textfield;\n}\n.cell[data-v-0ae701bb] {\n\tborder: 1px solid #eee;\n\tcursor: cell;\n}\n.display-span[data-v-0ae701bb] {\n\twidth: 100%;\n\twhite-space: pre;\n}\n.edit-input[data-v-0ae701bb] {\n\tpadding: 0px;\n\tborder-width: 0;\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/parts-list-cell.vue"],"names":[],"mappings":";AAyKA;;IAEA,yBAAA;IACA,UAAA;CACA;AACA;IACA,2BAAA;CACA;AAEA;CACA,uBAAA;CACA,aAAA;CACA;AAEA;CACA,YAAA;CACA,iBAAA;CACA;AAEA;CACA,aAAA;CACA,gBAAA;CACA,YAAA;IACA,uBAAA;CACA","file":"parts-list-cell.vue","sourcesContent":["<template>\n\t<td class=\"cell\"\n\t\t@click=\"edit_cell\"\n\t\t@focus=\"edit_cell\"\n\t\ttabindex=\"0\"\n\t\t:style=\"computed_style\">\n\n\t\t<span\n\t\t\tclass=\"display-span\"\n\t\t\tv-show=\"!is_editing\">{{display_value}}</span>\n\t\t\n\t\t<input\n\t\t\tv-if=\"is_editing\"\n\t\t\tclass=\"edit-input\"\n\t\t\tref=\"input\"\n\t\t\ttype=\"text\"\n\t\t\t@blur=\"commit_edit\"\n\t\t\t@keydown=\"on_keydown\"\n\t\t\tv-focus\n\t\t\tv-model=\"temp_value\"/>\n\t</td>\n</template>\n\n<script>\n\nexport default {\n\tname: 'PartsListCell',\n\tcomponents: {\n\t},\n\tdirectives: {\n\t\tfocus: {\n\t\t\tinserted(el) {\n\t\t\t\tel.focus();\n\t\t\t},\n\t\t},\n\t},\n\tprops: {\n\t\tpart: {\n\t\t\ttype: Object,\n\t\t},\n\t\tfield: {\n\t\t\ttype: Object,\n\t\t},\n\t},\n\tdata() {\n\t\treturn {\n\t\t\tis_editing: false,\n\t\t\ttemp_value: null,\n\t\t};\n\t},\n\tcomputed: {\n\t\tcomputed_style() {\n\t\t\treturn Object.assign({\n\t\t\t\t'width': this.field.width.toString() + 'px',\n\t\t\t\t'text-align': this.field.align,\n\t\t\t}, this.computed_font);\n\t\t},\n\t\tcomputed_font() {\n\t\t\tlet style = this.field.style;\n\t\t\tif (!style && this.field.fixed) {\n\t\t\t\tstyle = 'fixed';\n\t\t\t}\n\t\t\tswitch (style) {\n\t\t\tcase 'fixed':\n\t\t\t\treturn {\n\t\t\t\t\t['font-family']: \"'Roboto Mono', monospace\",\n\t\t\t\t\t['font-size']: '12px',\n\t\t\t\t};\n\t\t\tcase 'variable':\n\t\t\tdefault:\n\t\t\t\treturn {};\n\t\t\t}\n\t\t},\n\t\tdisplay_value() {\n\t\t\tswitch (this.field.edit_type) {\n\t\t\tcase 'number': {\n\t\t\t\t// return this.part[this.field.name];\n\t\t\t\tconst v = this.part[this.field.name];\n\t\t\t\tif (typeof(v) === 'number') {\n\t\t\t\t\tconst f = v.toFixed(this.field.fixed);\n\t\t\t\t\treturn f.replace(/(\\..*?)(0+)$/, (match, p1, p2) => p1 + ' '.repeat(p2.length)).replace(/\\. ( *)/, '.0$1');\n\t\t\t\t} else {\n\t\t\t\t\treturn v;\n\t\t\t\t}\n\t\t\t}\n\t\t\tcase 'string':\n\t\t\t\treturn this.part[this.field.name];\n\t\t\t}\n\t\t},\n\t\tvalue: {\n\t\t\tget() {\n\t\t\t\tswitch (this.field.edit_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\treturn this.value_number;\n\t\t\t\tcase 'string':\n\t\t\t\t\treturn this.value_string;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tswitch (this.field.edit_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\tthis.value_number = value;\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'string':\n\t\t\t\t\tthis.value_string = value;\n\t\t\t\t\tbreak;\n\t\t\t\t}\n\t\t\t},\n\t\t},\n\t\tvalue_number: {\n\t\t\tget() {\n\t\t\t\treturn Number(this.part[this.field.name]);\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tlet new_value = Number(typeof (value) === 'string' ? value.trim() : 0);\n\t\t\t\tif (this.value_number !== new_value) {\n\t\t\t\t\tthis.$store.commit('edit_part', {\n\t\t\t\t\t\tpart: this.part,\n\t\t\t\t\t\tfield: this.field.name,\n\t\t\t\t\t\tvalue: new_value,\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t},\n\t\t},\n\t\tvalue_string: {\n\t\t\tget() {\n\t\t\t\treturn this.part[this.field.name];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tif (this.value_string !== value) {\n\t\t\t\t\tthis.$store.commit('edit_part', {\n\t\t\t\t\t\tpart: this.part,\n\t\t\t\t\t\tfield: this.field.name,\n\t\t\t\t\t\tvalue: value,\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\ton_keydown(ev) {\n\t\t\tswitch (ev.key) {\n\t\t\tcase 'Enter':\n\t\t\t\t// leave focus and let the app save changes\n\t\t\t\tthis.commit_edit();\n\t\t\t\tbreak;\n\t\t\tcase 'Escape':\n\t\t\t\tthis.abort_edit();\n\t\t\t\tbreak;\n\t\t\t}\n\t\t},\n\t\tabort_edit() {\n\t\t\tthis.temp_value = this.value;\n\t\t\tthis.is_editing = false;\n\t\t},\n\t\tedit_cell(ev) {\n\t\t\tthis.is_editing = true;\n\t\t\tthis.temp_value = this.value;\n\t\t},\n\t\tcommit_edit(ev) {\n\t\t\tthis.is_editing = false;\n\t\t\tthis.value = this.temp_value;\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\ninput[type=\"number\"]::-webkit-outer-spin-button,\ninput[type=\"number\"]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\ninput[type=\"number\"] {\n    -moz-appearance: textfield;\n}\n\n.cell {\n\tborder: 1px solid #eee;\n\tcursor: cell;\n}\n\n.display-span {\n\twidth: 100%;\n\twhite-space: pre;\n}\n\n.edit-input {\n\tpadding: 0px;\n\tborder-width: 0;\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -6260,7 +6284,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.header[data-v-1b7fbdb4] {\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n}\n.select-tab-column[data-v-1b7fbdb4] {\n\tflex: 0 0 auto;\n\tdisplay: flex;\n\tflex-direction: column;\n}\n.select-tab[data-v-1b7fbdb4] {\n\tcursor: pointer;\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #33a;\n\tcolor: #fff;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n.select-tab[data-v-1b7fbdb4]:active {\n\tbackground: #66e;\n\tborder-style: inset;\n}\n.select-tab-selected[data-v-1b7fbdb4] {\n\tborder: 1px solid #eee;\n\tbackground: #44c;\n}\n.select-tab-text[data-v-1b7fbdb4] {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n.spacer-tab[data-v-1b7fbdb4] {\n\tflex: 0 0 30px;\n\tpadding: 4px;\n\tborder: 1 px outset #eee;\n\tbackground: #666;\n}\n.type-tab-column[data-v-1b7fbdb4] {\n\tflex: 1 0 0;\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n\talign-items: flex-start;\n}\n.type-tab[data-v-1b7fbdb4] {\n\tcursor: pointer;\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #666;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n.type-tab[data-v-1b7fbdb4]:active {\n\tbackground: #aaa;\n\tborder-style: inset;\n}\n.type-tab-selected[data-v-1b7fbdb4] {\n\tborder: 1px solid #eee;\n\tbackground: #999;\n}\n.type-tab-text[data-v-1b7fbdb4] {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n.indicator-lamp-wrapper[data-v-1b7fbdb4] {\n\tdisplay: flex;\n\tflex-direction: column;\n\n\theight: 100%;\n\n\tfloat: right;\n\tmargin-left: 4px;\n\tmargin-top: 0px;\n\tmargin-bottom: 0px;\n\tmargin-right: 0px;\n\t\n\twidth: 10px;\n}\n.indicator-lamp-spacer[data-v-1b7fbdb4] {\n\tflex: 1 0 0;\n}\n.indicator-lamp[data-v-1b7fbdb4] {\n\t/* width: 10px; */\n\tflex: 0 0 10px;\n\tbackground: black;\n}\n.indicator-lamp-selected[data-v-1b7fbdb4] {\n\tbackground: #2f2;\n}\n\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/parts-list-header.vue"],"names":[],"mappings":";AA+FA;CACA,cAAA;CACA,oBAAA;CACA,gBAAA;CACA,4BAAA;CACA;AAEA;CACA,eAAA;CACA,cAAA;CACA,uBAAA;CACA;AAEA;CACA,gBAAA;CACA,eAAA;CACA,aAAA;CACA,wBAAA;CACA,iBAAA;CACA,YAAA;;CAEA,oBAAA;CACA,0BAAA;CACA,kCAAA;CACA,wBAAA;CACA;AAEA;CACA,iBAAA;CACA,oBAAA;CACA;AAEA;CACA,uBAAA;CACA,iBAAA;CACA;AAEA;CACA,qBAAA;CACA,YAAA;CACA;AAEA;CACA,eAAA;CACA,aAAA;CACA,yBAAA;CACA,iBAAA;CACA;AAEA;CACA,YAAA;CACA,cAAA;CACA,oBAAA;CACA,gBAAA;CACA,4BAAA;CACA,wBAAA;CACA;AAEA;CACA,gBAAA;CACA,eAAA;CACA,aAAA;CACA,wBAAA;CACA,iBAAA;;CAEA,oBAAA;CACA,0BAAA;CACA,kCAAA;CACA,wBAAA;CACA;AAEA;CACA,iBAAA;CACA,oBAAA;CACA;AAEA;CACA,uBAAA;CACA,iBAAA;CACA;AAEA;CACA,qBAAA;CACA,YAAA;CACA;AAEA;CACA,cAAA;CACA,uBAAA;;CAEA,aAAA;;CAEA,aAAA;CACA,iBAAA;CACA,gBAAA;CACA,mBAAA;CACA,kBAAA;;CAEA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,kBAAA;CACA,eAAA;CACA,kBAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"parts-list-header.vue","sourcesContent":["<template>\n  <div class=\"header\">\n\t<div class=\"select-tab-column\">\n\t  <div class=\"select-tab\"\n\t\t   v-for=\"select in ['parts','modules','frames']\"\n\t\t   :key=\"select\"\n\t\t   @click=\"set_selection(select)\"\n\t\t   :class=\"tab_class_select(select)\">\n\t\t<div class=\"select-tab-text\">{{select}}</div>\n\t\t<div class=\"indicator-lamp-wrapper\">\n\t\t  <div class=\"indicator-lamp-spacer\"></div>\n\t\t  <div class=\"indicator-lamp\" :class=\"lamp_class_select(select)\"></div>\n\t\t  <div class=\"indicator-lamp-spacer\"></div>\n\t\t</div>\n\t  </div>\n\t</div>\n\n\t<div class=\"type-tab-column\">\n\t  <div class=\"type-tab\"\n\t\t   v-for=\"type in types\"\n\t\t   :key=\"type\"\n\t\t   @click=\"set_filter(type)\"\n\t\t   :class=\"tab_class_type(type)\">\n\t\t<div class=\"type-tab-text\">{{type}}</div>\n\t\t<div class=\"indicator-lamp-wrapper\">\n\t\t  <div class=\"indicator-lamp-spacer\"></div>\n\t\t  <div class=\"indicator-lamp\" :class=\"lamp_class_type(type)\"></div>\n\t\t  <div class=\"indicator-lamp-spacer\"></div>\n\t\t</div>\n\t  </div>\n\t</div>\n  </div>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nexport default {\n\tname: 'PartsListHeader',\n\tcomputed: {\n\t\ttypes () {\n\t\t\tlet type_sort_map = _.chain(this.$store.getters.selected_parts)\n\t\t\t\t.map((part) => { return { [part['Type']]: part['Type Sort'] }; })\n\t\t\t\t.reduce(_.assign, {})\n\t\t\t\t.value();\n\t\t\t\n\t\t\treturn _.chain(type_sort_map)\n\t\t\t\t.map((tsort, type) => { return { 'Type': type, 'Type Sort': tsort }; })\n\t\t\t\t.sortBy((elem) => elem['Type Sort'])\n\t\t\t\t.map((elem) => elem['Type'])\n\t\t\t\t.value();\n\t\t},\n\t\ttab_class_type () {\n\t\t\treturn function (type) {\n\t\t\t\treturn {\n\t\t\t\t\t'type-tab-selected': this.$store.state.display.filter.types.includes(type),\n\t\t\t\t};\n\t\t\t};\n\t\t},\n\t\ttab_class_select () {\n\t\t\treturn function (select) {\n\t\t\t\treturn {\n\t\t\t\t\t'select-tab-selected': this.$store.state.display.selected === select,\n\t\t\t\t};\n\t\t\t};\n\t\t},\n\t\tlamp_class_type () {\n\t\t\treturn function (type) {\n\t\t\t\treturn {\n\t\t\t\t\t'indicator-lamp-selected': this.$store.state.display.filter.types.includes(type),\n\t\t\t\t};\n\t\t\t};\n\t\t},\n\t\tlamp_class_select () {\n\t\t\treturn function (select) {\n\t\t\t\treturn {\n\t\t\t\t\t'indicator-lamp-selected': this.$store.state.display.selected === select,\n\t\t\t\t};\n\t\t\t};\n\t\t},\n\t},\n\tmethods: {\n\t\tset_selection(select) {\n\t\t\tthis.$store.state.display.selected = select;\n\t\t},\n\t\tset_filter(type) {\n\t\t\tthis.$store.commit('toggle_filter', type);\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.header {\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n}\n\n.select-tab-column {\n\tflex: 0 0 auto;\n\tdisplay: flex;\n\tflex-direction: column;\n}\n\n.select-tab {\n\tcursor: pointer;\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #33a;\n\tcolor: #fff;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n\n.select-tab:active {\n\tbackground: #66e;\n\tborder-style: inset;\n}\n\n.select-tab-selected {\n\tborder: 1px solid #eee;\n\tbackground: #44c;\n}\n\n.select-tab-text {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n\n.spacer-tab {\n\tflex: 0 0 30px;\n\tpadding: 4px;\n\tborder: 1 px outset #eee;\n\tbackground: #666;\n}\n\n.type-tab-column {\n\tflex: 1 0 0;\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n\talign-items: flex-start;\n}\n\n.type-tab {\n\tcursor: pointer;\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #666;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n\n.type-tab:active {\n\tbackground: #aaa;\n\tborder-style: inset;\n}\n\n.type-tab-selected {\n\tborder: 1px solid #eee;\n\tbackground: #999;\n}\n\n.type-tab-text {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n\n.indicator-lamp-wrapper {\n\tdisplay: flex;\n\tflex-direction: column;\n\n\theight: 100%;\n\n\tfloat: right;\n\tmargin-left: 4px;\n\tmargin-top: 0px;\n\tmargin-bottom: 0px;\n\tmargin-right: 0px;\n\t\n\twidth: 10px;\n}\n\n.indicator-lamp-spacer {\n\tflex: 1 0 0;\n}\n\n.indicator-lamp {\n\t/* width: 10px; */\n\tflex: 0 0 10px;\n\tbackground: black;\n}\n\n.indicator-lamp-selected {\n\tbackground: #2f2;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.header[data-v-1b7fbdb4] {\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n}\n.select-tab-column[data-v-1b7fbdb4] {\n\tflex: 0 0 auto;\n\tdisplay: flex;\n\tflex-direction: column;\n}\n.select-tab[data-v-1b7fbdb4] {\n\tcursor: pointer;\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #33a;\n\tcolor: #fff;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n.select-tab[data-v-1b7fbdb4]:active {\n\tbackground: #66e;\n\tborder-style: inset;\n}\n.select-tab-selected[data-v-1b7fbdb4] {\n\tborder: 1px solid #eee;\n\tbackground: #44c;\n}\n.select-tab-text[data-v-1b7fbdb4] {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n.spacer-tab[data-v-1b7fbdb4] {\n\tflex: 0 0 30px;\n\tpadding: 4px;\n\tborder: 1 px outset #eee;\n\tbackground: #666;\n}\n.type-tab-column[data-v-1b7fbdb4] {\n\tflex: 1 0 0;\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n\talign-items: flex-start;\n}\n.type-tab[data-v-1b7fbdb4] {\n\tcursor: pointer;\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #666;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n.type-tab[data-v-1b7fbdb4]:active {\n\tbackground: #aaa;\n\tborder-style: inset;\n}\n.type-tab-selected[data-v-1b7fbdb4] {\n\tborder: 1px solid #eee;\n\tbackground: #999;\n}\n.type-tab-text[data-v-1b7fbdb4] {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n.indicator-lamp-wrapper[data-v-1b7fbdb4] {\n\tdisplay: flex;\n\tflex-direction: column;\n\n\theight: 100%;\n\n\tfloat: right;\n\tmargin-left: 4px;\n\tmargin-top: 0px;\n\tmargin-bottom: 0px;\n\tmargin-right: 0px;\n\t\n\twidth: 10px;\n}\n.indicator-lamp-spacer[data-v-1b7fbdb4] {\n\tflex: 1 0 0;\n}\n.indicator-lamp[data-v-1b7fbdb4] {\n\t/* width: 10px; */\n\tflex: 0 0 10px;\n\tbackground: black;\n}\n.indicator-lamp-selected[data-v-1b7fbdb4] {\n\tbackground: #2f2;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/parts-list-header.vue"],"names":[],"mappings":";AAuFA;CACA,cAAA;CACA,oBAAA;CACA,gBAAA;CACA,4BAAA;CACA;AAEA;CACA,eAAA;CACA,cAAA;CACA,uBAAA;CACA;AAEA;CACA,gBAAA;CACA,eAAA;CACA,aAAA;CACA,wBAAA;CACA,iBAAA;CACA,YAAA;;CAEA,oBAAA;CACA,0BAAA;CACA,kCAAA;CACA,wBAAA;CACA;AAEA;CACA,iBAAA;CACA,oBAAA;CACA;AAEA;CACA,uBAAA;CACA,iBAAA;CACA;AAEA;CACA,qBAAA;CACA,YAAA;CACA;AAEA;CACA,eAAA;CACA,aAAA;CACA,yBAAA;CACA,iBAAA;CACA;AAEA;CACA,YAAA;CACA,cAAA;CACA,oBAAA;CACA,gBAAA;CACA,4BAAA;CACA,wBAAA;CACA;AAEA;CACA,gBAAA;CACA,eAAA;CACA,aAAA;CACA,wBAAA;CACA,iBAAA;;CAEA,oBAAA;CACA,0BAAA;CACA,kCAAA;CACA,wBAAA;CACA;AAEA;CACA,iBAAA;CACA,oBAAA;CACA;AAEA;CACA,uBAAA;CACA,iBAAA;CACA;AAEA;CACA,qBAAA;CACA,YAAA;CACA;AAEA;CACA,cAAA;CACA,uBAAA;;CAEA,aAAA;;CAEA,aAAA;CACA,iBAAA;CACA,gBAAA;CACA,mBAAA;CACA,kBAAA;;CAEA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,kBAAA;CACA,eAAA;CACA,kBAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"parts-list-header.vue","sourcesContent":["<template>\n\t<div class=\"header\">\n\t\t<div class=\"select-tab-column\">\n\t\t\t<div class=\"select-tab\"\n\t\t\t\tv-for=\"select in ['parts','modules','frames']\"\n\t\t\t\t:key=\"select\"\n\t\t\t\t@click=\"set_selection(select)\"\n\t\t\t\t:class=\"tab_class_select(select)\">\n\t\t\t\t<div class=\"select-tab-text\">{{select}}</div>\n\t\t\t\t<div class=\"indicator-lamp-wrapper\">\n\t\t\t\t\t<div class=\"indicator-lamp-spacer\"></div>\n\t\t\t\t\t<div class=\"indicator-lamp\" :class=\"lamp_class_select(select)\"></div>\n\t\t\t\t\t<div class=\"indicator-lamp-spacer\"></div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"type-tab-column\">\n\t\t\t<div class=\"type-tab\"\n\t\t\t\tv-for=\"type in types\"\n\t\t\t\t:key=\"type\"\n\t\t\t\t@click=\"set_filter(type)\"\n\t\t\t\t:class=\"tab_class_type(type)\">\n\t\t\t\t<div class=\"type-tab-text\">{{type}}</div>\n\t\t\t\t<div class=\"indicator-lamp-wrapper\">\n\t\t\t\t\t<div class=\"indicator-lamp-spacer\"></div>\n\t\t\t\t\t<div class=\"indicator-lamp\" :class=\"lamp_class_type(type)\"></div>\n\t\t\t\t\t<div class=\"indicator-lamp-spacer\"></div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nexport default {\n\tname: 'PartsListHeader',\n\tcomputed: {\n\t\ttypes() {\n\t\t\tlet type_sort_map = _.chain(this.$store.getters.selected_parts)\n\t\t\t\t.map((part) => { return { [part['Type']]: part['Type Sort'] }; })\n\t\t\t\t.reduce(_.assign, {})\n\t\t\t\t.value();\n\t\t\t\n\t\t\treturn _.chain(type_sort_map)\n\t\t\t\t.map((tsort, type) => { return { 'Type': type, 'Type Sort': tsort }; })\n\t\t\t\t.sortBy((elem) => elem['Type Sort'])\n\t\t\t\t.map((elem) => elem['Type'])\n\t\t\t\t.value();\n\t\t},\n\t\ttab_class_type() {\n\t\t\treturn (type) => ({\n\t\t\t\t'type-tab-selected': this.$store.state.display.filter.types.includes(type),\n\t\t\t});\n\t\t},\n\t\ttab_class_select() {\n\t\t\treturn (select) => ({\n\t\t\t\t'select-tab-selected': this.$store.state.display.selected === select,\n\t\t\t});\n\t\t},\n\t\tlamp_class_type() {\n\t\t\treturn (type) => ({\n\t\t\t\t'indicator-lamp-selected': this.$store.state.display.filter.types.includes(type),\n\t\t\t});\n\t\t},\n\t\tlamp_class_select() {\n\t\t\treturn (select) => ({\n\t\t\t\t'indicator-lamp-selected': this.$store.state.display.selected === select,\n\t\t\t});\n\t\t},\n\t},\n\tmethods: {\n\t\tset_selection(select) {\n\t\t\tthis.$store.state.display.selected = select;\n\t\t},\n\t\tset_filter(type) {\n\t\t\tthis.$store.commit('toggle_filter', type);\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.header {\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n}\n\n.select-tab-column {\n\tflex: 0 0 auto;\n\tdisplay: flex;\n\tflex-direction: column;\n}\n\n.select-tab {\n\tcursor: pointer;\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #33a;\n\tcolor: #fff;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n\n.select-tab:active {\n\tbackground: #66e;\n\tborder-style: inset;\n}\n\n.select-tab-selected {\n\tborder: 1px solid #eee;\n\tbackground: #44c;\n}\n\n.select-tab-text {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n\n.spacer-tab {\n\tflex: 0 0 30px;\n\tpadding: 4px;\n\tborder: 1 px outset #eee;\n\tbackground: #666;\n}\n\n.type-tab-column {\n\tflex: 1 0 0;\n\tdisplay: flex;\n\tflex-direction: row;\n\tflex-wrap: wrap;\n\tjustify-content: flex-start;\n\talign-items: flex-start;\n}\n\n.type-tab {\n\tcursor: pointer;\n\tflex: 0 0 auto;\n\tpadding: 4px;\n\tborder: 1px outset #eee;\n\tbackground: #666;\n\n\t/* display: flex; */\n\t/* flex-direction: row; */\n\t/* justify-content: flex-start; */\n\t/* flex-wrap: nowrap; */\n}\n\n.type-tab:active {\n\tbackground: #aaa;\n\tborder-style: inset;\n}\n\n.type-tab-selected {\n\tborder: 1px solid #eee;\n\tbackground: #999;\n}\n\n.type-tab-text {\n\t/* flex: 5 0 auto; */\n\tfloat: left;\n}\n\n.indicator-lamp-wrapper {\n\tdisplay: flex;\n\tflex-direction: column;\n\n\theight: 100%;\n\n\tfloat: right;\n\tmargin-left: 4px;\n\tmargin-top: 0px;\n\tmargin-bottom: 0px;\n\tmargin-right: 0px;\n\t\n\twidth: 10px;\n}\n\n.indicator-lamp-spacer {\n\tflex: 1 0 0;\n}\n\n.indicator-lamp {\n\t/* width: 10px; */\n\tflex: 0 0 10px;\n\tbackground: black;\n}\n\n.indicator-lamp-selected {\n\tbackground: #2f2;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -6279,7 +6303,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.editor[data-v-1f9cf006] {\n\t/* width: 1500px; */\n\ttable-layout: fixed;\n\tborder-collapse: collapse;\n}\n.column-header[data-v-1f9cf006] {\n\tcursor: pointer;\n\tborder: 1px solid #eee;\n}\n.delete-column[data-v-1f9cf006] {\n\twidth: 30px;\n}\n.new-part-button[data-v-1f9cf006] {\n\tmargin: 5px;\n}\n\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/parts-list-editor.vue"],"names":[],"mappings":";AA0EA;CACA,oBAAA;CACA,oBAAA;CACA,0BAAA;CACA;AAEA;CACA,gBAAA;CACA,uBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA","file":"parts-list-editor.vue","sourcesContent":["<template>\n  <div width=\"100%\" height=\"100%\">\n  <table class=\"editor\">\n\t<thead>\n\t  <th v-for=\"field in selected_schema\"\n\t\t  :key=\"field.name\"\n\t\t  @click=\"sort_list(field.name)\"\n\t\t  class=\"column-header\"\n\t\t  :style=\"header_style(field)\">{{field.name}}</th>\n\t  <th class=\"column-header delete-column\"></th>\n\t</thead>\n\t<tbody>\n\t  <PartsListPart v-for=\"part in displayed_parts\" :key=\"part.name\" :part=\"part\"></PartsListPart>\n\t</tbody>\n  </table>\n  <input type=\"button\" value=\"Add new part\" @click=\"add_new_part\" class=\"new-part-button\">\n  </div>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport PartsListPart from './parts-list-part.vue';\n\nexport default {\n\tname: 'PartsListEditor',\n\tcomponents: {\n\t\tPartsListPart,\n\t},\n\tdata () {\n\t\treturn {\n\t\t};\n\t},\n\tcomputed: {\n\t\tdisplayed_parts () {\n\t\t\treturn _(this.selected_parts)\n\t\t\t\t.filter((part) => this.$store.state.display.filter.types.includes(part['Type'])).value();\n\t\t},\n\t\theader_style () {\n\t\t\treturn function (field) {\n\t\t\t\treturn {\n\t\t\t\t\twidth: field.width.toString() + 'px',\n\t\t\t\t};\n\t\t\t};\n\t\t},\n\t\t...mapGetters([\n\t\t\t'selected_schema',\n\t\t\t'selected_parts',\n\t\t]),\n\t},\n\tmethods: {\n\t\tadd_new_part () {\n\t\t\tlet new_part = _.chain(this.fields)\n\t\t\t\t.map((field) => [field.name, null])\n\t\t\t\t.fromPairs()\n\t\t\t\t.value();\n\n\t\t\tconst last_part = this.displayed_parts[this.displayed_parts.length - 1];\n\t\t\tnew_part['Type'] = last_part['Type'];\n\t\t\tnew_part['Type Sort'] = last_part['Type Sort'];\n\t\t\tthis.$store.commit('add_part', new_part);\n\t\t},\n\t\tsort_list (field) {\n\t\t\tthis.$store.commit('sort_parts_list_by', field);\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.editor {\n\t/* width: 1500px; */\n\ttable-layout: fixed;\n\tborder-collapse: collapse;\n}\n\n.column-header {\n\tcursor: pointer;\n\tborder: 1px solid #eee;\n}\n\n.delete-column {\n\twidth: 30px;\n}\n\n.new-part-button {\n\tmargin: 5px;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.editor[data-v-1f9cf006] {\n\t/* width: 1500px; */\n\ttable-layout: fixed;\n\tborder-collapse: collapse;\n}\n.column-header[data-v-1f9cf006] {\n\tcursor: pointer;\n\tborder: 1px solid #eee;\n}\n.delete-column[data-v-1f9cf006] {\n\twidth: 30px;\n}\n.new-part-button[data-v-1f9cf006] {\n\tmargin: 5px;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/parts-list-editor.vue"],"names":[],"mappings":";AA0EA;CACA,oBAAA;CACA,oBAAA;CACA,0BAAA;CACA;AAEA;CACA,gBAAA;CACA,uBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA","file":"parts-list-editor.vue","sourcesContent":["<template>\n\t<div width=\"100%\" height=\"100%\">\n\t\t<table class=\"editor\">\n\t\t\t<thead>\n\t\t\t\t<th v-for=\"field in selected_schema\"\n\t\t\t\t\t:key=\"field.name\"\n\t\t\t\t\t@click=\"sort_list(field.name)\"\n\t\t\t\t\tclass=\"column-header\"\n\t\t\t\t\t:style=\"header_style(field)\">{{field.name}}</th>\n\t\t\t\t<th class=\"column-header delete-column\"></th>\n\t\t\t</thead>\n\t\t\t<tbody>\n\t\t\t\t<PartsListPart v-for=\"part in displayed_parts\" :key=\"part.name\" :part=\"part\"></PartsListPart>\n\t\t\t</tbody>\n\t\t</table>\n\t\t<input type=\"button\" value=\"Add new part\" @click=\"add_new_part\" class=\"new-part-button\">\n\t</div>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nimport { mapGetters } from 'vuex';\n\nimport PartsListPart from './parts-list-part.vue';\n\nexport default {\n\tname: 'PartsListEditor',\n\tcomponents: {\n\t\tPartsListPart,\n\t},\n\tdata() {\n\t\treturn {\n\t\t};\n\t},\n\tcomputed: {\n\t\tdisplayed_parts() {\n\t\t\treturn _(this.selected_parts)\n\t\t\t\t.filter((part) => this.$store.state.display.filter.types.includes(part['Type'])).value();\n\t\t},\n\t\theader_style() {\n\t\t\treturn function(field) {\n\t\t\t\treturn {\n\t\t\t\t\twidth: field.width.toString() + 'px',\n\t\t\t\t};\n\t\t\t};\n\t\t},\n\t\t...mapGetters([\n\t\t\t'selected_schema',\n\t\t\t'selected_parts',\n\t\t]),\n\t},\n\tmethods: {\n\t\tadd_new_part() {\n\t\t\tlet new_part = _.chain(this.fields)\n\t\t\t\t.map((field) => [field.name, null])\n\t\t\t\t.fromPairs()\n\t\t\t\t.value();\n\n\t\t\tconst last_part = this.displayed_parts[this.displayed_parts.length - 1];\n\t\t\tnew_part['Type'] = last_part['Type'];\n\t\t\tnew_part['Type Sort'] = last_part['Type Sort'];\n\t\t\tthis.$store.commit('add_part', new_part);\n\t\t},\n\t\tsort_list(field) {\n\t\t\tthis.$store.commit('sort_parts_list_by', field);\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.editor {\n\t/* width: 1500px; */\n\ttable-layout: fixed;\n\tborder-collapse: collapse;\n}\n\n.column-header {\n\tcursor: pointer;\n\tborder: 1px solid #eee;\n}\n\n.delete-column {\n\twidth: 30px;\n}\n\n.new-part-button {\n\tmargin: 5px;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -6298,7 +6322,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.footer[data-v-5de48598] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n}\n.parts-list-footer-status-message[data-v-5de48598] {\n}\n.fade[data-v-5de48598] {\n\tanimation: fadeanim-data-v-5de48598 3s forwards;\n}\n@keyframes fadeanim-data-v-5de48598 {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/parts-list-footer.vue"],"names":[],"mappings":";AAgNA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;CACA;AAEA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"parts-list-footer.vue","sourcesContent":["<template>\n  <div class=\"footer\">\n\t<!-- <input id=\"partslist-import-export-string\" v-model=\"data_json_string\"> -->\n\t<!-- <input type=\"button\" class=\"clipboard-copy-button\" data-clipboard-target=\"#partslist-import-export-string\" value=\"Copy\"></input> -->\n\n\t<input v-model=\"parts_list_name\">\n\n    <select v-model=\"selected_parts_list_name\">\n      <option v-for=\"parts_list in all_parts_lists\" :key=\"parts_list_save_name(parts_list)\">\n\t\t{{parts_list_save_name(parts_list)}}\n      </option>\n    </select>\n\n    <input type=\"button\" @click=\"parts_lists_delete_selected\" value=\"Delete saved parts\"/>\n    <input type=\"button\" @click=\"parts_lists_load_selected\" value=\"Load saved parts\"/>\n\n    <input type=\"button\" @click=\"parts_lists_save_current\" value=\"Save current parts\"/>\n    <input type=\"button\" @click=\"parts_lists_load_from_local_storage\" value=\"Refresh\"/>\n\n\t<input type=\"button\" @click=\"parts_lists_save_file\" value=\"Save to file\"/>\n\t<input type=\"button\" @click=\"$refs.load_file_input.click()\" value=\"Load from file\"/>\n\n    <input\n\t  style=\"display:none\"\n\t  type=\"file\"\n\t  ref=\"load_file_input\"\n\t  @change=\"parts_lists_load_file\"\n\t  value=\"Load file\"/>\n\n\t<a ref=\"save_file_a\" style=\"display:none\"></a>\n\n    <span\n\t  ref=\"status_message\"\n\t  class=\"design-import-export-status-message\"\n\t  @animationend=\"clear_status_message()\">{{ status_message }}</span>\n\n  </div>\n</template>\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nconst LOCAL_PARTS_LISTS_KEY = 'parts_lists';\nconst STATUS_DEFAULT_DURATION = 2000;\n\nconst pl_comparison_slice = _.partial(_.pick, _, ['name', 'timestamp']);\n\nfunction applyAnyMissingSchema(parts, canon_parts) {\n\tfor (let part_type in parts) {\n\t\tlet schema_list = parts[part_type].schema;\n\t\tif (schema_list) {\n\t\t\tlet canon_schema_list = canon_parts[part_type].schema;\n\t\t\tlet schema_map = new Map(schema_list.map(schema => [schema.name, schema]));\n\t\t\tlet canon_schema_map = new Map(canon_schema_list.map(schema => [schema.name, schema]));\n\t\t\tfor (let [schema_name, canon_schema] of canon_schema_map) {\n\t\t\t\tlet schema = schema_map.get(schema_name);\n\t\t\t\tif (schema) {\n\t\t\t\t\tfor (let prop in canon_schema) {\n\t\t\t\t\t\tif (!schema.hasOwnProperty(prop)) {\n\t\t\t\t\t\t\tschema[prop] = canon_schema[prop];\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t} else {\n\t\t\t\t\tschema_list.push(Object.assign({}, canon_schema));\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n}\n\nexport default {\n\tname: 'PartsListFooter',\n\tcomponents: {\n\t},\n\tdata () {\n\t\treturn {\n\t\t\tstatus_message: \"\",\n\t\t\tstatus_message_timeout_id: null,\n\n\t\t\tlocal_parts_lists: [],\n\t\t\tselected_parts_list: null,\n\t\t};\n\t},\n\tcomputed: {\n\t\tparts_list_name: {\n\t\t\tget () {\n\t\t\t\treturn this.$store.state.parts_list.name;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_parts_list_name', value);\n\t\t\t},\n\t\t},\n\t\tselected_parts_list_name: {\n\t\t\tget () {\n\t\t\t\tif (this.selected_parts_list) {\n\t\t\t\t\treturn this.parts_list_save_name(this.selected_parts_list);\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t};\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.selected_parts_list = _\n\t\t\t\t\t.chain(this.all_parts_lists)\n\t\t\t\t\t.find(list => this.parts_list_save_name(list) === value)\n\t\t\t\t\t.value();\n\t\t\t},\n\t\t},\n\t\tall_parts_lists () {\n\t\t\treturn [...this.local_parts_lists, this.canon_parts_list];\n\t\t},\n\t\t...mapState([\n\t\t\t'canon_parts_list',\n\t\t]),\n\t},\n    mounted () {\n\t\tthis.parts_lists_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_PARTS_LISTS_KEY) {\n\t\t\t\tthis.parts_lists_load_from_local_storage();\n\t\t\t};\n\t\t}.bind(this));\n    },\n\tmethods: {\n\t\treset_to_canon () {\n\t\t\tthis.$store.commit('reset_to_canon')\n\t\t},\n\t\tparts_list_save_name (pl) {\n\t\t\t// console.log(Object.keys(pl));\n\t\t\treturn pl.name + ' (' + (new Date(pl.timestamp).toLocaleString()) + ')';\n\t\t},\n\t\tparts_lists_load_from_local_storage () {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_parts_lists = [];\n\t\t\t\tthis.display_status_message(\"No parts lists to load\");\n\t\t\t} else {\n\t\t\t\tlet local_parts_lists = JSON.parse(loaded);\n\t\t\t\tlocal_parts_lists.forEach(local_parts => applyAnyMissingSchema(local_parts, this.canon_parts_list));\n\t\t\t\tthis.local_parts_lists = local_parts_lists;\n\t\t\t\tthis.display_status_message(\"Parts lists loaded.\");\n\t\t\t};\n\t\t},\n\t\tparts_lists_load_selected () {\n\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list));\n\t\t\tthis.display_status_message(\"Parts list loaded\");\n\t\t},\n\t\tparts_lists_delete_selected () {\n\t\t\t// remove the selected item\n\t\t\tthis.local_parts_lists = _.chain(this.local_parts_lists).reject(pl => {\n\t\t\t\treturn _.isEqual(pl_comparison_slice(pl), pl_comparison_slice(this.selected_parts_list));\n\t\t\t}).value();\n\t\t\tthis.parts_lists_save_to_local_storage();\n\t\t\tthis.display_status_message(\"Parts list deleted.\");\n\t\t},\n\t\tparts_lists_save_current () {\n\t\t\tthis.$store.commit('timestamp_parts_list');\n\t\t\tthis.local_parts_lists.push(_.cloneDeep(this.$store.state.parts_list));\n\t\t\tthis.parts_lists_save_to_local_storage();\n\t\t\tthis.display_status_message(\"Parts list saved.\");\n\t\t},\n\t\tparts_lists_save_to_local_storage () {\n\t\t\tlocalStorage.setItem(LOCAL_PARTS_LISTS_KEY, JSON.stringify(this.local_parts_lists))\n\t\t},\n\n\t\tparts_lists_save_file() {\n\t\t\tthis.$store.commit('timestamp_parts_list');\n\t\t\tconst data = encodeURIComponent(JSON.stringify(this.$store.state.parts_list));\n\t\t\tconst filename = this.$store.state.parts_list.name + ' ' + this.$store.state.parts_list.timestamp + '.json';\n\t\t\tlet element = this.$refs.save_file_a;\n\t\t\telement.setAttribute('href', 'data:text/plain;charset=utf-8,' + data);\n\t\t\telement.setAttribute('download', filename);\n\t\t\telement.click();\n\t\t},\n\t\tparts_lists_load_file() {\n\t\t\tlet load_f = this.$refs.load_file_input.files[0];\n\t\t\tlet reader = new FileReader();\n\t\t\treader.onload = function(event) {\n\t\t\t\tif (reader.readyState === FileReader.DONE) {\n\t\t\t\t\tlet local_parts = JSON.parse(reader.result);\n\t\t\t\t\tapplyAnyMissingSchema(local_parts, this.canon_parts_list);\n\t\t\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(local_parts));\n\t\t\t\t\tthis.local_parts_lists.push(_.cloneDeep(local_parts));\n\t\t\t\t\tthis.parts_lists_save_to_local_storage();\n\t\t\t\t\tthis.selected_parts_list = this.parts_list_save_name(local_parts);\n\t\t\t\t\tthis.display_status_message(\"Parts list loaded from file.\");\n\t\t\t\t};\n\t\t\t}.bind(this);\n\t\t\treader.readAsText(load_f)\n\t\t},\n\n\t\tdisplay_status_message (status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'parts-list-footer-status-message';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = \"parts-list-footer-status-message fade\";\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message () {\n\t\t\tthis.status_message = null;\n\t\t}\n\t},\n};\n</script>\n\n<style scoped>\n.footer {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n.parts-list-footer-status-message {\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.footer[data-v-5de48598] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n}\n.parts-list-footer-status-message[data-v-5de48598] {\n}\n.fade[data-v-5de48598] {\n\tanimation: fadeanim-data-v-5de48598 3s forwards;\n}\n@keyframes fadeanim-data-v-5de48598 {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/parts-list-footer.vue"],"names":[],"mappings":";AAiNA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;CACA;AAEA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"parts-list-footer.vue","sourcesContent":["<template>\n\t<div class=\"footer\">\n\t\t<!-- <input id=\"partslist-import-export-string\" v-model=\"data_json_string\"> -->\n\t\t<!-- <input type=\"button\" class=\"clipboard-copy-button\" data-clipboard-target=\"#partslist-import-export-string\" value=\"Copy\"></input> -->\n\n\t\t<input v-model=\"parts_list_name\">\n\n\t\t<select v-model=\"selected_parts_list_name\">\n\t\t\t<option v-for=\"parts_list in all_parts_lists\" :key=\"parts_list_save_name(parts_list)\">\n\t\t\t\t{{parts_list_save_name(parts_list)}}\n\t\t\t</option>\n\t\t</select>\n\n\t\t<input type=\"button\" @click=\"parts_lists_delete_selected\" value=\"Delete saved parts\"/>\n\t\t<input type=\"button\" @click=\"parts_lists_load_selected\" value=\"Load saved parts\"/>\n\n\t\t<input type=\"button\" @click=\"parts_lists_save_current\" value=\"Save current parts\"/>\n\t\t<input type=\"button\" @click=\"parts_lists_load_from_local_storage\" value=\"Refresh\"/>\n\n\t\t<input type=\"button\" @click=\"parts_lists_save_file\" value=\"Save to file\"/>\n\t\t<input type=\"button\" @click=\"$refs.load_file_input.click()\" value=\"Load from file\"/>\n\n\t\t<input\n\t\t\tstyle=\"display:none\"\n\t\t\ttype=\"file\"\n\t\t\tref=\"load_file_input\"\n\t\t\t@change=\"parts_lists_load_file\"\n\t\t\tvalue=\"Load file\"/>\n\n\t\t<a ref=\"save_file_a\" style=\"display:none\"></a>\n\n\t\t<span\n\t\t\tref=\"status_message\"\n\t\t\tclass=\"design-import-export-status-message\"\n\t\t\t@animationend=\"clear_status_message()\">{{ status_message }}</span>\n\n\t</div>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nimport { mapState } from 'vuex';\n\nconst LOCAL_PARTS_LISTS_KEY = 'parts_lists';\n\nconst pl_comparison_slice = _.partial(_.pick, _, ['name', 'timestamp']);\n\nfunction applyAnyMissingSchema(parts, canon_parts) {\n\tfor (let part_type of Object.keys(parts)) {\n\t\tlet schema_list = parts[part_type].schema;\n\t\tif (schema_list) {\n\t\t\tlet canon_schema_list = canon_parts[part_type].schema;\n\t\t\tlet schema_map = new Map(schema_list.map(schema => [schema.name, schema]));\n\t\t\tlet canon_schema_map = new Map(canon_schema_list.map(schema => [schema.name, schema]));\n\t\t\tfor (let [schema_name, canon_schema] of canon_schema_map) {\n\t\t\t\tlet schema = schema_map.get(schema_name);\n\t\t\t\tif (schema) {\n\t\t\t\t\tfor (let prop in canon_schema) {\n\t\t\t\t\t\tif (!schema.hasOwnProperty(prop)) {\n\t\t\t\t\t\t\tschema[prop] = canon_schema[prop];\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t} else {\n\t\t\t\t\tschema_list.push(Object.assign({}, canon_schema));\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n}\n\nexport default {\n\tname: 'PartsListFooter',\n\tcomponents: {\n\t},\n\tdata() {\n\t\treturn {\n\t\t\tstatus_message: '',\n\t\t\tstatus_message_timeout_id: null,\n\n\t\t\tlocal_parts_lists: [],\n\t\t\tselected_parts_list: null,\n\t\t};\n\t},\n\tcomputed: {\n\t\tparts_list_name: {\n\t\t\tget() {\n\t\t\t\treturn this.$store.state.parts_list.name;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_parts_list_name', value);\n\t\t\t},\n\t\t},\n\t\tselected_parts_list_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_parts_list) {\n\t\t\t\t\treturn this.parts_list_save_name(this.selected_parts_list);\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_parts_list = _\n\t\t\t\t\t.chain(this.all_parts_lists)\n\t\t\t\t\t.find(list => this.parts_list_save_name(list) === value)\n\t\t\t\t\t.value();\n\t\t\t},\n\t\t},\n\t\tall_parts_lists() {\n\t\t\treturn [...this.local_parts_lists, this.canon_parts_list];\n\t\t},\n\t\t...mapState([\n\t\t\t'canon_parts_list',\n\t\t]),\n\t},\n\tmounted() {\n\t\tthis.parts_lists_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_PARTS_LISTS_KEY) {\n\t\t\t\tthis.parts_lists_load_from_local_storage();\n\t\t\t}\n\t\t}.bind(this));\n\t},\n\tmethods: {\n\t\treset_to_canon() {\n\t\t\tthis.$store.commit('reset_to_canon');\n\t\t},\n\t\tparts_list_save_name(pl) {\n\t\t\t// console.log(Object.keys(pl));\n\t\t\treturn pl.name + ' (' + (new Date(pl.timestamp).toLocaleString()) + ')';\n\t\t},\n\t\tparts_lists_load_from_local_storage() {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_parts_lists = [];\n\t\t\t\tthis.display_status_message('No parts lists to load');\n\t\t\t} else {\n\t\t\t\tlet local_parts_lists = JSON.parse(loaded);\n\t\t\t\tlocal_parts_lists.forEach(local_parts => applyAnyMissingSchema(local_parts, this.canon_parts_list));\n\t\t\t\tthis.local_parts_lists = local_parts_lists;\n\t\t\t\tthis.display_status_message('Parts lists loaded');\n\t\t\t}\n\t\t},\n\t\tparts_lists_load_selected() {\n\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list));\n\t\t\tthis.display_status_message('Parts list loaded');\n\t\t},\n\t\tparts_lists_delete_selected() {\n\t\t\t// remove the selected item\n\t\t\tthis.local_parts_lists = _.chain(this.local_parts_lists).reject(pl => {\n\t\t\t\treturn _.isEqual(pl_comparison_slice(pl), pl_comparison_slice(this.selected_parts_list));\n\t\t\t}).value();\n\t\t\tthis.parts_lists_save_to_local_storage();\n\t\t\tthis.display_status_message('Parts list deleted');\n\t\t},\n\t\tparts_lists_save_current() {\n\t\t\tthis.$store.commit('timestamp_parts_list');\n\t\t\tthis.local_parts_lists.push(_.cloneDeep(this.$store.state.parts_list));\n\t\t\tthis.parts_lists_save_to_local_storage();\n\t\t\tthis.display_status_message('Parts list saved');\n\t\t},\n\t\tparts_lists_save_to_local_storage() {\n\t\t\tlocalStorage.setItem(LOCAL_PARTS_LISTS_KEY, JSON.stringify(this.local_parts_lists));\n\t\t},\n\n\t\tparts_lists_save_file() {\n\t\t\tthis.$store.commit('timestamp_parts_list');\n\t\t\tconst data = encodeURIComponent(JSON.stringify(this.$store.state.parts_list));\n\t\t\tconst filename = this.$store.state.parts_list.name + ' ' + this.$store.state.parts_list.timestamp + '.json';\n\t\t\tlet element = this.$refs.save_file_a;\n\t\t\telement.setAttribute('href', 'data:text/plain;charset=utf-8,' + data);\n\t\t\telement.setAttribute('download', filename);\n\t\t\telement.click();\n\t\t},\n\t\tparts_lists_load_file() {\n\t\t\tlet load_f = this.$refs.load_file_input.files[0];\n\t\t\tlet reader = new FileReader();\n\t\t\treader.onload = function(event) {\n\t\t\t\tif (reader.readyState === FileReader.DONE) {\n\t\t\t\t\tlet local_parts = JSON.parse(reader.result);\n\t\t\t\t\tapplyAnyMissingSchema(local_parts, this.canon_parts_list);\n\t\t\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(local_parts));\n\t\t\t\t\tthis.local_parts_lists.push(_.cloneDeep(local_parts));\n\t\t\t\t\tthis.parts_lists_save_to_local_storage();\n\t\t\t\t\tthis.selected_parts_list = this.parts_list_save_name(local_parts);\n\t\t\t\t\tthis.display_status_message('Parts list loaded from file');\n\t\t\t\t}\n\t\t\t}.bind(this);\n\t\t\treader.readAsText(load_f);\n\t\t},\n\n\t\tdisplay_status_message(status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'parts-list-footer-status-message';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = 'parts-list-footer-status-message fade';\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message() {\n\t\t\tthis.status_message = null;\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n.footer {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n.parts-list-footer-status-message {\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -6317,7 +6341,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.root[data-v-bfa04e02] {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\n\tfont-family: arial, sans-serif;\n\tfont-size: 13px;\n\tfont-stretch: 100%;\n\tfont-style: 100%;\n\tfont-variant-caps: normal;\n\tfont-variant-ligatures: normal;\n\tfont-variant-numeric: normal;\n\tfont-weight: 400;\n}\n.header[data-v-bfa04e02] {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n.editor[data-v-bfa04e02] {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n.footer[data-v-bfa04e02] {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/partbuilder.vue"],"names":[],"mappings":";AAgEA;CACA,YAAA;CACA,aAAA;;CAEA,cAAA;CACA,uBAAA;CACA,kBAAA;;CAEA,+BAAA;CACA,gBAAA;CACA,mBAAA;CACA,iBAAA;CACA,0BAAA;CACA,+BAAA;CACA,6BAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,yBAAA;CACA;AAEA;CACA,eAAA;CACA,mBAAA,yCAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,sBAAA;CACA","file":"partbuilder.vue","sourcesContent":["<template>\n  <div class=\"root\">\n\t<div class=\"header\">\n\t  <PartsListHeader></PartsListHeader>\n\t</div>\n\t<div class=\"editor\">\n\t  <PartsListEditor></PartsListEditor>\n\t</div>\n\t<div class=\"footer\">\n\t  <PartsListFooter></PartsListFooter>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\n\nimport PartsListHeader from './parts-list-header.vue';\nimport PartsListFooter from './parts-list-footer.vue';\nimport PartsListEditor from './parts-list-editor.vue';\n\nimport canon_parts_list from '../dist/canon_parts_list.json';\n\nconst PARTS_KEY = 'working_parts_list';\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tPartsListHeader,\n\t\tPartsListFooter,\n\t\tPartsListEditor,\n\t},\n\tdata () {\n\t\treturn {\n\t\t};\n\t},\n\tmounted () {\n\t\tthis.load_parts_from_storage();\n\t},\n\tupdated () {\n\t\tthis.save_parts_to_storage();\n\t},\n\tmethods: {\n\t\tload_parts_from_storage () {\n\t\t\tconst saved_parts = localStorage.getItem(PARTS_KEY);\n\t\t\tif (saved_parts) {\n\t\t\t\tthis.data = JSON.parse(saved_parts);\n\t\t\t} else if (this.data) {\n\t\t\t\tlocalStorage.setItem(PARTS_KEY, JSON.stringify(this.data));\n\t\t\t};\n\t\t},\n\t\tsave_parts_to_storage () {\n\t\t\tif (this.data) {\n\t\t\t\tlocalStorage.setItem(PARTS_KEY, JSON.stringify(this.data));\n\t\t\t}\n\t\t},\n\t},\n};\n\n</script>\n\n<style scoped>\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\n\tfont-family: arial, sans-serif;\n\tfont-size: 13px;\n\tfont-stretch: 100%;\n\tfont-style: 100%;\n\tfont-variant-caps: normal;\n\tfont-variant-ligatures: normal;\n\tfont-variant-numeric: normal;\n\tfont-weight: 400;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.editor {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n\n<style>\n\nbutton, input, select, textarea {\n\tfont-family : inherit;\n\tfont-size   : 100%;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.root[data-v-bfa04e02] {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\n\tfont-family: arial, sans-serif;\n\tfont-size: 13px;\n\tfont-stretch: 100%;\n\tfont-style: 100%;\n\tfont-variant-caps: normal;\n\tfont-variant-ligatures: normal;\n\tfont-variant-numeric: normal;\n\tfont-weight: 400;\n}\n.header[data-v-bfa04e02] {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n.editor[data-v-bfa04e02] {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n.footer[data-v-bfa04e02] {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/partbuilder.vue"],"names":[],"mappings":";AA4DA;CACA,YAAA;CACA,aAAA;;CAEA,cAAA;CACA,uBAAA;CACA,kBAAA;;CAEA,+BAAA;CACA,gBAAA;CACA,mBAAA;CACA,iBAAA;CACA,0BAAA;CACA,+BAAA;CACA,6BAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,yBAAA;CACA;AAEA;CACA,eAAA;CACA,mBAAA,yCAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,sBAAA;CACA","file":"partbuilder.vue","sourcesContent":["<template>\n\t<div class=\"root\">\n\t\t<div class=\"header\">\n\t\t\t<PartsListHeader></PartsListHeader>\n\t\t</div>\n\t\t<div class=\"editor\">\n\t\t\t<PartsListEditor></PartsListEditor>\n\t\t</div>\n\t\t<div class=\"footer\">\n\t\t\t<PartsListFooter></PartsListFooter>\n\t\t</div>\n\t</div>\n</template>\n\n\n<script>\n\nimport PartsListHeader from './parts-list-header.vue';\nimport PartsListFooter from './parts-list-footer.vue';\nimport PartsListEditor from './parts-list-editor.vue';\n\nconst PARTS_KEY = 'working_parts_list';\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tPartsListHeader,\n\t\tPartsListFooter,\n\t\tPartsListEditor,\n\t},\n\tdata() {\n\t\treturn {\n\t\t};\n\t},\n\tmounted() {\n\t\tthis.load_parts_from_storage();\n\t},\n\tupdated() {\n\t\tthis.save_parts_to_storage();\n\t},\n\tmethods: {\n\t\tload_parts_from_storage() {\n\t\t\tconst saved_parts = localStorage.getItem(PARTS_KEY);\n\t\t\tif (saved_parts) {\n\t\t\t\tthis.data = JSON.parse(saved_parts);\n\t\t\t} else if (this.data) {\n\t\t\t\tlocalStorage.setItem(PARTS_KEY, JSON.stringify(this.data));\n\t\t\t}\n\t\t},\n\t\tsave_parts_to_storage() {\n\t\t\tif (this.data) {\n\t\t\t\tlocalStorage.setItem(PARTS_KEY, JSON.stringify(this.data));\n\t\t\t}\n\t\t},\n\t},\n};\n\n</script>\n\n<style scoped>\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\n\tfont-family: arial, sans-serif;\n\tfont-size: 13px;\n\tfont-stretch: 100%;\n\tfont-style: 100%;\n\tfont-variant-caps: normal;\n\tfont-variant-ligatures: normal;\n\tfont-variant-numeric: normal;\n\tfont-weight: 400;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.editor {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n\n<style>\n\nbutton, input, select, textarea {\n\tfont-family : inherit;\n\tfont-size   : 100%;\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -6336,7 +6360,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.part[data-v-ef29a868] {\n}\n.has-error[data-v-ef29a868] {\n\tbackground: #faa;\n}\n.delete-cell[data-v-ef29a868] {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n.delete-button[data-v-ef29a868] {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n.copy-cell[data-v-ef29a868] {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n.copy-button[data-v-ef29a868] {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/parts-list-part.vue"],"names":[],"mappings":";AAkEA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,YAAA;CACA,uBAAA;CACA;AAEA;CACA,WAAA;CACA,gBAAA;;CAEA,YAAA;IACA,uBAAA;CACA;AAEA;CACA,YAAA;CACA,uBAAA;CACA;AAEA;CACA,WAAA;CACA,gBAAA;;CAEA,YAAA;IACA,uBAAA;CACA","file":"parts-list-part.vue","sourcesContent":["<template>\n  <tr class=\"part\">\n\t<PartsListCell\n\t  v-for=\"field in selected_schema\"\n\t  :class=\"list_class(field)\"\n\t  :key=\"field.name\"\n\t  :part=\"part\"\n\t  :field=\"field\">\n\t</PartsListCell>\n\t<td class=\"delete-cell\"><input type=\"button\" class=\"delete-button\" value=\"X\" @click=\"delete_this_part\"></td>\n\t<td class=\"copy-cell\"><input type=\"button\" class=\"copy-button\" value=\"+\" @click=\"copy_this_part\"></td>\n  </tr>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport PartsListCell from './parts-list-cell.vue';\n\nexport default {\n\tname: 'PartsListPart',\n\tcomponents: {\n\t\tPartsListCell,\n\t},\n\tprops: {\n\t\tpart: Object,\n\t},\n\tcomputed: {\n\t\thas_duplicate_name_error () {\n\t\t\tconst f = (part) => _.pick(part, ['Name', 'Variant', 'Type']);\n\t\t\tconst comp = (part) => _.isEqual(f(part), f(this.part))\n\t\t\treturn this.selected_parts.filter(comp).length > 1;\n\t\t},\n\t\tlist_class () {\n\t\t\treturn function (field) {\n\t\t\t\treturn {\n\t\t\t\t\t'has-error': (field.id === 'name') && (this.has_duplicate_name_error),\n\t\t\t\t};\n\t\t\t};\n\t\t},\n\t\t...mapGetters([\n\t\t\t'selected_schema',\n\t\t\t'selected_parts',\n\t\t]),\n\t},\n\tmethods: {\n\t\tdelete_this_part () {\n\t\t\tthis.$store.commit('delete_part', this.part['Name']);\n\t\t},\n\t\tcopy_this_part () {\n\t\t\tconst idx = this.selected_parts.findIndex((part) => part['Name'] === this.part['Name']);\n\t\t\tif (idx >= 0) {\n\t\t\t\tlet clone = _.cloneDeep(this.part);\n\t\t\t\tclone['Name'] += ' copy';\n\t\t\t\tthis.$store.commit('add_part', clone);\n\t\t\t};\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.part {\n}\n\n.has-error {\n\tbackground: #faa;\n}\n\n.delete-cell {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n\n.delete-button {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n.copy-cell {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n\n.copy-button {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.part[data-v-ef29a868] {\n}\n.has-error[data-v-ef29a868] {\n\tbackground: #faa;\n}\n.delete-cell[data-v-ef29a868] {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n.delete-button[data-v-ef29a868] {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n.copy-cell[data-v-ef29a868] {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n.copy-button[data-v-ef29a868] {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/parts-list-part.vue"],"names":[],"mappings":";AAgEA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,YAAA;CACA,uBAAA;CACA;AAEA;CACA,WAAA;CACA,gBAAA;;CAEA,YAAA;IACA,uBAAA;CACA;AAEA;CACA,YAAA;CACA,uBAAA;CACA;AAEA;CACA,WAAA;CACA,gBAAA;;CAEA,YAAA;IACA,uBAAA;CACA","file":"parts-list-part.vue","sourcesContent":["<template>\n\t<tr class=\"part\">\n\t\t<PartsListCell\n\t\t\tv-for=\"field in selected_schema\"\n\t\t\t:class=\"list_class(field)\"\n\t\t\t:key=\"field.name\"\n\t\t\t:part=\"part\"\n\t\t\t:field=\"field\">\n\t\t</PartsListCell>\n\t\t<td class=\"delete-cell\"><input type=\"button\" class=\"delete-button\" value=\"X\" @click=\"delete_this_part\"></td>\n\t\t<td class=\"copy-cell\"><input type=\"button\" class=\"copy-button\" value=\"+\" @click=\"copy_this_part\"></td>\n\t</tr>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nimport { mapGetters } from 'vuex';\n\nimport PartsListCell from './parts-list-cell.vue';\n\nexport default {\n\tname: 'PartsListPart',\n\tcomponents: {\n\t\tPartsListCell,\n\t},\n\tprops: {\n\t\tpart: Object,\n\t},\n\tcomputed: {\n\t\thas_duplicate_name_error() {\n\t\t\tconst f = (part) => _.pick(part, ['Name', 'Variant', 'Type']);\n\t\t\tconst comp = (part) => _.isEqual(f(part), f(this.part));\n\t\t\treturn this.selected_parts.filter(comp).length > 1;\n\t\t},\n\t\tlist_class() {\n\t\t\treturn (field) => ({\n\t\t\t\t'has-error': (field.id === 'name') && (this.has_duplicate_name_error),\n\t\t\t});\n\t\t},\n\t\t...mapGetters([\n\t\t\t'selected_schema',\n\t\t\t'selected_parts',\n\t\t]),\n\t},\n\tmethods: {\n\t\tdelete_this_part() {\n\t\t\tthis.$store.commit('delete_part', this.part['Name']);\n\t\t},\n\t\tcopy_this_part() {\n\t\t\tconst idx = this.selected_parts.findIndex((part) => part['Name'] === this.part['Name']);\n\t\t\tif (idx >= 0) {\n\t\t\t\tlet clone = _.cloneDeep(this.part);\n\t\t\t\tclone['Name'] += ' copy';\n\t\t\t\tthis.$store.commit('add_part', clone);\n\t\t\t}\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.part {\n}\n\n.has-error {\n\tbackground: #faa;\n}\n\n.delete-cell {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n\n.delete-button {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n.copy-cell {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n\n.copy-button {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -6355,7 +6379,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\nbutton, input, select, textarea {\n\tfont-family : inherit;\n\tfont-size   : 100%;\n}\n\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/partbuilder.vue"],"names":[],"mappings":";AAsGA;CACA,sBAAA;CACA,mBAAA;CACA","file":"partbuilder.vue","sourcesContent":["<template>\n  <div class=\"root\">\n\t<div class=\"header\">\n\t  <PartsListHeader></PartsListHeader>\n\t</div>\n\t<div class=\"editor\">\n\t  <PartsListEditor></PartsListEditor>\n\t</div>\n\t<div class=\"footer\">\n\t  <PartsListFooter></PartsListFooter>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\n\nimport PartsListHeader from './parts-list-header.vue';\nimport PartsListFooter from './parts-list-footer.vue';\nimport PartsListEditor from './parts-list-editor.vue';\n\nimport canon_parts_list from '../dist/canon_parts_list.json';\n\nconst PARTS_KEY = 'working_parts_list';\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tPartsListHeader,\n\t\tPartsListFooter,\n\t\tPartsListEditor,\n\t},\n\tdata () {\n\t\treturn {\n\t\t};\n\t},\n\tmounted () {\n\t\tthis.load_parts_from_storage();\n\t},\n\tupdated () {\n\t\tthis.save_parts_to_storage();\n\t},\n\tmethods: {\n\t\tload_parts_from_storage () {\n\t\t\tconst saved_parts = localStorage.getItem(PARTS_KEY);\n\t\t\tif (saved_parts) {\n\t\t\t\tthis.data = JSON.parse(saved_parts);\n\t\t\t} else if (this.data) {\n\t\t\t\tlocalStorage.setItem(PARTS_KEY, JSON.stringify(this.data));\n\t\t\t};\n\t\t},\n\t\tsave_parts_to_storage () {\n\t\t\tif (this.data) {\n\t\t\t\tlocalStorage.setItem(PARTS_KEY, JSON.stringify(this.data));\n\t\t\t}\n\t\t},\n\t},\n};\n\n</script>\n\n<style scoped>\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\n\tfont-family: arial, sans-serif;\n\tfont-size: 13px;\n\tfont-stretch: 100%;\n\tfont-style: 100%;\n\tfont-variant-caps: normal;\n\tfont-variant-ligatures: normal;\n\tfont-variant-numeric: normal;\n\tfont-weight: 400;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.editor {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n\n<style>\n\nbutton, input, select, textarea {\n\tfont-family : inherit;\n\tfont-size   : 100%;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\nbutton, input, select, textarea {\n\tfont-family : inherit;\n\tfont-size   : 100%;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/partbuilder.vue"],"names":[],"mappings":";AAkGA;CACA,sBAAA;CACA,mBAAA;CACA","file":"partbuilder.vue","sourcesContent":["<template>\n\t<div class=\"root\">\n\t\t<div class=\"header\">\n\t\t\t<PartsListHeader></PartsListHeader>\n\t\t</div>\n\t\t<div class=\"editor\">\n\t\t\t<PartsListEditor></PartsListEditor>\n\t\t</div>\n\t\t<div class=\"footer\">\n\t\t\t<PartsListFooter></PartsListFooter>\n\t\t</div>\n\t</div>\n</template>\n\n\n<script>\n\nimport PartsListHeader from './parts-list-header.vue';\nimport PartsListFooter from './parts-list-footer.vue';\nimport PartsListEditor from './parts-list-editor.vue';\n\nconst PARTS_KEY = 'working_parts_list';\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tPartsListHeader,\n\t\tPartsListFooter,\n\t\tPartsListEditor,\n\t},\n\tdata() {\n\t\treturn {\n\t\t};\n\t},\n\tmounted() {\n\t\tthis.load_parts_from_storage();\n\t},\n\tupdated() {\n\t\tthis.save_parts_to_storage();\n\t},\n\tmethods: {\n\t\tload_parts_from_storage() {\n\t\t\tconst saved_parts = localStorage.getItem(PARTS_KEY);\n\t\t\tif (saved_parts) {\n\t\t\t\tthis.data = JSON.parse(saved_parts);\n\t\t\t} else if (this.data) {\n\t\t\t\tlocalStorage.setItem(PARTS_KEY, JSON.stringify(this.data));\n\t\t\t}\n\t\t},\n\t\tsave_parts_to_storage() {\n\t\t\tif (this.data) {\n\t\t\t\tlocalStorage.setItem(PARTS_KEY, JSON.stringify(this.data));\n\t\t\t}\n\t\t},\n\t},\n};\n\n</script>\n\n<style scoped>\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\n\tfont-family: arial, sans-serif;\n\tfont-size: 13px;\n\tfont-stretch: 100%;\n\tfont-style: 100%;\n\tfont-variant-caps: normal;\n\tfont-variant-ligatures: normal;\n\tfont-variant-numeric: normal;\n\tfont-weight: 400;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.editor {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n\n<style>\n\nbutton, input, select, textarea {\n\tfont-family : inherit;\n\tfont-size   : 100%;\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -6374,7 +6398,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-cell.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-cell.vue","sourceRoot":""}]);
 
 // exports
 
@@ -6412,7 +6436,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-footer.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-footer.vue","sourceRoot":""}]);
 
 // exports
 
@@ -6431,7 +6455,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-header.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-header.vue","sourceRoot":""}]);
 
 // exports
 
@@ -6450,7 +6474,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-part.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-part.vue","sourceRoot":""}]);
 
 // exports
 
@@ -24526,7 +24550,7 @@ var render = function() {
       _vm._l(_vm.all_parts_lists, function(parts_list) {
         return _c("option", { key: _vm.parts_list_save_name(parts_list) }, [
           _vm._v(
-            "\n\t\t" + _vm._s(_vm.parts_list_save_name(parts_list)) + "\n      "
+            "\n\t\t\t" + _vm._s(_vm.parts_list_save_name(parts_list)) + "\n\t\t"
           )
         ])
       })
@@ -34350,7 +34374,7 @@ var store = new _vuex2.default.Store({
 			} else {
 				state.display.current_sort.field = field;
 				state.display.current_sort.ascending = true;
-			};
+			}
 
 			var selected_parts = state.parts_list[state.display.selected].records;
 
@@ -34367,7 +34391,7 @@ var store = new _vuex2.default.Store({
 						return a[field].localeCompare(b[field]) * invert;
 					});
 					break;
-			};
+			}
 		},
 		delete_part: function delete_part(state, payload) {
 			var selected_parts = state.parts_list[state.display.selected].records;
@@ -34376,7 +34400,7 @@ var store = new _vuex2.default.Store({
 			});
 			if (idx >= 0) {
 				selected_parts.splice(idx, 1);
-			};
+			}
 		},
 		add_part: function add_part(state, payload) {
 			state.parts_list[state.display.selected].records.push(payload);
@@ -34394,7 +34418,7 @@ var store = new _vuex2.default.Store({
 				});
 			} else {
 				state.display.filter.types.push(payload);
-			};
+			}
 		}
 	}
 });

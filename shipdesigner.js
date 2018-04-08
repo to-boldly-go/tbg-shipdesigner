@@ -187,7 +187,7 @@ var NamedVector = function () {
 					acc[name] = fun(_this5[name], other[name]);
 					return acc;
 				}, {}));
-			};
+			}
 		}
 	}, {
 		key: 'names',
@@ -223,8 +223,6 @@ var NamedVector = function () {
 
 	return NamedVector;
 }();
-
-;
 
 exports.NamedVector = NamedVector;
 
@@ -274,11 +272,11 @@ var SIZE_TO_WEIGHT_CAP_MULTIPLIER = 300;
 var BR_TO_WEIGHT_MULTIPLIER = 10;
 
 var SUBSYSTEM_SORT_ORDER = {
-	"Tactical": 1,
-	"Operations": 2,
-	"Hull": 3,
-	"Engineering": 4,
-	"Warp Core": 5
+	'Tactical': 1,
+	'Operations': 2,
+	'Hull': 3,
+	'Engineering': 4,
+	'Warp Core': 5
 };
 
 var BR_COST_ROUND_MAP = {
@@ -301,242 +299,243 @@ var WEIGHT_CLASS_MAP = {
 };
 
 var SUBSYSTEM_NAME_MAP = {
-	"Tactical": "Tac Mod",
-	"Engineering": "Eng. Mod",
-	"Hull": "Hull Mod",
-	"Operations": "Ops Mod",
-	"Warp Core": "Core Mod"
+	'Tactical': 'Tac Mod',
+	'Engineering': 'Eng. Mod',
+	'Hull': 'Hull Mod',
+	'Operations': 'Ops Mod',
+	'Warp Core': 'Core Mod'
+};
 
-	// REFACTOR: change the names of these to be less abbreviated
-	// (effectiveness instead of effect, for example)
-};var COMPONENT_MODIFIERS = {
-	"Primary Phasers": {
-		"Effect Qty?": true,
-		"combat": 1,
-		"Cost Mod": 1,
-		"Crew Mod": 1
+// REFACTOR: change the names of these to be less abbreviated
+// (effectiveness instead of effect, for example)
+var COMPONENT_MODIFIERS = {
+	'Primary Phasers': {
+		'Effect Qty?': true,
+		'combat': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
 	},
-	"Secondary Phasers": {
-		"Effect Qty?": true,
-		"combat": 1 / 4,
-		"Cost Mod": 1 / 4,
-		"Crew Mod": 1 / 4
+	'Secondary Phasers': {
+		'Effect Qty?': true,
+		'combat': 1 / 4,
+		'Cost Mod': 1 / 4,
+		'Crew Mod': 1 / 4
 	},
-	"Torpedo System": {
-		"Effect Qty?": true,
-		"combat": 1,
-		"Cost Mod": 1,
-		"Crew Mod": 1
+	'Torpedo System': {
+		'Effect Qty?': true,
+		'combat': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
 	},
-	"Short-Range Sensors": {
-		"Effect Qty?": true,
-		"combat": 1 / 2,
-		"science": 1 / 2,
-		"Cost Mod": 1,
-		"Crew Mod": 1
+	'Short-Range Sensors': {
+		'Effect Qty?': true,
+		'combat': 1 / 2,
+		'science': 1 / 2,
+		'Cost Mod': 1,
+		'Crew Mod': 1
 	},
-	"Targeting Computer": {
-		"Effect Qty?": true,
-		"combat": 1,
-		"Cost Mod": 1,
-		"Crew Mod": 1
+	'Targeting Computer': {
+		'Effect Qty?': true,
+		'combat': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
 	},
-	"Deflector Shields": {
-		"Effect Qty?": true,
-		"shields": 1,
-		"Cost Mod": 1,
-		"Crew Mod": 1
+	'Deflector Shields': {
+		'Effect Qty?': true,
+		'shields': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
 	},
-	"Backup Deflectors": {
-		"Effect Qty?": true,
-		"shields": 1 / 5,
-		"Cost Mod": 1 / 5,
-		"Crew Mod": 1 / 5
+	'Backup Deflectors': {
+		'Effect Qty?': true,
+		'shields': 1 / 5,
+		'Cost Mod': 1 / 5,
+		'Crew Mod': 1 / 5
 	},
-	"Impulse Engine Pwr": {
-		"Effect Qty?": true,
-		"combat": 1 / 4,
-		"defense": 4 / 5,
-		"Cost Mod": 1,
-		"Crew Mod": 1
-	},
-
-	"Long-Range Sensors": {
-		"Effect Qty?": true,
-		"science": 1,
-		"Cost Mod": 1,
-		"Crew Mod": 1
-	},
-	"Navigational Sensors": {
-		"Effect Qty?": true,
-		"science": 1,
-		"defense": 1 / 6,
-		"Cost Mod": 1,
-		"Crew Mod": 1
-	},
-	"Survey Sensors": {
-		"Effect Qty?": true,
-		"science": 1,
-		"Cost Mod": 1,
-		"Crew Mod": 1
-	},
-	"Science Labs": {
-		"Effect Qty?": true,
-		"science": 1,
-		"Cost Mod": 1,
-		"Crew Mod": 1
-	},
-	"Computer Core": {
-		"Effect Qty?": true,
-		"combat": 1 / 4,
-		"science": 1 / 4,
-		"hull": 1 / 10,
-		"shields": 1 / 7,
-		"presence": 1 / 6,
-		"defense": 1 / 8,
-		"Cost Mod": 1,
-		"Crew Mod": 1
-	},
-	"Operating System": {
-		"Effect Qty?": true,
-		"combat": 1 / 8,
-		"science": 1 / 8,
-		"shields": 1 / 14,
-		"defense": 1 / 10,
-		"Cost Mod": 1,
-		"Crew Mod": 1
-	},
-	"Secondary Core": {
-		"Effect Qty?": true,
-		"combat": 1 / 16,
-		"science": 1 / 16,
-		"shields": 1 / 28,
-		"defense": 1 / 40,
-		"Cost Mod": 1 / 2,
-		"Crew Mod": 1 / 4
-	},
-	"Diplomatic Package": {
-		"Effect Qty?": true,
-		"presence": 1,
-		"Cost Mod": 1,
-		"Crew Mod": 1
-	},
-	"Recreation Package": {
-		"Effect Qty?": true,
-		"presence": 1,
-		"Cost Mod": 1,
-		"Crew Mod": 1
-	},
-	"Sickbay": {
-		"Effect Qty?": true,
-		"science": 1 / 2,
-		"presence": 1,
-		"Cost Mod": 1,
-		"Crew Mod": 1
+	'Impulse Engine Pwr': {
+		'Effect Qty?': true,
+		'combat': 1 / 4,
+		'defense': 4 / 5,
+		'Cost Mod': 1,
+		'Crew Mod': 1
 	},
 
-	"Hull System": {
-		"Effect Qty?": true,
-		"hull": 1,
-		"Cost Mod": 1,
-		"Scale Wt?": 1,
-		"Crew Mod": 1
+	'Long-Range Sensors': {
+		'Effect Qty?': true,
+		'science': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Navigational Sensors': {
+		'Effect Qty?': true,
+		'science': 1,
+		'defense': 1 / 6,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Survey Sensors': {
+		'Effect Qty?': true,
+		'science': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Science Labs': {
+		'Effect Qty?': true,
+		'science': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Computer Core': {
+		'Effect Qty?': true,
+		'combat': 1 / 4,
+		'science': 1 / 4,
+		'hull': 1 / 10,
+		'shields': 1 / 7,
+		'presence': 1 / 6,
+		'defense': 1 / 8,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Operating System': {
+		'Effect Qty?': true,
+		'combat': 1 / 8,
+		'science': 1 / 8,
+		'shields': 1 / 14,
+		'defense': 1 / 10,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Secondary Core': {
+		'Effect Qty?': true,
+		'combat': 1 / 16,
+		'science': 1 / 16,
+		'shields': 1 / 28,
+		'defense': 1 / 40,
+		'Cost Mod': 1 / 2,
+		'Crew Mod': 1 / 4
+	},
+	'Diplomatic Package': {
+		'Effect Qty?': true,
+		'presence': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Recreation Package': {
+		'Effect Qty?': true,
+		'presence': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Sickbay': {
+		'Effect Qty?': true,
+		'science': 1 / 2,
+		'presence': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
 	},
 
-	"Structural Integrity Fields": {
-		"Effect Qty?": true,
-		"hull": 1,
-		"Cost Mod": 1,
-		"Crew Mod": 1
-	},
-	"Navigational Deflector": {
-		"Effect Qty?": false,
-		"science": 1 / 3,
-		"shields": 1 / 7,
-		"defense": 1,
-		"Cost Mod": 1,
-		"Crew Mod": 1
-	},
-	"Nacelle System": {
-		"Effect Qty?": true,
-		"defense": 1,
-		"Cost Mod": 1,
-		"Crew Mod": 1
-	},
-	"Replication Package": {
-		"Effect Qty?": true,
-		"science": 1 / 10,
-		"presence": 1 / 4,
-		"defense": 1,
-		"Cost Mod": 1,
-		"Crew Mod": 1
-	},
-	"Fuel & Matter Stores": {
-		"Effect Qty?": false,
-		"defense": 1,
-		"Cost Mod": 1,
-		"Crew Mod": 1
+	'Hull System': {
+		'Effect Qty?': true,
+		'hull': 1,
+		'Cost Mod': 1,
+		'Scale Wt?': 1,
+		'Crew Mod': 1
 	},
 
-	"Warp Core Type": {
-		"Effect Qty?": true,
-		"Cost Mod": 1,
-		"Crew Mod": 1
+	'Structural Integrity Fields': {
+		'Effect Qty?': true,
+		'hull': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
 	},
-	"M/AM Injectors": {
-		"Effect Qty?": true,
-		"Cost Mod": 1,
-		"Crew Mod": 1
+	'Navigational Deflector': {
+		'Effect Qty?': false,
+		'science': 1 / 3,
+		'shields': 1 / 7,
+		'defense': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
 	},
-	"Coolant Systems": {
-		"Effect Qty?": true,
-		"Cost Mod": 1,
-		"Crew Mod": 1
+	'Nacelle System': {
+		'Effect Qty?': true,
+		'defense': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
 	},
-	"EPS Manifold System": {
-		"Effect Qty?": false,
-		"Cost Mod": 1,
-		"Crew Mod": 1
+	'Replication Package': {
+		'Effect Qty?': true,
+		'science': 1 / 10,
+		'presence': 1 / 4,
+		'defense': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
 	},
-	"Eject System": {
-		"Effect Qty?": false,
-		"Cost Mod": 1,
-		"Crew Mod": 1
+	'Fuel & Matter Stores': {
+		'Effect Qty?': false,
+		'defense': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+
+	'Warp Core Type': {
+		'Effect Qty?': true,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'M/AM Injectors': {
+		'Effect Qty?': true,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Coolant Systems': {
+		'Effect Qty?': true,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'EPS Manifold System': {
+		'Effect Qty?': false,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Eject System': {
+		'Effect Qty?': false,
+		'Cost Mod': 1,
+		'Crew Mod': 1
 	}
 };
 
 // AI, AJ, AK block
 // GL column onward
 var COMPONENT_PART_CLASSIFICATIONS = {
-	"Primary Phasers": "Phasers",
-	"Secondary Phasers": "Phasers",
-	"Torpedo System": "Torpedoes",
-	"Short-Range Sensors": "Short-Range Sensors",
-	"Targeting Computer": "Targeting Computers",
-	"Deflector Shields": "Deflector Shields",
-	"Backup Deflectors": "Deflector Shields",
-	"Impulse Engine Pwr": "Impulse Engine Power",
-	"Long-Range Sensors": "Long-Range Sensors",
-	"Navigational Sensors": "Navigational Sensors",
-	"Survey Sensors": "Survey Sensors",
-	"Science Labs": "Science Labs",
-	"Computer Core": "Computer Cores",
-	"Operating System": "Operating System",
-	"Secondary Core": "Computer Cores",
-	"Diplomatic Package": "Diplomatic Packages",
-	"Recreation Package": "Recreation Packages",
-	"Sickbay": "Sickbays",
-	"Hull System": "Hull System",
-	"Structural Integrity Fields": "Structural Integrity Fields",
-	"Navigational Deflector": "Navigational Deflectors",
-	"Nacelle System": "Nacelles",
-	"Replication Package": "Replication Packages",
-	"Fuel & Matter Stores": "Fuel & Matter Stores",
-	"Warp Core Type": "Warp Core Types",
-	"M/AM Injectors": "Matter/Anti-Matter Injectors",
-	"Coolant Systems": "Coolant Systems",
-	"EPS Manifold System": "EPS Manifold System",
-	"Eject System": "Eject System"
+	'Primary Phasers': 'Phasers',
+	'Secondary Phasers': 'Phasers',
+	'Torpedo System': 'Torpedoes',
+	'Short-Range Sensors': 'Short-Range Sensors',
+	'Targeting Computer': 'Targeting Computers',
+	'Deflector Shields': 'Deflector Shields',
+	'Backup Deflectors': 'Deflector Shields',
+	'Impulse Engine Pwr': 'Impulse Engine Power',
+	'Long-Range Sensors': 'Long-Range Sensors',
+	'Navigational Sensors': 'Navigational Sensors',
+	'Survey Sensors': 'Survey Sensors',
+	'Science Labs': 'Science Labs',
+	'Computer Core': 'Computer Cores',
+	'Operating System': 'Operating System',
+	'Secondary Core': 'Computer Cores',
+	'Diplomatic Package': 'Diplomatic Packages',
+	'Recreation Package': 'Recreation Packages',
+	'Sickbay': 'Sickbays',
+	'Hull System': 'Hull System',
+	'Structural Integrity Fields': 'Structural Integrity Fields',
+	'Navigational Deflector': 'Navigational Deflectors',
+	'Nacelle System': 'Nacelles',
+	'Replication Package': 'Replication Packages',
+	'Fuel & Matter Stores': 'Fuel & Matter Stores',
+	'Warp Core Type': 'Warp Core Types',
+	'M/AM Injectors': 'Matter/Anti-Matter Injectors',
+	'Coolant Systems': 'Coolant Systems',
+	'EPS Manifold System': 'EPS Manifold System',
+	'Eject System': 'Eject System'
 };
 
 var Crewline = function (_NamedVector) {
@@ -561,8 +560,6 @@ var Crewline = function (_NamedVector) {
 
 	return Crewline;
 }(_namedvector.NamedVector);
-
-;
 
 var Statline = function (_NamedVector2) {
 	_inherits(Statline, _NamedVector2);
@@ -589,8 +586,6 @@ var Statline = function (_NamedVector2) {
 
 	return Statline;
 }(_namedvector.NamedVector);
-
-;
 
 var DesignComponent = function () {
 	function DesignComponent(db, subsystem, design_component_json) {
@@ -647,19 +642,19 @@ var DesignComponent = function () {
 			this.json['Part'] = value;
 			if (this.is_no_part) {
 				this.quantity_calcs.set(parseInt(0));
-			};
+			}
 		}
 	}, {
 		key: 'is_no_part',
 		get: function get() {
 			return this.json['Part'].match(/No .+/) !== null;
 		}
-	}, {
-		key: 'quantity',
-
 
 		// BK column
 		// scalar
+
+	}, {
+		key: 'quantity',
 		get: function get() {
 			return this.quantity_calcs.get();
 		},
@@ -672,9 +667,9 @@ var DesignComponent = function () {
 					});
 					if (no_part) {
 						this.json['Part'] = no_part['Name'];
-					};
-				};
-			};
+					}
+				}
+			}
 		}
 	}, {
 		key: 'is_quantity_configurable',
@@ -688,7 +683,7 @@ var DesignComponent = function () {
 				return this.quantity_calcs.options();
 			} else {
 				return [];
-			};
+			}
 		}
 	}, {
 		key: 'quantity_calcs',
@@ -709,7 +704,6 @@ var DesignComponent = function () {
 							return _this3.subsystem.design.size_round;
 						}
 					};
-					break;
 				case 'M/AM Injectors':
 				case 'Coolant Systems':
 					return {
@@ -724,7 +718,6 @@ var DesignComponent = function () {
 							return warp_core_type.quantity;
 						}
 					};
-					break;
 				case 'Targeting Computer':
 				case 'Nacelle System':
 				case 'Eject System':
@@ -737,10 +730,9 @@ var DesignComponent = function () {
 								return 0;
 							} else {
 								return 1;
-							};
+							}
 						}
 					};
-					break;
 				default:
 					return {
 						is_configurable: function is_configurable() {
@@ -756,42 +748,40 @@ var DesignComponent = function () {
 							switch (_this3.name) {
 								case 'Replication Package':
 									return [].concat(_toConsumableArray(Array(_this3.subsystem.design.size_round + 1).keys()));
-									break;
 								case 'Secondary Core':
 									return [0, 1, 2];
-									break;
 								case 'Structural Integrity Fields':
-									var hull_count = _this3.subsystem.design.subsystem('Hull').component('Hull System').quantity;
-									var hull_grade_civilian = _this3.part.match(/Civilian Grade$/);
-									var sif_max_count = hull_count * (hull_grade_civilian ? 1 : 2);
-									return [].concat(_toConsumableArray(Array(sif_max_count + 1).keys()));
-									break;
+									{
+										var hull_count = _this3.subsystem.design.subsystem('Hull').component('Hull System').quantity;
+										var hull_grade_civilian = _this3.part.match(/Civilian Grade$/);
+										var sif_max_count = hull_count * (hull_grade_civilian ? 1 : 2);
+										return [].concat(_toConsumableArray(Array(sif_max_count + 1).keys()));
+									}
 								default:
 									return [].concat(_toConsumableArray(Array(26).keys()));
-							};
+							}
 						}
 					};
-					break;
 			}
 		}
-	}, {
-		key: 'requires_heavy_navigational_deflector',
-
 
 		// Requires H navigational deflector:
 		// * Large Frigate Engineering Subframe
 		// * Large or Medium Cruiser Engineering Subframe
 		// * All Explorer
+
+	}, {
+		key: 'requires_heavy_navigational_deflector',
 		get: function get() {
 			return this.subsystem.design.weight_class === 'Explorer' || this.subsystem.design.weight_class === 'Cruiser' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Lg | Md /) || this.subsystem.design.weight_class === 'Frigate' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Lg /);
 		}
-	}, {
-		key: 'requires_light_navigational_deflector',
-
 
 		// Requires L navigational deflector:
 		// * Small or Medium Frigate Engineering Subframe
 		// * Small Cruiser Engineering Subframe
+
+	}, {
+		key: 'requires_light_navigational_deflector',
 		get: function get() {
 			return this.subsystem.design.weight_class === 'Cruiser' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Sm /) || this.subsystem.design.weight_class === 'Frigate' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Md | Sm /);
 		}
@@ -808,16 +798,16 @@ var DesignComponent = function () {
 						parts_of_type = parts_of_type.filter(function (part) {
 							return part['Name'].match(/\[H\]/);
 						});
-					};
+					}
 					if (this.requires_light_navigational_deflector) {
 						parts_of_type = parts_of_type.filter(function (part) {
 							return part['Name'].match(/\[L\]/);
 						});
-					};
+					}
 					break;
 				default:
 					break;
-			};
+			}
 			return parts_of_type;
 		}
 	}, {
@@ -833,7 +823,7 @@ var DesignComponent = function () {
 				return 1 + evasion_effect / 10;
 			} else {
 				return false;
-			};
+			}
 		}
 	}, {
 		key: 'warp_core_breach',
@@ -842,14 +832,14 @@ var DesignComponent = function () {
 				return this.attribute('Reliability');
 			} else {
 				return false;
-			};
+			}
 		}
-	}, {
-		key: 'cost_crew',
-
 
 		// CP-CR block
 		// crewline
+
+	}, {
+		key: 'cost_crew',
 		get: function get() {
 			// =DS31 * IF(VALUE($BK31)=0,1,(1+(LOG($BK31))*2)) * ($BK$26^0.7 / 2) * CP$29 * $DH31
 			//
@@ -864,20 +854,20 @@ var DesignComponent = function () {
 				return sum.mult(value);
 			}, new Crewline(1));
 		}
-	}, {
-		key: 'cost_crew_quantity_mod',
-
 
 		// IF(VALUE($BK31)=0,
 		// 1,
 		// (1+(LOG($BK31))*2))
 		// crewline
+
+	}, {
+		key: 'cost_crew_quantity_mod',
 		get: function get() {
 			if (this.quantity) {
 				return 1 + 2 * Math.log(this.quantity) / Math.log(10);
 			} else {
 				return 1;
-			};
+			}
 		}
 	}, {
 		key: 'cost_crew_raw',
@@ -912,26 +902,26 @@ var DesignComponent = function () {
 				return 0;
 			}
 			switch (this.name) {
-				case "M/AM Injectors":
+				case 'M/AM Injectors':
 					// =1 + (CD81 / 100 * CO$79)
 					// CD is effect
 					// CD$79 is the effect for the "Warp Core Type" component
 					return 1 + this.effect * warp_core_type.effect / 100.0;
-				case "Coolant Systems":
+				case 'Coolant Systems':
 					// =1 + (CD82 / 100 * CO$79)
 					return 1 + this.effect * warp_core_type.effect / 100.0;
-				case "EPS Manifold System":
+				case 'EPS Manifold System':
 					// =1 + (CD83 / 100 * CO$79)
 					return 1 + this.effect * warp_core_type.effect / 100.0;
 				default:
 					return 0;
-			};
+			}
 		}
-	}, {
-		key: 'cost_power',
-
 
 		// CN column
+
+	}, {
+		key: 'cost_power',
 		get: function get() {
 			// =(DP31 + DQ31*BK$26 + DR31*BK31) * DG31
 			// DP is 'Pwr O/H' column off parts sheet
@@ -952,35 +942,35 @@ var DesignComponent = function () {
 
 			return (this.cost_power_overhead + this.cost_power_scale * this.subsystem.design.size + this.cost_power_unit * this.quantity) * this.cost_mod;
 		}
-	}, {
-		key: 'cost_power_overhead',
-
 
 		// DP column
+
+	}, {
+		key: 'cost_power_overhead',
 		get: function get() {
 			return this.attribute('Pwr O/H');
 		}
-	}, {
-		key: 'cost_power_scale',
-
 
 		// DQ
+
+	}, {
+		key: 'cost_power_scale',
 		get: function get() {
 			return this.attribute('Scale Pwr');
 		}
-	}, {
-		key: 'cost_power_unit',
-
 
 		// DR
+
+	}, {
+		key: 'cost_power_unit',
 		get: function get() {
 			return this.attribute('Unit Power');
 		}
-	}, {
-		key: 'cost_SR',
-
 
 		// CM column
+
+	}, {
+		key: 'cost_SR',
 		get: function get() {
 			// =CK31 * DO31 * CM$29
 			// CM29 is subsystem frame 'SR Cost x'
@@ -988,30 +978,30 @@ var DesignComponent = function () {
 			// DO31 is SR Cost x off the part list
 			return (this.weight_internal + this.weight_external) * this.cost_SR_mult * this.subsystem.cost_SR_mult;
 		}
-	}, {
-		key: 'cost_SR_mult',
-
 
 		// DO31
+
+	}, {
+		key: 'cost_SR_mult',
 		get: function get() {
 			// SR Cost x off the part list
 			return this.attribute('SR Cost x');
 		}
-	}, {
-		key: 'cost_BR',
-
 
 		// CL column
+
+	}, {
+		key: 'cost_BR',
 		get: function get() {
 			// total weight divided by br to weight mult
 			return (this.weight_internal + this.weight_external) / BR_TO_WEIGHT_MULTIPLIER;
 		}
-	}, {
-		key: 'weight_internal',
-
 
 		// CK column
 		// scalar
+
+	}, {
+		key: 'weight_internal',
 		get: function get() {
 			// =(DL31 + IF(DF31,DM31*BK$26,DN31)*BK31) * DE31 * DG31
 			// DL31 is "Weight O/H", weight overhead, off parts list
@@ -1028,14 +1018,14 @@ var DesignComponent = function () {
 					return this.weight_overhead_raw * this.weight_custom * this.cost_mod;
 				default:
 					return this.weight_raw * this.weight_custom * this.cost_mod;
-			};
+			}
 		}
-	}, {
-		key: 'weight_external',
-
 
 		// CK column
 		// scalar
+
+	}, {
+		key: 'weight_external',
 		get: function get() {
 			// =(DL31 + IF(DF31,DM31*BK$26,DN31)*BK31) * DE31 * DG31
 			// DL31 is "Weight O/H", weight overhead, off parts list
@@ -1053,17 +1043,17 @@ var DesignComponent = function () {
 					return this.weight_unit_raw * this.quantity * this.weight_custom * this.cost_mod;
 				default:
 					return 0;
-			};
+			}
 		}
-	}, {
-		key: 'weight_raw',
-
 
 		// (DL31 + IF(DF31,DM31*BK$26,DN31)*BK31)
 		// scalar
 		//
 		// the weight of the component before component and size modifiers
 		// are applied
+
+	}, {
+		key: 'weight_raw',
 		get: function get() {
 			return this.weight_overhead_raw + this.weight_per_unit * this.quantity;
 		}
@@ -1072,19 +1062,19 @@ var DesignComponent = function () {
 		get: function get() {
 			return this.component_modifier['Cost Mod'] || 1;
 		}
-	}, {
-		key: 'weight_per_unit',
-
 
 		// IF(DF31,
 		// DM31*BK$26,
 		// DN31)
+
+	}, {
+		key: 'weight_per_unit',
 		get: function get() {
 			if (this.component_modifier['Scale Wt?']) {
 				return this.weight_scale_raw * this.subsystem.design.size;
 			} else {
 				return this.weight_unit_raw;
-			};
+			}
 		}
 
 		// DL31
@@ -1094,37 +1084,37 @@ var DesignComponent = function () {
 		get: function get() {
 			return this.attribute('Weight O/H');
 		}
-	}, {
-		key: 'weight_scale_raw',
-
 
 		// DM31
+
+	}, {
+		key: 'weight_scale_raw',
 		get: function get() {
 			return this.attribute('Scale Weight');
 		}
-	}, {
-		key: 'weight_unit_raw',
-
 
 		// DN31
+
+	}, {
+		key: 'weight_unit_raw',
 		get: function get() {
 			return this.attribute('Unit Weight');
 		}
-	}, {
-		key: 'raw_effect',
-
 
 		// DK column
 		// scalar
+
+	}, {
+		key: 'raw_effect',
 		get: function get() {
 			return this.attribute('Effect');
 		}
-	}, {
-		key: 'stats',
-
 
 		// CE block
 		// statline
+
+	}, {
+		key: 'stats',
 		get: function get() {
 			// CD column * CY block * CE$29 row
 			//
@@ -1132,12 +1122,12 @@ var DesignComponent = function () {
 			// component's statline modifier
 			return new Statline(this.component_modifier).mult(this.effect * this.subsystem.stats_multiplier);
 		}
-	}, {
-		key: 'effect',
-
 
 		// CD column
 		// scalar
+
+	}, {
+		key: 'effect',
 		get: function get() {
 			switch (this.subsystem.name) {
 				case 'Warp Core':
@@ -1150,35 +1140,32 @@ var DesignComponent = function () {
 					//
 					// raw effect from parts list * quantity multiplier * custom effect
 					return this.raw_effect * this.effect_custom * this.qty_mult;
-			};
+			}
 		}
-	}, {
-		key: 'qty_mult',
-
 
 		// IF(CX31,
 		// 1 + 3.5 * log10(0.7 * BK31 + 0.3)
 		// ,1)
 		//
 		// scalar
+
+	}, {
+		key: 'qty_mult',
 		get: function get() {
 			if (this.uses_effect_qty) {
 				return 1 + 3.5 * Math.log(0.7 * this.quantity + 0.3) / Math.log(10);
 			} else {
 				return 1;
-			};
+			}
 		}
-	}, {
-		key: 'uses_effect_qty',
-
 
 		// boolean
+
+	}, {
+		key: 'uses_effect_qty',
 		get: function get() {
 			return this.component_modifier['Effect Qty?'];
 		}
-	}, {
-		key: 'weight_custom',
-
 
 		// DE column
 		// scalar
@@ -1186,6 +1173,9 @@ var DesignComponent = function () {
 		// Additional custom multiplier on weight (and thus also BR/SR) -
 		// can be formula as long as it doesn't reference any cell on this
 		// row
+
+	}, {
+		key: 'weight_custom',
 		get: function get() {
 			if (this.name === 'Primary Phasers') {
 				return this.setting_phaser_array_weight_multiplier;
@@ -1198,16 +1188,16 @@ var DesignComponent = function () {
 			}
 			return 1;
 		}
-	}, {
-		key: 'effect_custom',
-
 
 		// CW column
 		//
 		// scalar
-		// 
+		//
 		// comment on sheet: Additional custom multiplier on effect - can
 		// be formula as long as it doesn't reference any cell on this row
+
+	}, {
+		key: 'effect_custom',
 		get: function get() {
 			if (this.name === 'Primary Phasers') {
 				// =(1-(BK$26/100)) * IF($D$33,2,1)
@@ -1245,7 +1235,7 @@ var DesignComponent = function () {
 				return 1.5;
 			} else {
 				return 1.0;
-			};
+			}
 		}
 	}, {
 		key: 'setting_phaser_array_combat_multiplier',
@@ -1254,7 +1244,7 @@ var DesignComponent = function () {
 				return 2.0;
 			} else {
 				return 1.0;
-			};
+			}
 		}
 	}, {
 		key: 'setting_burst_launcher_combat_multiplier',
@@ -1263,7 +1253,7 @@ var DesignComponent = function () {
 				return 1.5;
 			} else {
 				return 1.0;
-			};
+			}
 		}
 	}, {
 		key: 'setting_burst_launcher_weight_multiplier',
@@ -1272,14 +1262,12 @@ var DesignComponent = function () {
 				return 1.5;
 			} else {
 				return 1.0;
-			};
+			}
 		}
 	}]);
 
 	return DesignComponent;
 }();
-
-;
 
 var DesignSubsystem = function () {
 	function DesignSubsystem(db, design, design_subsystem_json) {
@@ -1327,6 +1315,9 @@ var DesignSubsystem = function () {
 				return comp.name === component_name;
 			});
 		}
+
+		// CN column, 29 etc
+
 	}, {
 		key: 'is_valid_frame',
 		get: function get() {
@@ -1377,34 +1368,34 @@ var DesignSubsystem = function () {
 			var _this6 = this;
 
 			return this.db.find_frames(this.name).filter(function (frame) {
-				return frame['Weight Class'] == _this6.design.weight_class_raw;
+				return frame['Weight Class'] === _this6.design.weight_class_raw;
 			}).filter(function (frame) {
 				return !frame['Name'].match(/^x/);
 			});
 		}
-	}, {
-		key: 'weight_cap',
-
 
 		// CV20, CV41
+
+	}, {
+		key: 'weight_cap',
 		get: function get() {
 			// sum of CV31-40 plus CV29
 			return this.weight_cap_components + this.weight_cap_frame;
 		}
-	}, {
-		key: 'weight_cap_components',
-
 
 		// CV column
+
+	}, {
+		key: 'weight_cap_components',
 		get: function get() {
 			// these can't be filled in the C8 sheet
 			return 0;
 		}
-	}, {
-		key: 'weight_cap_frame',
-
 
 		// CV29
+
+	}, {
+		key: 'weight_cap_frame',
 		get: function get() {
 			// =(DL29/100) * CV$18
 			return this.max_size_frame * this.design.frame_max_size_raw / 100;
@@ -1443,11 +1434,11 @@ var DesignSubsystem = function () {
 				return 1 - (1 - sum) * (1 - value);
 			}, 0);
 		}
-	}, {
-		key: 'build_time',
-
 
 		// CT column, subsystems
+
+	}, {
+		key: 'build_time',
 		get: function get() {
 			// =SUM(CT31:CT40)+CT29
 			//
@@ -1459,24 +1450,24 @@ var DesignSubsystem = function () {
 			// frames list
 			return (0, _uiFunctions.from_frac)(this.frame_attribute('Build Time'));
 		}
-	}, {
-		key: 'cost_crew_frame_mult',
-
 
 		// DS31-DSU31 row
 		// crewline
+
+	}, {
+		key: 'cost_crew_frame_mult',
 		get: function get() {
 			// CP$18 * DR29
 			// CP$18 is DR18 is design principal frame 'O-Mod' off parts list
 			// DR29 is subframe 'O-Mod' off parts list
 			return this.cost_crew_frame_mult_raw.mult(this.design.cost_crew_frame_mult);
 		}
-	}, {
-		key: 'cost_crew_frame_mult_raw',
-
 
 		// DR29 is subframe 'O-Mod' off parts list
 		// crewline
+
+	}, {
+		key: 'cost_crew_frame_mult_raw',
 		get: function get() {
 			var _this7 = this;
 
@@ -1490,12 +1481,12 @@ var DesignSubsystem = function () {
 			}, {});
 			return new Crewline(crew_block);
 		}
-	}, {
-		key: 'cost_crew',
-
 
 		// CP, CQ, CR block
 		// crewline
+
+	}, {
+		key: 'cost_crew',
 		get: function get() {
 			// straight sum of components
 			return this.components.filter(function (comp) {
@@ -1506,19 +1497,19 @@ var DesignSubsystem = function () {
 				return sum.add(value);
 			}, new Crewline({}));
 		}
-	}, {
-		key: 'power_generation',
-
 
 		// CO column
 		// scalar
+
+	}, {
+		key: 'power_generation',
 		get: function get() {
 			switch (this.name) {
 				case 'Warp Core':
 					return this.power_generation_components + this.setting_safety_performance;
 				default:
 					return this.power_generation_components;
-			};
+			}
 		}
 	}, {
 		key: 'power_generation_components',
@@ -1541,13 +1532,10 @@ var DesignSubsystem = function () {
 			if (!warp_core_type || !warp_core_type.is_loaded) {
 				return 0;
 			}
-			return -this.get_setting('Safety/Performance') * warp_core_type.effect * Math.pow(2.0, Math.abs(this.get_setting('Safety/Performance')) / 2.0) / 100.0;
+			return -this.get_setting('Safety/Performance') * warp_core_type.effect * (Math.pow(2.0, Math.abs(this.get_setting('Safety/Performance'))) / 2.0) / 100.0;
 		}
 	}, {
 		key: 'cost_power',
-
-
-		// CN column, 29 etc
 		get: function get() {
 			return this.cost_power_components;
 		}
@@ -1562,11 +1550,11 @@ var DesignSubsystem = function () {
 				return sum + value;
 			}, 0);
 		}
-	}, {
-		key: 'cost_SR_mult',
-
 
 		// CM column, 29 etc
+
+	}, {
+		key: 'cost_SR_mult',
 		get: function get() {
 			// =CM18 * DU29
 			// CM18 is principal frame SR cost
@@ -1578,11 +1566,11 @@ var DesignSubsystem = function () {
 		get: function get() {
 			return this.frame_attribute('SR-Mod');
 		}
-	}, {
-		key: 'cost_SR',
-
 
 		// CM column, 20:24, 41 etc
+
+	}, {
+		key: 'cost_SR',
 		get: function get() {
 			// straight sum of component costs
 			return this.components.filter(function (comp) {
@@ -1593,20 +1581,20 @@ var DesignSubsystem = function () {
 				return sum + value;
 			}, 0);
 		}
-	}, {
-		key: 'cost_BR',
-
 
 		// sum of component costs plus the frame cost
+
+	}, {
+		key: 'cost_BR',
 		get: function get() {
 			return this.cost_BR_components + this.cost_BR_frame;
 		}
-	}, {
-		key: 'cost_BR_frame',
-
 
 		// CL column
 		// CK column / br to weight mult
+
+	}, {
+		key: 'cost_BR_frame',
 		get: function get() {
 			return this.weight_frame / BR_TO_WEIGHT_MULTIPLIER;
 		}
@@ -1621,41 +1609,41 @@ var DesignSubsystem = function () {
 				return sum + value;
 			}, 0);
 		}
-	}, {
-		key: 'weight_external',
-
 
 		// CK20:CK25 column, [CK41, CK57, CK63, ...]
 		// scalar
+
+	}, {
+		key: 'weight_external',
 		get: function get() {
 			// =SUM(CK31:CK40)+CK29
 			return this.weight_components_external;
 		}
-	}, {
-		key: 'weight_internal',
-
 
 		// CK20:CK25 column, [CK41, CK57, CK63, ...]
 		// scalar
+
+	}, {
+		key: 'weight_internal',
 		get: function get() {
 			// =SUM(CK31:CK40)+CK29
 			return this.weight_frame + this.weight_components_internal;
 		}
-	}, {
-		key: 'weight_frame',
-
 
 		// CK29, DM29 if populated, DM29 is weight straight off frames list
 		// scalar
+
+	}, {
+		key: 'weight_frame',
 		get: function get() {
 			return this.frame_attribute('Wt') || 0;
 		}
-	}, {
-		key: 'weight_components_external',
-
 
 		// =SUM(CK31:CK40)
 		// scalar
+
+	}, {
+		key: 'weight_components_external',
 		get: function get() {
 			return this.components.filter(function (comp) {
 				return comp.is_loaded;
@@ -1665,12 +1653,12 @@ var DesignSubsystem = function () {
 				return sum + value;
 			}, 0);
 		}
-	}, {
-		key: 'weight_components_internal',
-
 
 		// =SUM(CK31:CK40)
 		// scalar
+
+	}, {
+		key: 'weight_components_internal',
 		get: function get() {
 			return this.components.filter(function (comp) {
 				return comp.is_loaded;
@@ -1680,15 +1668,15 @@ var DesignSubsystem = function () {
 				return sum + value;
 			}, 0);
 		}
-	}, {
-		key: 'stats',
-
 
 		// get weight_multiplier() {
 		// 	return this.frame_attribute('') || 0;
 		// };
 
 		// [CE41 row;CE57 row;CE63 row] block
+
+	}, {
+		key: 'stats',
 		get: function get() {
 			return this.components.filter(function (comp) {
 				return comp.is_loaded;
@@ -1698,11 +1686,11 @@ var DesignSubsystem = function () {
 				return sum.add(value);
 			}, new Statline({}));
 		}
-	}, {
-		key: 'stats_multiplier',
-
 
 		// CE29, CD29, DO29
+
+	}, {
+		key: 'stats_multiplier',
 		get: function get() {
 			// =IF(BI29="",0,DGET('[C8] Frames'!$A:$R,DO$28,{"Type","Name";"="&$AJ29,"="&BI29}))
 			// BI29 is frame name
@@ -1714,8 +1702,6 @@ var DesignSubsystem = function () {
 
 	return DesignSubsystem;
 }();
-
-;
 
 var Module = function () {
 	function Module(db, design, design_module_json) {
@@ -1768,21 +1754,21 @@ var Module = function () {
 		set: function set(value) {
 			this.json['Type'] = value;
 		}
-	}, {
-		key: 'build_time',
-
 
 		// CT88, DN88
+
+	}, {
+		key: 'build_time',
 		get: function get() {
 			// straight off modules list
 			return (0, _uiFunctions.from_frac)(this.attribute('Build Time'));
 		}
-	}, {
-		key: 'cost_crew',
-
 
 		// CP-CR 88, DS-DU88
 		// crewline
+
+	}, {
+		key: 'cost_crew',
 		get: function get() {
 			var _this8 = this;
 
@@ -1797,40 +1783,40 @@ var Module = function () {
 			}, {});
 			return new Crewline(stat_block);
 		}
-	}, {
-		key: 'cost_power',
-
 
 		// CN25, CN88, DP88, straight from parts list
+
+	}, {
+		key: 'cost_power',
 		get: function get() {
 			return this.attribute('Power Cost');
 		}
-	}, {
-		key: 'cost_SR',
-
 
 		// CM25, CM88, DO88
 		// straight off parts list
+
+	}, {
+		key: 'cost_SR',
 		get: function get() {
 			return this.attribute('SR Cost');
 		}
-	}, {
-		key: 'cost_BR',
-
 
 		// CL25, CL88
+
+	}, {
+		key: 'cost_BR',
 		get: function get() {
 			// CK88 / AL7
 			// CK88 is weight
 			// AL7 is the br to weight constant
 			return this.weight_total / BR_TO_WEIGHT_MULTIPLIER;
 		}
-	}, {
-		key: 'stats',
-
 
 		// CE88 row, CY88 row
 		// statline
+
+	}, {
+		key: 'stats',
 		get: function get() {
 			var _this9 = this;
 
@@ -1845,13 +1831,13 @@ var Module = function () {
 			}, {});
 			return new Statline(stat_block);
 		}
-	}, {
-		key: 'weight_total',
-
 
 		// CK25, CK88, DM88
 		// scalar
 		// "Weight" value off module definition
+
+	}, {
+		key: 'weight_total',
 		get: function get() {
 			return this.weight_internal + this.weight_external;
 		}
@@ -1865,23 +1851,23 @@ var Module = function () {
 		get: function get() {
 			return this.attribute('Weight');
 		}
-	}, {
-		key: 'size',
-
 
 		// BK25, BK88
 		// scalar
+
+	}, {
+		key: 'size',
 		get: function get() {
 			// BK25 = rollbar size?, BK88
 			// BK88 = rollbar size? = $CV88 / $AL$6
 			return this.size_raw / SIZE_TO_WEIGHT_CAP_MULTIPLIER;
 		}
-	}, {
-		key: 'size_raw',
-
 
 		// CV88, DL88
 		// scalar
+
+	}, {
+		key: 'size_raw',
 		get: function get() {
 			// $CV88 = DL88 = module weight cap? = module weight cap from "Weight Cap" element of module
 			return this.attribute('Weight Cap');
@@ -1890,8 +1876,6 @@ var Module = function () {
 
 	return Module;
 }();
-
-;
 
 var Design = function () {
 	function Design(db, design_json) {
@@ -1912,7 +1896,7 @@ var Design = function () {
 		} else {
 			this.parts_list_name = this.db.name;
 			this.parts_list_timestamp = this.db.timestamp;
-		};
+		}
 		this.princ_frame_def = this.db.find_frame(this.json['Principal Frame']);
 		if (!this.princ_frame_def) {
 			console.log("WARNING: Could not find principal frame named '" + this.json['Principal Frame'] + "'");
@@ -1938,7 +1922,7 @@ var Design = function () {
 	}, {
 		key: 'matches_parts_list',
 		value: function matches_parts_list(parts_db) {
-			return this.parts_list_name === parts_db.name && this.parts_list_timestamp.getTime() == parts_db.timestamp.getTime();
+			return this.parts_list_name === parts_db.name && this.parts_list_timestamp.getTime() === parts_db.timestamp.getTime();
 		}
 	}, {
 		key: 'frame_attribute',
@@ -1983,7 +1967,7 @@ var Design = function () {
 				return 'parts list missing';
 			} else {
 				return this.stats.toString();
-			};
+			}
 		}
 	}, {
 		key: 'has_parts_list_info',
@@ -2024,37 +2008,37 @@ var Design = function () {
 		get: function get() {
 			return this.db.find_frames('Frame');
 		}
-	}, {
-		key: 'build_time',
-
 
 		// CT27, CT26
+
+	}, {
+		key: 'build_time',
 		get: function get() {
 			return Math.ceil(this.build_time_raw * 12) / 12;
 		}
-	}, {
-		key: 'build_time_raw',
-
 
 		// CT26
+
+	}, {
+		key: 'build_time_raw',
 		get: function get() {
 			// =SUM(CT20:CT25)+CT$18
 			return this.build_time_frame + this.build_time_subsystems + this.module.build_time;
 		}
-	}, {
-		key: 'build_time_frame',
-
 
 		// CT18, DN18
+
+	}, {
+		key: 'build_time_frame',
 		get: function get() {
 			// "Build Time" off frames list
 			return (0, _uiFunctions.from_frac)(this.frame_attribute('Build Time'));
 		}
-	}, {
-		key: 'build_time_subsystems',
-
 
 		// sum of CT column on subsystems
+
+	}, {
+		key: 'build_time_subsystems',
 		get: function get() {
 			return this.subsystems.filter(function (ss) {
 				return ss.is_loaded;
@@ -2069,11 +2053,11 @@ var Design = function () {
 		get: function get() {
 			return Math.round(this.evasion_raw * 1e4) / 1e4;
 		}
-	}, {
-		key: 'evasion_raw',
-
 
 		// CD11
+
+	}, {
+		key: 'evasion_raw',
 		get: function get() {
 			// =(MAX(0, 30 - (BK$26*3)) / 100) * (1+((CJ$40/DD$40*10)/100))
 			// BK26 is size
@@ -2101,11 +2085,11 @@ var Design = function () {
 				return 1 - (1 - sum) * (1 - value);
 			}, 0);
 		}
-	}, {
-		key: 'warp_core_breach',
-
 
 		// CD13, DV84
+
+	}, {
+		key: 'warp_core_breach',
 		get: function get() {
 			return this.warp_core_breach_subsystems;
 		}
@@ -2123,23 +2107,23 @@ var Design = function () {
 				return 1 - (1 - sum) * (1 - value);
 			}, 0);
 		}
-	}, {
-		key: 'cost_crew_size_mod',
-
 
 		// ($BK$26^0.7 / 2)
 		// crewline
+
+	}, {
+		key: 'cost_crew_size_mod',
 		get: function get() {
 			// BK26 is design size
 			return Math.pow(this.size, 0.7) / 2;
 			// return 1/2;
 		}
-	}, {
-		key: 'cost_crew_frame_mult',
-
 
 		// CP$18 is DR18 is design principal frame 'O-Mod' off parts list
 		// crewline
+
+	}, {
+		key: 'cost_crew_frame_mult',
 		get: function get() {
 			var _this11 = this;
 
@@ -2153,22 +2137,22 @@ var Design = function () {
 			}, {});
 			return new Crewline(crew_block);
 		}
-	}, {
-		key: 'cost_crew',
-
 
 		// T,U,V 3; CP,CQ,CR 27
 		// crewline
+
+	}, {
+		key: 'cost_crew',
 		get: function get() {
 			// ceiling of CP,CQ,CR 26
 			return this.cost_crew_raw.ceil;
 		}
-	}, {
-		key: 'cost_crew_raw',
-
 
 		// T,U,V 2
 		// crewline
+
+	}, {
+		key: 'cost_crew_raw',
 		get: function get() {
 			// CP,CQ,CR 26
 			// sum of subsystem crew costs plus module crew cost
@@ -2201,19 +2185,19 @@ var Design = function () {
 				return sum + value;
 			}, 0);
 		}
-	}, {
-		key: 'stats',
-
 
 		// CE27 row
+
+	}, {
+		key: 'stats',
 		get: function get() {
 			return this.stats_raw.floor;
 		}
-	}, {
-		key: 'stats_raw',
-
 
 		// BL26, CE26 row
+
+	}, {
+		key: 'stats_raw',
 		get: function get() {
 			return this.stats_subsystems.add(this.stats_module);
 		}
@@ -2233,50 +2217,50 @@ var Design = function () {
 		get: function get() {
 			return this.module.stats;
 		}
-	}, {
-		key: 'weight_total',
-
 
 		// O3, CK27
 		// scalar
+
+	}, {
+		key: 'weight_total',
 		get: function get() {
 			return Math.floor(this.weight_total_raw);
 		}
-	}, {
-		key: 'weight_external',
-
 
 		// O2, CK26
 		// scalar
+
+	}, {
+		key: 'weight_external',
 		get: function get() {
 			// =SUM(CK20:CK25)+CK$18
 			return this.weight_subsystems_external + this.module.weight_external;
 		}
-	}, {
-		key: 'weight_internal',
-
 
 		// O2, CK26
 		// scalar
+
+	}, {
+		key: 'weight_internal',
 		get: function get() {
 			// =SUM(CK20:CK25)+CK$18
 			return this.weight_frame + this.weight_subsystems_internal + this.module.weight_internal;
 		}
-	}, {
-		key: 'weight_total_raw',
-
 
 		// O2, CK26
 		// scalar
+
+	}, {
+		key: 'weight_total_raw',
 		get: function get() {
 			// =SUM(CK20:CK25)+CK$18
 			return this.weight_external + this.weight_internal;
 		}
-	}, {
-		key: 'weight_subsystems_internal',
-
 
 		// CK26
+
+	}, {
+		key: 'weight_subsystems_internal',
 		get: function get() {
 			// =SUM(CK20:CK25)
 			// CK20:24 is subsystem weights
@@ -2289,11 +2273,11 @@ var Design = function () {
 				return sum + value;
 			}, 0);
 		}
-	}, {
-		key: 'weight_subsystems_external',
-
 
 		// CK26
+
+	}, {
+		key: 'weight_subsystems_external',
 		get: function get() {
 			// =SUM(CK20:CK25)
 			// CK20:24 is subsystem weights
@@ -2306,20 +2290,20 @@ var Design = function () {
 				return sum + value;
 			}, 0);
 		}
-	}, {
-		key: 'weight_frame',
-
 
 		// CK$18, DM18
 		// part frame weight
+
+	}, {
+		key: 'weight_frame',
 		get: function get() {
 			return this.frame_attribute('Wt');
 		}
-	}, {
-		key: 'cost_BR',
-
 
 		// P3, CL27
+
+	}, {
+		key: 'cost_BR',
 		get: function get() {
 			// =CEILING(CL26,INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0)))
 			// ceiling(CL16, cost_BR_round)
@@ -2338,30 +2322,30 @@ var Design = function () {
 			// CD9 is weight class
 			return BR_COST_ROUND_MAP[this.weight_class];
 		}
-	}, {
-		key: 'weight_class',
-
 
 		// CD9
+
+	}, {
+		key: 'weight_class',
 		get: function get() {
 			// =IF(DK$18 = 1, "Frigate", IF(DK$18 = 2, "Cruiser", "Explorer"))
 			return WEIGHT_CLASS_MAP[this.weight_class_raw];
 		}
-	}, {
-		key: 'weight_class_raw',
-
 
 		// DK18
+
+	}, {
+		key: 'weight_class_raw',
 		get: function get() {
 			// "Weight Class" value off of principal frame definition
 			// integer in [1, 3]
 			return this.frame_attribute('Weight Class');
 		}
-	}, {
-		key: 'cost_BR_raw',
-
 
 		// P2, CL26
+
+	}, {
+		key: 'cost_BR_raw',
 		get: function get() {
 			// sum(subsystem BR costs) + module cost + frame cost
 			return this.cost_BR_components + this.module.cost_BR + this.cost_BR_frame;
@@ -2377,42 +2361,42 @@ var Design = function () {
 				return sum + value;
 			}, 0);
 		}
-	}, {
-		key: 'cost_BR_frame',
-
 
 		// CL18
 		// scalar
+
+	}, {
+		key: 'cost_BR_frame',
 		get: function get() {
 			// CK18 / $AL$7
 			// CK18 = DM18
 			// DM18 is frame "Wt" value
 			return this.weight_frame / BR_TO_WEIGHT_MULTIPLIER;
 		}
-	}, {
-		key: 'cost_SR_frame_mult',
-
 
 		// CM18, DU18
+
+	}, {
+		key: 'cost_SR_frame_mult',
 		get: function get() {
 			return this.frame_attribute('SR-Mod');
 		}
-	}, {
-		key: 'cost_SR',
-
 
 		// Q2, CM27
+
+	}, {
+		key: 'cost_SR',
 		get: function get() {
 			// =CEILING(CL26,INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0)))
 			// ceiling(CL16, cost_BR_round)
 			// round raw BR cost to next integer multiple of the rounding interval
 			return Math.ceil(this.cost_SR_raw / this.cost_SR_round) * this.cost_SR_round;
 		}
-	}, {
-		key: 'cost_SR_raw',
-
 
 		// Q3, CM26
+
+	}, {
+		key: 'cost_SR_raw',
 		get: function get() {
 			// sum of subsystems plus module
 			return this.cost_SR_subsystems + this.module.cost_SR;
@@ -2433,20 +2417,20 @@ var Design = function () {
 		get: function get() {
 			return SR_COST_ROUND_MAP[this.weight_class];
 		}
-	}, {
-		key: 'cost_power',
-
 
 		// R2, CN27
+
+	}, {
+		key: 'cost_power',
 		get: function get() {
 			// round, not floor or ceil!
 			return Math.round(this.cost_power_raw);
 		}
-	}, {
-		key: 'cost_power_raw',
-
 
 		// R3, CN26
+
+	}, {
+		key: 'cost_power_raw',
 		get: function get() {
 			return this.cost_power_subsystems + this.module.cost_power;
 		}
@@ -2461,39 +2445,39 @@ var Design = function () {
 				return sum + value;
 			}, 0);
 		}
-	}, {
-		key: 'size_round',
-
 
 		// BK27
+
+	}, {
+		key: 'size_round',
 		get: function get() {
 			return Math.ceil(this.size);
 		}
-	}, {
-		key: 'size',
-
 
 		// BK26
+
+	}, {
+		key: 'size',
 		get: function get() {
 			// BK18 + BK88
 			return this.frame_size + this.module.size;
 		}
-	}, {
-		key: 'frame_size',
-
 
 		// BK18, "Size"
+
+	}, {
+		key: 'frame_size',
 		get: function get() {
 			// BK18 = $CV18 / $AL$6
 			// $CV18 = weight cap, DL18, equal principal frame MaxSz
 			// $AL$6 = "Size-To-Weight-Cap Multiplier", constant 300
 			return this.frame_max_size_raw / SIZE_TO_WEIGHT_CAP_MULTIPLIER;
 		}
-	}, {
-		key: 'frame_max_size_raw',
-
 
 		// CV18, DL18
+
+	}, {
+		key: 'frame_max_size_raw',
 		get: function get() {
 			// 'MaxSz' item off principal frame definition
 			return this.frame_attribute('MaxSz');
@@ -2506,13 +2490,13 @@ var Design = function () {
 	}, {
 		key: 'pretty_miscstats',
 		get: function get() {
-			return 'Evasion Chance: ' + (this.evasion * 100).toFixed(2) + "%\t" + 'Warp Core Breach Chance: ' + (this.warp_core_breach * 100).toFixed(2) + '%';
+			return 'Evasion Chance: ' + (this.evasion * 100).toFixed(2) + '%\t' + 'Warp Core Breach Chance: ' + (this.warp_core_breach * 100).toFixed(2) + '%';
 		}
 	}, {
 		key: 'pretty_summary',
 		get: function get() {
 			var ID = 'Class: ' + this.name;
-			return [ID, this.pretty_statline, this.pretty_miscstats].join("\n");
+			return [ID, this.pretty_statline, this.pretty_miscstats].join('\n');
 		}
 	}, {
 		key: 'pretty_statline_raw',
@@ -2529,7 +2513,7 @@ var Design = function () {
 	}, {
 		key: 'pretty_sdb_info',
 		get: function get() {
-			return [this.pretty_statline_raw, this.pretty_buildinfo].join("\n");
+			return [this.pretty_statline_raw, this.pretty_buildinfo].join('\n');
 		}
 	}, {
 		key: 'pretty_dump',
@@ -2545,8 +2529,6 @@ var Design = function () {
 
 	return Design;
 }();
-
-;
 
 var DB = function () {
 	function DB(parts_list_json) {
@@ -2572,7 +2554,7 @@ var DB = function () {
 	_createClass(DB, [{
 		key: 'matches',
 		value: function matches(other) {
-			return this.name == other.name && this.timestamp == other.timestamp;
+			return this.name === other.name && this.timestamp === other.timestamp;
 		}
 	}, {
 		key: 'matches_pretty_name',
@@ -2637,7 +2619,7 @@ var DB = function () {
 		key: 'find_by_design_json',
 		value: function find_by_design_json(design_json) {
 			return function (db) {
-				return db.name === design_json['Parts List'].name && db.timestamp.getTime() == new Date(design_json['Parts List'].timestamp).getTime();
+				return db.name === design_json['Parts List'].name && db.timestamp.getTime() === new Date(design_json['Parts List'].timestamp).getTime();
 			};
 		}
 	}, {
@@ -2651,8 +2633,6 @@ var DB = function () {
 
 	return DB;
 }();
-
-;
 
 exports.Design = Design;
 exports.DB = DB;
@@ -2675,10 +2655,6 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _shipengine = __webpack_require__(/*! ../lib/shipengine.js */ "./lib/shipengine.js");
-
-var ShipEngine = _interopRequireWildcard(_shipengine);
-
 var _uiFunctions = __webpack_require__(/*! ./ui-functions.js */ "./src/ui-functions.js");
 
 var _statlineCell = __webpack_require__(/*! ./statline-cell.vue */ "./src/statline-cell.vue");
@@ -2687,7 +2663,61 @@ var _statlineCell2 = _interopRequireDefault(_statlineCell);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 exports.default = {
 	name: 'ComponentTr',
@@ -2703,10 +2733,10 @@ exports.default = {
 				return 'This component is the latest-available part in the design.';
 			} else {
 				return false;
-			};
+			}
 		},
 		is_limiting_tech_year: function is_limiting_tech_year() {
-			return this.se_component.tech_year == this.se_component.subsystem.design.tech_year;
+			return this.se_component.tech_year === this.se_component.subsystem.design.tech_year;
 		},
 		tech_year: function tech_year() {
 			return this.se_component.tech_year;
@@ -2751,7 +2781,7 @@ exports.default = {
 				return this.quantity;
 			} else {
 				return this.quantity.toFixed(2);
-			};
+			}
 		},
 
 		quantity: {
@@ -2787,8 +2817,10 @@ exports.default = {
 			}
 		},
 		is_quantity_valid: function is_quantity_valid() {
+			var _this = this;
+
 			return function (hypothesis) {
-				return this.valid_quantities.map(function (elem) {
+				return _this.valid_quantities.map(function (elem) {
 					return elem === hypothesis;
 				}).reduce(function (acc, elem) {
 					return acc || elem;
@@ -2801,78 +2833,27 @@ exports.default = {
 			var hypothesis = this.quantity + 1;
 			if (this.is_quantity_valid(hypothesis)) {
 				this.quantity = hypothesis;
-			};
+			}
 		},
 		decrement_quantity: function decrement_quantity() {
 			var hypothesis = this.quantity - 1;
 			if (this.is_quantity_valid(hypothesis)) {
 				this.quantity = hypothesis;
-			};
+			}
 		},
 		quantity_select_wheel_event: function quantity_select_wheel_event(ev) {
 			if (ev.deltaY > 0) {
 				this.decrement_quantity();
 			} else if (ev.deltaY < 0) {
 				this.increment_quantity();
-			};
-			if (ev.preventDefault) ev.preventDefault();
+			}
+			if (ev.preventDefault) {
+				ev.preventDefault();
+			}
 			ev.returnValue = false;
 		}
 	}
-}; //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+};
 
 /***/ }),
 
@@ -2951,7 +2932,6 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 var LOCAL_PARTS_LISTS_KEY = 'parts_lists';
 var LOCAL_SAVES_KEY = 'local_saves';
-var STATUS_DEFAULT_DURATION = 2000;
 
 exports.default = {
 	name: 'DesignImportExport',
@@ -2967,7 +2947,7 @@ exports.default = {
 			// blueprints without clobbering their current work.
 			selected_save: null,
 
-			status_message: "",
+			status_message: '',
 
 			status_message_timeout_id: null,
 
@@ -2979,10 +2959,10 @@ exports.default = {
 	computed: _extends({
 		save_design_error: function save_design_error() {
 			if (!this.se_design.matches_parts_list(this.se_db)) {
-				return "Save disabled: unset parts list";
+				return 'Save disabled: unset parts list';
 			}
 			if (!this.se_design.is_loaded) {
-				return "Save disabled: Unknown parts/frames";
+				return 'Save disabled: Unknown parts/frames';
 			}
 			return null;
 		},
@@ -2993,7 +2973,7 @@ exports.default = {
 					return this.selected_parts_list.pretty_name;
 				} else {
 					return null;
-				};
+				}
 			},
 			set: function set(value) {
 				this.selected_parts_list = this.all_parts_lists.find(ShipEngine.DB.find_by_pretty_name(value));
@@ -3009,7 +2989,7 @@ exports.default = {
 					return this.selected_save.pretty_name;
 				} else {
 					return null;
-				};
+				}
 			},
 			set: function set(value) {
 				this.selected_save = this.local_saves.find(ShipEngine.Design.find_by_pretty_name(value));
@@ -3027,14 +3007,14 @@ exports.default = {
 		window.addEventListener('storage', function (ev) {
 			if (ev.key === LOCAL_PARTS_LISTS_KEY) {
 				this.parts_lists_load_from_local_storage();
-			};
+			}
 		}.bind(this));
 
 		this.local_saves_load_from_local_storage();
 		window.addEventListener('storage', function (ev) {
 			if (ev.key === LOCAL_SAVES_KEY) {
 				this.local_saves_load_from_local_storage();
-			};
+			}
 		}.bind(this));
 	},
 
@@ -3049,38 +3029,38 @@ exports.default = {
 			var loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);
 			if (loaded === null) {
 				this.local_parts_lists = [];
-				this.display_status_message("No parts lists to load");
+				this.display_status_message('No parts lists to load');
 			} else {
 				this.local_parts_lists = JSON.parse(loaded).map(function (pl_json) {
 					return new ShipEngine.DB(pl_json);
 				});
-				this.display_status_message("Parts lists loaded.");
-			};
+				this.display_status_message('Parts lists loaded');
+			}
 		},
 		parts_lists_load_selected: function parts_lists_load_selected() {
 			this.$store.commit('set_parts_list', _lodash2.default.cloneDeep(this.selected_parts_list.json));
 			this.$store.commit('set_design_parts_list');
-			this.display_status_message("Parts list loaded");
+			this.display_status_message('Parts list loaded');
 		},
 		local_saves_delete_selected: function local_saves_delete_selected() {
 			var _this = this;
 
 			// remove the selected item
 			this.local_saves = _lodash2.default.chain(this.local_saves).reject(function (elem) {
-				return elem == _this.selected_save;
+				return elem === _this.selected_save;
 			}).value();
 			this.local_saves_save_to_local_storage();
-			this.display_status_message("Blueprint deleted.");
+			this.display_status_message('Blueprint deleted');
 		},
 		local_saves_load_selected: function local_saves_load_selected() {
 			var db = this.all_parts_lists.find(ShipEngine.DB.find_by_design_json(this.selected_save.json));
 			if (db) {
 				this.$store.commit('set_parts_list', _lodash2.default.cloneDeep(db.json));
 				this.selected_parts_list = db;
-			};
+			}
 
 			this.$store.commit('set_design_json', _lodash2.default.cloneDeep(this.selected_save.json));
-			this.display_status_message("Blueprint loaded.");
+			this.display_status_message('Blueprint loaded');
 		},
 		local_saves_save_design: function local_saves_save_design() {
 			// If there's an error with the design, the save design button should be disabled,
@@ -3096,7 +3076,7 @@ exports.default = {
 			this.local_saves.push(new_save);
 			this.local_saves_save_to_local_storage();
 			this.selected_save = new_save;
-			this.display_status_message("Blueprint saved.");
+			this.display_status_message('Blueprint saved');
 		},
 		local_saves_load_from_local_storage: function local_saves_load_from_local_storage() {
 			var _this2 = this;
@@ -3104,7 +3084,7 @@ exports.default = {
 			var loaded = localStorage.getItem(LOCAL_SAVES_KEY);
 			if (loaded === null) {
 				this.local_saves = [];
-				this.display_status_message("No Blueprints to load");
+				this.display_status_message('No Blueprints to load');
 			} else {
 				this.local_saves = JSON.parse(loaded).map(function (design_json) {
 					var db = void 0;
@@ -3115,11 +3095,11 @@ exports.default = {
 					} else {
 						db = _this2.se_db;
 						wrong_db = false;
-					};
+					}
 					return new ShipEngine.Design(db || _this2.se_db, design_json, wrong_db);
 				});
-				this.display_status_message("Blueprints loaded.");
-			};
+				this.display_status_message('Blueprints loaded');
+			}
 		},
 		local_saves_save_to_local_storage: function local_saves_save_to_local_storage() {
 			localStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(_lodash2.default.chain(this.local_saves).map(function (design) {
@@ -3131,7 +3111,7 @@ exports.default = {
 			this.$refs.status_message.className = 'design-import-export-status-message';
 			window.requestAnimationFrame(function (time) {
 				window.requestAnimationFrame(function (time) {
-					this.$refs.status_message.className = "design-import-export-status-message fade";
+					this.$refs.status_message.className = 'design-import-export-status-message fade';
 				}.bind(this));
 			}.bind(this));
 		},
@@ -3204,13 +3184,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 
-var _shipengine = __webpack_require__(/*! ../lib/shipengine.js */ "./lib/shipengine.js");
-
-var ShipEngine = _interopRequireWildcard(_shipengine);
-
 var _uiFunctions = __webpack_require__(/*! ./ui-functions.js */ "./src/ui-functions.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 exports.default = {
 	name: 'DesignSummary',
@@ -3220,10 +3194,10 @@ exports.default = {
 		},
 		parts_list_load_title: function parts_list_load_title() {
 			if (this.has_parts_list_load_error) {
-				return "Could not find this parts list";
+				return 'Could not find this parts list';
 			} else {
 				return null;
-			};
+			}
 		},
 		has_parts_list_load_error: function has_parts_list_load_error() {
 			return !this.se_design.matches_parts_list(this.se_db);
@@ -3308,10 +3282,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 
-var _shipengine = __webpack_require__(/*! ../lib/shipengine.js */ "./lib/shipengine.js");
-
-var ShipEngine = _interopRequireWildcard(_shipengine);
-
 var _principalFrameRaw = __webpack_require__(/*! ./principal-frame-raw.vue */ "./src/principal-frame-raw.vue");
 
 var _principalFrameRaw2 = _interopRequireDefault(_principalFrameRaw);
@@ -3341,8 +3311,6 @@ var _module = __webpack_require__(/*! ./module.vue */ "./src/module.vue");
 var _module2 = _interopRequireDefault(_module);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 exports.default = {
 	name: 'Design',
@@ -3379,10 +3347,6 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _shipengine = __webpack_require__(/*! ../lib/shipengine.js */ "./lib/shipengine.js");
-
-var ShipEngine = _interopRequireWildcard(_shipengine);
-
 var _uiFunctions = __webpack_require__(/*! ./ui-functions.js */ "./src/ui-functions.js");
 
 var _statlineCell = __webpack_require__(/*! ./statline-cell.vue */ "./src/statline-cell.vue");
@@ -3391,7 +3355,46 @@ var _statlineCell2 = _interopRequireDefault(_statlineCell);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 exports.default = {
 	name: 'ModuleTr',
@@ -3473,45 +3476,7 @@ exports.default = {
 			this.part = this.part;
 		}
 	}
-}; //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+};
 
 /***/ }),
 
@@ -3568,10 +3533,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 
-var _shipengine = __webpack_require__(/*! ../lib/shipengine.js */ "./lib/shipengine.js");
-
-var ShipEngine = _interopRequireWildcard(_shipengine);
-
 var _statlineCell = __webpack_require__(/*! ./statline-cell.vue */ "./src/statline-cell.vue");
 
 var _statlineCell2 = _interopRequireDefault(_statlineCell);
@@ -3579,8 +3540,6 @@ var _statlineCell2 = _interopRequireDefault(_statlineCell);
 var _uiFunctions = __webpack_require__(/*! ./ui-functions.js */ "./src/ui-functions.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 exports.default = {
 	name: 'PrincipalFrame',
@@ -3593,7 +3552,7 @@ exports.default = {
 				return 'Error: Power cost greater than power generation.';
 			} else {
 				return '';
-			};
+			}
 		},
 		power_final_class: function power_final_class() {
 			return {
@@ -3686,10 +3645,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 
-var _shipengine = __webpack_require__(/*! ../lib/shipengine.js */ "./lib/shipengine.js");
-
-var ShipEngine = _interopRequireWildcard(_shipengine);
-
 var _statlineCell = __webpack_require__(/*! ./statline-cell.vue */ "./src/statline-cell.vue");
 
 var _statlineCell2 = _interopRequireDefault(_statlineCell);
@@ -3697,8 +3652,6 @@ var _statlineCell2 = _interopRequireDefault(_statlineCell);
 var _uiFunctions = __webpack_require__(/*! ./ui-functions.js */ "./src/ui-functions.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 exports.default = {
 	name: 'PrincipalFrameRaw',
@@ -3714,7 +3667,7 @@ exports.default = {
 				return 'Error: Power cost greater than power generation.';
 			} else {
 				return '';
-			};
+			}
 		},
 		power_final_class: function power_final_class() {
 			return {
@@ -3775,12 +3728,27 @@ exports.default = {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
-var _shipengine = __webpack_require__(/*! ../lib/shipengine.js */ "./lib/shipengine.js");
-
-var ShipEngine = _interopRequireWildcard(_shipengine);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 exports.default = {
 	name: 'SettingCell',
@@ -3801,10 +3769,6 @@ exports.default = {
 				this.setting['Name'] = value;
 			}
 		},
-		setting_type: function setting_type() {
-			return;
-		},
-
 		setting_value: {
 			get: function get() {
 				return this.setting['Value'];
@@ -3817,26 +3781,7 @@ exports.default = {
 			}
 		}
 	}
-}; //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+};
 
 /***/ }),
 
@@ -3854,8 +3799,6 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
-
 var _designSummary = __webpack_require__(/*! ./design-summary.vue */ "./src/design-summary.vue");
 
 var _designSummary2 = _interopRequireDefault(_designSummary);
@@ -3870,23 +3813,6 @@ var _designImportExport2 = _interopRequireDefault(_designImportExport);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
 exports.default = {
 	name: 'app',
 	components: {
@@ -3895,7 +3821,21 @@ exports.default = {
 		DesignImportExport: _designImportExport2.default
 	},
 	computed: {}
-};
+}; //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /***/ }),
 
@@ -3946,7 +3886,7 @@ exports.default = {
 				return this.raw.toFixed(this.fixed);
 			} else {
 				return this.raw;
-			};
+			}
 		},
 		is_zero: function is_zero() {
 			return Math.abs(this.raw) < Number.EPSILON;
@@ -3973,12 +3913,6 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
-
-var _shipengine = __webpack_require__(/*! ../lib/shipengine.js */ "./lib/shipengine.js");
-
-var ShipEngine = _interopRequireWildcard(_shipengine);
-
 var _statlineCell = __webpack_require__(/*! ./statline-cell.vue */ "./src/statline-cell.vue");
 
 var _statlineCell2 = _interopRequireDefault(_statlineCell);
@@ -3987,9 +3921,6 @@ var _uiFunctions = __webpack_require__(/*! ./ui-functions.js */ "./src/ui-functi
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-//
 //
 //
 //
@@ -4098,19 +4029,11 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
-
-var _shipengine = __webpack_require__(/*! ../lib/shipengine.js */ "./lib/shipengine.js");
-
-var ShipEngine = _interopRequireWildcard(_shipengine);
-
 var _settingCell = __webpack_require__(/*! ./setting-cell.vue */ "./src/setting-cell.vue");
 
 var _settingCell2 = _interopRequireDefault(_settingCell);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 exports.default = {
 	name: 'SubsystemSettings',
@@ -4153,12 +4076,6 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
-
-var _shipengine = __webpack_require__(/*! ../lib/shipengine.js */ "./lib/shipengine.js");
-
-var ShipEngine = _interopRequireWildcard(_shipengine);
-
 var _statlineCell = __webpack_require__(/*! ./statline-cell.vue */ "./src/statline-cell.vue");
 
 var _statlineCell2 = _interopRequireDefault(_statlineCell);
@@ -4166,8 +4083,6 @@ var _statlineCell2 = _interopRequireDefault(_statlineCell);
 var _uiFunctions = __webpack_require__(/*! ./ui-functions.js */ "./src/ui-functions.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 //
 //
@@ -9568,7 +9483,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.setting-tr[data-v-06bcc24c] {\n\tbackground: #ccc;\n}\n.setting-container[data-v-06bcc24c] {\n\tdisplay: flex;\n}\n\n\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/subsystem-settings.vue"],"names":[],"mappings":";AA0CA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA","file":"subsystem-settings.vue","sourcesContent":["<template>\n  <tr class=\"setting-tr\" v-if=\"has_settings\">\n\t<td class=\"settings-cell\" colspan=\"100\"> <!-- span all columns and we'll just fill it with settings -->\n\t  <SettingCell v-for=\"setting in settings\" :key=\"setting['Name']\" :setting=\"setting\"></SettingCell>\n\t</td>\n  </tr>\n</template>\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport * as ShipEngine from '../lib/shipengine.js';\n\nimport SettingCell from './setting-cell.vue'\n\nexport default {\n\tname: 'SubsystemSettings',\n\tcomponents: {\n\t\tSettingCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\thas_settings () {\n\t\t\treturn this.se_subsystem.settings.length > 0;\n\t\t},\n\t\tsettings () {\n\t\t\treturn this.se_subsystem.settings;\n\t\t},\n\t},\n}\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-tr {\n\tbackground: #ccc;\n}\n\n.setting-container {\n\tdisplay: flex;\n}\n\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.setting-tr[data-v-06bcc24c] {\n\tbackground: #ccc;\n}\n.setting-container[data-v-06bcc24c] {\n\tdisplay: flex;\n}\n\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/subsystem-settings.vue"],"names":[],"mappings":";AAsCA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA","file":"subsystem-settings.vue","sourcesContent":["<template>\n\t<tr class=\"setting-tr\" v-if=\"has_settings\">\n\t\t<td class=\"settings-cell\" colspan=\"100\"> <!-- span all columns and we'll just fill it with settings -->\n\t\t\t<SettingCell v-for=\"setting in settings\" :key=\"setting['Name']\" :setting=\"setting\"></SettingCell>\n\t\t</td>\n\t</tr>\n</template>\n\n<script>\n\nimport SettingCell from './setting-cell.vue';\n\nexport default {\n\tname: 'SubsystemSettings',\n\tcomponents: {\n\t\tSettingCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\thas_settings() {\n\t\t\treturn this.se_subsystem.settings.length > 0;\n\t\t},\n\t\tsettings() {\n\t\t\treturn this.se_subsystem.settings;\n\t\t},\n\t},\n};\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-tr {\n\tbackground: #ccc;\n}\n\n.setting-container {\n\tdisplay: flex;\n}\n\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -9587,7 +9502,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.subsystem-frame[data-v-1fa46046] {\n\tbackground: #ccc;\n}\n.has-error[data-v-1fa46046] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/subsystem-frame.vue"],"names":[],"mappings":";AA2GA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-frame.vue","sourcesContent":["<template>\n\n  <tr class=\"subsystem-frame\" v-bind:class=\"{ 'has-error': !is_valid_frame }\">\n\t<td class=\"name-column\" colspan=\"2\">{{se_subsystem.name}}</td>\n\n\t<td class=\"part-column\">\n\t  <select v-model=\"sub_frame\" class=\"part-column-select\">\n\t\t<option v-for=\"sub_frame_value in se_subsystem.valid_frames\" :key=\"sub_frame_value['Name']\">{{sub_frame_value['Name']}}</option>\n\t\t<option v-if=\"!is_valid_frame\" class=\"has-error\">{{sub_frame}}</option>\n\t  </select>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <td :key=\"name\" class=\"stat-column\">{{stats_multiplier_pretty}}</td>\n\t</template>\n\n\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>\n\n\t<td class=\"power-cost-column\"></td>\n\t<td class=\"power-gen-column\"></td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :key=\"name\" :stats=\"crew_mult_pretty\" :name=\"name\" :ispretty=\"false\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t<td class=\"tech-year-column\">{{tech_year}} (Frame)</td>\n  </tr>\n\n\n</template>\n\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport * as ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'SubsystemFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tis_valid_frame () {\n\t\t\treturn this.se_subsystem.is_valid_frame;\n\t\t},\n\t\tvalid_frames () {\n\t\t\treturn this.se_subsystem.valid_frames;\n\t\t},\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tstats_multiplier_pretty() {\n\t\t\treturn this.se_subsystem.stats_multiplier.toFixed(2) + 'x';\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tcrew_mult_pretty() {\n\t\t\treturn this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\ttech_year () {\n\t\t\treturn this.se_subsystem.tech_year_frame;\n\t\t},\n\t\tsub_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.se_subsystem.sub_frame;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_subsystem_frame', {\n\t\t\t\t\tvalue: value,\n\t\t\t\t\tsubsystem: this.se_subsystem,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n\n</style>\n\n\n<style scoped>\n.subsystem-frame {\n\tbackground: #ccc;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.subsystem-frame[data-v-1fa46046] {\n\tbackground: #ccc;\n}\n.has-error[data-v-1fa46046] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/subsystem-frame.vue"],"names":[],"mappings":";AAsGA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-frame.vue","sourcesContent":["<template>\n\n\t<tr class=\"subsystem-frame\" v-bind:class=\"{ 'has-error': !is_valid_frame }\">\n\t\t<td class=\"name-column\" colspan=\"2\">{{se_subsystem.name}}</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<select v-model=\"sub_frame\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"sub_frame_value in se_subsystem.valid_frames\" :key=\"sub_frame_value['Name']\">{{sub_frame_value['Name']}}</option>\n\t\t\t\t<option v-if=\"!is_valid_frame\" class=\"has-error\">{{sub_frame}}</option>\n\t\t\t</select>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<td :key=\"name\" class=\"stat-column\">{{stats_multiplier_pretty}}</td>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t\t<td class=\"br-column\">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>\n\t\t<td class=\"sr-column\">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>\n\n\t\t<td class=\"power-cost-column\"></td>\n\t\t<td class=\"power-gen-column\"></td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew_mult_pretty\" :name=\"name\" :ispretty=\"false\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year}} (Frame)</td>\n\t</tr>\n\n</template>\n\n\n<script>\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'SubsystemFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tis_valid_frame() {\n\t\t\treturn this.se_subsystem.is_valid_frame;\n\t\t},\n\t\tvalid_frames() {\n\t\t\treturn this.se_subsystem.valid_frames;\n\t\t},\n\t\tse_components() {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tstats_multiplier_pretty() {\n\t\t\treturn this.se_subsystem.stats_multiplier.toFixed(2) + 'x';\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tcrew_mult_pretty() {\n\t\t\treturn this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_subsystem.tech_year_frame;\n\t\t},\n\t\tsub_frame: {\n\t\t\tget() {\n\t\t\t\treturn this.se_subsystem.sub_frame;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_subsystem_frame', {\n\t\t\t\t\tvalue: value,\n\t\t\t\t\tsubsystem: this.se_subsystem,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style>\n\n</style>\n\n\n<style scoped>\n.subsystem-frame {\n\tbackground: #ccc;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -9606,7 +9521,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.design-import-export[data-v-38841434] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.design-import-export-status-message[data-v-38841434] {\n}\n.fade[data-v-38841434] {\n\tanimation: fadeanim-data-v-38841434 3s forwards;\n}\n@keyframes fadeanim-data-v-38841434 {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/design-import-export.vue"],"names":[],"mappings":";AA+PA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n  <div class=\"design-import-export\">\n\t<input type=\"button\"\n\t\t   class=\"undo-button\"\n\t\t   @click=\"dispatch_undo\"\n\t\t   value=\"<\"/>\n\t<input type=\"button\"\n\t\t   class=\"redo-button\"\n\t\t   @click=\"dispatch_redo\"\n\t\t   value=\">\"/>\n\n    <select v-model=\"selected_parts_list_name\">\n      <option v-for=\"parts_list in all_parts_lists\" :key=\"parts_list.pretty_name\">\n\t\t{{parts_list.pretty_name}}\n      </option>\n    </select>\n\n    <input type=\"button\" @click=\"parts_lists_load_selected\" value=\"Load parts list\"/>\n\n\t<span><a :href=\"'shipdesigner.html#' + design_json_url_encoded_string\">Link to this design</a></span>\n\n    <select v-model=\"selected_design_name\">\n      <option v-for=\"blueprint in local_saves\" :key=\"blueprint.pretty_name\">\n\t\t{{blueprint.pretty_name}}\n      </option>\n    </select>\n\n    <input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"/>\n    <input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"/>\n\n    <input type=\"button\" @click=\"local_saves_save_design\" :value=\"save_design_error ? save_design_error : 'Save current design'\" :disabled=\"save_design_error !== null\"/>\n    <input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"/>\n\n    <span\n\t  ref=\"status_message\"\n\t  class=\"design-import-export-status-message\"\n\t  @animationend=\"clear_status_message()\">{{ status_message }}</span>\n  </div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\nimport * as ShipEngine from '../lib/shipengine';\n\nimport { mapState, mapGetters } from 'vuex';\n\nconst LOCAL_PARTS_LISTS_KEY = 'parts_lists';\nconst LOCAL_SAVES_KEY = 'local_saves';\nconst STATUS_DEFAULT_DURATION = 2000;\n\nexport default {\n    name: 'DesignImportExport',\n    components: {\n    },\n    data () {\n\t\treturn {\n\t\t\t// local_saves is a straight array of blueprint objects,\n\t\t\t// exactly the same as the design_json object.\n\t\t\tlocal_saves: [],\n\t\t\t// the currently selected element of the local_saves\n\t\t\t// array. *not* the same as design_json! this is so\n\t\t\t// the user can work with the list of locally saved\n\t\t\t// blueprints without clobbering their current work.\n\t\t\tselected_save: null,\n\n\t\t\tstatus_message: \"\",\n\n\t\t\tstatus_message_timeout_id: null,\n\n\t\t\tlocal_parts_lists: [],\n\t\t\tselected_parts_list: null,\n\t\t};\n    },\n    computed: {\n\t\tsave_design_error () {\n\t\t\tif (!this.se_design.matches_parts_list(this.se_db)) {\n\t\t\t\treturn \"Save disabled: unset parts list\";\n\t\t\t}\n\t\t\tif (!this.se_design.is_loaded) {\n\t\t\t\treturn \"Save disabled: Unknown parts/frames\";\n\t\t\t}\n\t\t\treturn null;\n\t\t},\n\t\tselected_parts_list_name: {\n\t\t\tget () {\n\t\t\t\tif (this.selected_parts_list) {\n\t\t\t\t\treturn this.selected_parts_list.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t};\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.selected_parts_list = this.all_parts_lists.find(\n\t\t\t\t\tShipEngine.DB.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tall_parts_lists () {\n\t\t\treturn [...this.local_parts_lists, this.canon_se_db];\n\t\t},\n\t\tselected_design_name: {\n\t\t\tget () {\n\t\t\t\tif (this.selected_save) {\n\t\t\t\t\treturn this.selected_save.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t};\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.selected_save = this.local_saves.find(\n\t\t\t\t\tShipEngine.Design.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tdesign_json_string () {\n\t\t\treturn JSON.stringify(this.$store.state.design_json);\n\t\t},\n\t\tdesign_json_url_encoded_string () {\n\t\t\treturn encodeURI(this.design_json_string);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'canon_se_db',\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t]),\n    },\n    mounted () {\n\t\tthis.parts_lists_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_PARTS_LISTS_KEY) {\n\t\t\t\tthis.parts_lists_load_from_local_storage();\n\t\t\t};\n\t\t}.bind(this));\n\n\t\tthis.local_saves_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_SAVES_KEY) {\n\t\t\t\tthis.local_saves_load_from_local_storage();\n\t\t\t};\n\t\t}.bind(this));\n    },\n    methods: {\n\t\tdispatch_undo () {\n\t\t\tthis.$store.dispatch('undo');\n\t\t},\n\t\tdispatch_redo () {\n\t\t\tthis.$store.dispatch('redo');\n\t\t},\n\t\tparts_lists_load_from_local_storage () {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_parts_lists = [];\n\t\t\t\tthis.display_status_message(\"No parts lists to load\");\n\t\t\t} else {\n\t\t\t\tthis.local_parts_lists = JSON.parse(loaded).map(\n\t\t\t\t\tpl_json => new ShipEngine.DB(pl_json)\n\t\t\t\t);\n\t\t\t\tthis.display_status_message(\"Parts lists loaded.\");\n\t\t\t};\n\t\t},\n\t\tparts_lists_load_selected () {\n\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list.json));\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.display_status_message(\"Parts list loaded\");\n\t\t},\n\t\t\n\t\tlocal_saves_delete_selected () {\n\t\t\t// remove the selected item\n\t\t\tthis.local_saves = _.chain(this.local_saves).reject(\n\t\t\t\t(elem) => elem == this.selected_save\n\t\t\t).value();\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message(\"Blueprint deleted.\");\n\t\t},\n\t\tlocal_saves_load_selected () {\n\t\t\tconst db = this.all_parts_lists.find(\n\t\t\t\tShipEngine.DB.find_by_design_json(this.selected_save.json)\n\t\t\t);\n\t\t\tif (db) {\n\t\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(db.json));\n\t\t\t\tthis.selected_parts_list = db;\n\t\t\t};\n\n\t\t\tthis.$store.commit('set_design_json', _.cloneDeep(this.selected_save.json));\n\t\t\tthis.display_status_message(\"Blueprint loaded.\");\n\t\t},\n\t\tlocal_saves_save_design () {\n\t\t\t// If there's an error with the design, the save design button should be disabled,\n\t\t\t// but if that's somehow bypassed, this check ensures an invalid design is not saved.\n\t\t\tlet error = this.save_design_error;\n\t\t\tif (error) {\n\t\t\t\tthis.display_status_message(error);\n\t\t\t\treturn;\n\t\t\t}\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.$store.commit('timestamp_design');\n\t\t\tconst new_save = new ShipEngine.Design(this.se_db, _.cloneDeep(this.$store.state.design_json));\n\t\t\tthis.local_saves.push(new_save);\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.selected_save = new_save;\n\t\t\tthis.display_status_message(\"Blueprint saved.\");\n\t\t},\n\n\t\tlocal_saves_load_from_local_storage () {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_SAVES_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_saves = [];\n\t\t\t\tthis.display_status_message(\"No Blueprints to load\");\n\t\t\t} else {\n\t\t\t\tthis.local_saves = JSON.parse(loaded).map((design_json) => {\n\t\t\t\t\tlet db;\n\t\t\t\t\tlet wrong_db;\n\t\t\t\t\tif (design_json['Parts List']) {\n\t\t\t\t\t\tdb = this.all_parts_lists.find(\n\t\t\t\t\t\t\tShipEngine.DB.find_by_design_json(design_json)\n\t\t\t\t\t\t);\n\t\t\t\t\t\twrong_db = db === undefined;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tdb = this.se_db;\n\t\t\t\t\t\twrong_db = false;\n\t\t\t\t\t};\n\t\t\t\t\treturn new ShipEngine.Design(db || this.se_db, design_json, wrong_db);\n\t\t\t\t});\n\t\t\t\tthis.display_status_message(\"Blueprints loaded.\");\n\t\t\t};\n\t\t},\n\t\tlocal_saves_save_to_local_storage () {\n\t\t\tlocalStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(\n\t\t\t\t_.chain(this.local_saves)\n\t\t\t\t\t.map((design) => design.json)\n\t\t\t\t\t.value()\n\t\t\t));\n\t\t},\n\n\t\tdisplay_status_message (status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'design-import-export-status-message';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = \"design-import-export-status-message fade\";\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message () {\n\t\t\tthis.status_message = null;\n\t\t}\n\t\t\n    },\n}\n</script>\n\n\n<style scoped>\n.design-import-export {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.design-import-export-status-message {\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.design-import-export[data-v-38841434] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.design-import-export-status-message[data-v-38841434] {\n}\n.fade[data-v-38841434] {\n\tanimation: fadeanim-data-v-38841434 3s forwards;\n}\n@keyframes fadeanim-data-v-38841434 {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/design-import-export.vue"],"names":[],"mappings":";AA8PA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n\t<div class=\"design-import-export\">\n\t\t<input type=\"button\"\n\t\t\tclass=\"undo-button\"\n\t\t\t@click=\"dispatch_undo\"\n\t\t\tvalue=\"<\"/>\n\t\t<input type=\"button\"\n\t\t\tclass=\"redo-button\"\n\t\t\t@click=\"dispatch_redo\"\n\t\t\tvalue=\">\"/>\n\n\t\t<select v-model=\"selected_parts_list_name\">\n\t\t\t<option v-for=\"parts_list in all_parts_lists\" :key=\"parts_list.pretty_name\">\n\t\t\t\t{{parts_list.pretty_name}}\n\t\t\t</option>\n\t\t</select>\n\n\t\t<input type=\"button\" @click=\"parts_lists_load_selected\" value=\"Load parts list\"/>\n\n\t\t<span><a :href=\"'shipdesigner.html#' + design_json_url_encoded_string\">Link to this design</a></span>\n\n\t\t<select v-model=\"selected_design_name\">\n\t\t\t<option v-for=\"blueprint in local_saves\" :key=\"blueprint.pretty_name\">\n\t\t\t\t{{blueprint.pretty_name}}\n\t\t\t</option>\n\t\t</select>\n\n\t\t<input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"/>\n\t\t<input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"/>\n\n\t\t<input type=\"button\" @click=\"local_saves_save_design\" :value=\"save_design_error ? save_design_error : 'Save current design'\" :disabled=\"save_design_error !== null\"/>\n\t\t<input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"/>\n\n\t\t<span\n\t\t\tref=\"status_message\"\n\t\t\tclass=\"design-import-export-status-message\"\n\t\t\t@animationend=\"clear_status_message()\">{{ status_message }}</span>\n\t</div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\nimport * as ShipEngine from '../lib/shipengine';\n\nimport { mapGetters } from 'vuex';\n\nconst LOCAL_PARTS_LISTS_KEY = 'parts_lists';\nconst LOCAL_SAVES_KEY = 'local_saves';\n\nexport default {\n\tname: 'DesignImportExport',\n\tcomponents: {\n\t},\n\tdata() {\n\t\treturn {\n\t\t\t// local_saves is a straight array of blueprint objects,\n\t\t\t// exactly the same as the design_json object.\n\t\t\tlocal_saves: [],\n\t\t\t// the currently selected element of the local_saves\n\t\t\t// array. *not* the same as design_json! this is so\n\t\t\t// the user can work with the list of locally saved\n\t\t\t// blueprints without clobbering their current work.\n\t\t\tselected_save: null,\n\n\t\t\tstatus_message: '',\n\n\t\t\tstatus_message_timeout_id: null,\n\n\t\t\tlocal_parts_lists: [],\n\t\t\tselected_parts_list: null,\n\t\t};\n\t},\n\tcomputed: {\n\t\tsave_design_error() {\n\t\t\tif (!this.se_design.matches_parts_list(this.se_db)) {\n\t\t\t\treturn 'Save disabled: unset parts list';\n\t\t\t}\n\t\t\tif (!this.se_design.is_loaded) {\n\t\t\t\treturn 'Save disabled: Unknown parts/frames';\n\t\t\t}\n\t\t\treturn null;\n\t\t},\n\t\tselected_parts_list_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_parts_list) {\n\t\t\t\t\treturn this.selected_parts_list.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_parts_list = this.all_parts_lists.find(\n\t\t\t\t\tShipEngine.DB.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tall_parts_lists() {\n\t\t\treturn [...this.local_parts_lists, this.canon_se_db];\n\t\t},\n\t\tselected_design_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_save) {\n\t\t\t\t\treturn this.selected_save.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_save = this.local_saves.find(\n\t\t\t\t\tShipEngine.Design.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tdesign_json_string() {\n\t\t\treturn JSON.stringify(this.$store.state.design_json);\n\t\t},\n\t\tdesign_json_url_encoded_string() {\n\t\t\treturn encodeURI(this.design_json_string);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'canon_se_db',\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t]),\n\t},\n\tmounted() {\n\t\tthis.parts_lists_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_PARTS_LISTS_KEY) {\n\t\t\t\tthis.parts_lists_load_from_local_storage();\n\t\t\t}\n\t\t}.bind(this));\n\n\t\tthis.local_saves_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_SAVES_KEY) {\n\t\t\t\tthis.local_saves_load_from_local_storage();\n\t\t\t}\n\t\t}.bind(this));\n\t},\n\tmethods: {\n\t\tdispatch_undo() {\n\t\t\tthis.$store.dispatch('undo');\n\t\t},\n\t\tdispatch_redo() {\n\t\t\tthis.$store.dispatch('redo');\n\t\t},\n\t\tparts_lists_load_from_local_storage() {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_parts_lists = [];\n\t\t\t\tthis.display_status_message('No parts lists to load');\n\t\t\t} else {\n\t\t\t\tthis.local_parts_lists = JSON.parse(loaded).map(\n\t\t\t\t\tpl_json => new ShipEngine.DB(pl_json)\n\t\t\t\t);\n\t\t\t\tthis.display_status_message('Parts lists loaded');\n\t\t\t}\n\t\t},\n\t\tparts_lists_load_selected() {\n\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list.json));\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.display_status_message('Parts list loaded');\n\t\t},\n\t\t\n\t\tlocal_saves_delete_selected() {\n\t\t\t// remove the selected item\n\t\t\tthis.local_saves = _.chain(this.local_saves).reject(\n\t\t\t\t(elem) => elem === this.selected_save\n\t\t\t).value();\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message('Blueprint deleted');\n\t\t},\n\t\tlocal_saves_load_selected() {\n\t\t\tconst db = this.all_parts_lists.find(\n\t\t\t\tShipEngine.DB.find_by_design_json(this.selected_save.json)\n\t\t\t);\n\t\t\tif (db) {\n\t\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(db.json));\n\t\t\t\tthis.selected_parts_list = db;\n\t\t\t}\n\n\t\t\tthis.$store.commit('set_design_json', _.cloneDeep(this.selected_save.json));\n\t\t\tthis.display_status_message('Blueprint loaded');\n\t\t},\n\t\tlocal_saves_save_design() {\n\t\t\t// If there's an error with the design, the save design button should be disabled,\n\t\t\t// but if that's somehow bypassed, this check ensures an invalid design is not saved.\n\t\t\tlet error = this.save_design_error;\n\t\t\tif (error) {\n\t\t\t\tthis.display_status_message(error);\n\t\t\t\treturn;\n\t\t\t}\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.$store.commit('timestamp_design');\n\t\t\tconst new_save = new ShipEngine.Design(this.se_db, _.cloneDeep(this.$store.state.design_json));\n\t\t\tthis.local_saves.push(new_save);\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.selected_save = new_save;\n\t\t\tthis.display_status_message('Blueprint saved');\n\t\t},\n\n\t\tlocal_saves_load_from_local_storage() {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_SAVES_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_saves = [];\n\t\t\t\tthis.display_status_message('No Blueprints to load');\n\t\t\t} else {\n\t\t\t\tthis.local_saves = JSON.parse(loaded).map((design_json) => {\n\t\t\t\t\tlet db;\n\t\t\t\t\tlet wrong_db;\n\t\t\t\t\tif (design_json['Parts List']) {\n\t\t\t\t\t\tdb = this.all_parts_lists.find(\n\t\t\t\t\t\t\tShipEngine.DB.find_by_design_json(design_json)\n\t\t\t\t\t\t);\n\t\t\t\t\t\twrong_db = db === undefined;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tdb = this.se_db;\n\t\t\t\t\t\twrong_db = false;\n\t\t\t\t\t}\n\t\t\t\t\treturn new ShipEngine.Design(db || this.se_db, design_json, wrong_db);\n\t\t\t\t});\n\t\t\t\tthis.display_status_message('Blueprints loaded');\n\t\t\t}\n\t\t},\n\t\tlocal_saves_save_to_local_storage() {\n\t\t\tlocalStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(\n\t\t\t\t_.chain(this.local_saves)\n\t\t\t\t\t.map((design) => design.json)\n\t\t\t\t\t.value()\n\t\t\t));\n\t\t},\n\n\t\tdisplay_status_message(status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'design-import-export-status-message';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = 'design-import-export-status-message fade';\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message() {\n\t\t\tthis.status_message = null;\n\t\t},\n\t\t\n\t},\n};\n</script>\n\n\n<style scoped>\n.design-import-export {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.design-import-export-status-message {\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -9625,7 +9540,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.principal-frame-final[data-v-3d6f706e] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n.name-column-input[data-v-3d6f706e] {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.stat-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.br-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.sr-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.has-error[data-v-3d6f706e] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/principal-frame-final.vue"],"names":[],"mappings":";AAoGA;CACA,iBAAA;CACA,YAAA;;CAEA,kBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,mBAAA;CACA;AAEA;CACA,aAAA;CACA,kBAAA;CACA,kBAAA;CACA,YAAA;CACA,mBAAA;CACA,mBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-final.vue","sourcesContent":["<template>\n  <tr class=\"principal-frame-final\">\n\t<td class=\"name-column\" colspan=\"2\">\n\t  <input v-model=\"ship_name\" placeholder=\"Ship Name\" class=\"name-column-input\">\n\t</td>\n\n\t<td class=\"part-column\">{{principal_frame}}</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t</template>\n\t\n\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_design.weight_total}}</td>\n\n\t<td class=\"br-column\">{{se_design.cost_BR}}</td>\n\t<td class=\"sr-column\">{{se_design.cost_SR}}</td>\n\n\t<td class=\"power-cost-column\"\n\t\t:title=\"power_final_title\"\n\t\t:class=\"power_final_class\">{{se_design.cost_power}}</td>\n\t<td class=\"power-gen-column\"\n\t\t:title=\"power_final_title\"\n\t\t:class=\"power_final_class\">{{se_design.power_generation}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t<td class=\"tech-year-column\">{{tech_year}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport * as ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tcomputed: {\n\t\tpower_final_title () {\n\t\t\tif (this.has_power_error) {\n\t\t\t\treturn 'Error: Power cost greater than power generation.';\n\t\t\t} else {\n\t\t\t\treturn '';\n\t\t\t};\n\t\t},\n\t\tpower_final_class () {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_power_error,\n\t\t\t};\n\t\t},\n\t\thas_power_error () {\n\t\t\treturn this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;\n\t\t},\n\t\tprincipal_frame () {\n\t\t\treturn this.$store.getters.se_design.json['Principal Frame'];\n\t\t},\n\t\tstats () {\n\t\t\treturn this.$store.getters.se_design.stats;\n\t\t},\n\t\tcrew () {\n\t\t\treturn this.$store.getters.se_design.cost_crew;\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.$store.getters.se_design.build_time, 12, true);\n\t\t},\n\t\ttech_year () {\n\t\t\treturn this.$store.getters.se_design.tech_year_max;\n\t\t},\n\t\tship_name: {\n\t\t\tget () {\n\t\t\t\treturn this.$store.getters.se_design.json['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_design_name', value);\n\t\t\t}\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.principal-frame-final {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n\n.name-column-input {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.principal-frame-final[data-v-3d6f706e] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n.name-column-input[data-v-3d6f706e] {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.stat-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.br-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.sr-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.has-error[data-v-3d6f706e] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/principal-frame-final.vue"],"names":[],"mappings":";AAkGA;CACA,iBAAA;CACA,YAAA;;CAEA,kBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,mBAAA;CACA;AAEA;CACA,aAAA;CACA,kBAAA;CACA,kBAAA;CACA,YAAA;CACA,mBAAA;CACA,mBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-final.vue","sourcesContent":["<template>\n\t<tr class=\"principal-frame-final\">\n\t\t<td class=\"name-column\" colspan=\"2\">\n\t\t\t<input v-model=\"ship_name\" placeholder=\"Ship Name\" class=\"name-column-input\">\n\t\t</td>\n\n\t\t<td class=\"part-column\">{{principal_frame}}</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t\t</template>\n\t\t\n\t\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_design.weight_total}}</td>\n\n\t\t<td class=\"br-column\">{{se_design.cost_BR}}</td>\n\t\t<td class=\"sr-column\">{{se_design.cost_SR}}</td>\n\n\t\t<td class=\"power-cost-column\"\n\t\t\t:title=\"power_final_title\"\n\t\t\t:class=\"power_final_class\">{{se_design.cost_power}}</td>\n\t\t<td class=\"power-gen-column\"\n\t\t\t:title=\"power_final_title\"\n\t\t\t:class=\"power_final_class\">{{se_design.power_generation}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year}}</td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tcomputed: {\n\t\tpower_final_title() {\n\t\t\tif (this.has_power_error) {\n\t\t\t\treturn 'Error: Power cost greater than power generation.';\n\t\t\t} else {\n\t\t\t\treturn '';\n\t\t\t}\n\t\t},\n\t\tpower_final_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_power_error,\n\t\t\t};\n\t\t},\n\t\thas_power_error() {\n\t\t\treturn this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;\n\t\t},\n\t\tprincipal_frame() {\n\t\t\treturn this.$store.getters.se_design.json['Principal Frame'];\n\t\t},\n\t\tstats() {\n\t\t\treturn this.$store.getters.se_design.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.$store.getters.se_design.cost_crew;\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.$store.getters.se_design.build_time, 12, true);\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.$store.getters.se_design.tech_year_max;\n\t\t},\n\t\tship_name: {\n\t\t\tget() {\n\t\t\t\treturn this.$store.getters.se_design.json['Name'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_design_name', value);\n\t\t\t},\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style scoped>\n.principal-frame-final {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n\n.name-column-input {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -9663,7 +9578,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.subsystem-summary[data-v-6f922482] {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n.name-cell[data-v-6f922482] {\n\tborder-style: none;\n}\n.part-cell[data-v-6f922482] {\n\tborder-style: none;\n}\n.part-select[data-v-6f922482] {\n\twidth: 100%;\n}\n.has-error[data-v-6f922482] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/subsystem-summary.vue"],"names":[],"mappings":";AAoFA;CACA,iBAAA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-summary.vue","sourcesContent":["<template>\n\n  <tr class=\"subsystem-summary\">\n\t<td class=\"name-column\"\n\t\t:class=\"weight_summary_class\"\n\t\tcolspan=\"2\">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t<td class=\"part-column\"></td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\" :class=\"weight_summary_class\">{{se_subsystem.weight_internal.toFixed(2)}}</td>\n\t<td class=\"weight-external-column\">{{se_subsystem.weight_external.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_subsystem.cost_BR.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_subsystem.cost_SR.toFixed(2)}}</td>\n\n\t<td class=\"power-cost-column\">{{se_subsystem.cost_power.toFixed(2)}}</td>\n\t<td class=\"power-gen-column\">{{se_subsystem.power_generation.toFixed(2)}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t<td class=\"tech-year-column\">{{tech_year}}</td>\n  </tr>\n\n</template>\n\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport * as ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'SubsystemSummary',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tweight_summary_class () {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error () {\n\t\t\treturn this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;\n\t\t},\n\t\tse_components () {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\ttech_year () {\n\t\t\treturn this.se_subsystem.tech_year_max;\n\t\t},\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style scoped>\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n\n.name-cell {\n\tborder-style: none;\n}\n\n.part-cell {\n\tborder-style: none;\n}\n\n.part-select {\n\twidth: 100%;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.subsystem-summary[data-v-6f922482] {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n.name-cell[data-v-6f922482] {\n\tborder-style: none;\n}\n.part-cell[data-v-6f922482] {\n\tborder-style: none;\n}\n.part-select[data-v-6f922482] {\n\twidth: 100%;\n}\n.has-error[data-v-6f922482] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/subsystem-summary.vue"],"names":[],"mappings":";AAgFA;CACA,iBAAA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-summary.vue","sourcesContent":["<template>\n\n\t<tr class=\"subsystem-summary\">\n\t\t<td class=\"name-column\"\n\t\t\t:class=\"weight_summary_class\"\n\t\t\tcolspan=\"2\">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t\t<td class=\"part-column\"></td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\" :class=\"weight_summary_class\">{{se_subsystem.weight_internal.toFixed(2)}}</td>\n\t\t<td class=\"weight-external-column\">{{se_subsystem.weight_external.toFixed(2)}}</td>\n\n\t\t<td class=\"br-column\">{{se_subsystem.cost_BR.toFixed(2)}}</td>\n\t\t<td class=\"sr-column\">{{se_subsystem.cost_SR.toFixed(2)}}</td>\n\n\t\t<td class=\"power-cost-column\">{{se_subsystem.cost_power.toFixed(2)}}</td>\n\t\t<td class=\"power-gen-column\">{{se_subsystem.power_generation.toFixed(2)}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year}}</td>\n\t</tr>\n\n</template>\n\n\n<script>\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'SubsystemSummary',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tweight_summary_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error() {\n\t\t\treturn this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;\n\t\t},\n\t\tse_components() {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_subsystem.tech_year_max;\n\t\t},\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style scoped>\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n\n.name-cell {\n\tborder-style: none;\n}\n\n.part-cell {\n\tborder-style: none;\n}\n\n.part-select {\n\twidth: 100%;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -9682,7 +9597,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.design-summary[data-v-9f9c61a0] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.has-error[data-v-9f9c61a0] {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n.design-weight-summary[data-v-9f9c61a0] {\n\tmargin-left: 5px;\n}\n.design-power-summary[data-v-9f9c61a0] {\n}\n.subsystem-weight-summary[data-v-9f9c61a0] {\n\tmargin-left: 5px;\n}\n\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/design-summary.vue"],"names":[],"mappings":";AAqFA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA,YAAA;CACA,kBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA;AAEA;CACA,iBAAA;CACA","file":"design-summary.vue","sourcesContent":["<template>\n  <div class=\"design-summary\">\n\t<div>\n\t  <span>{{se_design.name}} | {{se_design.pretty_miscstats}}</span>\n\t  <span> | </span>\n\t  <span\n\t\t:class=\"{'has-error': has_parts_list_load_error}\"\n\t\t:title=\"parts_list_load_title\">Parts: {{parts_list_name}}</span>\n\t  <span\n\t\tv-if=\"has_parts_list_load_error\"\n\t\t:class=\"{'has-error': has_parts_list_load_error}\"> (WRONG PARTS LIST! EVERYTHING MAY BE INVALID!)</span>\n\t</div>\n\n\t<div>\n\t  <span>{{se_design.stats_raw.toFixed(2)}}</span>\n\t  <span> | </span>\n\t  <span>[{{se_design.cost_BR_raw.toFixed(2)}}]br</span>\n\t  <span>[{{se_design.cost_SR_raw.toFixed(2)}}]sr</span>\n\t  <span> | </span>\n\t  <span>{{se_design.cost_crew_raw.toFixed(2)}}</span>\n\t  <span> | </span>\n\t  <span>[{{build_time}}]years</span>\n\t</div>\n\t<div>\n\t  <span\n\t\tclass=\"design-power-summary\"\n\t\t:class=\"{'has-error': se_design.cost_power_raw > se_design.power_generation_raw}\"\n\t\t>Power[{{se_design.cost_power_raw.toFixed(2)}}/{{se_design.power_generation_raw.toFixed(2)}}]</span>\n\t  <span\n\t\tclass=\"design-weight-summary\"\n\t\t:class=\"{'has-error': se_design.weight_internal > se_design.frame_max_size_raw}\"\n\t\t>Internal[{{se_design.weight_internal.toFixed(2)}}/{{se_design.frame_max_size_raw.toFixed(2)}}]</span>\n\t  <span\n\t\tclass=\"subsystem-weight-summary\"\n\t\tv-for=\"ss in se_design.subsystems\"\n\t\t:key=\"ss.name\"\n\t\t:class=\"{'has-error': ss.weight_internal > ss.weight_cap}\"\n\t\t>{{ss.name}}[{{ss.weight_internal.toFixed(2)}}/{{ss.weight_cap.toFixed(2)}}] </span>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport * as ShipEngine from '../lib/shipengine.js';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'DesignSummary',\n\tcomputed: {\n\t\tparts_list_name () {\n\t\t\treturn this.se_design.parts_list_pretty_name;\n\t\t},\n\t\tparts_list_load_title () {\n\t\t\tif (this.has_parts_list_load_error) {\n\t\t\t\treturn \"Could not find this parts list\";\n\t\t\t} else {\n\t\t\t\treturn null;\n\t\t\t};\n\t\t},\n\t\thas_parts_list_load_error () {\n\t\t\treturn !this.se_design.matches_parts_list(this.se_db);\n\t\t},\n\t\tbuild_time () {\n\t\t\treturn frac(this.$store.getters.se_design.build_time, 12);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t]),\n\t},\n\tmethods: {\n\t\tparts_list_save_name (pl) {\n\t\t\treturn pl.name + ' (' + (new Date(pl.timestamp).toLocaleString()) + ')';\n\t\t},\n\t},\n}\n</script>\n\n\n<style scoped>\n.design-summary {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.has-error {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n\n.design-weight-summary {\n\tmargin-left: 5px;\n}\n\n.design-power-summary {\n}\n\n.subsystem-weight-summary {\n\tmargin-left: 5px;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.design-summary[data-v-9f9c61a0] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.has-error[data-v-9f9c61a0] {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n.design-weight-summary[data-v-9f9c61a0] {\n\tmargin-left: 5px;\n}\n.design-power-summary[data-v-9f9c61a0] {\n}\n.subsystem-weight-summary[data-v-9f9c61a0] {\n\tmargin-left: 5px;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/design-summary.vue"],"names":[],"mappings":";AAmFA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA,YAAA;CACA,kBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA;AAEA;CACA,iBAAA;CACA","file":"design-summary.vue","sourcesContent":["<template>\n\t<div class=\"design-summary\">\n\t\t<div>\n\t\t\t<span>{{se_design.name}} | {{se_design.pretty_miscstats}}</span>\n\t\t\t<span> | </span>\n\t\t\t<span\n\t\t\t\t:class=\"{'has-error': has_parts_list_load_error}\"\n\t\t\t\t:title=\"parts_list_load_title\">Parts: {{parts_list_name}}</span>\n\t\t\t<span\n\t\t\t\tv-if=\"has_parts_list_load_error\"\n\t\t\t\t:class=\"{'has-error': has_parts_list_load_error}\"> (WRONG PARTS LIST! EVERYTHING MAY BE INVALID!)</span>\n\t\t</div>\n\n\t\t<div>\n\t\t\t<span>{{se_design.stats_raw.toFixed(2)}}</span>\n\t\t\t<span> | </span>\n\t\t\t<span>[{{se_design.cost_BR_raw.toFixed(2)}}]br</span>\n\t\t\t<span>[{{se_design.cost_SR_raw.toFixed(2)}}]sr</span>\n\t\t\t<span> | </span>\n\t\t\t<span>{{se_design.cost_crew_raw.toFixed(2)}}</span>\n\t\t\t<span> | </span>\n\t\t\t<span>[{{build_time}}]years</span>\n\t\t</div>\n\t\t<div>\n\t\t\t<span\n\t\t\t\tclass=\"design-power-summary\"\n\t\t\t\t:class=\"{'has-error': se_design.cost_power_raw > se_design.power_generation_raw}\"\n\t\t\t\t>Power[{{se_design.cost_power_raw.toFixed(2)}}/{{se_design.power_generation_raw.toFixed(2)}}]</span>\n\t\t\t<span\n\t\t\t\tclass=\"design-weight-summary\"\n\t\t\t\t:class=\"{'has-error': se_design.weight_internal > se_design.frame_max_size_raw}\"\n\t\t\t\t>Internal[{{se_design.weight_internal.toFixed(2)}}/{{se_design.frame_max_size_raw.toFixed(2)}}]</span>\n\t\t\t<span\n\t\t\t\tclass=\"subsystem-weight-summary\"\n\t\t\t\tv-for=\"ss in se_design.subsystems\"\n\t\t\t\t:key=\"ss.name\"\n\t\t\t\t:class=\"{'has-error': ss.weight_internal > ss.weight_cap}\"\n\t\t\t\t>{{ss.name}}[{{ss.weight_internal.toFixed(2)}}/{{ss.weight_cap.toFixed(2)}}] </span>\n\t\t</div>\n\t</div>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'DesignSummary',\n\tcomputed: {\n\t\tparts_list_name() {\n\t\t\treturn this.se_design.parts_list_pretty_name;\n\t\t},\n\t\tparts_list_load_title() {\n\t\t\tif (this.has_parts_list_load_error) {\n\t\t\t\treturn 'Could not find this parts list';\n\t\t\t} else {\n\t\t\t\treturn null;\n\t\t\t}\n\t\t},\n\t\thas_parts_list_load_error() {\n\t\t\treturn !this.se_design.matches_parts_list(this.se_db);\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.$store.getters.se_design.build_time, 12);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t]),\n\t},\n\tmethods: {\n\t\tparts_list_save_name(pl) {\n\t\t\treturn pl.name + ' (' + (new Date(pl.timestamp).toLocaleString()) + ')';\n\t\t},\n\t},\n};\n</script>\n\n\n<style scoped>\n.design-summary {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.has-error {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n\n.design-weight-summary {\n\tmargin-left: 5px;\n}\n\n.design-power-summary {\n}\n\n.subsystem-weight-summary {\n\tmargin-left: 5px;\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -9701,7 +9616,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.component-tr[data-v-a8ea6a18] {\n\twidth: 100%;\n\tmargin: 0px;\n}\n.has-error[data-v-a8ea6a18] {\n\tbackground: #faa;\n}\n.has-warning[data-v-a8ea6a18] {\n\tbackground: #ffa;\n}\n.quantity-column[data-v-a8ea6a18] {\n}\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/component.vue"],"names":[],"mappings":";AAwMA;CACA,YAAA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA","file":"component.vue","sourcesContent":["<template>\n  <tr class=\"component-tr\" :class=\"{ 'has-error': !is_loaded }\">\n\t<td class=\"name-column\">{{se_component.name}}</td>\n\n\t<td class=\"quantity-column\" :class=\"{ 'has-error': has_quantity_error }\">\n\t  <select\n\t\tv-if=\"quantity_configurable\"\n\t\tclass=\"quantity-column-select\"\n\t\tv-model=\"quantity\"\n\t\tv-on:wheel=\"quantity_select_wheel_event\"\n\t\t:class=\"{ 'has-error': has_quantity_error }\">\n\n\t\t<option v-if=\"!valid_quantities.includes(quantity)\">{{quantity}}</option>\n\t\t<option v-for=\"valid_quantity in valid_quantities\" :key=\"valid_quantity\">{{valid_quantity}}</option>\n\t  </select>\n\t  <span v-if=\"!quantity_configurable\">{{quantity_pretty}}</span>\n\t</td>\n\n\t<td class=\"part-column\">\n\t  <select\n\t\tv-model=\"part\"\n\t\tclass=\"part-column-select\">\n\t\t<option v-for=\"part_value in valid_parts\" :key=\"part_value['Name']\">{{part_value['Name']}}</option>\n\t\t<option v-if=\"!is_valid_part\" class=\"has-error\">{{part}}</option>\n\t  </select>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t<td class=\"br-column\">{{cost_br}}</td>\n\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\"></td>\n\n\t<td class=\"tech-year-column\"\n\t\t:class=\"{ ['has-warning']: is_limiting_tech_year }\"\n\t\t:title=\"tech_year_tooltip\"\n\t\t>{{tech_year}}</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport * as ShipEngine from '../lib/shipengine.js';\n\nimport {\n\tpretty,\n} from './ui-functions.js'\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ComponentTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_component: Object,\n\t},\n\tcomputed: {\n\t\ttech_year_tooltip () {\n\t\t\tif (this.is_limiting_tech_year) {\n\t\t\t\treturn 'This component is the latest-available part in the design.';\n\t\t\t} else {\n\t\t\t\treturn false;\n\t\t\t};\n\t\t},\n\t\tis_limiting_tech_year () {\n\t\t\treturn this.se_component.tech_year == this.se_component.subsystem.design.tech_year;\n\t\t},\n\t\ttech_year () {\n\t\t\treturn this.se_component.tech_year;\n\t\t},\n\t\tis_valid_part () {\n\t\t\treturn this.valid_parts\n\t\t\t\t.map((part) => part['Name'])\n\t\t\t\t.includes(this.part);\n\t\t},\n\t\thas_quantity_error () {\n\t\t\treturn this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));\n\t\t},\n\t\tpower_gen () {\n\t\t\treturn pretty(this.se_component.power_generation);\n\t\t},\n\t\tpower_cost () {\n\t\t\treturn pretty(this.se_component.cost_power);\n\t\t},\n\t\tcost_sr () {\n\t\t\treturn pretty(this.se_component.cost_SR);\n\t\t},\n\t\tcost_br () {\n\t\t\treturn pretty(this.se_component.cost_BR);\n\t\t},\n\t\tweight_internal () {\n\t\t\treturn pretty(this.se_component.weight_internal);\n\t\t},\n\t\tweight_external () {\n\t\t\treturn pretty(this.se_component.weight_external);\n\t\t},\n\t\tis_loaded () {\n\t\t\treturn this.se_component.is_loaded;\n\t\t},\n\t\tvalid_parts () {\n\t\t\treturn this.se_component.valid_parts;\n\t\t},\n\t\tquantity_configurable () {\n\t\t\treturn this.se_component.is_quantity_configurable;\n\t\t},\n\t\tquantity_pretty () {\n\t\t\tif (this.quantity === Math.round(this.quantity)) {\n\t\t\t\treturn this.quantity;\n\t\t\t} else {\n\t\t\t\treturn this.quantity.toFixed(2);\n\t\t\t};\n\t\t},\n\t\tquantity: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.quantity;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_component_quantity', {\n\t\t\t\t\tcomponent: this.se_component,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tvalid_quantities () {\n\t\t\treturn this.se_component.valid_quantities;\n\t\t},\n\t\tstats () {\n\t\t\treturn this.se_component.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_component.cost_crew;\n\t\t},\n\t\tpart: {\n\t\t\tget () {\n\t\t\t\treturn this.se_component.part;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_component_part', {\n\t\t\t\t\tcomponent: this.se_component,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tis_quantity_valid () {\n\t\t\treturn function (hypothesis) {\n\t\t\t\treturn this\n\t\t\t\t\t.valid_quantities\n\t\t\t\t\t.map((elem) => (elem === hypothesis))\n\t\t\t\t\t.reduce((acc, elem) => acc || elem);\n\t\t\t}\n\t\t},\n\t},\n\tmethods: {\n\t\tincrement_quantity () {\n\t\t\tlet hypothesis = this.quantity + 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t};\n\t\t},\n\t\tdecrement_quantity () {\n\t\t\tlet hypothesis = this.quantity - 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t};\n\t\t},\n\t\tquantity_select_wheel_event (ev) {\n\t\t\tif (ev.deltaY > 0) {\n\t\t\t\tthis.decrement_quantity();\n\t\t\t} else if (ev.deltaY < 0) {\n\t\t\t\tthis.increment_quantity();\n\t\t\t};\n\t\t\tif (ev.preventDefault)\n\t\t\t\tev.preventDefault();\n\t\t\tev.returnValue = false;\n\t\t},\n\t},\n}\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.component-tr {\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n\n.has-warning {\n\tbackground: #ffa;\n}\n\n.quantity-column {\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.component-tr[data-v-a8ea6a18] {\n\twidth: 100%;\n\tmargin: 0px;\n}\n.has-error[data-v-a8ea6a18] {\n\tbackground: #faa;\n}\n.has-warning[data-v-a8ea6a18] {\n\tbackground: #ffa;\n}\n.quantity-column[data-v-a8ea6a18] {\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/component.vue"],"names":[],"mappings":";AAqMA;CACA,YAAA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA","file":"component.vue","sourcesContent":["<template>\n\t<tr class=\"component-tr\" :class=\"{ 'has-error': !is_loaded }\">\n\t\t<td class=\"name-column\">{{se_component.name}}</td>\n\n\t\t<td class=\"quantity-column\" :class=\"{ 'has-error': has_quantity_error }\">\n\t\t\t<select\n\t\t\t\tv-if=\"quantity_configurable\"\n\t\t\t\tclass=\"quantity-column-select\"\n\t\t\t\tv-model=\"quantity\"\n\t\t\t\tv-on:wheel=\"quantity_select_wheel_event\"\n\t\t\t\t:class=\"{ 'has-error': has_quantity_error }\">\n\n\t\t\t\t<option v-if=\"!valid_quantities.includes(quantity)\">{{quantity}}</option>\n\t\t\t\t<option v-for=\"valid_quantity in valid_quantities\" :key=\"valid_quantity\">{{valid_quantity}}</option>\n\t\t\t</select>\n\t\t\t<span v-if=\"!quantity_configurable\">{{quantity_pretty}}</span>\n\t\t</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<select\n\t\t\t\tv-model=\"part\"\n\t\t\t\tclass=\"part-column-select\">\n\t\t\t\t<option v-for=\"part_value in valid_parts\" :key=\"part_value['Name']\">{{part_value['Name']}}</option>\n\t\t\t\t<option v-if=\"!is_valid_part\" class=\"has-error\">{{part}}</option>\n\t\t\t</select>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t\t<td class=\"br-column\">{{cost_br}}</td>\n\t\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\"></td>\n\n\t\t<td class=\"tech-year-column\"\n\t\t\t:class=\"{ ['has-warning']: is_limiting_tech_year }\"\n\t\t\t:title=\"tech_year_tooltip\"\n\t\t\t>{{tech_year}}</td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport {\n\tpretty,\n} from './ui-functions.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ComponentTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_component: Object,\n\t},\n\tcomputed: {\n\t\ttech_year_tooltip() {\n\t\t\tif (this.is_limiting_tech_year) {\n\t\t\t\treturn 'This component is the latest-available part in the design.';\n\t\t\t} else {\n\t\t\t\treturn false;\n\t\t\t}\n\t\t},\n\t\tis_limiting_tech_year() {\n\t\t\treturn this.se_component.tech_year === this.se_component.subsystem.design.tech_year;\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_component.tech_year;\n\t\t},\n\t\tis_valid_part() {\n\t\t\treturn this.valid_parts\n\t\t\t\t.map((part) => part['Name'])\n\t\t\t\t.includes(this.part);\n\t\t},\n\t\thas_quantity_error() {\n\t\t\treturn this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));\n\t\t},\n\t\tpower_gen() {\n\t\t\treturn pretty(this.se_component.power_generation);\n\t\t},\n\t\tpower_cost() {\n\t\t\treturn pretty(this.se_component.cost_power);\n\t\t},\n\t\tcost_sr() {\n\t\t\treturn pretty(this.se_component.cost_SR);\n\t\t},\n\t\tcost_br() {\n\t\t\treturn pretty(this.se_component.cost_BR);\n\t\t},\n\t\tweight_internal() {\n\t\t\treturn pretty(this.se_component.weight_internal);\n\t\t},\n\t\tweight_external() {\n\t\t\treturn pretty(this.se_component.weight_external);\n\t\t},\n\t\tis_loaded() {\n\t\t\treturn this.se_component.is_loaded;\n\t\t},\n\t\tvalid_parts() {\n\t\t\treturn this.se_component.valid_parts;\n\t\t},\n\t\tquantity_configurable() {\n\t\t\treturn this.se_component.is_quantity_configurable;\n\t\t},\n\t\tquantity_pretty() {\n\t\t\tif (this.quantity === Math.round(this.quantity)) {\n\t\t\t\treturn this.quantity;\n\t\t\t} else {\n\t\t\t\treturn this.quantity.toFixed(2);\n\t\t\t}\n\t\t},\n\t\tquantity: {\n\t\t\tget() {\n\t\t\t\treturn this.se_component.quantity;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_component_quantity', {\n\t\t\t\t\tcomponent: this.se_component,\n\t\t\t\t\tvalue,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tvalid_quantities() {\n\t\t\treturn this.se_component.valid_quantities;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_component.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_component.cost_crew;\n\t\t},\n\t\tpart: {\n\t\t\tget() {\n\t\t\t\treturn this.se_component.part;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_component_part', {\n\t\t\t\t\tcomponent: this.se_component,\n\t\t\t\t\tvalue,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tis_quantity_valid() {\n\t\t\treturn (hypothesis) => this\n\t\t\t\t.valid_quantities\n\t\t\t\t.map((elem) => (elem === hypothesis))\n\t\t\t\t.reduce((acc, elem) => acc || elem);\n\t\t},\n\t},\n\tmethods: {\n\t\tincrement_quantity() {\n\t\t\tlet hypothesis = this.quantity + 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t}\n\t\t},\n\t\tdecrement_quantity() {\n\t\t\tlet hypothesis = this.quantity - 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t}\n\t\t},\n\t\tquantity_select_wheel_event(ev) {\n\t\t\tif (ev.deltaY > 0) {\n\t\t\t\tthis.decrement_quantity();\n\t\t\t} else if (ev.deltaY < 0) {\n\t\t\t\tthis.increment_quantity();\n\t\t\t}\n\t\t\tif (ev.preventDefault) {\n\t\t\t\tev.preventDefault();\n\t\t\t}\n\t\t\tev.returnValue = false;\n\t\t},\n\t},\n};\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.component-tr {\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n\n.has-warning {\n\tbackground: #ffa;\n}\n\n.quantity-column {\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -9720,7 +9635,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.module-tr[data-v-b52a34f6] {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n.hasloaderror[data-v-b52a34f6] {\n\tbackground: #faa;\n}\n.module-pair-span[data-v-b52a34f6] {\n\tdisplay: flex;\n}\n.module-pair-type[data-v-b52a34f6] {\n\tflex: 1 1 0;\n}\n.module-pair-variant[data-v-b52a34f6] {\n\tflex: 1 1 0;\n}\n.part-column-select[data-v-b52a34f6] {\n}\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/module.vue"],"names":[],"mappings":";AAwIA;CACA,iBAAA;;CAEA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA","file":"module.vue","sourcesContent":["<template>\n  <tr class=\"module-tr\" :class=\"{ hasloaderror: !is_loaded }\">\n\t<td class=\"name-column\" colspan=\"2\">Module</td>\n\n\t<td class=\"part-column\">\n\t  <span class=\"module-pair-span\">\n\t\t<span class=\"module-pair-type\"><select v-model=\"module_type\" class=\"part-column-select\">\n\t\t\t<option v-for=\"module_type_value in valid_types\" :key=\"module_type_value\">{{module_type_value}}</option>\n\t\t</select></span>\n\t\t<span class=\"module-pair-variant\"><select v-model=\"module_variant\" class=\"part-column-select\">\n\t\t\t<option v-for=\"module_variant_value in valid_variants\" :key=\"module_variant_value['Variant']\">{{module_variant_value['Variant']}}</option>\n\t\t</select></span>\n\t  </span>\n\t</td>\n\n\t<template v-for=\"name in stats.names\">\n\t  <StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t<td class=\"br-column\">{{cost_br}}</td>\n\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t<template v-for=\"name in crew.names\">\n\t  <StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t<td class=\"tech-year-column\"></td>\n  </tr>\n</template>\n\n\n<script>\n\nimport * as ShipEngine from '../lib/shipengine.js';\n\nimport {\n\tpretty,\n\tfrac,\n} from './ui-functions.js'\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ModuleTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_module: Object,\n\t},\n\tcomputed: {\n\t\tbuild_time () {\n\t\t\treturn frac(this.se_module.build_time, 12) || '';\n\t\t},\n\t\tpower_gen () {\n\t\t\treturn pretty(this.se_module.power_generation);\n\t\t},\n\t\tpower_cost () {\n\t\t\treturn pretty(this.se_module.cost_power);\n\t\t},\n\t\tcost_sr () {\n\t\t\treturn pretty(this.se_module.cost_SR);\n\t\t},\n\t\tcost_br () {\n\t\t\treturn pretty(this.se_module.cost_BR);\n\t\t},\n\t\tweight_internal () {\n\t\t\treturn pretty(this.se_module.weight_internal);\n\t\t},\n\t\tweight_external () {\n\t\t\treturn pretty(this.se_module.weight_external);\n\t\t},\n\t\tis_loaded () {\n\t\t\treturn this.se_module.is_loaded;\n\t\t},\n\t\tstats () {\n\t\t\treturn this.se_module.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_module.cost_crew;\n\t\t},\n\n\t\tvalid_types () {\n\t\t\treturn this.$store.getters.se_db.valid_module_types();\n\t\t},\n\t\tvalid_variants () {\n\t\t\treturn this.$store.getters.se_db.find_modules(this.se_module.module_type);\n\t\t},\n\t\tmodule_type: {\n\t\t\tget () {\n\t\t\t\treturn this.se_module.module_type;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_module_type', {\n\t\t\t\t\tse_db: this.$store.getters.se_db,\n\t\t\t\t\tmodule: this.se_module,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tmodule_variant: {\n\t\t\tget () {\n\t\t\t\treturn this.se_module.module_variant;\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_module_variant', {\n\t\t\t\t\tmodule: this.se_module,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tlog_parts() {\n\t\t\tconsole.log('\"' + this.part + '\"');\n\t\t\tconsole.log(this.valid_parts.map((part) => part['Name']))\n\t\t\tconsole.log(this.$store.getters.se_db.find_part(this.part));\n\t\t\tthis.part = this.part;\n\t\t},\n\t},\n}\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.module-tr {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n\n.hasloaderror {\n\tbackground: #faa;\n}\n\n.module-pair-span {\n\tdisplay: flex;\n}\n\n.module-pair-type {\n\tflex: 1 1 0;\n}\n\n.module-pair-variant {\n\tflex: 1 1 0;\n}\n\n.part-column-select {\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.module-tr[data-v-b52a34f6] {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n.hasloaderror[data-v-b52a34f6] {\n\tbackground: #faa;\n}\n.module-pair-span[data-v-b52a34f6] {\n\tdisplay: flex;\n}\n.module-pair-type[data-v-b52a34f6] {\n\tflex: 1 1 0;\n}\n.module-pair-variant[data-v-b52a34f6] {\n\tflex: 1 1 0;\n}\n.part-column-select[data-v-b52a34f6] {\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/module.vue"],"names":[],"mappings":";AAsIA;CACA,iBAAA;;CAEA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA","file":"module.vue","sourcesContent":["<template>\n\t<tr class=\"module-tr\" :class=\"{ hasloaderror: !is_loaded }\">\n\t\t<td class=\"name-column\" colspan=\"2\">Module</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<span class=\"module-pair-span\">\n\t\t\t<span class=\"module-pair-type\"><select v-model=\"module_type\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"module_type_value in valid_types\" :key=\"module_type_value\">{{module_type_value}}</option>\n\t\t\t</select></span>\n\t\t\t<span class=\"module-pair-variant\"><select v-model=\"module_variant\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"module_variant_value in valid_variants\" :key=\"module_variant_value['Variant']\">{{module_variant_value['Variant']}}</option>\n\t\t\t</select></span>\n\t\t\t</span>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t\t<td class=\"br-column\">{{cost_br}}</td>\n\t\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\"></td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport {\n\tpretty,\n\tfrac,\n} from './ui-functions.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ModuleTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_module: Object,\n\t},\n\tcomputed: {\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_module.build_time, 12) || '';\n\t\t},\n\t\tpower_gen() {\n\t\t\treturn pretty(this.se_module.power_generation);\n\t\t},\n\t\tpower_cost() {\n\t\t\treturn pretty(this.se_module.cost_power);\n\t\t},\n\t\tcost_sr() {\n\t\t\treturn pretty(this.se_module.cost_SR);\n\t\t},\n\t\tcost_br() {\n\t\t\treturn pretty(this.se_module.cost_BR);\n\t\t},\n\t\tweight_internal() {\n\t\t\treturn pretty(this.se_module.weight_internal);\n\t\t},\n\t\tweight_external() {\n\t\t\treturn pretty(this.se_module.weight_external);\n\t\t},\n\t\tis_loaded() {\n\t\t\treturn this.se_module.is_loaded;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_module.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_module.cost_crew;\n\t\t},\n\n\t\tvalid_types() {\n\t\t\treturn this.$store.getters.se_db.valid_module_types();\n\t\t},\n\t\tvalid_variants() {\n\t\t\treturn this.$store.getters.se_db.find_modules(this.se_module.module_type);\n\t\t},\n\t\tmodule_type: {\n\t\t\tget() {\n\t\t\t\treturn this.se_module.module_type;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_module_type', {\n\t\t\t\t\tse_db: this.$store.getters.se_db,\n\t\t\t\t\tmodule: this.se_module,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tmodule_variant: {\n\t\t\tget() {\n\t\t\t\treturn this.se_module.module_variant;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_module_variant', {\n\t\t\t\t\tmodule: this.se_module,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tlog_parts() {\n\t\t\tconsole.log('\"' + this.part + '\"');\n\t\t\tconsole.log(this.valid_parts.map((part) => part['Name']));\n\t\t\tconsole.log(this.$store.getters.se_db.find_part(this.part));\n\t\t\tthis.part = this.part;\n\t\t},\n\t},\n};\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.module-tr {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n\n.hasloaderror {\n\tbackground: #faa;\n}\n\n.module-pair-span {\n\tdisplay: flex;\n}\n\n.module-pair-type {\n\tflex: 1 1 0;\n}\n\n.module-pair-variant {\n\tflex: 1 1 0;\n}\n\n.part-column-select {\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -9739,7 +9654,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.setting-cell[data-v-f5f570d0] {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n.setting-input-number[data-v-f5f570d0] {\n\twidth: 60px;\n}\n.setting-input-bool[data-v-f5f570d0] {\n}\n.setting-name[data-v-f5f570d0] {\n}\n\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/setting-cell.vue"],"names":[],"mappings":";AAoEA;CACA,YAAA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA;AAEA;CACA","file":"setting-cell.vue","sourcesContent":["<template>\n  <span class=\"setting-cell\">\n\t<span class=\"setting-name\">{{setting_name}}</span>\n\n\t<select\n\t  v-if=\"typeof(setting_value) === 'number'\"\n\t  class=\"setting-input-number\"\n\t  type=\"number\"\n\t  v-model=\"setting_value\">\n\t  <option v-for=\"num in valid_numbers\" :key=\"num\">{{num}}</option>\n\t</select>\n\n\t<input\n\t  v-if=\"typeof(setting_value) === 'boolean'\"\n\t  class=\"setting-input-bool\"\n\t  type=\"checkbox\"\n\t  v-model=\"setting_value\">\n  </span>\n</template>\n\n<script>\n\nimport * as ShipEngine from '../lib/shipengine.js';\n\nexport default {\n\tname: 'SettingCell',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tsetting: Object,\n\t},\n\tcomputed: {\n\t\tvalid_numbers () {\n\t\t\treturn [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];\n\t\t},\n\t\tsetting_name: {\n\t\t\tget () {\n\t\t\t\treturn this.setting['Name'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.setting['Name'] = value;\n\t\t\t},\n\t\t},\n\t\tsetting_type () {\n\t\t\treturn ;\n\t\t},\n\t\tsetting_value: {\n\t\t\tget () {\n\t\t\t\treturn this.setting['Value'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.commit('set_setting', {\n\t\t\t\t\tsetting: this.setting,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t}\n\t},\n}\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-cell {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n\n.setting-input-number {\n\twidth: 60px;\n}\n\n.setting-input-bool {\n}\n\n.setting-name {\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.setting-cell[data-v-f5f570d0] {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n.setting-input-number[data-v-f5f570d0] {\n\twidth: 60px;\n}\n.setting-input-bool[data-v-f5f570d0] {\n}\n.setting-name[data-v-f5f570d0] {\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/setting-cell.vue"],"names":[],"mappings":";AA+DA;CACA,YAAA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA;AAEA;CACA","file":"setting-cell.vue","sourcesContent":["<template>\n\t<span class=\"setting-cell\">\n\t\t<span class=\"setting-name\">{{setting_name}}</span>\n\n\t\t<select\n\t\t\tv-if=\"typeof(setting_value) === 'number'\"\n\t\t\tclass=\"setting-input-number\"\n\t\t\ttype=\"number\"\n\t\t\tv-model=\"setting_value\">\n\t\t\t<option v-for=\"num in valid_numbers\" :key=\"num\">{{num}}</option>\n\t\t</select>\n\n\t\t<input\n\t\t\tv-if=\"typeof(setting_value) === 'boolean'\"\n\t\t\tclass=\"setting-input-bool\"\n\t\t\ttype=\"checkbox\"\n\t\t\tv-model=\"setting_value\"/>\n\t</span>\n</template>\n\n<script>\n\nexport default {\n\tname: 'SettingCell',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tsetting: Object,\n\t},\n\tcomputed: {\n\t\tvalid_numbers() {\n\t\t\treturn [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];\n\t\t},\n\t\tsetting_name: {\n\t\t\tget() {\n\t\t\t\treturn this.setting['Name'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.setting['Name'] = value;\n\t\t\t},\n\t\t},\n\t\tsetting_value: {\n\t\t\tget() {\n\t\t\t\treturn this.setting['Value'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_setting', {\n\t\t\t\t\tsetting: this.setting,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n};\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-cell {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n\n.setting-input-number {\n\twidth: 60px;\n}\n\n.setting-input-bool {\n}\n\n.setting-name {\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -9758,7 +9673,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.principal-frame-raw[data-v-fef3d3c0] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n.name-column[data-v-fef3d3c0] {\n\ttext-align: right;\n\tpadding-right: 0.2em;\n}\n\n/* override global value for this one */\n.stat-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.br-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.sr-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.has-error[data-v-fef3d3c0] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/principal-frame-raw.vue"],"names":[],"mappings":";AAkHA;CACA,iBAAA;CACA,YAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,yBAAA;CACA,gBAAA;CACA,eAAA;CACA;AAEA;CACA,kBAAA;CACA,qBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-raw.vue","sourcesContent":["<template>\n  <tr class=\"principal-frame-raw\" v-bind:class=\"{ 'has-error': !is_valid_frame }\">\n\t<td class=\"name-column\" colspan=\"2\">Size: {{frame_size}}</td>\n\n\t<td class=\"part-column\">\n\t  <select v-model=\"principal_frame\" class=\"part-column-select\">\n\t\t<option v-for=\"princ_frame_value in se_design.valid_frames\" :key=\"princ_frame_value['Name']\">{{princ_frame_value['Name']}}</option>\n\t\t<option v-if=\"!is_valid_frame\" class=\"has-error\">{{principal_frame}}</option>\n\t  </select>\n\t</td>\n\n\t<template v-for=\"name in stats_raw.names\">\n\t  <StatlineCell :key=\"name\" :stats=\"stats_raw\" :name=\"name\"></StatlineCell>\n\t</template>\n\t\n\t<td class=\"weight-internal-column\" :class=\"weight_summary_class\">{{se_design.weight_internal.toFixed(2)}}</td>\n\t<td class=\"weight-external-column\">{{se_design.weight_external.toFixed(2)}}</td>\n\n\t<td class=\"br-column\">{{se_design.cost_BR_raw.toFixed(2)}}</td>\n\t<td class=\"sr-column\">{{se_design.cost_SR_raw.toFixed(2)}}</td>\n\n\t<td class=\"power-cost-column\" :title=\"power_final_title\" :class=\"power_final_class\">{{se_design.cost_power_raw.toFixed(2)}}</td>\n\t<td class=\"power-gen-column\" :title=\"power_final_title\" :class=\"power_final_class\">{{se_design.power_generation_raw.toFixed(2)}}</td>\n\n\t<template v-for=\"name in crew_raw.names\">\n\t  <StatlineCell :key=\"name\" :stats=\"crew_raw\" :name=\"name\"></StatlineCell>\n\t</template>\n\n\t<td class=\"build-time-column\">{{build_time_frame}}</td>\n\n\t<td class=\"tech-year-column\">{{tech_year_frame}} (Frame)</td>\n  </tr>\n</template>\n\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport * as ShipEngine from '../lib/shipengine.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrameRaw',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tcomputed: {\n\t\tis_valid_frame () {\n\t\t\treturn this.se_design.is_valid_frame;\n\t\t},\n\t\tpower_final_title () {\n\t\t\tif (this.has_power_error) {\n\t\t\t\treturn 'Error: Power cost greater than power generation.';\n\t\t\t} else {\n\t\t\t\treturn '';\n\t\t\t};\n\t\t},\n\t\tpower_final_class () {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_power_error,\n\t\t\t};\n\t\t},\n\t\thas_power_error () {\n\t\t\treturn this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;\n\t\t},\n\t\tweight_summary_class () {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error () {\n\t\t\treturn this.$store.getters.se_design.weight_internal > this.$store.getters.se_design.frame_max_size_raw;\n\t\t},\n\t\tprincipal_frame: {\n\t\t\tget () {\n\t\t\t\treturn this.$store.getters.se_design.json['Principal Frame'];\n\t\t\t},\n\t\t\tset (value) {\n\t\t\t\tthis.$store.getters.se_design.json['Principal Frame'] = value;\n\t\t\t},\n\t\t},\n\t\tstats_raw () {\n\t\t\treturn this.$store.getters.se_design.stats_raw;\n\t\t},\n\t\tcrew_raw () {\n\t\t\treturn this.$store.getters.se_design.cost_crew_raw;\n\t\t},\n\t\tbuild_time_frame () {\n\t\t\treturn frac(this.$store.getters.se_design.build_time_frame, 12);\n\t\t},\n\t\ttech_year_frame () {\n\t\t\treturn this.$store.getters.se_design.tech_year_frame;\n\t\t},\n\t\tframe_size () {\n\t\t\treturn this.$store.getters.se_design.frame_size.toFixed(2);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n</style>\n\n<style scoped>\n.principal-frame-raw {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n\n.name-column {\n\ttext-align: right;\n\tpadding-right: 0.2em;\n}\n\n/* override global value for this one */\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.principal-frame-raw[data-v-fef3d3c0] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n.name-column[data-v-fef3d3c0] {\n\ttext-align: right;\n\tpadding-right: 0.2em;\n}\n\n/* override global value for this one */\n.stat-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.br-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.sr-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.has-error[data-v-fef3d3c0] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/principal-frame-raw.vue"],"names":[],"mappings":";AAgHA;CACA,iBAAA;CACA,YAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,yBAAA;CACA,gBAAA;CACA,eAAA;CACA;AAEA;CACA,kBAAA;CACA,qBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-raw.vue","sourcesContent":["<template>\n\t<tr class=\"principal-frame-raw\" v-bind:class=\"{ 'has-error': !is_valid_frame }\">\n\t\t<td class=\"name-column\" colspan=\"2\">Size: {{frame_size}}</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<select v-model=\"principal_frame\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"princ_frame_value in se_design.valid_frames\" :key=\"princ_frame_value['Name']\">{{princ_frame_value['Name']}}</option>\n\t\t\t\t<option v-if=\"!is_valid_frame\" class=\"has-error\">{{principal_frame}}</option>\n\t\t\t</select>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats_raw.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats_raw\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\t\t\n\t\t<td class=\"weight-internal-column\" :class=\"weight_summary_class\">{{se_design.weight_internal.toFixed(2)}}</td>\n\t\t<td class=\"weight-external-column\">{{se_design.weight_external.toFixed(2)}}</td>\n\n\t\t<td class=\"br-column\">{{se_design.cost_BR_raw.toFixed(2)}}</td>\n\t\t<td class=\"sr-column\">{{se_design.cost_SR_raw.toFixed(2)}}</td>\n\n\t\t<td class=\"power-cost-column\" :title=\"power_final_title\" :class=\"power_final_class\">{{se_design.cost_power_raw.toFixed(2)}}</td>\n\t\t<td class=\"power-gen-column\" :title=\"power_final_title\" :class=\"power_final_class\">{{se_design.power_generation_raw.toFixed(2)}}</td>\n\n\t\t<template v-for=\"name in crew_raw.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew_raw\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time_frame}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year_frame}} (Frame)</td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrameRaw',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tcomputed: {\n\t\tis_valid_frame() {\n\t\t\treturn this.se_design.is_valid_frame;\n\t\t},\n\t\tpower_final_title() {\n\t\t\tif (this.has_power_error) {\n\t\t\t\treturn 'Error: Power cost greater than power generation.';\n\t\t\t} else {\n\t\t\t\treturn '';\n\t\t\t}\n\t\t},\n\t\tpower_final_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_power_error,\n\t\t\t};\n\t\t},\n\t\thas_power_error() {\n\t\t\treturn this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;\n\t\t},\n\t\tweight_summary_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error() {\n\t\t\treturn this.$store.getters.se_design.weight_internal > this.$store.getters.se_design.frame_max_size_raw;\n\t\t},\n\t\tprincipal_frame: {\n\t\t\tget() {\n\t\t\t\treturn this.$store.getters.se_design.json['Principal Frame'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.getters.se_design.json['Principal Frame'] = value;\n\t\t\t},\n\t\t},\n\t\tstats_raw() {\n\t\t\treturn this.$store.getters.se_design.stats_raw;\n\t\t},\n\t\tcrew_raw() {\n\t\t\treturn this.$store.getters.se_design.cost_crew_raw;\n\t\t},\n\t\tbuild_time_frame() {\n\t\t\treturn frac(this.$store.getters.se_design.build_time_frame, 12);\n\t\t},\n\t\ttech_year_frame() {\n\t\t\treturn this.$store.getters.se_design.tech_year_frame;\n\t\t},\n\t\tframe_size() {\n\t\t\treturn this.$store.getters.se_design.frame_size.toFixed(2);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style>\n</style>\n\n<style scoped>\n.principal-frame-raw {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n\n.name-column {\n\ttext-align: right;\n\tpadding-right: 0.2em;\n}\n\n/* override global value for this one */\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -9777,7 +9692,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"component.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"component.vue","sourceRoot":""}]);
 
 // exports
 
@@ -9796,7 +9711,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n    /* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.name-column {\n}\n.part-column {\n}\n.part-column-select {\n\twidth: 100%;\n}\n.quantity-column {\n\twidth: 30px;\n}\n.quantity-column-input {\n\twidth: 100%;\n}\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.build-time-column {\n\ttext-align: center;\n}\n.tech-year-column {\n\ttext-align: center;\n}\n.design-table-head {\n}\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/design.vue"],"names":[],"mappings":";AAyFA;CACA,mBAAA;;CAEA,YAAA;CACA,YAAA;IACA,mBAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA;AAEA;CACA,qBAAA;CACA,yBAAA;CACA;AAGA;IACA,qBAAA;IACA,qBAAA;IACA,kBAAA;IACA,mBAAA;CACA","file":"design.vue","sourcesContent":["<template>\n  <div class=\"design-table\">\n\t<table>\n\t  <thead class=\"design-table-head\">\n\t\t<tr class=\"design-table-head-tr\">\n\t\t  <th></th>\t<!-- name -->\n\t\t  <th></th>\t<!-- quantity -->\n\t\t  <th></th>\t<!-- part -->\n\t\t  <th>C</th>\n\t\t  <th>S</th>\n\t\t  <th>H</th>\n\t\t  <th>L</th>\n\t\t  <th>P</th>\n\t\t  <th>D</th>\n\t\t  <th>Wt (Int</th>\n\t\t  <th>Ext)</th>\n\t\t  <th>BR</th>\n\t\t  <th>SR</th>\n\t\t  <th>Pwr Cost</th>\n\t\t  <th>Pwr Gen</th>\n\t\t  <th>O</th>\n\t\t  <th>E</th>\n\t\t  <th>T</th>\n\t\t  <th>Build Time</th>\n\t\t  <th>Year Available</th>\n\t\t</tr>\n\t  </thead>\n\t  <tbody class=\"design-table-body\">\n\t\t<PrincipalFrameFinal></PrincipalFrameFinal>\n\t\t<PrincipalFrameRaw></PrincipalFrameRaw>\n\t\t<template v-for=\"se_subsystem in se_subsystems\">\n\t\t  <tr :key=\"se_subsystem.name\" class=\"subsystem-spacer-row\"><td colspan=\"100\" height=\"30px\"></td></tr>\t<!-- empty line for spacing -->\n\t\t  <SubsystemFrame :key=\"se_subsystem.name + '-frame'\" :se_subsystem=\"se_subsystem\"></SubsystemFrame>\n\t\t  <SubsystemSummary :key=\"se_subsystem.name + '-summary'\" :se_subsystem=\"se_subsystem\"></SubsystemSummary>\n\t\t  <SubsystemSettings :key=\"se_subsystem.name + '-settings'\" :se_subsystem=\"se_subsystem\"></SubsystemSettings>\n\n\t\t  <template v-for=\"se_component in se_subsystem.components\">\n\t\t\t<ComponentTr :key=\"se_component.name\" :se_component=\"se_component\"></ComponentTr>\n\t\t  </template>\n\t\t</template>\n\n\t\t<tr class=\"subsystem-spacer-row\"><td colspan=\"100\" height=\"30px\"></td></tr>\t<!-- empty line for spacing -->\n\t\t<ModuleTr :se_module=\"se_design.module\"></ModuleTr>\n\t  </tbody>\n\t</table>\n  </div>\n</template>\n\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport * as ShipEngine from '../lib/shipengine.js';\n\nimport PrincipalFrameRaw from './principal-frame-raw.vue';\nimport PrincipalFrameFinal from './principal-frame-final.vue';\nimport SubsystemSummary from './subsystem-summary.vue';\nimport SubsystemFrame from './subsystem-frame.vue';\nimport SubsystemSettings from './subsystem-settings.vue';\nimport ComponentTr from './component.vue';\nimport ModuleTr from './module.vue';\n\nexport default {\n\tname: 'Design',\n\tcomponents: {\n\t\tPrincipalFrameRaw,\n\t\tPrincipalFrameFinal,\n\t\tSubsystemSummary,\n\t\tSubsystemFrame,\n\t\tSubsystemSettings,\n\t\tComponentTr,\n\t\tModuleTr,\n\t},\n\tcomputed: {\n\t\tse_subsystems () {\n\t\t\treturn this.$store.getters.se_design.subsystems;\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n}\n</script>\n\n\n<style>\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n    /* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.name-column {\n}\n\n.part-column {\n}\n\n.part-column-select {\n\twidth: 100%;\n}\n\n.quantity-column {\n\twidth: 30px;\n}\n\n.quantity-column-input {\n\twidth: 100%;\n}\n\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.build-time-column {\n\ttext-align: center;\n}\n\n.tech-year-column {\n\ttext-align: center;\n}\n\n.design-table-head {\n}\n\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n\n\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n\t/* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.name-column {\n}\n.part-column {\n}\n.part-column-select {\n\twidth: 100%;\n}\n.quantity-column {\n\twidth: 30px;\n}\n.quantity-column-input {\n\twidth: 100%;\n}\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.build-time-column {\n\ttext-align: center;\n}\n.tech-year-column {\n\ttext-align: center;\n}\n.design-table-head {\n}\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/design.vue"],"names":[],"mappings":";AAuFA;CACA,mBAAA;;CAEA,YAAA;CACA,YAAA;CACA,mBAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA;AAEA;CACA,qBAAA;CACA,yBAAA;CACA;AAGA;IACA,qBAAA;IACA,qBAAA;IACA,kBAAA;IACA,mBAAA;CACA","file":"design.vue","sourcesContent":["<template>\n\t<div class=\"design-table\">\n\t\t<table>\n\t\t\t<thead class=\"design-table-head\">\n\t\t\t\t<tr class=\"design-table-head-tr\">\n\t\t\t\t\t<th></th>\t<!-- name -->\n\t\t\t\t\t<th></th>\t<!-- quantity -->\n\t\t\t\t\t<th></th>\t<!-- part -->\n\t\t\t\t\t<th>C</th>\n\t\t\t\t\t<th>S</th>\n\t\t\t\t\t<th>H</th>\n\t\t\t\t\t<th>L</th>\n\t\t\t\t\t<th>P</th>\n\t\t\t\t\t<th>D</th>\n\t\t\t\t\t<th>Wt (Int</th>\n\t\t\t\t\t<th>Ext)</th>\n\t\t\t\t\t<th>BR</th>\n\t\t\t\t\t<th>SR</th>\n\t\t\t\t\t<th>Pwr Cost</th>\n\t\t\t\t\t<th>Pwr Gen</th>\n\t\t\t\t\t<th>O</th>\n\t\t\t\t\t<th>E</th>\n\t\t\t\t\t<th>T</th>\n\t\t\t\t\t<th>Build Time</th>\n\t\t\t\t\t<th>Year Available</th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody class=\"design-table-body\">\n\t\t\t\t<PrincipalFrameFinal></PrincipalFrameFinal>\n\t\t\t\t<PrincipalFrameRaw></PrincipalFrameRaw>\n\t\t\t\t<template v-for=\"se_subsystem in se_subsystems\">\n\t\t\t\t\t<tr :key=\"se_subsystem.name\" class=\"subsystem-spacer-row\"><td colspan=\"100\" height=\"30px\"></td></tr>\t<!-- empty line for spacing -->\n\t\t\t\t\t<SubsystemFrame :key=\"se_subsystem.name + '-frame'\" :se_subsystem=\"se_subsystem\"></SubsystemFrame>\n\t\t\t\t\t<SubsystemSummary :key=\"se_subsystem.name + '-summary'\" :se_subsystem=\"se_subsystem\"></SubsystemSummary>\n\t\t\t\t\t<SubsystemSettings :key=\"se_subsystem.name + '-settings'\" :se_subsystem=\"se_subsystem\"></SubsystemSettings>\n\n\t\t\t\t\t<template v-for=\"se_component in se_subsystem.components\">\n\t\t\t\t\t\t<ComponentTr :key=\"se_component.name\" :se_component=\"se_component\"></ComponentTr>\n\t\t\t\t\t</template>\n\t\t\t\t</template>\n\n\t\t\t\t<tr class=\"subsystem-spacer-row\"><td colspan=\"100\" height=\"30px\"></td></tr>\t<!-- empty line for spacing -->\n\t\t\t\t<ModuleTr :se_module=\"se_design.module\"></ModuleTr>\n\t\t\t</tbody>\n\t\t</table>\n\t</div>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport PrincipalFrameRaw from './principal-frame-raw.vue';\nimport PrincipalFrameFinal from './principal-frame-final.vue';\nimport SubsystemSummary from './subsystem-summary.vue';\nimport SubsystemFrame from './subsystem-frame.vue';\nimport SubsystemSettings from './subsystem-settings.vue';\nimport ComponentTr from './component.vue';\nimport ModuleTr from './module.vue';\n\nexport default {\n\tname: 'Design',\n\tcomponents: {\n\t\tPrincipalFrameRaw,\n\t\tPrincipalFrameFinal,\n\t\tSubsystemSummary,\n\t\tSubsystemFrame,\n\t\tSubsystemSettings,\n\t\tComponentTr,\n\t\tModuleTr,\n\t},\n\tcomputed: {\n\t\tse_subsystems() {\n\t\t\treturn this.$store.getters.se_design.subsystems;\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style>\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n\t/* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.name-column {\n}\n\n.part-column {\n}\n\n.part-column-select {\n\twidth: 100%;\n}\n\n.quantity-column {\n\twidth: 30px;\n}\n\n.quantity-column-input {\n\twidth: 100%;\n}\n\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.build-time-column {\n\ttext-align: center;\n}\n\n.tech-year-column {\n\ttext-align: center;\n}\n\n.design-table-head {\n}\n\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n\n\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -9815,7 +9730,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"module.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"module.vue","sourceRoot":""}]);
 
 // exports
 
@@ -9834,7 +9749,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"principal-frame-raw.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"principal-frame-raw.vue","sourceRoot":""}]);
 
 // exports
 
@@ -9853,7 +9768,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"setting-cell.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"setting-cell.vue","sourceRoot":""}]);
 
 // exports
 
@@ -9872,7 +9787,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\tfont-size: 15px;\n}\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n", "", {"version":3,"sources":["/mnt/c/Users/Maian/workspace/tbg-shipdesigner/src/src/shipdesigner.vue"],"names":[],"mappings":";AAuCA;CACA,YAAA;CACA,aAAA;;CAEA,cAAA;CACA,uBAAA;CACA,kBAAA;CACA,gBAAA;CACA;AAEA;CACA,eAAA;CACA,yBAAA;CACA;AAEA;CACA,eAAA;CACA,mBAAA,yCAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,sBAAA;CACA","file":"shipdesigner.vue","sourcesContent":["<template>\n  <div class=\"root\">\n\t<div class=\"header\">\n\t  <DesignSummary></DesignSummary>\n\t</div>\n\t<div class=\"design\">\n\t  <Design></Design>\n\t</div>\n\t<div class=\"footer\">\n\t  <DesignImportExport></DesignImportExport>\n\t</div>\n  </div>\n</template>\n\n\n<script>\n\nimport { mapState, mapGetters } from 'vuex';\n\nimport DesignSummary from './design-summary.vue';\nimport Design from './design.vue';\nimport DesignImportExport from './design-import-export.vue';\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tDesignSummary,\n\t\tDesign,\n\t\tDesignImportExport,\n\t},\n\tcomputed: {\n\t},\n};\n\n</script>\n\n\n<style>\n\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\tfont-size: 15px;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\tfont-size: 15px;\n}\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/shipdesigner.vue"],"names":[],"mappings":";AAqCA;CACA,YAAA;CACA,aAAA;;CAEA,cAAA;CACA,uBAAA;CACA,kBAAA;CACA,gBAAA;CACA;AAEA;CACA,eAAA;CACA,yBAAA;CACA;AAEA;CACA,eAAA;CACA,mBAAA,yCAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,sBAAA;CACA","file":"shipdesigner.vue","sourcesContent":["<template>\n\t<div class=\"root\">\n\t\t<div class=\"header\">\n\t\t\t<DesignSummary></DesignSummary>\n\t\t</div>\n\t\t<div class=\"design\">\n\t\t\t<Design></Design>\n\t\t</div>\n\t\t<div class=\"footer\">\n\t\t\t<DesignImportExport></DesignImportExport>\n\t\t</div>\n\t</div>\n</template>\n\n\n<script>\n\nimport DesignSummary from './design-summary.vue';\nimport Design from './design.vue';\nimport DesignImportExport from './design-import-export.vue';\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tDesignSummary,\n\t\tDesign,\n\t\tDesignImportExport,\n\t},\n\tcomputed: {\n\t},\n};\n\n</script>\n\n\n<style>\n\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\tfont-size: 15px;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -9910,7 +9825,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-frame.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-frame.vue","sourceRoot":""}]);
 
 // exports
 
@@ -9929,7 +9844,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-settings.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-settings.vue","sourceRoot":""}]);
 
 // exports
 
@@ -9948,7 +9863,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-summary.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-summary.vue","sourceRoot":""}]);
 
 // exports
 
@@ -27942,7 +27857,7 @@ var render = function() {
       },
       _vm._l(_vm.all_parts_lists, function(parts_list) {
         return _c("option", { key: parts_list.pretty_name }, [
-          _vm._v("\n\t\t" + _vm._s(parts_list.pretty_name) + "\n      ")
+          _vm._v("\n\t\t\t" + _vm._s(parts_list.pretty_name) + "\n\t\t")
         ])
       })
     ),
@@ -27993,7 +27908,7 @@ var render = function() {
       },
       _vm._l(_vm.local_saves, function(blueprint) {
         return _c("option", { key: blueprint.pretty_name }, [
-          _vm._v("\n\t\t" + _vm._s(blueprint.pretty_name) + "\n      ")
+          _vm._v("\n\t\t\t" + _vm._s(blueprint.pretty_name) + "\n\t\t")
         ])
       })
     ),
@@ -39437,7 +39352,7 @@ if (hash) {
 	design_json = JSON.parse(decodeURI(hash.substring(1)));
 } else {
 	design_json = _swb_kepler_recreation2.default;
-};
+}
 
 var store = new _vuex2.default.Store({
 	state: {
@@ -39465,7 +39380,7 @@ var store = new _vuex2.default.Store({
 			if (context.state.undo.current < context.state.undo.history.length - 1) {
 				context.commit('history_forward');
 				context.commit(context.state.undo.history[context.state.undo.current].redo);
-			};
+			}
 		},
 		undo: function undo(context) {
 			if (context.state.undo.current >= 0) {
@@ -39576,7 +39491,7 @@ var store = new _vuex2.default.Store({
 			payload.component.part = payload.value;
 			if (!payload.component.quantity && !payload.component.is_no_part) {
 				payload.component.quantity = 1;
-			};
+			}
 			state.undo.current += 1;
 			state.undo.history.splice(state.undo.current);
 			state.undo.history[state.undo.current] = {
@@ -39717,11 +39632,11 @@ window.addEventListener('keydown', function (ev) {
 	if (ev.key === 'z' && ev.ctrlKey) {
 		store.dispatch('undo');
 		ev.preventDefault();
-	};
+	}
 	if (ev.key === 'y' && ev.ctrlKey) {
 		store.dispatch('redo');
 		ev.preventDefault();
-	};
+	}
 });
 
 // create a root instance
@@ -40019,15 +39934,15 @@ function frac(val, base, mixed) {
 		while (fractional >= base) {
 			integral += 1;
 			fractional -= base;
-		};
+		}
 		var integral_print = '';
 		if (integral) {
 			integral_print = integral.toString();
-		};
+		}
 		var fractional_print = '';
 		if (fractional) {
 			fractional_print = fractional.toString() + '/' + base.toString();
-		};
+		}
 		return [integral_print, fractional_print].join(' ') || 0;
 	} else {
 		return Math.round(val * base).toString() + '/' + base.toString();
@@ -40051,7 +39966,7 @@ function pretty(val, n) {
 	} else {
 		return n || '';
 	}
-};
+}
 
 exports.pretty = pretty;
 exports.frac = frac;
