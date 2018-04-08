@@ -10,17 +10,17 @@
 	  <StatlineCell :key="name" :stats="stats" :name="name" :fixed="0"></StatlineCell>
 	</template>
 	
-	<td class="weight-internal-column" colspan="2">{{is_valid_frame ? se_design.weight_total : '?'}}</td>
+	<td class="weight-internal-column" colspan="2">{{se_design.weight_total}}</td>
 
-	<td class="br-column">{{is_valid_frame ? se_design.cost_BR : '?'}}</td>
-	<td class="sr-column">{{is_valid_frame ? se_design.cost_SR : '?'}}</td>
+	<td class="br-column">{{se_design.cost_BR}}</td>
+	<td class="sr-column">{{se_design.cost_SR}}</td>
 
 	<td class="power-cost-column"
 		:title="power_final_title"
-		:class="power_final_class">{{is_valid_frame ? se_design.cost_power : '?'}}</td>
+		:class="power_final_class">{{se_design.cost_power}}</td>
 	<td class="power-gen-column"
 		:title="power_final_title"
-		:class="power_final_class">{{is_valid_frame ? se_design.power_generation : '?'}}</td>
+		:class="power_final_class">{{se_design.power_generation}}</td>
 
 	<template v-for="name in crew.names">
 	  <StatlineCell :key="name" :stats="crew" :name="name" :fixed="0"></StatlineCell>
@@ -49,9 +49,6 @@ export default {
 		StatlineCell,
 	},
 	computed: {
-		is_valid_frame () {
-			return this.se_design.is_valid_frame;
-		},
 		power_final_title () {
 			if (this.has_power_error) {
 				return 'Error: Power cost greater than power generation.';
@@ -65,22 +62,22 @@ export default {
 			};
 		},
 		has_power_error () {
-			return !this.is_valid_frame || this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;
+			return this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;
 		},
 		principal_frame () {
 			return this.$store.getters.se_design.json['Principal Frame'];
 		},
 		stats () {
-			return this.is_valid_frame ? this.$store.getters.se_design.stats : new ShipEngine.Statline(0);
+			return this.$store.getters.se_design.stats;
 		},
 		crew () {
-			return this.is_valid_frame ? this.$store.getters.se_design.cost_crew : new ShipEngine.Crewline(0);
+			return this.$store.getters.se_design.cost_crew;
 		},
 		build_time () {
-			return this.is_valid_frame ? frac(this.$store.getters.se_design.build_time, 12, true) : '?';
+			return frac(this.$store.getters.se_design.build_time, 12, true);
 		},
 		tech_year () {
-			return this.is_valid_frame ? this.$store.getters.se_design.tech_year_max : '?';
+			return this.$store.getters.se_design.tech_year_max;
 		},
 		ship_name: {
 			get () {

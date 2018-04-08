@@ -58,34 +58,34 @@ export default {
 	},
 	computed: {
 		build_time () {
-			return this.is_loaded ? frac(this.se_module.build_time, 12) || '' : '';
+			return frac(this.se_module.build_time, 12) || '';
 		},
 		power_gen () {
-			return pretty(this.is_loaded ? this.se_module.power_generation : 0);
+			return pretty(this.se_module.power_generation);
 		},
 		power_cost () {
-			return pretty(this.is_loaded ? this.se_module.cost_power : 0);
+			return pretty(this.se_module.cost_power);
 		},
 		cost_sr () {
-			return pretty(this.is_loaded ? this.se_module.cost_SR : 0);
+			return pretty(this.se_module.cost_SR);
 		},
 		cost_br () {
-			return pretty(this.is_loaded ? this.se_module.cost_BR : 0);
+			return pretty(this.se_module.cost_BR);
 		},
 		weight_internal () {
-			return pretty(this.is_loaded ? this.se_module.weight_internal : 0);
+			return pretty(this.se_module.weight_internal);
 		},
 		weight_external () {
-			return pretty(this.is_loaded ? this.se_module.weight_external : 0);
+			return pretty(this.se_module.weight_external);
 		},
 		is_loaded () {
 			return this.se_module.is_loaded;
 		},
 		stats () {
-			return this.is_loaded ? this.se_module.stats : new ShipEngine.Statline(0);
+			return this.se_module.stats;
 		},
 		crew() {
-			return this.is_loaded ? this.se_module.cost_crew : new ShipEngine.Crewline(0);
+			return this.se_module.cost_crew;
 		},
 
 		valid_types () {
