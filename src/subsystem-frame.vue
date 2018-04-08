@@ -14,10 +14,10 @@
 	  <td :key="name" class="stat-column">{{stats_multiplier_pretty}}</td>
 	</template>
 
-	<td class="weight-internal-column" colspan="2">{{is_valid_frame ? se_subsystem.weight_cap.toFixed(2) : '?'}}</td>
+	<td class="weight-internal-column" colspan="2">{{se_subsystem.weight_cap.toFixed(2)}}</td>
 
-	<td class="br-column">{{is_valid_frame ? se_subsystem.cost_BR_frame.toFixed(2) : '?'}}</td>
-	<td class="sr-column">{{is_valid_frame ? se_subsystem.cost_SR_mult.toFixed(2) : '?'}}x</td>
+	<td class="br-column">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>
+	<td class="sr-column">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>
 
 	<td class="power-cost-column"></td>
 	<td class="power-gen-column"></td>
@@ -67,19 +67,19 @@ export default {
 			return this.se_subsystem.stats;
 		},
 		stats_multiplier_pretty() {
-			return this.is_valid_frame ? this.se_subsystem.stats_multiplier.toFixed(2) + 'x' : '?';
+			return this.se_subsystem.stats_multiplier.toFixed(2) + 'x';
 		},
 		crew() {
-			return this.is_valid_frame ? this.se_subsystem.cost_crew : new ShipEngine.Crewline(0);
+			return this.se_subsystem.cost_crew;
 		},
 		crew_mult_pretty() {
-			return this.is_valid_frame ? this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x') : new ShipEngine.Crewline(0).apply(val => '?');
+			return this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');
 		},
 		build_time () {
-			return this.is_valid_frame ? frac(this.se_subsystem.build_time, 12) : '?';
+			return frac(this.se_subsystem.build_time, 12);
 		},
 		tech_year () {
-			return this.is_valid_frame ? this.se_subsystem.tech_year_frame : '?';
+			return this.se_subsystem.tech_year_frame;
 		},
 		sub_frame: {
 			get () {

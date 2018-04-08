@@ -79,10 +79,10 @@ export default {
 			};
 		},
 		is_limiting_tech_year () {
-			return this.is_loaded ? this.se_component.tech_year == this.se_component.subsystem.design.tech_year : false;
+			return this.se_component.tech_year == this.se_component.subsystem.design.tech_year;
 		},
 		tech_year () {
-			return this.is_loaded ? this.se_component.tech_year : "";
+			return this.se_component.tech_year;
 		},
 		is_valid_part () {
 			return this.valid_parts
@@ -93,22 +93,22 @@ export default {
 			return this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));
 		},
 		power_gen () {
-			return pretty(this.is_loaded ? this.se_component.power_generation : 0);
+			return pretty(this.se_component.power_generation);
 		},
 		power_cost () {
-			return pretty(this.is_loaded ? this.se_component.cost_power : 0);
+			return pretty(this.se_component.cost_power);
 		},
 		cost_sr () {
-			return pretty(this.is_loaded ? this.se_component.cost_SR : 0);
+			return pretty(this.se_component.cost_SR);
 		},
 		cost_br () {
-			return pretty(this.is_loaded ? this.se_component.cost_BR : 0);
+			return pretty(this.se_component.cost_BR);
 		},
 		weight_internal () {
-			return pretty(this.is_loaded ? this.se_component.weight_internal : 0);
+			return pretty(this.se_component.weight_internal);
 		},
 		weight_external () {
-			return pretty(this.is_loaded ? this.se_component.weight_external : 0);
+			return pretty(this.se_component.weight_external);
 		},
 		is_loaded () {
 			return this.se_component.is_loaded;
@@ -141,10 +141,10 @@ export default {
 			return this.se_component.valid_quantities;
 		},
 		stats () {
-			return this.is_loaded ? this.se_component.stats : new ShipEngine.Statline(0);
+			return this.se_component.stats;
 		},
 		crew() {
-			return this.is_loaded ? this.se_component.cost_crew : new ShipEngine.Crewline(0);
+			return this.se_component.cost_crew;
 		},
 		part: {
 			get () {
