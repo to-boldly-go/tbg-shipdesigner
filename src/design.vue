@@ -1,57 +1,55 @@
 <template>
-  <div class="design-table">
-	<table>
-	  <thead class="design-table-head">
-		<tr class="design-table-head-tr">
-		  <th></th>	<!-- name -->
-		  <th></th>	<!-- quantity -->
-		  <th></th>	<!-- part -->
-		  <th>C</th>
-		  <th>S</th>
-		  <th>H</th>
-		  <th>L</th>
-		  <th>P</th>
-		  <th>D</th>
-		  <th>Wt (Int</th>
-		  <th>Ext)</th>
-		  <th>BR</th>
-		  <th>SR</th>
-		  <th>Pwr Cost</th>
-		  <th>Pwr Gen</th>
-		  <th>O</th>
-		  <th>E</th>
-		  <th>T</th>
-		  <th>Build Time</th>
-		  <th>Year Available</th>
-		</tr>
-	  </thead>
-	  <tbody class="design-table-body">
-		<PrincipalFrameFinal></PrincipalFrameFinal>
-		<PrincipalFrameRaw></PrincipalFrameRaw>
-		<template v-for="se_subsystem in se_subsystems">
-		  <tr :key="se_subsystem.name" class="subsystem-spacer-row"><td colspan="100" height="30px"></td></tr>	<!-- empty line for spacing -->
-		  <SubsystemFrame :key="se_subsystem.name + '-frame'" :se_subsystem="se_subsystem"></SubsystemFrame>
-		  <SubsystemSummary :key="se_subsystem.name + '-summary'" :se_subsystem="se_subsystem"></SubsystemSummary>
-		  <SubsystemSettings :key="se_subsystem.name + '-settings'" :se_subsystem="se_subsystem"></SubsystemSettings>
+	<div class="design-table">
+		<table>
+			<thead class="design-table-head">
+				<tr class="design-table-head-tr">
+					<th></th>	<!-- name -->
+					<th></th>	<!-- quantity -->
+					<th></th>	<!-- part -->
+					<th>C</th>
+					<th>S</th>
+					<th>H</th>
+					<th>L</th>
+					<th>P</th>
+					<th>D</th>
+					<th>Wt (Int</th>
+					<th>Ext)</th>
+					<th>BR</th>
+					<th>SR</th>
+					<th>Pwr Cost</th>
+					<th>Pwr Gen</th>
+					<th>O</th>
+					<th>E</th>
+					<th>T</th>
+					<th>Build Time</th>
+					<th>Year Available</th>
+				</tr>
+			</thead>
+			<tbody class="design-table-body">
+				<PrincipalFrameFinal></PrincipalFrameFinal>
+				<PrincipalFrameRaw></PrincipalFrameRaw>
+				<template v-for="se_subsystem in se_subsystems">
+					<tr :key="se_subsystem.name" class="subsystem-spacer-row"><td colspan="100" height="30px"></td></tr>	<!-- empty line for spacing -->
+					<SubsystemFrame :key="se_subsystem.name + '-frame'" :se_subsystem="se_subsystem"></SubsystemFrame>
+					<SubsystemSummary :key="se_subsystem.name + '-summary'" :se_subsystem="se_subsystem"></SubsystemSummary>
+					<SubsystemSettings :key="se_subsystem.name + '-settings'" :se_subsystem="se_subsystem"></SubsystemSettings>
 
-		  <template v-for="se_component in se_subsystem.components">
-			<ComponentTr :key="se_component.name" :se_component="se_component"></ComponentTr>
-		  </template>
-		</template>
+					<template v-for="se_component in se_subsystem.components">
+						<ComponentTr :key="se_component.name" :se_component="se_component"></ComponentTr>
+					</template>
+				</template>
 
-		<tr class="subsystem-spacer-row"><td colspan="100" height="30px"></td></tr>	<!-- empty line for spacing -->
-		<ModuleTr :se_module="se_design.module"></ModuleTr>
-	  </tbody>
-	</table>
-  </div>
+				<tr class="subsystem-spacer-row"><td colspan="100" height="30px"></td></tr>	<!-- empty line for spacing -->
+				<ModuleTr :se_module="se_design.module"></ModuleTr>
+			</tbody>
+		</table>
+	</div>
 </template>
 
 
 <script>
 
-import { mapState, mapGetters } from 'vuex';
-
-import * as ShipEngine from '../lib/shipengine.js';
+import { mapGetters } from 'vuex';
 
 import PrincipalFrameRaw from './principal-frame-raw.vue';
 import PrincipalFrameFinal from './principal-frame-final.vue';
@@ -73,7 +71,7 @@ export default {
 		ModuleTr,
 	},
 	computed: {
-		se_subsystems () {
+		se_subsystems() {
 			return this.$store.getters.se_design.subsystems;
 		},
 		...mapGetters([
@@ -82,7 +80,7 @@ export default {
 	},
 	methods: {
 	},
-}
+};
 </script>
 
 
@@ -92,7 +90,7 @@ export default {
 
 	width: 100%;
 	margin: 0px;
-    /* height: 100%; */
+	/* height: 100%; */
 
 	left: 5px;
 	top: 5px;

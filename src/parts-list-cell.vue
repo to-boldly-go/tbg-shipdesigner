@@ -1,24 +1,24 @@
 <template>
-  <td class="cell"
-	  @click="edit_cell"
-	  @focus="edit_cell"
-	  tabindex="0"
-	  :style="computed_style">
+	<td class="cell"
+		@click="edit_cell"
+		@focus="edit_cell"
+		tabindex="0"
+		:style="computed_style">
 
-	<span
-	  class="display-span"
-	  v-show="!is_editing">{{display_value}}</span>
-	
-	<input
-	  v-if="is_editing"
-	  class="edit-input"
-	  ref="input"
-	  type="text"
-	  @blur="commit_edit"
-	  @keydown="on_keydown"
-	  v-focus
-	  v-model="temp_value"/>
-  </td>
+		<span
+			class="display-span"
+			v-show="!is_editing">{{display_value}}</span>
+		
+		<input
+			v-if="is_editing"
+			class="edit-input"
+			ref="input"
+			type="text"
+			@blur="commit_edit"
+			@keydown="on_keydown"
+			v-focus
+			v-model="temp_value"/>
+	</td>
 </template>
 
 <script>
@@ -29,7 +29,7 @@ export default {
 	},
 	directives: {
 		focus: {
-			inserted (el) {
+			inserted(el) {
 				el.focus();
 			},
 		},
@@ -42,21 +42,21 @@ export default {
 			type: Object,
 		},
 	},
-	data () {
+	data() {
 		return {
 			is_editing: false,
 			temp_value: null,
 		};
 	},
 	computed: {
-		computed_style () {
+		computed_style() {
 			return Object.assign({
 				'width': this.field.width.toString() + 'px',
 				'text-align': this.field.align,
 			}, this.computed_font);
 		},
-		computed_font () {
-			var style = this.field.style;
+		computed_font() {
+			let style = this.field.style;
 			if (!style && this.field.fixed) {
 				style = 'fixed';
 			}
@@ -66,42 +66,37 @@ export default {
 					['font-family']: "'Roboto Mono', monospace",
 					['font-size']: '12px',
 				};
-				break;
 			case 'variable':
 			default:
 				return {};
-				break;
-			};
+			}
 		},
-		display_value () {
+		display_value() {
 			switch (this.field.edit_type) {
-			case 'number':
+			case 'number': {
 				// return this.part[this.field.name];
 				const v = this.part[this.field.name];
-				if (typeof(v) == 'number') {
+				if (typeof(v) === 'number') {
 					const f = v.toFixed(this.field.fixed);
-					return f.replace(/(\..*?)(0+)$/, (match, p1, p2) => p1 + ' '.repeat(p2.length)).replace(/\. ( *)/, ".0$1");
+					return f.replace(/(\..*?)(0+)$/, (match, p1, p2) => p1 + ' '.repeat(p2.length)).replace(/\. ( *)/, '.0$1');
 				} else {
 					return v;
-				};
-				break;
+				}
+			}
 			case 'string':
 				return this.part[this.field.name];
-				break;
-			};
+			}
 		},
 		value: {
-			get () {
+			get() {
 				switch (this.field.edit_type) {
 				case 'number':
 					return this.value_number;
-					break;
 				case 'string':
 					return this.value_string;
-					break;
-				};
+				}
 			},
-			set (value) {
+			set(value) {
 				switch (this.field.edit_type) {
 				case 'number':
 					this.value_number = value;
@@ -109,14 +104,14 @@ export default {
 				case 'string':
 					this.value_string = value;
 					break;
-				};
+				}
 			},
 		},
 		value_number: {
-			get () {
+			get() {
 				return Number(this.part[this.field.name]);
 			},
-			set (value) {
+			set(value) {
 				let new_value = Number(typeof (value) === 'string' ? value.trim() : 0);
 				if (this.value_number !== new_value) {
 					this.$store.commit('edit_part', {
@@ -128,10 +123,10 @@ export default {
 			},
 		},
 		value_string: {
-			get () {
+			get() {
 				return this.part[this.field.name];
 			},
-			set (value) {
+			set(value) {
 				if (this.value_string !== value) {
 					this.$store.commit('edit_part', {
 						part: this.part,
@@ -144,7 +139,7 @@ export default {
 	},
 	methods: {
 		on_keydown(ev) {
-			switch (ev.key){
+			switch (ev.key) {
 			case 'Enter':
 				// leave focus and let the app save changes
 				this.commit_edit();
@@ -152,17 +147,17 @@ export default {
 			case 'Escape':
 				this.abort_edit();
 				break;
-			};
+			}
 		},
-		abort_edit () {
+		abort_edit() {
 			this.temp_value = this.value;
 			this.is_editing = false;
 		},
-		edit_cell (ev) {
+		edit_cell(ev) {
 			this.is_editing = true;
 			this.temp_value = this.value;
 		},
-		commit_edit (ev) {
+		commit_edit(ev) {
 			this.is_editing = false;
 			this.value = this.temp_value;
 		},

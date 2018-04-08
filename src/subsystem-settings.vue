@@ -1,18 +1,14 @@
 <template>
-  <tr class="setting-tr" v-if="has_settings">
-	<td class="settings-cell" colspan="100"> <!-- span all columns and we'll just fill it with settings -->
-	  <SettingCell v-for="setting in settings" :key="setting['Name']" :setting="setting"></SettingCell>
-	</td>
-  </tr>
+	<tr class="setting-tr" v-if="has_settings">
+		<td class="settings-cell" colspan="100"> <!-- span all columns and we'll just fill it with settings -->
+			<SettingCell v-for="setting in settings" :key="setting['Name']" :setting="setting"></SettingCell>
+		</td>
+	</tr>
 </template>
 
 <script>
 
-import { mapState, mapGetters } from 'vuex';
-
-import * as ShipEngine from '../lib/shipengine.js';
-
-import SettingCell from './setting-cell.vue'
+import SettingCell from './setting-cell.vue';
 
 export default {
 	name: 'SubsystemSettings',
@@ -23,14 +19,14 @@ export default {
 		se_subsystem: Object,
 	},
 	computed: {
-		has_settings () {
+		has_settings() {
 			return this.se_subsystem.settings.length > 0;
 		},
-		settings () {
+		settings() {
 			return this.se_subsystem.settings;
 		},
 	},
-}
+};
 
 </script>
 

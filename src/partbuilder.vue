@@ -1,27 +1,23 @@
 <template>
-  <div class="root">
-	<div class="header">
-	  <PartsListHeader></PartsListHeader>
+	<div class="root">
+		<div class="header">
+			<PartsListHeader></PartsListHeader>
+		</div>
+		<div class="editor">
+			<PartsListEditor></PartsListEditor>
+		</div>
+		<div class="footer">
+			<PartsListFooter></PartsListFooter>
+		</div>
 	</div>
-	<div class="editor">
-	  <PartsListEditor></PartsListEditor>
-	</div>
-	<div class="footer">
-	  <PartsListFooter></PartsListFooter>
-	</div>
-  </div>
 </template>
 
 
 <script>
 
-import _ from 'lodash';
-
 import PartsListHeader from './parts-list-header.vue';
 import PartsListFooter from './parts-list-footer.vue';
 import PartsListEditor from './parts-list-editor.vue';
-
-import canon_parts_list from '../dist/canon_parts_list.json';
 
 const PARTS_KEY = 'working_parts_list';
 
@@ -32,26 +28,26 @@ export default {
 		PartsListFooter,
 		PartsListEditor,
 	},
-	data () {
+	data() {
 		return {
 		};
 	},
-	mounted () {
+	mounted() {
 		this.load_parts_from_storage();
 	},
-	updated () {
+	updated() {
 		this.save_parts_to_storage();
 	},
 	methods: {
-		load_parts_from_storage () {
+		load_parts_from_storage() {
 			const saved_parts = localStorage.getItem(PARTS_KEY);
 			if (saved_parts) {
 				this.data = JSON.parse(saved_parts);
 			} else if (this.data) {
 				localStorage.setItem(PARTS_KEY, JSON.stringify(this.data));
-			};
+			}
 		},
-		save_parts_to_storage () {
+		save_parts_to_storage() {
 			if (this.data) {
 				localStorage.setItem(PARTS_KEY, JSON.stringify(this.data));
 			}

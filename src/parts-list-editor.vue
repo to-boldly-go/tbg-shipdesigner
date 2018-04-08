@@ -1,27 +1,27 @@
 <template>
-  <div width="100%" height="100%">
-  <table class="editor">
-	<thead>
-	  <th v-for="field in selected_schema"
-		  :key="field.name"
-		  @click="sort_list(field.name)"
-		  class="column-header"
-		  :style="header_style(field)">{{field.name}}</th>
-	  <th class="column-header delete-column"></th>
-	</thead>
-	<tbody>
-	  <PartsListPart v-for="part in displayed_parts" :key="part.name" :part="part"></PartsListPart>
-	</tbody>
-  </table>
-  <input type="button" value="Add new part" @click="add_new_part" class="new-part-button">
-  </div>
+	<div width="100%" height="100%">
+		<table class="editor">
+			<thead>
+				<th v-for="field in selected_schema"
+					:key="field.name"
+					@click="sort_list(field.name)"
+					class="column-header"
+					:style="header_style(field)">{{field.name}}</th>
+				<th class="column-header delete-column"></th>
+			</thead>
+			<tbody>
+				<PartsListPart v-for="part in displayed_parts" :key="part.name" :part="part"></PartsListPart>
+			</tbody>
+		</table>
+		<input type="button" value="Add new part" @click="add_new_part" class="new-part-button">
+	</div>
 </template>
 
 <script>
 
 import _ from 'lodash';
 
-import { mapState, mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
 
 import PartsListPart from './parts-list-part.vue';
 
@@ -30,17 +30,17 @@ export default {
 	components: {
 		PartsListPart,
 	},
-	data () {
+	data() {
 		return {
 		};
 	},
 	computed: {
-		displayed_parts () {
+		displayed_parts() {
 			return _(this.selected_parts)
 				.filter((part) => this.$store.state.display.filter.types.includes(part['Type'])).value();
 		},
-		header_style () {
-			return function (field) {
+		header_style() {
+			return function(field) {
 				return {
 					width: field.width.toString() + 'px',
 				};
@@ -52,7 +52,7 @@ export default {
 		]),
 	},
 	methods: {
-		add_new_part () {
+		add_new_part() {
 			let new_part = _.chain(this.fields)
 				.map((field) => [field.name, null])
 				.fromPairs()
@@ -63,7 +63,7 @@ export default {
 			new_part['Type Sort'] = last_part['Type Sort'];
 			this.$store.commit('add_part', new_part);
 		},
-		sort_list (field) {
+		sort_list(field) {
 			this.$store.commit('sort_parts_list_by', field);
 		},
 	},

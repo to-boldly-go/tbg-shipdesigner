@@ -1,21 +1,19 @@
 <template>
-  <div class="root">
-	<div class="header">
-	  <DesignSummary></DesignSummary>
+	<div class="root">
+		<div class="header">
+			<DesignSummary></DesignSummary>
+		</div>
+		<div class="design">
+			<Design></Design>
+		</div>
+		<div class="footer">
+			<DesignImportExport></DesignImportExport>
+		</div>
 	</div>
-	<div class="design">
-	  <Design></Design>
-	</div>
-	<div class="footer">
-	  <DesignImportExport></DesignImportExport>
-	</div>
-  </div>
 </template>
 
 
 <script>
-
-import { mapState, mapGetters } from 'vuex';
 
 import DesignSummary from './design-summary.vue';
 import Design from './design.vue';
