@@ -60,3 +60,9 @@ typings/
 # VS Code workspace folder
 .vscode
 
+dist/shipdesigner.js
+dist/partbuilder.js
+dist/csvimporter.js
+dist/shipdesigner.js.map
+dist/partbuilder.js.map
+dist/csvimporter.js.map
