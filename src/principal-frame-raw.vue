@@ -1,43 +1,41 @@
 <template>
-  <tr class="principal-frame-raw" v-bind:class="{ 'has-error': !is_valid_frame }">
-	<td class="name-column" colspan="2">Size: {{frame_size}}</td>
+	<tr class="principal-frame-raw" v-bind:class="{ 'has-error': !is_valid_frame }">
+		<td class="name-column" colspan="2">Size: {{frame_size}}</td>
 
-	<td class="part-column">
-	  <select v-model="principal_frame" class="part-column-select">
-		<option v-for="princ_frame_value in se_design.valid_frames" :key="princ_frame_value['Name']">{{princ_frame_value['Name']}}</option>
-		<option v-if="!is_valid_frame" class="has-error">{{principal_frame}}</option>
-	  </select>
-	</td>
+		<td class="part-column">
+			<select v-model="principal_frame" class="part-column-select">
+				<option v-for="princ_frame_value in se_design.valid_frames" :key="princ_frame_value['Name']">{{princ_frame_value['Name']}}</option>
+				<option v-if="!is_valid_frame" class="has-error">{{principal_frame}}</option>
+			</select>
+		</td>
 
-	<template v-for="name in stats_raw.names">
-	  <StatlineCell :key="name" :stats="stats_raw" :name="name"></StatlineCell>
-	</template>
-	
-	<td class="weight-internal-column" :class="weight_summary_class">{{se_design.weight_internal.toFixed(2)}}</td>
-	<td class="weight-external-column">{{se_design.weight_external.toFixed(2)}}</td>
+		<template v-for="name in stats_raw.names">
+			<StatlineCell :key="name" :stats="stats_raw" :name="name"></StatlineCell>
+		</template>
+		
+		<td class="weight-internal-column" :class="weight_summary_class">{{se_design.weight_internal.toFixed(2)}}</td>
+		<td class="weight-external-column">{{se_design.weight_external.toFixed(2)}}</td>
 
-	<td class="br-column">{{se_design.cost_BR_raw.toFixed(2)}}</td>
-	<td class="sr-column">{{se_design.cost_SR_raw.toFixed(2)}}</td>
+		<td class="br-column">{{se_design.cost_BR_raw.toFixed(2)}}</td>
+		<td class="sr-column">{{se_design.cost_SR_raw.toFixed(2)}}</td>
 
-	<td class="power-cost-column" :title="power_final_title" :class="power_final_class">{{se_design.cost_power_raw.toFixed(2)}}</td>
-	<td class="power-gen-column" :title="power_final_title" :class="power_final_class">{{se_design.power_generation_raw.toFixed(2)}}</td>
+		<td class="power-cost-column" :title="power_final_title" :class="power_final_class">{{se_design.cost_power_raw.toFixed(2)}}</td>
+		<td class="power-gen-column" :title="power_final_title" :class="power_final_class">{{se_design.power_generation_raw.toFixed(2)}}</td>
 
-	<template v-for="name in crew_raw.names">
-	  <StatlineCell :key="name" :stats="crew_raw" :name="name"></StatlineCell>
-	</template>
+		<template v-for="name in crew_raw.names">
+			<StatlineCell :key="name" :stats="crew_raw" :name="name"></StatlineCell>
+		</template>
 
-	<td class="build-time-column">{{build_time_frame}}</td>
+		<td class="build-time-column">{{build_time_frame}}</td>
 
-	<td class="tech-year-column">{{tech_year_frame}} (Frame)</td>
-  </tr>
+		<td class="tech-year-column">{{tech_year_frame}} (Frame)</td>
+	</tr>
 </template>
 
 
 <script>
 
-import { mapState, mapGetters } from 'vuex';
-
-import * as ShipEngine from '../lib/shipengine.js';
+import { mapGetters } from 'vuex';
 
 import StatlineCell from './statline-cell.vue';
 
@@ -49,53 +47,53 @@ export default {
 		StatlineCell,
 	},
 	computed: {
-		is_valid_frame () {
+		is_valid_frame() {
 			return this.se_design.is_valid_frame;
 		},
-		power_final_title () {
+		power_final_title() {
 			if (this.has_power_error) {
 				return 'Error: Power cost greater than power generation.';
 			} else {
 				return '';
-			};
+			}
 		},
-		power_final_class () {
+		power_final_class() {
 			return {
 				'has-error': this.has_power_error,
 			};
 		},
-		has_power_error () {
+		has_power_error() {
 			return this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;
 		},
-		weight_summary_class () {
+		weight_summary_class() {
 			return {
 				'has-error': this.has_weight_error,
 			};
 		},
-		has_weight_error () {
+		has_weight_error() {
 			return this.$store.getters.se_design.weight_internal > this.$store.getters.se_design.frame_max_size_raw;
 		},
 		principal_frame: {
-			get () {
+			get() {
 				return this.$store.getters.se_design.json['Principal Frame'];
 			},
-			set (value) {
+			set(value) {
 				this.$store.getters.se_design.json['Principal Frame'] = value;
 			},
 		},
-		stats_raw () {
+		stats_raw() {
 			return this.$store.getters.se_design.stats_raw;
 		},
-		crew_raw () {
+		crew_raw() {
 			return this.$store.getters.se_design.cost_crew_raw;
 		},
-		build_time_frame () {
+		build_time_frame() {
 			return frac(this.$store.getters.se_design.build_time_frame, 12);
 		},
-		tech_year_frame () {
+		tech_year_frame() {
 			return this.$store.getters.se_design.tech_year_frame;
 		},
-		frame_size () {
+		frame_size() {
 			return this.$store.getters.se_design.frame_size.toFixed(2);
 		},
 		...mapGetters([
@@ -104,7 +102,7 @@ export default {
 	},
 	methods: {
 	},
-}
+};
 </script>
 
 

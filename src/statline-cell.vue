@@ -1,5 +1,5 @@
 <template>
-  <td class="stat-column">{{pretty}}</td>
+	<td class="stat-column">{{pretty}}</td>
 </template>
 
 
@@ -14,31 +14,31 @@ export default {
 		name: String,
 		fixed: {
 			type: Number,
-			default () { return 2; },
+			default() { return 2; },
 		},
 		ispretty: {
 			type: Boolean,
-			default () { return true; },
+			default() { return true; },
 		},
 	},
 	computed: {
-		pretty () {
+		pretty() {
 			if (this.is_zero) {
 				return '';
 			} else if (this.ispretty) {
 				return this.raw.toFixed(this.fixed);
 			} else {
 				return this.raw;
-			};
+			}
 		},
-		is_zero () {
+		is_zero() {
 			return Math.abs(this.raw) < Number.EPSILON;
 		},
-		raw () {
+		raw() {
 			return this.stats[this.name];
 		},
 	},
-}
+};
 </script>
 
 <style>

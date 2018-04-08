@@ -20,10 +20,10 @@ const store = new Vuex.Store({
 	actions: {
 	},
 	mutations: {
-		set_parts_list (state, payload) {
+		set_parts_list(state, payload) {
 			state.parts_list = payload;
 		},
-		set_design_json (state, payload) {
+		set_design_json(state, payload) {
 			state.design_json = payload;
 		},
 	},
@@ -33,6 +33,6 @@ const store = new Vuex.Store({
 // create a root instance
 new Vue({
 	el: '#app',
- 	render: h => h(CsvImporter),
+	render: h => h(CsvImporter),
 	store,
 });

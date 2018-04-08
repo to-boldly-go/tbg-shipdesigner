@@ -1,43 +1,41 @@
 <template>
-  <tr class="principal-frame-final">
-	<td class="name-column" colspan="2">
-	  <input v-model="ship_name" placeholder="Ship Name" class="name-column-input">
-	</td>
+	<tr class="principal-frame-final">
+		<td class="name-column" colspan="2">
+			<input v-model="ship_name" placeholder="Ship Name" class="name-column-input">
+		</td>
 
-	<td class="part-column">{{principal_frame}}</td>
+		<td class="part-column">{{principal_frame}}</td>
 
-	<template v-for="name in stats.names">
-	  <StatlineCell :key="name" :stats="stats" :name="name" :fixed="0"></StatlineCell>
-	</template>
-	
-	<td class="weight-internal-column" colspan="2">{{se_design.weight_total}}</td>
+		<template v-for="name in stats.names">
+			<StatlineCell :key="name" :stats="stats" :name="name" :fixed="0"></StatlineCell>
+		</template>
+		
+		<td class="weight-internal-column" colspan="2">{{se_design.weight_total}}</td>
 
-	<td class="br-column">{{se_design.cost_BR}}</td>
-	<td class="sr-column">{{se_design.cost_SR}}</td>
+		<td class="br-column">{{se_design.cost_BR}}</td>
+		<td class="sr-column">{{se_design.cost_SR}}</td>
 
-	<td class="power-cost-column"
-		:title="power_final_title"
-		:class="power_final_class">{{se_design.cost_power}}</td>
-	<td class="power-gen-column"
-		:title="power_final_title"
-		:class="power_final_class">{{se_design.power_generation}}</td>
+		<td class="power-cost-column"
+			:title="power_final_title"
+			:class="power_final_class">{{se_design.cost_power}}</td>
+		<td class="power-gen-column"
+			:title="power_final_title"
+			:class="power_final_class">{{se_design.power_generation}}</td>
 
-	<template v-for="name in crew.names">
-	  <StatlineCell :key="name" :stats="crew" :name="name" :fixed="0"></StatlineCell>
-	</template>
+		<template v-for="name in crew.names">
+			<StatlineCell :key="name" :stats="crew" :name="name" :fixed="0"></StatlineCell>
+		</template>
 
-	<td class="build-time-column">{{build_time}}</td>
+		<td class="build-time-column">{{build_time}}</td>
 
-	<td class="tech-year-column">{{tech_year}}</td>
-  </tr>
+		<td class="tech-year-column">{{tech_year}}</td>
+	</tr>
 </template>
 
 
 <script>
 
-import { mapState, mapGetters } from 'vuex';
-
-import * as ShipEngine from '../lib/shipengine.js';
+import { mapGetters } from 'vuex';
 
 import StatlineCell from './statline-cell.vue';
 
@@ -49,43 +47,43 @@ export default {
 		StatlineCell,
 	},
 	computed: {
-		power_final_title () {
+		power_final_title() {
 			if (this.has_power_error) {
 				return 'Error: Power cost greater than power generation.';
 			} else {
 				return '';
-			};
+			}
 		},
-		power_final_class () {
+		power_final_class() {
 			return {
 				'has-error': this.has_power_error,
 			};
 		},
-		has_power_error () {
+		has_power_error() {
 			return this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;
 		},
-		principal_frame () {
+		principal_frame() {
 			return this.$store.getters.se_design.json['Principal Frame'];
 		},
-		stats () {
+		stats() {
 			return this.$store.getters.se_design.stats;
 		},
-		crew () {
+		crew() {
 			return this.$store.getters.se_design.cost_crew;
 		},
-		build_time () {
+		build_time() {
 			return frac(this.$store.getters.se_design.build_time, 12, true);
 		},
-		tech_year () {
+		tech_year() {
 			return this.$store.getters.se_design.tech_year_max;
 		},
 		ship_name: {
-			get () {
+			get() {
 				return this.$store.getters.se_design.json['Name'];
 			},
-			set (value) {
+			set(value) {
 				this.$store.commit('set_design_name', value);
-			}
+			},
 		},
 		...mapGetters([
 			'se_design',
@@ -93,7 +91,7 @@ export default {
 	},
 	methods: {
 	},
-}
+};
 </script>
 
 

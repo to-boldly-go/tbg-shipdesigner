@@ -15,28 +15,28 @@ let parser = new ArgumentParser({
 parser.addArgument(
 	['-p', '--parts'],
 	{
-		help: "The CSV for the parts list",
+		help: 'The CSV for the parts list',
 	}
 );
 
 parser.addArgument(
 	['-f', '--frames'],
 	{
-		help: "The CSV for the frames list",
+		help: 'The CSV for the frames list',
 	}
 );
 
 parser.addArgument(
 	['-m', '--modules'],
 	{
-		help: "The CSV for the modules list",
+		help: 'The CSV for the modules list',
 	}
 );
 
 parser.addArgument(
 	'name',
 	{
-		help: "The name of the json parts lists to create.",
+		help: 'The name of the json parts lists to create.',
 	}
 );
 
@@ -206,14 +206,14 @@ const DEFAULT_PARTS_SCHEMA = [
 
 const DEFAULT_MODULES_SCHEMA = [
 	{
-		name: "Type",
+		name: 'Type',
 		id: 'type',
 		edit_type: 'string',
 		width: 151,
 		align: 'right',
 	},
 	{
-		name: "Weight Cap",
+		name: 'Weight Cap',
 		id: 'weightcap',
 		edit_type: 'number',
 		fixed: 0,
@@ -221,14 +221,14 @@ const DEFAULT_MODULES_SCHEMA = [
 		align: 'right',
 	},
 	{
-		name: "Variant",
+		name: 'Variant',
 		id: 'variant',
 		edit_type: 'string',
 		width: 70,
 		align: 'right',
 	},
 	{
-		name: "Tier",
+		name: 'Tier',
 		id: 'tier',
 		edit_type: 'number',
 		fixed: 0,
@@ -236,7 +236,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		align: 'right',
 	},
 	{
-		name: "Build Time",
+		name: 'Build Time',
 		id: 'buildtime',
 		edit_type: 'number',
 		fixed: 2,
@@ -244,7 +244,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		align: 'right',
 	},
 	{
-		name: "C",
+		name: 'C',
 		id: 'combat',
 		edit_type: 'number',
 		fixed: 1,
@@ -252,7 +252,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		align: 'right',
 	},
 	{
-		name: "S",
+		name: 'S',
 		id: 'science',
 		edit_type: 'number',
 		fixed: 1,
@@ -260,7 +260,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		align: 'right',
 	},
 	{
-		name: "H",
+		name: 'H',
 		id: 'hull',
 		edit_type: 'number',
 		fixed: 1,
@@ -268,7 +268,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		align: 'right',
 	},
 	{
-		name: "L",
+		name: 'L',
 		id: 'shields',
 		edit_type: 'number',
 		fixed: 1,
@@ -276,7 +276,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		align: 'right',
 	},
 	{
-		name: "P",
+		name: 'P',
 		id: 'presence',
 		edit_type: 'number',
 		fixed: 1,
@@ -284,7 +284,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		align: 'right',
 	},
 	{
-		name: "D",
+		name: 'D',
 		id: 'defense',
 		edit_type: 'number',
 		fixed: 1,
@@ -292,7 +292,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		align: 'right',
 	},
 	{
-		name: "Weight",
+		name: 'Weight',
 		id: 'weight',
 		edit_type: 'number',
 		fixed: 0,
@@ -300,7 +300,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		align: 'right',
 	},
 	{
-		name: "SR Cost",
+		name: 'SR Cost',
 		id: 'srcost',
 		edit_type: 'number',
 		fixed: 0,
@@ -308,7 +308,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		align: 'right',
 	},
 	{
-		name: "Power Cost",
+		name: 'Power Cost',
 		id: 'powercost',
 		edit_type: 'number',
 		fixed: 0,
@@ -316,7 +316,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		align: 'right',
 	},
 	{
-		name: "O",
+		name: 'O',
 		id: 'ocost',
 		edit_type: 'number',
 		fixed: 2,
@@ -324,7 +324,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		align: 'right',
 	},
 	{
-		name: "E",
+		name: 'E',
 		id: 'ecost',
 		edit_type: 'number',
 		fixed: 2,
@@ -332,7 +332,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		align: 'right',
 	},
 	{
-		name: "T",
+		name: 'T',
 		id: 'tcost',
 		edit_type: 'number',
 		fixed: 2,
@@ -340,7 +340,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		align: 'right',
 	},
 	{
-		name: "Reliability",
+		name: 'Reliability',
 		id: 'reliability',
 		edit_type: 'number',
 		fixed: 7,
@@ -501,7 +501,7 @@ Papa.parsePromise = function(file) {
 			header: true,
 			dynamicTyping: true,
 			complete,
-			error
+			error,
 		});
 	});
 };
@@ -513,30 +513,31 @@ function readFile(filename, enc) {
 				error(err);
 			} else {
 				complete(result);
-			};
+			}
 		});
 	});
-};
+}
 
 
-Promise.all([readFile(args.parts, 'utf8').then(Papa.parsePromise),
-			 readFile(args.frames, 'utf8').then(Papa.parsePromise),
-			 readFile(args.modules, 'utf8').then(Papa.parsePromise)])
-	.then(([parts, frames, modules]) => {
-		console.log(JSON.stringify({
-			name: args.name,
-			timestamp: new Date().toISOString(),
-			parts: {
-				records: parts.data.filter((row) => _.size(row) > 2),
-				schema: DEFAULT_PARTS_SCHEMA,
-			},
-			modules: {
-				records: modules.data.filter((row) => _.size(row) > 2),
-				schema: DEFAULT_MODULES_SCHEMA,
-			},
-			frames: {
-				records: frames.data.filter((row) => _.size(row) > 2),
-				schema: DEFAULT_FRAMES_SCHEMA,
-			},
-		}));
-	});
+Promise.all([
+	readFile(args.parts, 'utf8').then(Papa.parsePromise),
+	readFile(args.frames, 'utf8').then(Papa.parsePromise),
+	readFile(args.modules, 'utf8').then(Papa.parsePromise),
+]).then(([parts, frames, modules]) => {
+	console.log(JSON.stringify({
+		name: args.name,
+		timestamp: new Date().toISOString(),
+		parts: {
+			records: parts.data.filter((row) => _.size(row) > 2),
+			schema: DEFAULT_PARTS_SCHEMA,
+		},
+		modules: {
+			records: modules.data.filter((row) => _.size(row) > 2),
+			schema: DEFAULT_MODULES_SCHEMA,
+		},
+		frames: {
+			records: frames.data.filter((row) => _.size(row) > 2),
+			schema: DEFAULT_FRAMES_SCHEMA,
+		},
+	}));
+});
