@@ -1,40 +1,100 @@
 <template>
-	<div class="design-import-export">
-		<input type="button"
-			class="undo-button"
-			@click="dispatch_undo"
-			value="<"/>
-		<input type="button"
-			class="redo-button"
-			@click="dispatch_redo"
-			value=">"/>
+	<div id="design-bar" class="design-bar-row">
+		<div class="design-bar-column">
+			<div class="design-bar-cell design-bar-row">
+				<div class="design-bar-column">
+					<div class="design-bar-cell">
+						<input type="button"
+							class="undo-button"
+							@click="dispatch_undo"
+							value="<"/>
+						<input type="button"
+							class="redo-button"
+							@click="dispatch_redo"
+							value=">"/>
+					</div>
+				</div>
 
-		<select v-model="selected_parts_list_name">
-			<option v-for="parts_list in all_parts_lists" :key="parts_list.pretty_name">
-				{{parts_list.pretty_name}}
-			</option>
-		</select>
+				<div class="design-bar-flex-column">
+					<div class="design-bar-cell"
+						id="design-bar-status-message"
+						ref="status_message"
+						@animationend="clear_status_message()">{{ status_message }}</div>
+				</div>
 
-		<input type="button" @click="parts_lists_load_selected" value="Load parts list"/>
+				<div class="design-bar-column">
+					<div class="design-bar-cell">
+						<!-- hopefully temporary workaround for https://github.com/to-boldly-go/tbg-shipdesigner/issues/57 -->
+						<input type="button" @click="local_saves_load_from_local_storage" value="Refresh"/>
+					</div>
+				</div>
+			</div>
 
-		<span><a :href="'shipdesigner.html#' + design_json_url_encoded_string">Link to this design</a></span>
+			<div class="design-bar-cell design-bar-row">
+				<div class="design-bar-flex-column">
+					<div class="design-bar-cell">
+						<select v-model="selected_parts_list_name">
+							<option v-for="parts_list in all_parts_lists" :key="parts_list.pretty_name">
+								{{parts_list.pretty_name}}
+							</option>
+						</select>
+					</div>
+				</div>
 
-		<select v-model="selected_design_name">
-			<option v-for="blueprint in local_saves" :key="blueprint.pretty_name">
-				{{blueprint.pretty_name}}
-			</option>
-		</select>
+				<div class="design-bar-column">
+					<div class="design-bar-cell">
+						<input type="button" @click="parts_lists_load_selected" value="Load parts list"/>
+					</div>
+				</div>
+			</div>
+		</div>
 
-		<input type="button" @click="local_saves_delete_selected" value="Delete save"/>
-		<input type="button" @click="local_saves_load_selected" value="Load save"/>
+		<div class="design-bar-column">
+			<div class="design-bar-cell">
+				<span><a :href="'shipdesigner.html#' + design_json_url_encoded_string">Link to this design</a></span>
+			</div>
 
-		<input type="button" @click="local_saves_save_design" :value="save_design_error ? save_design_error : 'Save current design'" :disabled="save_design_error !== null"/>
-		<input type="button" @click="local_saves_load_from_local_storage" value="Refresh"/>
+			<div class="design-bar-cell">
+				<select id="design-bar-design-mode" v-model="selected_design_mode" disabled="true">
+					<option value="none">Mode</option>
+					<option value="refit">Refit for</option>
+					<option value="compare">Compare with</option>
+				</select>
+			</div>
+		</div>
 
-		<span
-			ref="status_message"
-			class="design-import-export-status-message"
-			@animationend="clear_status_message()">{{ status_message }}</span>
+		<div class="design-bar-flex-column">
+			<div class="design-bar-cell">
+				<select v-model="selected_design_name">
+					<option v-for="blueprint in local_saves" :key="blueprint.pretty_name">
+						{{blueprint.pretty_name}}
+					</option>
+				</select>
+			</div>
+
+			<div class="design-bar-cell">
+				<select v-model="selected_other_design_name" :disabled="selected_design_mode === 'none'">
+					<option v-for="blueprint in local_saves" :key="blueprint.pretty_name">
+						{{blueprint.pretty_name}}
+					</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="design-bar-column">
+			<div class="design-bar-cell">
+				<input type="button" @click="local_saves_load_selected" value="Load save"/>
+				<input type="button" @click="local_saves_delete_selected" value="Delete save"/>
+
+				<input type="button" id="design-bar-save-button" @click="local_saves_save_design" :value="save_design_error ? save_design_error : 'Save current design'" :disabled="save_design_error !== null"/>
+			</div>
+
+			<div class="design-bar-cell">
+				<span>Filter:</span>
+				<input type="checkbox" id="filter-latest-for-name" v-model="design_filter" value="latest-for-name" disabled="true"/><label for="filter-latest-for-name">Latest for name</label>
+				<input type="checkbox" id="filter-same-name" v-model="design_filter" value="same-name" disabled="true"/><label for="filter-latest-for-name">Same name</label>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -64,12 +124,17 @@ export default {
 			// blueprints without clobbering their current work.
 			selected_save: null,
 
-			status_message: '',
+			selected_other_save: null,
 
-			status_message_timeout_id: null,
+			status_message: null,
 
 			local_parts_lists: [],
+
 			selected_parts_list: null,
+
+			selected_design_mode: 'none',
+
+			design_filter: [],
 		};
 	},
 	computed: {
@@ -109,6 +174,20 @@ export default {
 			},
 			set(value) {
 				this.selected_save = this.local_saves.find(
+					ShipEngine.Design.find_by_pretty_name(value)
+				);
+			},
+		},
+		selected_other_design_name: {
+			get() {
+				if (this.selected_other_save) {
+					return this.selected_other_save.pretty_name;
+				} else {
+					return null;
+				}
+			},
+			set(value) {
+				this.selected_other_save = this.local_saves.find(
 					ShipEngine.Design.find_by_pretty_name(value)
 				);
 			},
@@ -235,10 +314,10 @@ export default {
 
 		display_status_message(status) {
 			this.status_message = status;
-			this.$refs.status_message.className = 'design-import-export-status-message';
+			this.$refs.status_message.className = 'design-bar-cell';
 			window.requestAnimationFrame(function(time) {
 				window.requestAnimationFrame(function(time) {
-					this.$refs.status_message.className = 'design-import-export-status-message fade';
+					this.$refs.status_message.className = 'design-bar-cell fade';
 				}.bind(this));
 			}.bind(this));
 		},
@@ -252,7 +331,7 @@ export default {
 
 
 <style scoped>
-.design-import-export {
+#design-bar {
 	background-color: #999;
 
 	width: 100%;
@@ -260,9 +339,64 @@ export default {
 
 	left: 5px;
 	top: 5px;
+
+	flex-wrap: wrap;
 }
 
-.design-import-export-status-message {
+.design-bar-row {
+	display: flex;
+	flex-flow: row;
+}
+
+.design-bar-column {
+	flex: none;
+}
+
+.design-bar-flex-column {
+	flex: auto;
+}
+
+.design-bar-column, .design-bar-flex-column {
+	display: flex;
+	flex-flow: column;
+	justify-content: space-between;
+}
+
+#design-bar > .design-bar-column > .design-bar-cell {
+	margin: 0.1em 0.2em;
+}
+
+.design-bar-cell > select:only-child {
+	width: 100%;
+}
+
+.design-bar-flex-column > .design-bar-cell > select {
+	width: 100%;
+}
+
+.design-bar-cell > span {
+	margin: 0 0.2em;
+}
+
+.design-bar-cell > input[type=checkbox] {
+	vertical-align: text-bottom;
+}
+
+#design-bar-status-message {
+	height: 100%;
+	text-align: center;
+}
+
+#design-bar-design-mode {
+	text-align: right;
+}
+
+#design-bar-design-mode > option {
+	direction: rtl;
+}
+
+#design-bar-save-button {
+	width: 15em;
 }
 
 .fade {
