@@ -1,58 +1,7 @@
 const path = require('path');
+const nodeExternals = require('webpack-node-externals');
 
-const common = {
-	devServer: {
-		contentBase: path.join(__dirname, "dist"),
-		port: 8001,
-		host: '0.0.0.0',
-		disableHostCheck: true,
-	},
-	devtool: 'cheap-module-source-map',
-	resolve: {
-		modules: [
-			path.resolve('./src'),
-			path.resolve('./node_modules'),
-		],
-		alias: {
-			'@': path.resolve('src'),
-			'#': path.resolve('dist'),
-		},
-	},
-	module: {
-		rules: [
-			{
-				test: /\.js$/,
-				exclude: /(node_modules|bower_components)/,
-				use: {
-					loader: 'babel-loader',
-				},
-			},
-			{
-				test: /\.vue$/,
-				use: [
-					'vue-loader',
-				],
-			},
-			{
-				test: /\.raw\./,
-				use: [
-					'raw-loader',
-				],
-			},
-			{
-				test: /\.csv$/,
-				exclude: /(node_modules|bower_components|\.raw\.)/,
-				loader: 'csv-loader',
-				options: {
-					dynamicTyping: true,
-					header: true,
-					skipEmptyLines: true,
-				},
-			},
-		],
-	},
-	mode: "development",
-};
+const common = require('./webpack.config-base.js');
 
 const webapp = {
 	entry: {
@@ -71,6 +20,7 @@ const scripts = {
 		'import-parts': './src/scripts/import-parts.js',
 	},
     target: 'node',
+    externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
 	output: {
 		path: path.resolve(__dirname, 'bin'),
 		filename: '[name].js',

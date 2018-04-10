@@ -1,5 +1,4 @@
-import NamedVectors from '../../lib/namedvector.js';
-const NamedVector = NamedVectors.NamedVector;
+import { NamedVector } from '@/lib/namedvector.js';
 
 import assert from 'assert';
 
