@@ -55,8 +55,9 @@
 			</div>
 
 			<div class="design-bar-cell">
-				<select id="design-bar-design-mode" v-model="selected_design_mode" disabled="true">
-					<option value="none">Mode</option>
+				<input type="checkbox" v-model="design_mode_enabled"/>
+				<select id="design-bar-design-mode" v-model="selected_design_mode" :disabled="!design_mode_enabled">
+					<option value="none" disabled>Select Mode</option>
 					<option value="refit">Refit for</option>
 					<option value="compare">Compare with</option>
 				</select>
@@ -132,7 +133,8 @@ export default {
 
 			selected_parts_list: null,
 
-			selected_design_mode: 'none',
+			design_mode_enabled: false,
+			design_mode: 'none',
 
 			design_filter: [],
 		};
@@ -190,6 +192,14 @@ export default {
 				this.selected_other_save = this.local_saves.find(
 					ShipEngine.Design.find_by_pretty_name(value)
 				);
+			},
+		},
+		selected_design_mode: {
+			get() {
+				return this.design_mode_enabled ? this.design_mode : 'none';
+			},
+			set(value) {
+				this.design_mode = this.design_mode_enabled ? value : 'none';
 			},
 		},
 		design_json_string() {
@@ -359,7 +369,7 @@ export default {
 .design-bar-column, .design-bar-flex-column {
 	display: flex;
 	flex-flow: column;
-	justify-content: space-between;
+	justify-content: space-around;
 }
 
 #design-bar > .design-bar-column > .design-bar-cell {
