@@ -13,6 +13,12 @@ const webapp = {
 		path: path.resolve(__dirname, 'dist'),
 		filename: '[name].js',
 	},
+	devServer: {
+		contentBase: path.join(__dirname, "dist"),
+		port: 8001,
+		host: '0.0.0.0',
+		disableHostCheck: true,
+	},
 };
 
 const scripts = {
