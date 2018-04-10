@@ -62,3 +62,5 @@ typings/
 
 dist/*.js.map
 dist/*.js
+bin/*.js
+bin/*.js.map

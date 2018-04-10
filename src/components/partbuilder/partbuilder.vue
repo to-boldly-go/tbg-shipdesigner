@@ -15,9 +15,9 @@
 
 <script>
 
-import PartsListHeader from './parts-list-header.vue';
-import PartsListFooter from './parts-list-footer.vue';
-import PartsListEditor from './parts-list-editor.vue';
+import PartsListHeader from '@/components/partbuilder/parts-list-header.vue';
+import PartsListFooter from '@/components/partbuilder/parts-list-footer.vue';
+import PartsListEditor from '@/components/partbuilder/parts-list-editor.vue';
 
 const PARTS_KEY = 'working_parts_list';
 

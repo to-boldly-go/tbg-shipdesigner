@@ -1,5 +1,5 @@
-import { from_frac } from '../src/ui-functions.js';
-import { NamedVector } from './namedvector.js';
+import { from_frac } from '@/lib/ui-functions.js';
+import { NamedVector } from '@/lib/namedvector.js';
 import _ from 'lodash';
 
 // AL6, $AL$6

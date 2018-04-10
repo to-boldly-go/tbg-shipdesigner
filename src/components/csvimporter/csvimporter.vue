@@ -90,7 +90,7 @@
 
 <script>
 
-import canon_parts_list from '../dist/canon_parts_list.json';
+import canon_parts_list from '#/canon_parts_list.json';
 
 import _ from 'lodash';
 

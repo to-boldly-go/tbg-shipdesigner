@@ -1,7 +1,6 @@
 'use strict';
 
 import Vue from 'vue';
-import ShipDesigner from './shipdesigner.vue';
 import Vuex from 'vuex';
 
 import Promise from 'bluebird';
@@ -9,10 +8,12 @@ Promise.longStackTraces();
 
 Vue.use(Vuex);
 
-import * as ShipEngine from '../lib/shipengine.js';
+import ShipDesigner from '@/components/shipdesigner/shipdesigner.vue';
 
-import design_json_init from '../dist/swb_kepler_recreation.json';
-import canon_parts_list from '../dist/canon_parts_list.json';
+import * as ShipEngine from '@/lib/shipengine.js';
+
+import design_json_init from '#/swb_kepler_recreation.json';
+import canon_parts_list from '#/canon_parts_list.json';
 
 let design_json;
 let hash = new URL(location).hash;

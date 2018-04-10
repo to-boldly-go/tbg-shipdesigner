@@ -102,7 +102,7 @@
 <script>
 
 import _ from 'lodash';
-import * as ShipEngine from '../lib/shipengine';
+import * as ShipEngine from '@/lib/shipengine';
 
 import { mapGetters } from 'vuex';
 

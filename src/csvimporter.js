@@ -1,6 +1,6 @@
 'use strict';
 
-import CsvImporter from './csvimporter.vue';
+import CsvImporter from '@/components/csvimporter/csvimporter.vue';
 
 import Promise from 'bluebird';
 Promise.longStackTraces();

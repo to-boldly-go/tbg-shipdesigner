@@ -8,7 +8,7 @@
 
 <script>
 
-import SettingCell from './setting-cell.vue';
+import SettingCell from '@/components/shipdesigner/setting-cell.vue';
 
 export default {
 	name: 'SubsystemSettings',

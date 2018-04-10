@@ -1,62 +1,39 @@
 const path = require('path');
+const nodeExternals = require('webpack-node-externals');
 
-const config = {
+const common = require('./webpack.config-base.js');
+
+const webapp = {
 	entry: {
 		'shipdesigner': './src/shipdesigner.js',
 		'partbuilder': './src/partbuilder.js',
 		'csvimporter': './src/csvimporter.js',
 	},
-	resolve: {
-		modules: [
-			path.resolve('./src'),
-			path.resolve('./node_modules'),
-		],
-	},
 	output: {
 		path: path.resolve(__dirname, 'dist'),
 		filename: '[name].js',
 	},
-	devtool: 'cheap-module-source-map',
 	devServer: {
 		contentBase: path.join(__dirname, "dist"),
 		port: 8001,
 		host: '0.0.0.0',
 		disableHostCheck: true,
 	},
-	module: {
-		rules: [
-			{
-				test: /\.js$/,
-				exclude: /(node_modules|bower_components)/,
-				use: {
-					loader: 'babel-loader',
-				},
-			},
-			{
-				test: /\.vue$/,
-				use: [
-					'vue-loader',
-				],
-			},
-			{
-				test: /\.raw\./,
-				use: [
-					'raw-loader',
-				],
-			},
-			{
-				test: /\.csv$/,
-				exclude: /(node_modules|bower_components|\.raw\.)/,
-				loader: 'csv-loader',
-				options: {
-					dynamicTyping: true,
-					header: true,
-					skipEmptyLines: true,
-				},
-			},
-		],
-	},
-	mode: "development",
 };
 
-module.exports = config;
+const scripts = {
+	entry: {
+		'import-parts': './src/scripts/import-parts.js',
+	},
+	target: 'node',
+	externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
+	output: {
+		path: path.resolve(__dirname, 'bin'),
+		filename: '[name].js',
+	},
+};
+
+module.exports = [
+	Object.assign({}, common, webapp),
+	Object.assign({}, common, scripts),
+];

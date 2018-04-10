@@ -23,7 +23,7 @@ import _ from 'lodash';
 
 import { mapGetters } from 'vuex';
 
-import PartsListPart from './parts-list-part.vue';
+import PartsListPart from '@/components/partbuilder/parts-list-part.vue';
 
 export default {
 	name: 'PartsListEditor',
