@@ -25,8 +25,8 @@ const scripts = {
 	entry: {
 		'import-parts': './src/scripts/import-parts.js',
 	},
-    target: 'node',
-    externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
+	target: 'node',
+	externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
 	output: {
 		path: path.resolve(__dirname, 'bin'),
 		filename: '[name].js',
