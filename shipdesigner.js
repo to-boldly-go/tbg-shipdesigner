@@ -2912,6 +2912,66 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
@@ -2947,12 +3007,17 @@ exports.default = {
 			// blueprints without clobbering their current work.
 			selected_save: null,
 
-			status_message: '',
+			selected_other_save: null,
 
-			status_message_timeout_id: null,
+			status_message: null,
 
 			local_parts_lists: [],
-			selected_parts_list: null
+
+			selected_parts_list: null,
+
+			selected_design_mode: 'none',
+
+			design_filter: []
 		};
 	},
 
@@ -2993,6 +3058,18 @@ exports.default = {
 			},
 			set: function set(value) {
 				this.selected_save = this.local_saves.find(ShipEngine.Design.find_by_pretty_name(value));
+			}
+		},
+		selected_other_design_name: {
+			get: function get() {
+				if (this.selected_other_save) {
+					return this.selected_other_save.pretty_name;
+				} else {
+					return null;
+				}
+			},
+			set: function set(value) {
+				this.selected_other_save = this.local_saves.find(ShipEngine.Design.find_by_pretty_name(value));
 			}
 		},
 		design_json_string: function design_json_string() {
@@ -3108,10 +3185,10 @@ exports.default = {
 		},
 		display_status_message: function display_status_message(status) {
 			this.status_message = status;
-			this.$refs.status_message.className = 'design-import-export-status-message';
+			this.$refs.status_message.className = 'design-bar-cell';
 			window.requestAnimationFrame(function (time) {
 				window.requestAnimationFrame(function (time) {
-					this.$refs.status_message.className = 'design-import-export-status-message fade';
+					this.$refs.status_message.className = 'design-bar-cell fade';
 				}.bind(this));
 			}.bind(this));
 		},
@@ -9521,7 +9598,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "\n.design-import-export[data-v-38841434] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.design-import-export-status-message[data-v-38841434] {\n}\n.fade[data-v-38841434] {\n\tanimation: fadeanim-data-v-38841434 3s forwards;\n}\n@keyframes fadeanim-data-v-38841434 {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/design-import-export.vue"],"names":[],"mappings":";AA8PA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n\t<div class=\"design-import-export\">\n\t\t<input type=\"button\"\n\t\t\tclass=\"undo-button\"\n\t\t\t@click=\"dispatch_undo\"\n\t\t\tvalue=\"<\"/>\n\t\t<input type=\"button\"\n\t\t\tclass=\"redo-button\"\n\t\t\t@click=\"dispatch_redo\"\n\t\t\tvalue=\">\"/>\n\n\t\t<select v-model=\"selected_parts_list_name\">\n\t\t\t<option v-for=\"parts_list in all_parts_lists\" :key=\"parts_list.pretty_name\">\n\t\t\t\t{{parts_list.pretty_name}}\n\t\t\t</option>\n\t\t</select>\n\n\t\t<input type=\"button\" @click=\"parts_lists_load_selected\" value=\"Load parts list\"/>\n\n\t\t<span><a :href=\"'shipdesigner.html#' + design_json_url_encoded_string\">Link to this design</a></span>\n\n\t\t<select v-model=\"selected_design_name\">\n\t\t\t<option v-for=\"blueprint in local_saves\" :key=\"blueprint.pretty_name\">\n\t\t\t\t{{blueprint.pretty_name}}\n\t\t\t</option>\n\t\t</select>\n\n\t\t<input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"/>\n\t\t<input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"/>\n\n\t\t<input type=\"button\" @click=\"local_saves_save_design\" :value=\"save_design_error ? save_design_error : 'Save current design'\" :disabled=\"save_design_error !== null\"/>\n\t\t<input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"/>\n\n\t\t<span\n\t\t\tref=\"status_message\"\n\t\t\tclass=\"design-import-export-status-message\"\n\t\t\t@animationend=\"clear_status_message()\">{{ status_message }}</span>\n\t</div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\nimport * as ShipEngine from '../lib/shipengine';\n\nimport { mapGetters } from 'vuex';\n\nconst LOCAL_PARTS_LISTS_KEY = 'parts_lists';\nconst LOCAL_SAVES_KEY = 'local_saves';\n\nexport default {\n\tname: 'DesignImportExport',\n\tcomponents: {\n\t},\n\tdata() {\n\t\treturn {\n\t\t\t// local_saves is a straight array of blueprint objects,\n\t\t\t// exactly the same as the design_json object.\n\t\t\tlocal_saves: [],\n\t\t\t// the currently selected element of the local_saves\n\t\t\t// array. *not* the same as design_json! this is so\n\t\t\t// the user can work with the list of locally saved\n\t\t\t// blueprints without clobbering their current work.\n\t\t\tselected_save: null,\n\n\t\t\tstatus_message: '',\n\n\t\t\tstatus_message_timeout_id: null,\n\n\t\t\tlocal_parts_lists: [],\n\t\t\tselected_parts_list: null,\n\t\t};\n\t},\n\tcomputed: {\n\t\tsave_design_error() {\n\t\t\tif (!this.se_design.matches_parts_list(this.se_db)) {\n\t\t\t\treturn 'Save disabled: unset parts list';\n\t\t\t}\n\t\t\tif (!this.se_design.is_loaded) {\n\t\t\t\treturn 'Save disabled: Unknown parts/frames';\n\t\t\t}\n\t\t\treturn null;\n\t\t},\n\t\tselected_parts_list_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_parts_list) {\n\t\t\t\t\treturn this.selected_parts_list.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_parts_list = this.all_parts_lists.find(\n\t\t\t\t\tShipEngine.DB.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tall_parts_lists() {\n\t\t\treturn [...this.local_parts_lists, this.canon_se_db];\n\t\t},\n\t\tselected_design_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_save) {\n\t\t\t\t\treturn this.selected_save.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_save = this.local_saves.find(\n\t\t\t\t\tShipEngine.Design.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tdesign_json_string() {\n\t\t\treturn JSON.stringify(this.$store.state.design_json);\n\t\t},\n\t\tdesign_json_url_encoded_string() {\n\t\t\treturn encodeURI(this.design_json_string);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'canon_se_db',\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t]),\n\t},\n\tmounted() {\n\t\tthis.parts_lists_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_PARTS_LISTS_KEY) {\n\t\t\t\tthis.parts_lists_load_from_local_storage();\n\t\t\t}\n\t\t}.bind(this));\n\n\t\tthis.local_saves_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_SAVES_KEY) {\n\t\t\t\tthis.local_saves_load_from_local_storage();\n\t\t\t}\n\t\t}.bind(this));\n\t},\n\tmethods: {\n\t\tdispatch_undo() {\n\t\t\tthis.$store.dispatch('undo');\n\t\t},\n\t\tdispatch_redo() {\n\t\t\tthis.$store.dispatch('redo');\n\t\t},\n\t\tparts_lists_load_from_local_storage() {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_parts_lists = [];\n\t\t\t\tthis.display_status_message('No parts lists to load');\n\t\t\t} else {\n\t\t\t\tthis.local_parts_lists = JSON.parse(loaded).map(\n\t\t\t\t\tpl_json => new ShipEngine.DB(pl_json)\n\t\t\t\t);\n\t\t\t\tthis.display_status_message('Parts lists loaded');\n\t\t\t}\n\t\t},\n\t\tparts_lists_load_selected() {\n\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list.json));\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.display_status_message('Parts list loaded');\n\t\t},\n\t\t\n\t\tlocal_saves_delete_selected() {\n\t\t\t// remove the selected item\n\t\t\tthis.local_saves = _.chain(this.local_saves).reject(\n\t\t\t\t(elem) => elem === this.selected_save\n\t\t\t).value();\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message('Blueprint deleted');\n\t\t},\n\t\tlocal_saves_load_selected() {\n\t\t\tconst db = this.all_parts_lists.find(\n\t\t\t\tShipEngine.DB.find_by_design_json(this.selected_save.json)\n\t\t\t);\n\t\t\tif (db) {\n\t\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(db.json));\n\t\t\t\tthis.selected_parts_list = db;\n\t\t\t}\n\n\t\t\tthis.$store.commit('set_design_json', _.cloneDeep(this.selected_save.json));\n\t\t\tthis.display_status_message('Blueprint loaded');\n\t\t},\n\t\tlocal_saves_save_design() {\n\t\t\t// If there's an error with the design, the save design button should be disabled,\n\t\t\t// but if that's somehow bypassed, this check ensures an invalid design is not saved.\n\t\t\tlet error = this.save_design_error;\n\t\t\tif (error) {\n\t\t\t\tthis.display_status_message(error);\n\t\t\t\treturn;\n\t\t\t}\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.$store.commit('timestamp_design');\n\t\t\tconst new_save = new ShipEngine.Design(this.se_db, _.cloneDeep(this.$store.state.design_json));\n\t\t\tthis.local_saves.push(new_save);\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.selected_save = new_save;\n\t\t\tthis.display_status_message('Blueprint saved');\n\t\t},\n\n\t\tlocal_saves_load_from_local_storage() {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_SAVES_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_saves = [];\n\t\t\t\tthis.display_status_message('No Blueprints to load');\n\t\t\t} else {\n\t\t\t\tthis.local_saves = JSON.parse(loaded).map((design_json) => {\n\t\t\t\t\tlet db;\n\t\t\t\t\tlet wrong_db;\n\t\t\t\t\tif (design_json['Parts List']) {\n\t\t\t\t\t\tdb = this.all_parts_lists.find(\n\t\t\t\t\t\t\tShipEngine.DB.find_by_design_json(design_json)\n\t\t\t\t\t\t);\n\t\t\t\t\t\twrong_db = db === undefined;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tdb = this.se_db;\n\t\t\t\t\t\twrong_db = false;\n\t\t\t\t\t}\n\t\t\t\t\treturn new ShipEngine.Design(db || this.se_db, design_json, wrong_db);\n\t\t\t\t});\n\t\t\t\tthis.display_status_message('Blueprints loaded');\n\t\t\t}\n\t\t},\n\t\tlocal_saves_save_to_local_storage() {\n\t\t\tlocalStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(\n\t\t\t\t_.chain(this.local_saves)\n\t\t\t\t\t.map((design) => design.json)\n\t\t\t\t\t.value()\n\t\t\t));\n\t\t},\n\n\t\tdisplay_status_message(status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'design-import-export-status-message';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = 'design-import-export-status-message fade';\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message() {\n\t\t\tthis.status_message = null;\n\t\t},\n\t\t\n\t},\n};\n</script>\n\n\n<style scoped>\n.design-import-export {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.design-import-export-status-message {\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n#design-bar[data-v-38841434] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n\n\tflex-wrap: wrap;\n}\n.design-bar-row[data-v-38841434] {\n\tdisplay: flex;\n\tflex-flow: row;\n}\n.design-bar-column[data-v-38841434] {\n\tflex: none;\n}\n.design-bar-flex-column[data-v-38841434] {\n\tflex: auto;\n}\n.design-bar-column[data-v-38841434], .design-bar-flex-column[data-v-38841434] {\n\tdisplay: flex;\n\tflex-flow: column;\n\tjustify-content: space-between;\n}\n#design-bar > .design-bar-column > .design-bar-cell[data-v-38841434] {\n\tmargin: 0.1em 0.2em;\n}\n.design-bar-cell > select[data-v-38841434]:only-child {\n\twidth: 100%;\n}\n.design-bar-flex-column > .design-bar-cell > select[data-v-38841434] {\n\twidth: 100%;\n}\n.design-bar-cell > span[data-v-38841434] {\n\tmargin: 0 0.2em;\n}\n.design-bar-cell > input[type=checkbox][data-v-38841434] {\n\tvertical-align: text-bottom;\n}\n#design-bar-status-message[data-v-38841434] {\n\theight: 100%;\n\ttext-align: center;\n}\n#design-bar-design-mode[data-v-38841434] {\n\ttext-align: right;\n}\n#design-bar-design-mode > option[data-v-38841434] {\n\tdirection: rtl;\n}\n#design-bar-save-button[data-v-38841434] {\n\twidth: 15em;\n}\n.fade[data-v-38841434] {\n\tanimation: fadeanim-data-v-38841434 3s forwards;\n}\n@keyframes fadeanim-data-v-38841434 {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/design-import-export.vue"],"names":[],"mappings":";AA6UA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;;CAEA,gBAAA;CACA;AAEA;CACA,cAAA;CACA,eAAA;CACA;AAEA;CACA,WAAA;CACA;AAEA;CACA,WAAA;CACA;AAEA;CACA,cAAA;CACA,kBAAA;CACA,+BAAA;CACA;AAEA;CACA,oBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,gBAAA;CACA;AAEA;CACA,4BAAA;CACA;AAEA;CACA,aAAA;CACA,mBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,eAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n\t<div id=\"design-bar\" class=\"design-bar-row\">\n\t\t<div class=\"design-bar-column\">\n\t\t\t<div class=\"design-bar-cell design-bar-row\">\n\t\t\t\t<div class=\"design-bar-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<input type=\"button\"\n\t\t\t\t\t\t\tclass=\"undo-button\"\n\t\t\t\t\t\t\t@click=\"dispatch_undo\"\n\t\t\t\t\t\t\tvalue=\"<\"/>\n\t\t\t\t\t\t<input type=\"button\"\n\t\t\t\t\t\t\tclass=\"redo-button\"\n\t\t\t\t\t\t\t@click=\"dispatch_redo\"\n\t\t\t\t\t\t\tvalue=\">\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"design-bar-flex-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\"\n\t\t\t\t\t\tid=\"design-bar-status-message\"\n\t\t\t\t\t\tref=\"status_message\"\n\t\t\t\t\t\t@animationend=\"clear_status_message()\">{{ status_message }}</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"design-bar-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<!-- hopefully temporary workaround for https://github.com/to-boldly-go/tbg-shipdesigner/issues/57 -->\n\t\t\t\t\t\t<input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell design-bar-row\">\n\t\t\t\t<div class=\"design-bar-flex-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<select v-model=\"selected_parts_list_name\">\n\t\t\t\t\t\t\t<option v-for=\"parts_list in all_parts_lists\" :key=\"parts_list.pretty_name\">\n\t\t\t\t\t\t\t\t{{parts_list.pretty_name}}\n\t\t\t\t\t\t\t</option>\n\t\t\t\t\t\t</select>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"design-bar-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<input type=\"button\" @click=\"parts_lists_load_selected\" value=\"Load parts list\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"design-bar-column\">\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<span><a :href=\"'shipdesigner.html#' + design_json_url_encoded_string\">Link to this design</a></span>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<select id=\"design-bar-design-mode\" v-model=\"selected_design_mode\" disabled=\"true\">\n\t\t\t\t\t<option value=\"none\">Mode</option>\n\t\t\t\t\t<option value=\"refit\">Refit for</option>\n\t\t\t\t\t<option value=\"compare\">Compare with</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"design-bar-flex-column\">\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<select v-model=\"selected_design_name\">\n\t\t\t\t\t<option v-for=\"blueprint in local_saves\" :key=\"blueprint.pretty_name\">\n\t\t\t\t\t\t{{blueprint.pretty_name}}\n\t\t\t\t\t</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<select v-model=\"selected_other_design_name\" :disabled=\"selected_design_mode === 'none'\">\n\t\t\t\t\t<option v-for=\"blueprint in local_saves\" :key=\"blueprint.pretty_name\">\n\t\t\t\t\t\t{{blueprint.pretty_name}}\n\t\t\t\t\t</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"design-bar-column\">\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"/>\n\t\t\t\t<input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"/>\n\n\t\t\t\t<input type=\"button\" id=\"design-bar-save-button\" @click=\"local_saves_save_design\" :value=\"save_design_error ? save_design_error : 'Save current design'\" :disabled=\"save_design_error !== null\"/>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<span>Filter:</span>\n\t\t\t\t<input type=\"checkbox\" id=\"filter-latest-for-name\" v-model=\"design_filter\" value=\"latest-for-name\" disabled=\"true\"/><label for=\"filter-latest-for-name\">Latest for name</label>\n\t\t\t\t<input type=\"checkbox\" id=\"filter-same-name\" v-model=\"design_filter\" value=\"same-name\" disabled=\"true\"/><label for=\"filter-latest-for-name\">Same name</label>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\nimport * as ShipEngine from '../lib/shipengine';\n\nimport { mapGetters } from 'vuex';\n\nconst LOCAL_PARTS_LISTS_KEY = 'parts_lists';\nconst LOCAL_SAVES_KEY = 'local_saves';\n\nexport default {\n\tname: 'DesignImportExport',\n\tcomponents: {\n\t},\n\tdata() {\n\t\treturn {\n\t\t\t// local_saves is a straight array of blueprint objects,\n\t\t\t// exactly the same as the design_json object.\n\t\t\tlocal_saves: [],\n\t\t\t// the currently selected element of the local_saves\n\t\t\t// array. *not* the same as design_json! this is so\n\t\t\t// the user can work with the list of locally saved\n\t\t\t// blueprints without clobbering their current work.\n\t\t\tselected_save: null,\n\n\t\t\tselected_other_save: null,\n\n\t\t\tstatus_message: null,\n\n\t\t\tlocal_parts_lists: [],\n\n\t\t\tselected_parts_list: null,\n\n\t\t\tselected_design_mode: 'none',\n\n\t\t\tdesign_filter: [],\n\t\t};\n\t},\n\tcomputed: {\n\t\tsave_design_error() {\n\t\t\tif (!this.se_design.matches_parts_list(this.se_db)) {\n\t\t\t\treturn 'Save disabled: unset parts list';\n\t\t\t}\n\t\t\tif (!this.se_design.is_loaded) {\n\t\t\t\treturn 'Save disabled: Unknown parts/frames';\n\t\t\t}\n\t\t\treturn null;\n\t\t},\n\t\tselected_parts_list_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_parts_list) {\n\t\t\t\t\treturn this.selected_parts_list.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_parts_list = this.all_parts_lists.find(\n\t\t\t\t\tShipEngine.DB.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tall_parts_lists() {\n\t\t\treturn [...this.local_parts_lists, this.canon_se_db];\n\t\t},\n\t\tselected_design_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_save) {\n\t\t\t\t\treturn this.selected_save.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_save = this.local_saves.find(\n\t\t\t\t\tShipEngine.Design.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tselected_other_design_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_other_save) {\n\t\t\t\t\treturn this.selected_other_save.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_other_save = this.local_saves.find(\n\t\t\t\t\tShipEngine.Design.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tdesign_json_string() {\n\t\t\treturn JSON.stringify(this.$store.state.design_json);\n\t\t},\n\t\tdesign_json_url_encoded_string() {\n\t\t\treturn encodeURI(this.design_json_string);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'canon_se_db',\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t]),\n\t},\n\tmounted() {\n\t\tthis.parts_lists_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_PARTS_LISTS_KEY) {\n\t\t\t\tthis.parts_lists_load_from_local_storage();\n\t\t\t}\n\t\t}.bind(this));\n\n\t\tthis.local_saves_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_SAVES_KEY) {\n\t\t\t\tthis.local_saves_load_from_local_storage();\n\t\t\t}\n\t\t}.bind(this));\n\t},\n\tmethods: {\n\t\tdispatch_undo() {\n\t\t\tthis.$store.dispatch('undo');\n\t\t},\n\t\tdispatch_redo() {\n\t\t\tthis.$store.dispatch('redo');\n\t\t},\n\t\tparts_lists_load_from_local_storage() {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_parts_lists = [];\n\t\t\t\tthis.display_status_message('No parts lists to load');\n\t\t\t} else {\n\t\t\t\tthis.local_parts_lists = JSON.parse(loaded).map(\n\t\t\t\t\tpl_json => new ShipEngine.DB(pl_json)\n\t\t\t\t);\n\t\t\t\tthis.display_status_message('Parts lists loaded');\n\t\t\t}\n\t\t},\n\t\tparts_lists_load_selected() {\n\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list.json));\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.display_status_message('Parts list loaded');\n\t\t},\n\t\t\n\t\tlocal_saves_delete_selected() {\n\t\t\t// remove the selected item\n\t\t\tthis.local_saves = _.chain(this.local_saves).reject(\n\t\t\t\t(elem) => elem === this.selected_save\n\t\t\t).value();\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message('Blueprint deleted');\n\t\t},\n\t\tlocal_saves_load_selected() {\n\t\t\tconst db = this.all_parts_lists.find(\n\t\t\t\tShipEngine.DB.find_by_design_json(this.selected_save.json)\n\t\t\t);\n\t\t\tif (db) {\n\t\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(db.json));\n\t\t\t\tthis.selected_parts_list = db;\n\t\t\t}\n\n\t\t\tthis.$store.commit('set_design_json', _.cloneDeep(this.selected_save.json));\n\t\t\tthis.display_status_message('Blueprint loaded');\n\t\t},\n\t\tlocal_saves_save_design() {\n\t\t\t// If there's an error with the design, the save design button should be disabled,\n\t\t\t// but if that's somehow bypassed, this check ensures an invalid design is not saved.\n\t\t\tlet error = this.save_design_error;\n\t\t\tif (error) {\n\t\t\t\tthis.display_status_message(error);\n\t\t\t\treturn;\n\t\t\t}\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.$store.commit('timestamp_design');\n\t\t\tconst new_save = new ShipEngine.Design(this.se_db, _.cloneDeep(this.$store.state.design_json));\n\t\t\tthis.local_saves.push(new_save);\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.selected_save = new_save;\n\t\t\tthis.display_status_message('Blueprint saved');\n\t\t},\n\n\t\tlocal_saves_load_from_local_storage() {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_SAVES_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_saves = [];\n\t\t\t\tthis.display_status_message('No Blueprints to load');\n\t\t\t} else {\n\t\t\t\tthis.local_saves = JSON.parse(loaded).map((design_json) => {\n\t\t\t\t\tlet db;\n\t\t\t\t\tlet wrong_db;\n\t\t\t\t\tif (design_json['Parts List']) {\n\t\t\t\t\t\tdb = this.all_parts_lists.find(\n\t\t\t\t\t\t\tShipEngine.DB.find_by_design_json(design_json)\n\t\t\t\t\t\t);\n\t\t\t\t\t\twrong_db = db === undefined;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tdb = this.se_db;\n\t\t\t\t\t\twrong_db = false;\n\t\t\t\t\t}\n\t\t\t\t\treturn new ShipEngine.Design(db || this.se_db, design_json, wrong_db);\n\t\t\t\t});\n\t\t\t\tthis.display_status_message('Blueprints loaded');\n\t\t\t}\n\t\t},\n\t\tlocal_saves_save_to_local_storage() {\n\t\t\tlocalStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(\n\t\t\t\t_.chain(this.local_saves)\n\t\t\t\t\t.map((design) => design.json)\n\t\t\t\t\t.value()\n\t\t\t));\n\t\t},\n\n\t\tdisplay_status_message(status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'design-bar-cell';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = 'design-bar-cell fade';\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message() {\n\t\t\tthis.status_message = null;\n\t\t},\n\t\t\n\t},\n};\n</script>\n\n\n<style scoped>\n#design-bar {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n\n\tflex-wrap: wrap;\n}\n\n.design-bar-row {\n\tdisplay: flex;\n\tflex-flow: row;\n}\n\n.design-bar-column {\n\tflex: none;\n}\n\n.design-bar-flex-column {\n\tflex: auto;\n}\n\n.design-bar-column, .design-bar-flex-column {\n\tdisplay: flex;\n\tflex-flow: column;\n\tjustify-content: space-between;\n}\n\n#design-bar > .design-bar-column > .design-bar-cell {\n\tmargin: 0.1em 0.2em;\n}\n\n.design-bar-cell > select:only-child {\n\twidth: 100%;\n}\n\n.design-bar-flex-column > .design-bar-cell > select {\n\twidth: 100%;\n}\n\n.design-bar-cell > span {\n\tmargin: 0 0.2em;\n}\n\n.design-bar-cell > input[type=checkbox] {\n\tvertical-align: text-bottom;\n}\n\n#design-bar-status-message {\n\theight: 100%;\n\ttext-align: center;\n}\n\n#design-bar-design-mode {\n\ttext-align: right;\n}\n\n#design-bar-design-mode > option {\n\tdirection: rtl;\n}\n\n#design-bar-save-button {\n\twidth: 15em;\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -27815,144 +27892,371 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "design-import-export" }, [
-    _c("input", {
-      staticClass: "undo-button",
-      attrs: { type: "button", value: "<" },
-      on: { click: _vm.dispatch_undo }
-    }),
-    _vm._v(" "),
-    _c("input", {
-      staticClass: "redo-button",
-      attrs: { type: "button", value: ">" },
-      on: { click: _vm.dispatch_redo }
-    }),
-    _vm._v(" "),
-    _c(
-      "select",
-      {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.selected_parts_list_name,
-            expression: "selected_parts_list_name"
-          }
-        ],
-        on: {
-          change: function($event) {
-            var $$selectedVal = Array.prototype.filter
-              .call($event.target.options, function(o) {
-                return o.selected
+  return _c(
+    "div",
+    { staticClass: "design-bar-row", attrs: { id: "design-bar" } },
+    [
+      _c("div", { staticClass: "design-bar-column" }, [
+        _c("div", { staticClass: "design-bar-cell design-bar-row" }, [
+          _c("div", { staticClass: "design-bar-column" }, [
+            _c("div", { staticClass: "design-bar-cell" }, [
+              _c("input", {
+                staticClass: "undo-button",
+                attrs: { type: "button", value: "<" },
+                on: { click: _vm.dispatch_undo }
+              }),
+              _vm._v(" "),
+              _c("input", {
+                staticClass: "redo-button",
+                attrs: { type: "button", value: ">" },
+                on: { click: _vm.dispatch_redo }
               })
-              .map(function(o) {
-                var val = "_value" in o ? o._value : o.value
-                return val
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "design-bar-flex-column" }, [
+            _c(
+              "div",
+              {
+                ref: "status_message",
+                staticClass: "design-bar-cell",
+                attrs: { id: "design-bar-status-message" },
+                on: {
+                  animationend: function($event) {
+                    _vm.clear_status_message()
+                  }
+                }
+              },
+              [_vm._v(_vm._s(_vm.status_message))]
+            )
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "design-bar-column" }, [
+            _c("div", { staticClass: "design-bar-cell" }, [
+              _c("input", {
+                attrs: { type: "button", value: "Refresh" },
+                on: { click: _vm.local_saves_load_from_local_storage }
               })
-            _vm.selected_parts_list_name = $event.target.multiple
-              ? $$selectedVal
-              : $$selectedVal[0]
-          }
-        }
-      },
-      _vm._l(_vm.all_parts_lists, function(parts_list) {
-        return _c("option", { key: parts_list.pretty_name }, [
-          _vm._v("\n\t\t\t" + _vm._s(parts_list.pretty_name) + "\n\t\t")
+            ])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "design-bar-cell design-bar-row" }, [
+          _c("div", { staticClass: "design-bar-flex-column" }, [
+            _c("div", { staticClass: "design-bar-cell" }, [
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.selected_parts_list_name,
+                      expression: "selected_parts_list_name"
+                    }
+                  ],
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.selected_parts_list_name = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
+                  }
+                },
+                _vm._l(_vm.all_parts_lists, function(parts_list) {
+                  return _c("option", { key: parts_list.pretty_name }, [
+                    _vm._v(
+                      "\n\t\t\t\t\t\t\t" +
+                        _vm._s(parts_list.pretty_name) +
+                        "\n\t\t\t\t\t\t"
+                    )
+                  ])
+                })
+              )
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "design-bar-column" }, [
+            _c("div", { staticClass: "design-bar-cell" }, [
+              _c("input", {
+                attrs: { type: "button", value: "Load parts list" },
+                on: { click: _vm.parts_lists_load_selected }
+              })
+            ])
+          ])
         ])
-      })
-    ),
-    _vm._v(" "),
-    _c("input", {
-      attrs: { type: "button", value: "Load parts list" },
-      on: { click: _vm.parts_lists_load_selected }
-    }),
-    _vm._v(" "),
-    _c("span", [
-      _c(
-        "a",
-        {
-          attrs: {
-            href: "shipdesigner.html#" + _vm.design_json_url_encoded_string
-          }
-        },
-        [_vm._v("Link to this design")]
-      )
-    ]),
-    _vm._v(" "),
-    _c(
-      "select",
-      {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.selected_design_name,
-            expression: "selected_design_name"
-          }
-        ],
-        on: {
-          change: function($event) {
-            var $$selectedVal = Array.prototype.filter
-              .call($event.target.options, function(o) {
-                return o.selected
-              })
-              .map(function(o) {
-                var val = "_value" in o ? o._value : o.value
-                return val
-              })
-            _vm.selected_design_name = $event.target.multiple
-              ? $$selectedVal
-              : $$selectedVal[0]
-          }
-        }
-      },
-      _vm._l(_vm.local_saves, function(blueprint) {
-        return _c("option", { key: blueprint.pretty_name }, [
-          _vm._v("\n\t\t\t" + _vm._s(blueprint.pretty_name) + "\n\t\t")
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "design-bar-column" }, [
+        _c("div", { staticClass: "design-bar-cell" }, [
+          _c("span", [
+            _c(
+              "a",
+              {
+                attrs: {
+                  href:
+                    "shipdesigner.html#" + _vm.design_json_url_encoded_string
+                }
+              },
+              [_vm._v("Link to this design")]
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "design-bar-cell" }, [
+          _c(
+            "select",
+            {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.selected_design_mode,
+                  expression: "selected_design_mode"
+                }
+              ],
+              attrs: { id: "design-bar-design-mode", disabled: "true" },
+              on: {
+                change: function($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function(o) {
+                      return o.selected
+                    })
+                    .map(function(o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.selected_design_mode = $event.target.multiple
+                    ? $$selectedVal
+                    : $$selectedVal[0]
+                }
+              }
+            },
+            [
+              _c("option", { attrs: { value: "none" } }, [_vm._v("Mode")]),
+              _vm._v(" "),
+              _c("option", { attrs: { value: "refit" } }, [
+                _vm._v("Refit for")
+              ]),
+              _vm._v(" "),
+              _c("option", { attrs: { value: "compare" } }, [
+                _vm._v("Compare with")
+              ])
+            ]
+          )
         ])
-      })
-    ),
-    _vm._v(" "),
-    _c("input", {
-      attrs: { type: "button", value: "Delete save" },
-      on: { click: _vm.local_saves_delete_selected }
-    }),
-    _vm._v(" "),
-    _c("input", {
-      attrs: { type: "button", value: "Load save" },
-      on: { click: _vm.local_saves_load_selected }
-    }),
-    _vm._v(" "),
-    _c("input", {
-      attrs: {
-        type: "button",
-        value: _vm.save_design_error
-          ? _vm.save_design_error
-          : "Save current design",
-        disabled: _vm.save_design_error !== null
-      },
-      on: { click: _vm.local_saves_save_design }
-    }),
-    _vm._v(" "),
-    _c("input", {
-      attrs: { type: "button", value: "Refresh" },
-      on: { click: _vm.local_saves_load_from_local_storage }
-    }),
-    _vm._v(" "),
-    _c(
-      "span",
-      {
-        ref: "status_message",
-        staticClass: "design-import-export-status-message",
-        on: {
-          animationend: function($event) {
-            _vm.clear_status_message()
-          }
-        }
-      },
-      [_vm._v(_vm._s(_vm.status_message))]
-    )
-  ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "design-bar-flex-column" }, [
+        _c("div", { staticClass: "design-bar-cell" }, [
+          _c(
+            "select",
+            {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.selected_design_name,
+                  expression: "selected_design_name"
+                }
+              ],
+              on: {
+                change: function($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function(o) {
+                      return o.selected
+                    })
+                    .map(function(o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.selected_design_name = $event.target.multiple
+                    ? $$selectedVal
+                    : $$selectedVal[0]
+                }
+              }
+            },
+            _vm._l(_vm.local_saves, function(blueprint) {
+              return _c("option", { key: blueprint.pretty_name }, [
+                _vm._v(
+                  "\n\t\t\t\t\t" + _vm._s(blueprint.pretty_name) + "\n\t\t\t\t"
+                )
+              ])
+            })
+          )
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "design-bar-cell" }, [
+          _c(
+            "select",
+            {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.selected_other_design_name,
+                  expression: "selected_other_design_name"
+                }
+              ],
+              attrs: { disabled: _vm.selected_design_mode === "none" },
+              on: {
+                change: function($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function(o) {
+                      return o.selected
+                    })
+                    .map(function(o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.selected_other_design_name = $event.target.multiple
+                    ? $$selectedVal
+                    : $$selectedVal[0]
+                }
+              }
+            },
+            _vm._l(_vm.local_saves, function(blueprint) {
+              return _c("option", { key: blueprint.pretty_name }, [
+                _vm._v(
+                  "\n\t\t\t\t\t" + _vm._s(blueprint.pretty_name) + "\n\t\t\t\t"
+                )
+              ])
+            })
+          )
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "design-bar-column" }, [
+        _c("div", { staticClass: "design-bar-cell" }, [
+          _c("input", {
+            attrs: { type: "button", value: "Load save" },
+            on: { click: _vm.local_saves_load_selected }
+          }),
+          _vm._v(" "),
+          _c("input", {
+            attrs: { type: "button", value: "Delete save" },
+            on: { click: _vm.local_saves_delete_selected }
+          }),
+          _vm._v(" "),
+          _c("input", {
+            attrs: {
+              type: "button",
+              id: "design-bar-save-button",
+              value: _vm.save_design_error
+                ? _vm.save_design_error
+                : "Save current design",
+              disabled: _vm.save_design_error !== null
+            },
+            on: { click: _vm.local_saves_save_design }
+          })
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "design-bar-cell" }, [
+          _c("span", [_vm._v("Filter:")]),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.design_filter,
+                expression: "design_filter"
+              }
+            ],
+            attrs: {
+              type: "checkbox",
+              id: "filter-latest-for-name",
+              value: "latest-for-name",
+              disabled: "true"
+            },
+            domProps: {
+              checked: Array.isArray(_vm.design_filter)
+                ? _vm._i(_vm.design_filter, "latest-for-name") > -1
+                : _vm.design_filter
+            },
+            on: {
+              change: function($event) {
+                var $$a = _vm.design_filter,
+                  $$el = $event.target,
+                  $$c = $$el.checked ? true : false
+                if (Array.isArray($$a)) {
+                  var $$v = "latest-for-name",
+                    $$i = _vm._i($$a, $$v)
+                  if ($$el.checked) {
+                    $$i < 0 && (_vm.design_filter = $$a.concat([$$v]))
+                  } else {
+                    $$i > -1 &&
+                      (_vm.design_filter = $$a
+                        .slice(0, $$i)
+                        .concat($$a.slice($$i + 1)))
+                  }
+                } else {
+                  _vm.design_filter = $$c
+                }
+              }
+            }
+          }),
+          _c("label", { attrs: { for: "filter-latest-for-name" } }, [
+            _vm._v("Latest for name")
+          ]),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.design_filter,
+                expression: "design_filter"
+              }
+            ],
+            attrs: {
+              type: "checkbox",
+              id: "filter-same-name",
+              value: "same-name",
+              disabled: "true"
+            },
+            domProps: {
+              checked: Array.isArray(_vm.design_filter)
+                ? _vm._i(_vm.design_filter, "same-name") > -1
+                : _vm.design_filter
+            },
+            on: {
+              change: function($event) {
+                var $$a = _vm.design_filter,
+                  $$el = $event.target,
+                  $$c = $$el.checked ? true : false
+                if (Array.isArray($$a)) {
+                  var $$v = "same-name",
+                    $$i = _vm._i($$a, $$v)
+                  if ($$el.checked) {
+                    $$i < 0 && (_vm.design_filter = $$a.concat([$$v]))
+                  } else {
+                    $$i > -1 &&
+                      (_vm.design_filter = $$a
+                        .slice(0, $$i)
+                        .concat($$a.slice($$i + 1)))
+                  }
+                } else {
+                  _vm.design_filter = $$c
+                }
+              }
+            }
+          }),
+          _c("label", { attrs: { for: "filter-latest-for-name" } }, [
+            _vm._v("Same name")
+          ])
+        ])
+      ])
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
