@@ -56,9 +56,9 @@
 
 import {
 	pretty,
-} from './ui-functions.js';
+} from '@/lib/ui-functions';
 
-import StatlineCell from './statline-cell.vue';
+import StatlineCell from '@/components/shipdesigner/statline-cell.vue';
 
 export default {
 	name: 'ComponentTr',

@@ -45,7 +45,7 @@
 
 import { mapGetters } from 'vuex';
 
-import { frac } from './ui-functions.js';
+import { frac } from '@/lib/ui-functions';
 
 export default {
 	name: 'DesignSummary',

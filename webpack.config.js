@@ -11,6 +11,10 @@ const config = {
 			path.resolve('./src'),
 			path.resolve('./node_modules'),
 		],
+		alias: {
+			'@': path.resolve('src'),
+			'#': path.resolve('dist'),
+		},
 	},
 	output: {
 		path: path.resolve(__dirname, 'dist'),

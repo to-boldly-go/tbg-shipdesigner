@@ -37,9 +37,9 @@
 
 import { mapGetters } from 'vuex';
 
-import StatlineCell from './statline-cell.vue';
+import StatlineCell from '@/components/shipdesigner/statline-cell.vue';
 
-import { frac } from './ui-functions.js';
+import { frac } from '@/lib/ui-functions';
 
 export default {
 	name: 'PrincipalFrame',

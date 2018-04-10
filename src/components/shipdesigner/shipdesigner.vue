@@ -15,9 +15,9 @@
 
 <script>
 
-import DesignSummary from './design-summary.vue';
-import Design from './design.vue';
-import DesignImportExport from './design-import-export.vue';
+import DesignSummary from '@/components/shipdesigner/design-summary.vue';
+import Design from '@/components/shipdesigner/design.vue';
+import DesignImportExport from '@/components/shipdesigner/design-import-export.vue';
 
 export default {
 	name: 'app',

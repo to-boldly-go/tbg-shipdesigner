@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import Vue from 'vue';
 import Vuex from 'vuex';
-import PartBuilder from './partbuilder.vue';
+import PartBuilder from '@/components/partbuilder/partbuilder.vue';
 
 import Promise from 'bluebird';
 

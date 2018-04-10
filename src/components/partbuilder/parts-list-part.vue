@@ -18,7 +18,7 @@ import _ from 'lodash';
 
 import { mapGetters } from 'vuex';
 
-import PartsListCell from './parts-list-cell.vue';
+import PartsListCell from '@/components/partbuilder/parts-list-cell.vue';
 
 export default {
 	name: 'PartsListPart',

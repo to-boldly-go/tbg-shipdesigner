@@ -51,13 +51,13 @@
 
 import { mapGetters } from 'vuex';
 
-import PrincipalFrameRaw from './principal-frame-raw.vue';
-import PrincipalFrameFinal from './principal-frame-final.vue';
-import SubsystemSummary from './subsystem-summary.vue';
-import SubsystemFrame from './subsystem-frame.vue';
-import SubsystemSettings from './subsystem-settings.vue';
-import ComponentTr from './component.vue';
-import ModuleTr from './module.vue';
+import PrincipalFrameRaw from '@/components/shipdesigner/principal-frame-raw.vue';
+import PrincipalFrameFinal from '@/components/shipdesigner/principal-frame-final.vue';
+import SubsystemSummary from '@/components/shipdesigner/subsystem-summary.vue';
+import SubsystemFrame from '@/components/shipdesigner/subsystem-frame.vue';
+import SubsystemSettings from '@/components/shipdesigner/subsystem-settings.vue';
+import ComponentTr from '@/components/shipdesigner/component.vue';
+import ModuleTr from '@/components/shipdesigner/module.vue';
 
 export default {
 	name: 'Design',
