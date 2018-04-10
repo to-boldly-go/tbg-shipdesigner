@@ -93,10 +93,10 @@ module.exports = {"Name":"SWB Cheapish Kepler","Blueprint Date":"2017-09-23T17:3
 
 /***/ }),
 
-/***/ "./lib/namedvector.js":
-/*!****************************!*\
-  !*** ./lib/namedvector.js ***!
-  \****************************/
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/component.vue":
+/*!*************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/component.vue ***!
+  \*************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -107,2557 +107,9 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _uiFunctions = __webpack_require__(/*! @/lib/ui-functions */ "./src/lib/ui-functions.js");
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var NamedVector = function () {
-	function NamedVector(val, shortnames) {
-		var _this = this;
-
-		_classCallCheck(this, NamedVector);
-
-		this.shortnames = shortnames;
-		if (typeof val === 'number') {
-			this.names.forEach(function (name) {
-				_this[name] = val;
-			});
-		} else {
-			this.names.forEach(function (name) {
-				_this[name] = val[name] || 0;
-			});
-		}
-	}
-
-	_createClass(NamedVector, [{
-		key: 'toFixed',
-		value: function toFixed(n) {
-			var _this2 = this;
-
-			return this.names.map(function (name) {
-				return _this2.shortnames[name].toUpperCase() + '[' + _this2[name].toFixed(n) + ']';
-			}).join(' ');
-		}
-	}, {
-		key: 'toString',
-		value: function toString() {
-			var _this3 = this;
-
-			return this.names.map(function (name) {
-				return _this3.shortnames[name].toUpperCase() + _this3[name].toString();
-			}).join(' ');
-		}
-	}, {
-		key: 'add',
-		value: function add(other) {
-			return this.op(NamedVector.op_add, other);
-		}
-	}, {
-		key: 'mult',
-		value: function mult(other) {
-			return this.op(NamedVector.op_mult, other);
-		}
-	}, {
-		key: 'div',
-		value: function div(other) {
-			return this.op(NamedVector.op_div, other);
-		}
-	}, {
-		key: 'apply',
-		value: function apply(fun) {
-			var _this4 = this;
-
-			return new this.constructor(this.names.reduce(function (acc, name) {
-				acc[name] = fun(_this4[name]);
-				return acc;
-			}, {}));
-		}
-	}, {
-		key: 'op',
-		value: function op(fun, other) {
-			var _this5 = this;
-
-			if (typeof other === 'number') {
-				return new this.constructor(this.names.reduce(function (acc, name) {
-					acc[name] = fun(_this5[name], other);
-					return acc;
-				}, {}));
-			} else {
-				return new this.constructor(this.names.reduce(function (acc, name) {
-					acc[name] = fun(_this5[name], other[name]);
-					return acc;
-				}, {}));
-			}
-		}
-	}, {
-		key: 'names',
-		get: function get() {
-			return Object.keys(this.shortnames);
-		}
-	}, {
-		key: 'floor',
-		get: function get() {
-			return this.apply(Math.floor);
-		}
-	}, {
-		key: 'ceil',
-		get: function get() {
-			return this.apply(Math.ceil);
-		}
-	}], [{
-		key: 'op_add',
-		value: function op_add(a, b) {
-			return a + b;
-		}
-	}, {
-		key: 'op_mult',
-		value: function op_mult(a, b) {
-			return a * b;
-		}
-	}, {
-		key: 'op_div',
-		value: function op_div(a, b) {
-			return a / b;
-		}
-	}]);
-
-	return NamedVector;
-}();
-
-exports.NamedVector = NamedVector;
-
-/***/ }),
-
-/***/ "./lib/shipengine.js":
-/*!***************************!*\
-  !*** ./lib/shipengine.js ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.Crewline = exports.Statline = exports.DB = exports.Design = undefined;
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _uiFunctions = __webpack_require__(/*! ../src/ui-functions.js */ "./src/ui-functions.js");
-
-var _namedvector = __webpack_require__(/*! ./namedvector.js */ "./lib/namedvector.js");
-
-var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-
-var _lodash2 = _interopRequireDefault(_lodash);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-// AL6, $AL$6
-var SIZE_TO_WEIGHT_CAP_MULTIPLIER = 300;
-
-// AL7
-var BR_TO_WEIGHT_MULTIPLIER = 10;
-
-var SUBSYSTEM_SORT_ORDER = {
-	'Tactical': 1,
-	'Operations': 2,
-	'Hull': 3,
-	'Engineering': 4,
-	'Warp Core': 5
-};
-
-var BR_COST_ROUND_MAP = {
-	'Frigate': 5,
-	'Cruiser': 10,
-	'Explorer': 10
-};
-
-var SR_COST_ROUND_MAP = {
-	'Frigate': 5,
-	'Cruiser': 5,
-	'Explorer': 10
-};
-
-// =IF(DK$18 = 1, "Frigate", IF(DK$18 = 2, "Cruiser", "Explorer"))
-var WEIGHT_CLASS_MAP = {
-	1: 'Frigate',
-	2: 'Cruiser',
-	3: 'Explorer'
-};
-
-var SUBSYSTEM_NAME_MAP = {
-	'Tactical': 'Tac Mod',
-	'Engineering': 'Eng. Mod',
-	'Hull': 'Hull Mod',
-	'Operations': 'Ops Mod',
-	'Warp Core': 'Core Mod'
-};
-
-// REFACTOR: change the names of these to be less abbreviated
-// (effectiveness instead of effect, for example)
-var COMPONENT_MODIFIERS = {
-	'Primary Phasers': {
-		'Effect Qty?': true,
-		'combat': 1,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Secondary Phasers': {
-		'Effect Qty?': true,
-		'combat': 1 / 4,
-		'Cost Mod': 1 / 4,
-		'Crew Mod': 1 / 4
-	},
-	'Torpedo System': {
-		'Effect Qty?': true,
-		'combat': 1,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Short-Range Sensors': {
-		'Effect Qty?': true,
-		'combat': 1 / 2,
-		'science': 1 / 2,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Targeting Computer': {
-		'Effect Qty?': true,
-		'combat': 1,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Deflector Shields': {
-		'Effect Qty?': true,
-		'shields': 1,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Backup Deflectors': {
-		'Effect Qty?': true,
-		'shields': 1 / 5,
-		'Cost Mod': 1 / 5,
-		'Crew Mod': 1 / 5
-	},
-	'Impulse Engine Pwr': {
-		'Effect Qty?': true,
-		'combat': 1 / 4,
-		'defense': 4 / 5,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-
-	'Long-Range Sensors': {
-		'Effect Qty?': true,
-		'science': 1,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Navigational Sensors': {
-		'Effect Qty?': true,
-		'science': 1,
-		'defense': 1 / 6,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Survey Sensors': {
-		'Effect Qty?': true,
-		'science': 1,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Science Labs': {
-		'Effect Qty?': true,
-		'science': 1,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Computer Core': {
-		'Effect Qty?': true,
-		'combat': 1 / 4,
-		'science': 1 / 4,
-		'hull': 1 / 10,
-		'shields': 1 / 7,
-		'presence': 1 / 6,
-		'defense': 1 / 8,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Operating System': {
-		'Effect Qty?': true,
-		'combat': 1 / 8,
-		'science': 1 / 8,
-		'shields': 1 / 14,
-		'defense': 1 / 10,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Secondary Core': {
-		'Effect Qty?': true,
-		'combat': 1 / 16,
-		'science': 1 / 16,
-		'shields': 1 / 28,
-		'defense': 1 / 40,
-		'Cost Mod': 1 / 2,
-		'Crew Mod': 1 / 4
-	},
-	'Diplomatic Package': {
-		'Effect Qty?': true,
-		'presence': 1,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Recreation Package': {
-		'Effect Qty?': true,
-		'presence': 1,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Sickbay': {
-		'Effect Qty?': true,
-		'science': 1 / 2,
-		'presence': 1,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-
-	'Hull System': {
-		'Effect Qty?': true,
-		'hull': 1,
-		'Cost Mod': 1,
-		'Scale Wt?': 1,
-		'Crew Mod': 1
-	},
-
-	'Structural Integrity Fields': {
-		'Effect Qty?': true,
-		'hull': 1,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Navigational Deflector': {
-		'Effect Qty?': false,
-		'science': 1 / 3,
-		'shields': 1 / 7,
-		'defense': 1,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Nacelle System': {
-		'Effect Qty?': true,
-		'defense': 1,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Replication Package': {
-		'Effect Qty?': true,
-		'science': 1 / 10,
-		'presence': 1 / 4,
-		'defense': 1,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Fuel & Matter Stores': {
-		'Effect Qty?': false,
-		'defense': 1,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-
-	'Warp Core Type': {
-		'Effect Qty?': true,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'M/AM Injectors': {
-		'Effect Qty?': true,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Coolant Systems': {
-		'Effect Qty?': true,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'EPS Manifold System': {
-		'Effect Qty?': false,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	},
-	'Eject System': {
-		'Effect Qty?': false,
-		'Cost Mod': 1,
-		'Crew Mod': 1
-	}
-};
-
-// AI, AJ, AK block
-// GL column onward
-var COMPONENT_PART_CLASSIFICATIONS = {
-	'Primary Phasers': 'Phasers',
-	'Secondary Phasers': 'Phasers',
-	'Torpedo System': 'Torpedoes',
-	'Short-Range Sensors': 'Short-Range Sensors',
-	'Targeting Computer': 'Targeting Computers',
-	'Deflector Shields': 'Deflector Shields',
-	'Backup Deflectors': 'Deflector Shields',
-	'Impulse Engine Pwr': 'Impulse Engine Power',
-	'Long-Range Sensors': 'Long-Range Sensors',
-	'Navigational Sensors': 'Navigational Sensors',
-	'Survey Sensors': 'Survey Sensors',
-	'Science Labs': 'Science Labs',
-	'Computer Core': 'Computer Cores',
-	'Operating System': 'Operating System',
-	'Secondary Core': 'Computer Cores',
-	'Diplomatic Package': 'Diplomatic Packages',
-	'Recreation Package': 'Recreation Packages',
-	'Sickbay': 'Sickbays',
-	'Hull System': 'Hull System',
-	'Structural Integrity Fields': 'Structural Integrity Fields',
-	'Navigational Deflector': 'Navigational Deflectors',
-	'Nacelle System': 'Nacelles',
-	'Replication Package': 'Replication Packages',
-	'Fuel & Matter Stores': 'Fuel & Matter Stores',
-	'Warp Core Type': 'Warp Core Types',
-	'M/AM Injectors': 'Matter/Anti-Matter Injectors',
-	'Coolant Systems': 'Coolant Systems',
-	'EPS Manifold System': 'EPS Manifold System',
-	'Eject System': 'Eject System'
-};
-
-var Crewline = function (_NamedVector) {
-	_inherits(Crewline, _NamedVector);
-
-	_createClass(Crewline, null, [{
-		key: 'shortnames',
-		get: function get() {
-			return {
-				'officer': 'O',
-				'enlisted': 'E',
-				'technician': 'T'
-			};
-		}
-	}]);
-
-	function Crewline(val) {
-		_classCallCheck(this, Crewline);
-
-		return _possibleConstructorReturn(this, (Crewline.__proto__ || Object.getPrototypeOf(Crewline)).call(this, val, Crewline.shortnames));
-	}
-
-	return Crewline;
-}(_namedvector.NamedVector);
-
-var Statline = function (_NamedVector2) {
-	_inherits(Statline, _NamedVector2);
-
-	_createClass(Statline, null, [{
-		key: 'shortnames',
-		get: function get() {
-			return {
-				'combat': 'C',
-				'science': 'S',
-				'hull': 'H',
-				'shields': 'L',
-				'presence': 'P',
-				'defense': 'D'
-			};
-		}
-	}]);
-
-	function Statline(val) {
-		_classCallCheck(this, Statline);
-
-		return _possibleConstructorReturn(this, (Statline.__proto__ || Object.getPrototypeOf(Statline)).call(this, val, Statline.shortnames));
-	}
-
-	return Statline;
-}(_namedvector.NamedVector);
-
-var DesignComponent = function () {
-	function DesignComponent(db, subsystem, design_component_json) {
-		_classCallCheck(this, DesignComponent);
-
-		this.json = design_component_json;
-
-		this.db = db;
-		this.name = this.json['Name'];
-
-		// parent
-		this.subsystem = subsystem;
-
-		// CY block
-		// statline
-		this.component_modifier = COMPONENT_MODIFIERS[this.name];
-
-		// BL block
-		// statline
-		this.part_def = this.db.find_part(this.json['Part']);
-		if (!this.part_def) {
-			console.log("WARNING: Could not find '" + this.name + "' part named '" + this.json['Part'] + "'");
-		}
-	}
-
-	_createClass(DesignComponent, [{
-		key: 'attribute',
-		value: function attribute(name) {
-			if (!this.part_def) {
-				if (this.db.part_schema.get(name).edit_type === 'number') {
-					return 0;
-				} else {
-					return '';
-				}
-			}
-			return this.part_def[name];
-		}
-	}, {
-		key: 'is_loaded',
-		get: function get() {
-			return !!this.part_def;
-		}
-	}, {
-		key: 'tech_year',
-		get: function get() {
-			return this.attribute('Year Available (SF)');
-		}
-	}, {
-		key: 'part',
-		get: function get() {
-			return this.json['Part'];
-		},
-		set: function set(value) {
-			this.json['Part'] = value;
-			if (this.is_no_part) {
-				this.quantity_calcs.set(parseInt(0));
-			}
-		}
-	}, {
-		key: 'is_no_part',
-		get: function get() {
-			return this.json['Part'].match(/No .+/) !== null;
-		}
-
-		// BK column
-		// scalar
-
-	}, {
-		key: 'quantity',
-		get: function get() {
-			return this.quantity_calcs.get();
-		},
-		set: function set(value) {
-			if (this.is_quantity_configurable) {
-				this.quantity_calcs.set(parseInt(value));
-				if (value === 0) {
-					var no_part = this.valid_parts.find(function (part) {
-						return part['Name'].match(/No .+/) !== null;
-					});
-					if (no_part) {
-						this.json['Part'] = no_part['Name'];
-					}
-				}
-			}
-		}
-	}, {
-		key: 'is_quantity_configurable',
-		get: function get() {
-			return this.quantity_calcs.is_configurable() && !this.is_no_part;
-		}
-	}, {
-		key: 'valid_quantities',
-		get: function get() {
-			if (this.is_quantity_configurable) {
-				return this.quantity_calcs.options();
-			} else {
-				return [];
-			}
-		}
-	}, {
-		key: 'quantity_calcs',
-		get: function get() {
-			var _this3 = this;
-
-			switch (this.name) {
-				case 'Computer Core':
-				case 'Operating System':
-				case 'Navigational Deflector':
-				case 'Fuel & Matter Stores':
-				case 'EPS Manifold System':
-					return {
-						is_configurable: function is_configurable() {
-							return false;
-						},
-						get: function get() {
-							return _this3.subsystem.design.size_round;
-						}
-					};
-				case 'M/AM Injectors':
-				case 'Coolant Systems':
-					return {
-						is_configurable: function is_configurable() {
-							return false;
-						},
-						get: function get() {
-							var warp_core_type = _this3.subsystem.component('Warp Core Type');
-							if (!warp_core_type || !warp_core_type.is_loaded) {
-								return 0;
-							}
-							return warp_core_type.quantity;
-						}
-					};
-				case 'Targeting Computer':
-				case 'Nacelle System':
-				case 'Eject System':
-					return {
-						is_configurable: function is_configurable() {
-							return false;
-						},
-						get: function get() {
-							if (_this3.is_no_part) {
-								return 0;
-							} else {
-								return 1;
-							}
-						}
-					};
-				default:
-					return {
-						is_configurable: function is_configurable() {
-							return true;
-						},
-						get: function get() {
-							return _this3.json['Quantity'];
-						},
-						set: function set(value) {
-							_this3.json['Quantity'] = value;
-						},
-						options: function options() {
-							switch (_this3.name) {
-								case 'Replication Package':
-									return [].concat(_toConsumableArray(Array(_this3.subsystem.design.size_round + 1).keys()));
-								case 'Secondary Core':
-									return [0, 1, 2];
-								case 'Structural Integrity Fields':
-									{
-										var hull_count = _this3.subsystem.design.subsystem('Hull').component('Hull System').quantity;
-										var hull_grade_civilian = _this3.part.match(/Civilian Grade$/);
-										var sif_max_count = hull_count * (hull_grade_civilian ? 1 : 2);
-										return [].concat(_toConsumableArray(Array(sif_max_count + 1).keys()));
-									}
-								default:
-									return [].concat(_toConsumableArray(Array(26).keys()));
-							}
-						}
-					};
-			}
-		}
-
-		// Requires H navigational deflector:
-		// * Large Frigate Engineering Subframe
-		// * Large or Medium Cruiser Engineering Subframe
-		// * All Explorer
-
-	}, {
-		key: 'requires_heavy_navigational_deflector',
-		get: function get() {
-			return this.subsystem.design.weight_class === 'Explorer' || this.subsystem.design.weight_class === 'Cruiser' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Lg | Md /) || this.subsystem.design.weight_class === 'Frigate' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Lg /);
-		}
-
-		// Requires L navigational deflector:
-		// * Small or Medium Frigate Engineering Subframe
-		// * Small Cruiser Engineering Subframe
-
-	}, {
-		key: 'requires_light_navigational_deflector',
-		get: function get() {
-			return this.subsystem.design.weight_class === 'Cruiser' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Sm /) || this.subsystem.design.weight_class === 'Frigate' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Md | Sm /);
-		}
-	}, {
-		key: 'valid_parts',
-		get: function get() {
-			var parts_of_type = this.db.find_parts(COMPONENT_PART_CLASSIFICATIONS[this.name]).filter(function (part) {
-				return !part['Name'].match(/^x/);
-			});
-
-			switch (this.name) {
-				case 'Navigational Deflector':
-					if (this.requires_heavy_navigational_deflector) {
-						parts_of_type = parts_of_type.filter(function (part) {
-							return part['Name'].match(/\[H\]/);
-						});
-					}
-					if (this.requires_light_navigational_deflector) {
-						parts_of_type = parts_of_type.filter(function (part) {
-							return part['Name'].match(/\[L\]/);
-						});
-					}
-					break;
-				default:
-					break;
-			}
-			return parts_of_type;
-		}
-	}, {
-		key: 'evasion',
-		get: function get() {
-			if (this.name === 'Impulse Engine Pwr') {
-				// (1+((CJ$40/DD$40*10)/100))
-				//
-				// that's the effect with the component modifer divided
-				// out and some junk to convert it to a probability
-				//
-				var evasion_effect = this.effect * this.subsystem.stats_multiplier;
-				return 1 + evasion_effect / 10;
-			} else {
-				return false;
-			}
-		}
-	}, {
-		key: 'warp_core_breach',
-		get: function get() {
-			if (this.name === 'Eject System') {
-				return this.attribute('Reliability');
-			} else {
-				return false;
-			}
-		}
-
-		// CP-CR block
-		// crewline
-
-	}, {
-		key: 'cost_crew',
-		get: function get() {
-			// =DS31 * IF(VALUE($BK31)=0,1,(1+(LOG($BK31))*2)) * ($BK$26^0.7 / 2) * CP$29 * $DH31
-			//
-			// DS31 is officer cost off sheet
-			// $BK31 is quantity
-			//
-			// $BK$26 is design size
-			//
-			// CP$29 is subsystem officer multiplier
-			// $DH31 is component crew modifier
-			return [this.cost_crew_raw, this.subsystem.cost_crew_frame_mult, this.crew_mod, this.cost_crew_quantity_mod, this.subsystem.design.cost_crew_size_mod].reduce(function (sum, value) {
-				return sum.mult(value);
-			}, new Crewline(1));
-		}
-
-		// IF(VALUE($BK31)=0,
-		// 1,
-		// (1+(LOG($BK31))*2))
-		// crewline
-
-	}, {
-		key: 'cost_crew_quantity_mod',
-		get: function get() {
-			if (this.quantity) {
-				return 1 + 2 * Math.log(this.quantity) / Math.log(10);
-			} else {
-				return 1;
-			}
-		}
-	}, {
-		key: 'cost_crew_raw',
-		get: function get() {
-			var _this4 = this;
-
-			var map = [['officer', 'O'], ['enlisted', 'E'], ['technician', 'T']];
-			var crew_block = map.reduce(function (res, _ref) {
-				var _ref2 = _slicedToArray(_ref, 2),
-				    longname = _ref2[0],
-				    shortname = _ref2[1];
-
-				res[longname] = _this4.attribute(shortname);return res;
-			}, {});
-			return new Crewline(crew_block);
-		}
-	}, {
-		key: 'crew_mod',
-		get: function get() {
-			return new Crewline(this.component_modifier['Crew Mod'] || 1);
-		}
-	}, {
-		key: 'power_generation',
-		get: function get() {
-			if (this.name === 'Warp Core Type') {
-				// CD79
-				// CD is effect
-				return this.effect;
-			}
-			var warp_core_type = this.subsystem.component('Warp Core Type');
-			if (!warp_core_type || !warp_core_type.is_loaded) {
-				return 0;
-			}
-			switch (this.name) {
-				case 'M/AM Injectors':
-					// =1 + (CD81 / 100 * CO$79)
-					// CD is effect
-					// CD$79 is the effect for the "Warp Core Type" component
-					return 1 + this.effect * warp_core_type.effect / 100.0;
-				case 'Coolant Systems':
-					// =1 + (CD82 / 100 * CO$79)
-					return 1 + this.effect * warp_core_type.effect / 100.0;
-				case 'EPS Manifold System':
-					// =1 + (CD83 / 100 * CO$79)
-					return 1 + this.effect * warp_core_type.effect / 100.0;
-				default:
-					return 0;
-			}
-		}
-
-		// CN column
-
-	}, {
-		key: 'cost_power',
-		get: function get() {
-			// =(DP31 + DQ31*BK$26 + DR31*BK31) * DG31
-			// DP is 'Pwr O/H' column off parts sheet
-
-			// DQ is 'Scale Pwr' column off parts sheet
-			// BK$26 is design size
-
-			// DR is 'Unit Power' column off parts sheet
-			// BK is part quantity
-
-			// DG is 'Cost Mod' column off COMPONENT_MODIFIERS
-
-			// the two Nacelle lines look like this:
-			// =(DP70 + DR70*BK70) * DG70
-			// =DQ70 * BK$26 * DG70
-			// these sum together to the same as the normal case, so need
-			// not be special-cased!
-
-			return (this.cost_power_overhead + this.cost_power_scale * this.subsystem.design.size + this.cost_power_unit * this.quantity) * this.cost_mod;
-		}
-
-		// DP column
-
-	}, {
-		key: 'cost_power_overhead',
-		get: function get() {
-			return this.attribute('Pwr O/H');
-		}
-
-		// DQ
-
-	}, {
-		key: 'cost_power_scale',
-		get: function get() {
-			return this.attribute('Scale Pwr');
-		}
-
-		// DR
-
-	}, {
-		key: 'cost_power_unit',
-		get: function get() {
-			return this.attribute('Unit Power');
-		}
-
-		// CM column
-
-	}, {
-		key: 'cost_SR',
-		get: function get() {
-			// =CK31 * DO31 * CM$29
-			// CM29 is subsystem frame 'SR Cost x'
-			// CK31 is weight
-			// DO31 is SR Cost x off the part list
-			return (this.weight_internal + this.weight_external) * this.cost_SR_mult * this.subsystem.cost_SR_mult;
-		}
-
-		// DO31
-
-	}, {
-		key: 'cost_SR_mult',
-		get: function get() {
-			// SR Cost x off the part list
-			return this.attribute('SR Cost x');
-		}
-
-		// CL column
-
-	}, {
-		key: 'cost_BR',
-		get: function get() {
-			// total weight divided by br to weight mult
-			return (this.weight_internal + this.weight_external) / BR_TO_WEIGHT_MULTIPLIER;
-		}
-
-		// CK column
-		// scalar
-
-	}, {
-		key: 'weight_internal',
-		get: function get() {
-			// =(DL31 + IF(DF31,DM31*BK$26,DN31)*BK31) * DE31 * DG31
-			// DL31 is "Weight O/H", weight overhead, off parts list
-			// DF31 is "Scale Wt?" component configuration
-			// DM31 is "Scale Weight" off parts list
-			// BK$26 is frame size?, BK18+BK25
-			// DN31 is "Unit Weight" off parts list
-			// BK31 is part quantity
-			// DE31 is "Wt Custom" component configuration
-			// DG31 is "Cost Mod" component configuration
-			switch (this.name) {
-				case 'Nacelle System':
-					// "Nacelle Distribution" line in spreadsheet
-					return this.weight_overhead_raw * this.weight_custom * this.cost_mod;
-				default:
-					return this.weight_raw * this.weight_custom * this.cost_mod;
-			}
-		}
-
-		// CK column
-		// scalar
-
-	}, {
-		key: 'weight_external',
-		get: function get() {
-			// =(DL31 + IF(DF31,DM31*BK$26,DN31)*BK31) * DE31 * DG31
-			// DL31 is "Weight O/H", weight overhead, off parts list
-			// DF31 is "Scale Wt?" component configuration
-			// DM31 is "Scale Weight" off parts list
-			// BK$26 is frame size?, BK18+BK25
-			// DN31 is "Unit Weight" off parts list
-			// BK31 is part quantity
-			// DE31 is "Wt Custom" component configuration
-			// DG31 is "Cost Mod" component configuration
-			switch (this.name) {
-				case 'Nacelle System':
-					// "Nacelle System" line in spreadsheet
-					// DN70 * BK70 * DE70 * DG70
-					return this.weight_unit_raw * this.quantity * this.weight_custom * this.cost_mod;
-				default:
-					return 0;
-			}
-		}
-
-		// (DL31 + IF(DF31,DM31*BK$26,DN31)*BK31)
-		// scalar
-		//
-		// the weight of the component before component and size modifiers
-		// are applied
-
-	}, {
-		key: 'weight_raw',
-		get: function get() {
-			return this.weight_overhead_raw + this.weight_per_unit * this.quantity;
-		}
-	}, {
-		key: 'cost_mod',
-		get: function get() {
-			return this.component_modifier['Cost Mod'] || 1;
-		}
-
-		// IF(DF31,
-		// DM31*BK$26,
-		// DN31)
-
-	}, {
-		key: 'weight_per_unit',
-		get: function get() {
-			if (this.component_modifier['Scale Wt?']) {
-				return this.weight_scale_raw * this.subsystem.design.size;
-			} else {
-				return this.weight_unit_raw;
-			}
-		}
-
-		// DL31
-
-	}, {
-		key: 'weight_overhead_raw',
-		get: function get() {
-			return this.attribute('Weight O/H');
-		}
-
-		// DM31
-
-	}, {
-		key: 'weight_scale_raw',
-		get: function get() {
-			return this.attribute('Scale Weight');
-		}
-
-		// DN31
-
-	}, {
-		key: 'weight_unit_raw',
-		get: function get() {
-			return this.attribute('Unit Weight');
-		}
-
-		// DK column
-		// scalar
-
-	}, {
-		key: 'raw_effect',
-		get: function get() {
-			return this.attribute('Effect');
-		}
-
-		// CE block
-		// statline
-
-	}, {
-		key: 'stats',
-		get: function get() {
-			// CD column * CY block * CE$29 row
-			//
-			// effect for this part * frame effect multiplier * the
-			// component's statline modifier
-			return new Statline(this.component_modifier).mult(this.effect * this.subsystem.stats_multiplier);
-		}
-
-		// CD column
-		// scalar
-
-	}, {
-		key: 'effect',
-		get: function get() {
-			switch (this.subsystem.name) {
-				case 'Warp Core':
-					// =DK79 * IF(CX79,1+3.5*log10(0.7*BK79+0.3),1) * CW79 * CD$77
-					//
-					// raw effect * quantity mult * custom effect * frame effect modifier
-					return this.raw_effect * this.effect_custom * this.qty_mult * this.subsystem.stats_multiplier;
-				default:
-					// =DK31 * IF(CX31,1+3.5*log10(0.7*BK31+0.3),1) * CW31
-					//
-					// raw effect from parts list * quantity multiplier * custom effect
-					return this.raw_effect * this.effect_custom * this.qty_mult;
-			}
-		}
-
-		// IF(CX31,
-		// 1 + 3.5 * log10(0.7 * BK31 + 0.3)
-		// ,1)
-		//
-		// scalar
-
-	}, {
-		key: 'qty_mult',
-		get: function get() {
-			if (this.uses_effect_qty) {
-				return 1 + 3.5 * Math.log(0.7 * this.quantity + 0.3) / Math.log(10);
-			} else {
-				return 1;
-			}
-		}
-
-		// boolean
-
-	}, {
-		key: 'uses_effect_qty',
-		get: function get() {
-			return this.component_modifier['Effect Qty?'];
-		}
-
-		// DE column
-		// scalar
-		//
-		// Additional custom multiplier on weight (and thus also BR/SR) -
-		// can be formula as long as it doesn't reference any cell on this
-		// row
-
-	}, {
-		key: 'weight_custom',
-		get: function get() {
-			if (this.name === 'Primary Phasers') {
-				return this.setting_phaser_array_weight_multiplier;
-			}
-			if (this.name === 'Secondary Phasers') {
-				return this.setting_phaser_array_weight_multiplier;
-			}
-			if (this.name === 'Torpedo System') {
-				return this.setting_burst_launcher_weight_multiplier;
-			}
-			return 1;
-		}
-
-		// CW column
-		//
-		// scalar
-		//
-		// comment on sheet: Additional custom multiplier on effect - can
-		// be formula as long as it doesn't reference any cell on this row
-
-	}, {
-		key: 'effect_custom',
-		get: function get() {
-			if (this.name === 'Primary Phasers') {
-				// =(1-(BK$26/100)) * IF($D$33,2,1)
-				// BK$26 = BK18 + BK25
-				// BK18 is design size
-
-				// $D$33 is "phaser arrays Y/N"
-
-				// AL6 is size to weight multiplier
-
-				// return (0.97 / 2) * ;
-
-				return this.phaser_size_mult * this.setting_phaser_array_combat_multiplier;
-			}
-			if (this.name === 'Secondary Phasers') {
-				return this.phaser_size_mult * this.setting_phaser_array_combat_multiplier;
-			}
-			if (this.name === 'Torpedo System') {
-				// =IF($D$35, 1.5, 1)
-				// $D$35 is burst launchers Y/N
-				return this.setting_burst_launcher_combat_multiplier;
-			}
-			// if nothing else, no change
-			return 1;
-		}
-	}, {
-		key: 'phaser_size_mult',
-		get: function get() {
-			return 1 - this.subsystem.design.size / 100.0;
-		}
-	}, {
-		key: 'setting_phaser_array_weight_multiplier',
-		get: function get() {
-			if (this.subsystem.get_setting('Phaser Arrays')) {
-				return 1.5;
-			} else {
-				return 1.0;
-			}
-		}
-	}, {
-		key: 'setting_phaser_array_combat_multiplier',
-		get: function get() {
-			if (this.subsystem.get_setting('Phaser Arrays')) {
-				return 2.0;
-			} else {
-				return 1.0;
-			}
-		}
-	}, {
-		key: 'setting_burst_launcher_combat_multiplier',
-		get: function get() {
-			if (this.subsystem.get_setting('Burst Launchers')) {
-				return 1.5;
-			} else {
-				return 1.0;
-			}
-		}
-	}, {
-		key: 'setting_burst_launcher_weight_multiplier',
-		get: function get() {
-			if (this.subsystem.get_setting('Burst Launchers')) {
-				return 1.5;
-			} else {
-				return 1.0;
-			}
-		}
-	}]);
-
-	return DesignComponent;
-}();
-
-var DesignSubsystem = function () {
-	function DesignSubsystem(db, design, design_subsystem_json) {
-		var _this5 = this;
-
-		_classCallCheck(this, DesignSubsystem);
-
-		this.json = design_subsystem_json;
-		this.db = db;
-		this.name = this.json['Name'];
-		this.design = design;
-		this.settings = this.json['Settings'];
-		this.sub_frame_def = this.db.find_frame(this.json['Sub-Frame']);
-		if (!this.sub_frame_def) {
-			console.log("WARNING: Could not find '" + this.name + "' subframe named '" + this.json['Sub-Frame'] + "'");
-		}
-		this.components = this.json['Components'].map(function (comp_json) {
-			return new DesignComponent(_this5.db, _this5, comp_json);
-		});
-	}
-
-	_createClass(DesignSubsystem, [{
-		key: 'frame_attribute',
-		value: function frame_attribute(name) {
-			if (!this.sub_frame_def) {
-				if (this.db.frame_schema.get(name).edit_type === 'number') {
-					return 0;
-				} else {
-					return '';
-				}
-			}
-			return this.sub_frame_def[name];
-		}
-	}, {
-		key: 'get_setting',
-		value: function get_setting(key) {
-			return this.settings.find(function (elem) {
-				return elem['Name'] === key;
-			})['Value'];
-		}
-	}, {
-		key: 'component',
-		value: function component(component_name) {
-			return this.components.find(function (comp) {
-				return comp.name === component_name;
-			});
-		}
-
-		// CN column, 29 etc
-
-	}, {
-		key: 'is_valid_frame',
-		get: function get() {
-			return !!this.sub_frame_def;
-		}
-	}, {
-		key: 'is_loaded',
-		get: function get() {
-			return this.is_valid_frame && this.components.every(function (comp) {
-				return comp.is_loaded;
-			});
-		}
-	}, {
-		key: 'tech_year_frame',
-		get: function get() {
-			return this.frame_attribute('Year Available (SF)');
-		}
-	}, {
-		key: 'tech_year_max',
-		get: function get() {
-			var years = _lodash2.default.chain(this.components).filter(function (comp) {
-				return comp.is_loaded;
-			}).map(function (comp) {
-				return Number(comp.tech_year);
-			}).filter(function (n) {
-				return n;
-			}).value();
-			var max = _lodash2.default.max(years);
-			if (!max) {
-				return this.tech_year_frame;
-			}
-			if (!Number(this.tech_year_frame)) {
-				return max;
-			}
-			return Math.max(max, this.tech_year_frame);
-		}
-	}, {
-		key: 'sub_frame',
-		get: function get() {
-			return this.json['Sub-Frame'];
-		},
-		set: function set(value) {
-			this.json['Sub-Frame'] = value;
-		}
-	}, {
-		key: 'valid_frames',
-		get: function get() {
-			var _this6 = this;
-
-			return this.db.find_frames(this.name).filter(function (frame) {
-				return frame['Weight Class'] === _this6.design.weight_class_raw;
-			}).filter(function (frame) {
-				return !frame['Name'].match(/^x/);
-			});
-		}
-
-		// CV20, CV41
-
-	}, {
-		key: 'weight_cap',
-		get: function get() {
-			// sum of CV31-40 plus CV29
-			return this.weight_cap_components + this.weight_cap_frame;
-		}
-
-		// CV column
-
-	}, {
-		key: 'weight_cap_components',
-		get: function get() {
-			// these can't be filled in the C8 sheet
-			return 0;
-		}
-
-		// CV29
-
-	}, {
-		key: 'weight_cap_frame',
-		get: function get() {
-			// =(DL29/100) * CV$18
-			return this.max_size_frame * this.design.frame_max_size_raw / 100;
-		}
-	}, {
-		key: 'max_size_frame',
-		get: function get() {
-			// "MaxSz" off frame def
-			return this.frame_attribute('MaxSz');
-		}
-	}, {
-		key: 'warp_core_breach',
-		get: function get() {
-			return this.components.filter(function (comp) {
-				return comp.is_loaded;
-			}).map(function (comp) {
-				return comp.warp_core_breach;
-			}).filter(function (val) {
-				return val !== false;
-			}).reduce(function (sum, value) {
-				return 1 - (1 - sum) * (1 - value);
-			}, 0);
-		}
-	}, {
-		key: 'evasion',
-		get: function get() {
-			// CJ40 is D value for Impulse Engine Pwr
-			// DD40 D mod for Impulse Engine Pwr
-			return this.components.filter(function (comp) {
-				return comp.is_loaded;
-			}).map(function (comp) {
-				return comp.evasion;
-			}).filter(function (val) {
-				return val !== false;
-			}).reduce(function (sum, value) {
-				return 1 - (1 - sum) * (1 - value);
-			}, 0);
-		}
-
-		// CT column, subsystems
-
-	}, {
-		key: 'build_time',
-		get: function get() {
-			// =SUM(CT31:CT40)+CT29
-			//
-			// but the component values are all blank - no way for them to
-			// be filled, and parts don't have build times - so this is
-			// just CT29
-			//
-			// CT29 is DN29 is the build time value straight off the
-			// frames list
-			return (0, _uiFunctions.from_frac)(this.frame_attribute('Build Time'));
-		}
-
-		// DS31-DSU31 row
-		// crewline
-
-	}, {
-		key: 'cost_crew_frame_mult',
-		get: function get() {
-			// CP$18 * DR29
-			// CP$18 is DR18 is design principal frame 'O-Mod' off parts list
-			// DR29 is subframe 'O-Mod' off parts list
-			return this.cost_crew_frame_mult_raw.mult(this.design.cost_crew_frame_mult);
-		}
-
-		// DR29 is subframe 'O-Mod' off parts list
-		// crewline
-
-	}, {
-		key: 'cost_crew_frame_mult_raw',
-		get: function get() {
-			var _this7 = this;
-
-			var map = [['officer', 'O-Mod'], ['enlisted', 'E-Mod'], ['technician', 'T-Mod']];
-			var crew_block = map.reduce(function (res, _ref3) {
-				var _ref4 = _slicedToArray(_ref3, 2),
-				    longname = _ref4[0],
-				    shortname = _ref4[1];
-
-				res[longname] = _this7.frame_attribute(shortname);return res;
-			}, {});
-			return new Crewline(crew_block);
-		}
-
-		// CP, CQ, CR block
-		// crewline
-
-	}, {
-		key: 'cost_crew',
-		get: function get() {
-			// straight sum of components
-			return this.components.filter(function (comp) {
-				return comp.is_loaded;
-			}).map(function (comp) {
-				return comp.cost_crew;
-			}).reduce(function (sum, value) {
-				return sum.add(value);
-			}, new Crewline({}));
-		}
-
-		// CO column
-		// scalar
-
-	}, {
-		key: 'power_generation',
-		get: function get() {
-			switch (this.name) {
-				case 'Warp Core':
-					return this.power_generation_components + this.setting_safety_performance;
-				default:
-					return this.power_generation_components;
-			}
-		}
-	}, {
-		key: 'power_generation_components',
-		get: function get() {
-			return this.components.filter(function (comp) {
-				return comp.is_loaded;
-			}).map(function (comp) {
-				return comp.power_generation;
-			}).reduce(function (sum, value) {
-				return sum + value;
-			}, 0);
-		}
-	}, {
-		key: 'setting_safety_performance',
-		get: function get() {
-			// =-BK80 * POWER(2,(ABS(BK80)/2)) / 100 * CO$79
-			// BK80 is D80 is Safety/Performance slider value
-			// CD$79 is warp core effect
-			var warp_core_type = this.component('Warp Core Type');
-			if (!warp_core_type || !warp_core_type.is_loaded) {
-				return 0;
-			}
-			return -this.get_setting('Safety/Performance') * warp_core_type.effect * (Math.pow(2.0, Math.abs(this.get_setting('Safety/Performance'))) / 2.0) / 100.0;
-		}
-	}, {
-		key: 'cost_power',
-		get: function get() {
-			return this.cost_power_components;
-		}
-	}, {
-		key: 'cost_power_components',
-		get: function get() {
-			return this.components.filter(function (comp) {
-				return comp.is_loaded;
-			}).map(function (comp) {
-				return comp.cost_power;
-			}).reduce(function (sum, value) {
-				return sum + value;
-			}, 0);
-		}
-
-		// CM column, 29 etc
-
-	}, {
-		key: 'cost_SR_mult',
-		get: function get() {
-			// =CM18 * DU29
-			// CM18 is principal frame SR cost
-			// DU29 is 'SR-Mod' straight off part list
-			return this.cost_SR_mult_raw * this.design.cost_SR_frame_mult;
-		}
-	}, {
-		key: 'cost_SR_mult_raw',
-		get: function get() {
-			return this.frame_attribute('SR-Mod');
-		}
-
-		// CM column, 20:24, 41 etc
-
-	}, {
-		key: 'cost_SR',
-		get: function get() {
-			// straight sum of component costs
-			return this.components.filter(function (comp) {
-				return comp.is_loaded;
-			}).map(function (comp) {
-				return comp.cost_SR;
-			}).reduce(function (sum, value) {
-				return sum + value;
-			}, 0);
-		}
-
-		// sum of component costs plus the frame cost
-
-	}, {
-		key: 'cost_BR',
-		get: function get() {
-			return this.cost_BR_components + this.cost_BR_frame;
-		}
-
-		// CL column
-		// CK column / br to weight mult
-
-	}, {
-		key: 'cost_BR_frame',
-		get: function get() {
-			return this.weight_frame / BR_TO_WEIGHT_MULTIPLIER;
-		}
-	}, {
-		key: 'cost_BR_components',
-		get: function get() {
-			return this.components.filter(function (comp) {
-				return comp.is_loaded;
-			}).map(function (comp) {
-				return comp.cost_BR;
-			}).reduce(function (sum, value) {
-				return sum + value;
-			}, 0);
-		}
-
-		// CK20:CK25 column, [CK41, CK57, CK63, ...]
-		// scalar
-
-	}, {
-		key: 'weight_external',
-		get: function get() {
-			// =SUM(CK31:CK40)+CK29
-			return this.weight_components_external;
-		}
-
-		// CK20:CK25 column, [CK41, CK57, CK63, ...]
-		// scalar
-
-	}, {
-		key: 'weight_internal',
-		get: function get() {
-			// =SUM(CK31:CK40)+CK29
-			return this.weight_frame + this.weight_components_internal;
-		}
-
-		// CK29, DM29 if populated, DM29 is weight straight off frames list
-		// scalar
-
-	}, {
-		key: 'weight_frame',
-		get: function get() {
-			return this.frame_attribute('Wt') || 0;
-		}
-
-		// =SUM(CK31:CK40)
-		// scalar
-
-	}, {
-		key: 'weight_components_external',
-		get: function get() {
-			return this.components.filter(function (comp) {
-				return comp.is_loaded;
-			}).map(function (comp) {
-				return comp.weight_external;
-			}).reduce(function (sum, value) {
-				return sum + value;
-			}, 0);
-		}
-
-		// =SUM(CK31:CK40)
-		// scalar
-
-	}, {
-		key: 'weight_components_internal',
-		get: function get() {
-			return this.components.filter(function (comp) {
-				return comp.is_loaded;
-			}).map(function (comp) {
-				return comp.weight_internal;
-			}).reduce(function (sum, value) {
-				return sum + value;
-			}, 0);
-		}
-
-		// get weight_multiplier() {
-		// 	return this.frame_attribute('') || 0;
-		// };
-
-		// [CE41 row;CE57 row;CE63 row] block
-
-	}, {
-		key: 'stats',
-		get: function get() {
-			return this.components.filter(function (comp) {
-				return comp.is_loaded;
-			}).map(function (comp) {
-				return comp.stats;
-			}).reduce(function (sum, value) {
-				return sum.add(value);
-			}, new Statline({}));
-		}
-
-		// CE29, CD29, DO29
-
-	}, {
-		key: 'stats_multiplier',
-		get: function get() {
-			// =IF(BI29="",0,DGET('[C8] Frames'!$A:$R,DO$28,{"Type","Name";"="&$AJ29,"="&BI29}))
-			// BI29 is frame name
-			// if no frame, then 0
-			// if frame, then look up "tac mod" field in frames list
-			return this.frame_attribute(SUBSYSTEM_NAME_MAP[this.name]);
-		}
-	}]);
-
-	return DesignSubsystem;
-}();
-
-var Module = function () {
-	function Module(db, design, design_module_json) {
-		_classCallCheck(this, Module);
-
-		this.json = design_module_json;
-		this.db = db;
-		this.design = design;
-		this.module_def = this.db.find_module(this.json['Type'], this.json['Variant']);
-		if (!this.module_def) {
-			console.log("WARNING: Could not find module of type '" + this.json['Type'] + "' and variant '" + this.json['Variant'] + "'");
-		}
-	}
-
-	_createClass(Module, [{
-		key: 'attribute',
-		value: function attribute(name) {
-			if (!this.module_def) {
-				if (this.db.module_schema.get(name).edit_type === 'number') {
-					return 0;
-				} else {
-					return '';
-				}
-			}
-			return this.module_def[name];
-		}
-	}, {
-		key: 'is_loaded',
-		get: function get() {
-			return !!this.module_def;
-		}
-	}, {
-		key: 'module_variant',
-		get: function get() {
-			return this.json['Variant'];
-		},
-		set: function set(value) {
-			this.json['Variant'] = value;
-		}
-	}, {
-		key: 'valid_variants',
-		get: function get() {
-			return this.db.find_modules(this.attribute('Type'));
-		}
-	}, {
-		key: 'module_type',
-		get: function get() {
-			return this.json['Type'];
-		},
-		set: function set(value) {
-			this.json['Type'] = value;
-		}
-
-		// CT88, DN88
-
-	}, {
-		key: 'build_time',
-		get: function get() {
-			// straight off modules list
-			return (0, _uiFunctions.from_frac)(this.attribute('Build Time'));
-		}
-
-		// CP-CR 88, DS-DU88
-		// crewline
-
-	}, {
-		key: 'cost_crew',
-		get: function get() {
-			var _this8 = this;
-
-			// straight off parts list
-			var map = [['officer', 'O'], ['enlisted', 'E'], ['technician', 'T']];
-			var stat_block = map.reduce(function (res, _ref5) {
-				var _ref6 = _slicedToArray(_ref5, 2),
-				    longname = _ref6[0],
-				    shortname = _ref6[1];
-
-				res[longname] = _this8.attribute(shortname);return res;
-			}, {});
-			return new Crewline(stat_block);
-		}
-
-		// CN25, CN88, DP88, straight from parts list
-
-	}, {
-		key: 'cost_power',
-		get: function get() {
-			return this.attribute('Power Cost');
-		}
-
-		// CM25, CM88, DO88
-		// straight off parts list
-
-	}, {
-		key: 'cost_SR',
-		get: function get() {
-			return this.attribute('SR Cost');
-		}
-
-		// CL25, CL88
-
-	}, {
-		key: 'cost_BR',
-		get: function get() {
-			// CK88 / AL7
-			// CK88 is weight
-			// AL7 is the br to weight constant
-			return this.weight_total / BR_TO_WEIGHT_MULTIPLIER;
-		}
-
-		// CE88 row, CY88 row
-		// statline
-
-	}, {
-		key: 'stats',
-		get: function get() {
-			var _this9 = this;
-
-			// pulled straight out of module definition
-			var map = [['combat', 'C'], ['science', 'S'], ['hull', 'H'], ['shields', 'L'], ['presence', 'P'], ['defense', 'D']];
-			var stat_block = map.reduce(function (res, _ref7) {
-				var _ref8 = _slicedToArray(_ref7, 2),
-				    longname = _ref8[0],
-				    shortname = _ref8[1];
-
-				res[longname] = _this9.attribute(shortname);return res;
-			}, {});
-			return new Statline(stat_block);
-		}
-
-		// CK25, CK88, DM88
-		// scalar
-		// "Weight" value off module definition
-
-	}, {
-		key: 'weight_total',
-		get: function get() {
-			return this.weight_internal + this.weight_external;
-		}
-	}, {
-		key: 'weight_internal',
-		get: function get() {
-			return 0;
-		}
-	}, {
-		key: 'weight_external',
-		get: function get() {
-			return this.attribute('Weight');
-		}
-
-		// BK25, BK88
-		// scalar
-
-	}, {
-		key: 'size',
-		get: function get() {
-			// BK25 = rollbar size?, BK88
-			// BK88 = rollbar size? = $CV88 / $AL$6
-			return this.size_raw / SIZE_TO_WEIGHT_CAP_MULTIPLIER;
-		}
-
-		// CV88, DL88
-		// scalar
-
-	}, {
-		key: 'size_raw',
-		get: function get() {
-			// $CV88 = DL88 = module weight cap? = module weight cap from "Weight Cap" element of module
-			return this.attribute('Weight Cap');
-		}
-	}]);
-
-	return Module;
-}();
-
-var Design = function () {
-	function Design(db, design_json) {
-		var _this10 = this;
-
-		var wrong_db = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-		_classCallCheck(this, Design);
-
-		this.json = design_json;
-		this.db = db;
-		this.wrong_db = wrong_db;
-		this.name = this.json['Name'];
-		this.timestamp = new Date(this.json['Blueprint Date']);
-		if (this.json['Parts List']) {
-			this.parts_list_name = this.json['Parts List'].name;
-			this.parts_list_timestamp = new Date(this.json['Parts List'].timestamp);
-		} else {
-			this.parts_list_name = this.db.name;
-			this.parts_list_timestamp = this.db.timestamp;
-		}
-		this.princ_frame_def = this.db.find_frame(this.json['Principal Frame']);
-		if (!this.princ_frame_def) {
-			console.log("WARNING: Could not find principal frame named '" + this.json['Principal Frame'] + "'");
-		}
-		this.subsystems = this.json['Subsystems'].map(function (ss_json) {
-			return new DesignSubsystem(_this10.db, _this10, ss_json);
-		}).sort(function (ssa, ssb) {
-			return SUBSYSTEM_SORT_ORDER[ssa.name] > SUBSYSTEM_SORT_ORDER[ssb.name];
-		});
-		this.module = new Module(db, this, this.json['Module']);
-	}
-
-	_createClass(Design, [{
-		key: 'matches_pretty_name',
-		value: function matches_pretty_name(value) {
-			return this.pretty_name === value;
-		}
-	}, {
-		key: 'matches_design',
-		value: function matches_design(other) {
-			return this.name === other.name && this.timestamp === other.timestamp;
-		}
-	}, {
-		key: 'matches_parts_list',
-		value: function matches_parts_list(parts_db) {
-			return this.parts_list_name === parts_db.name && this.parts_list_timestamp.getTime() === parts_db.timestamp.getTime();
-		}
-	}, {
-		key: 'frame_attribute',
-		value: function frame_attribute(name) {
-			if (!this.princ_frame_def) {
-				if (this.db.frame_schema.get(name).edit_type === 'number') {
-					return 0;
-				} else {
-					return '';
-				}
-			}
-			return this.princ_frame_def[name];
-		}
-	}, {
-		key: 'subsystem',
-		value: function subsystem(subsystem_name) {
-			return this.subsystems.find(function (ss) {
-				return ss.name === subsystem_name;
-			});
-		}
-	}, {
-		key: 'is_valid_frame',
-		get: function get() {
-			return !!this.princ_frame_def;
-		}
-	}, {
-		key: 'is_loaded',
-		get: function get() {
-			return this.is_valid_frame && this.subsystems.every(function (ss) {
-				return ss.is_loaded;
-			}) && this.module.is_loaded;
-		}
-	}, {
-		key: 'pretty_name',
-		get: function get() {
-			return this.name + ' (' + this.timestamp.toLocaleString() + ')' + ' [' + this.pretty_name_stats + ']';
-		}
-	}, {
-		key: 'pretty_name_stats',
-		get: function get() {
-			if (this.wrong_db) {
-				return 'parts list missing';
-			} else {
-				return this.stats.toString();
-			}
-		}
-	}, {
-		key: 'has_parts_list_info',
-		get: function get() {
-			return this.parts_list_name.length && this.parts_list_timestamp;
-		}
-	}, {
-		key: 'parts_list_pretty_name',
-		get: function get() {
-			return this.parts_list_name + ' (' + this.parts_list_timestamp.toLocaleString() + ')';
-		}
-	}, {
-		key: 'tech_year_frame',
-		get: function get() {
-			return this.frame_attribute('Year Available (SF)');
-		}
-	}, {
-		key: 'tech_year_max',
-		get: function get() {
-			var years = _lodash2.default.chain(this.subsystems).filter(function (ss) {
-				return ss.is_loaded;
-			}).map(function (ss) {
-				return Number(ss.tech_year_max);
-			}).filter(function (n) {
-				return n;
-			}).value();
-			var max = _lodash2.default.max(years);
-			if (!max) {
-				return this.tech_year_frame;
-			}
-			if (!Number(this.tech_year_frame)) {
-				return max;
-			}
-			return Math.max(max, this.tech_year_frame);
-		}
-	}, {
-		key: 'valid_frames',
-		get: function get() {
-			return this.db.find_frames('Frame');
-		}
-
-		// CT27, CT26
-
-	}, {
-		key: 'build_time',
-		get: function get() {
-			return Math.ceil(this.build_time_raw * 12) / 12;
-		}
-
-		// CT26
-
-	}, {
-		key: 'build_time_raw',
-		get: function get() {
-			// =SUM(CT20:CT25)+CT$18
-			return this.build_time_frame + this.build_time_subsystems + this.module.build_time;
-		}
-
-		// CT18, DN18
-
-	}, {
-		key: 'build_time_frame',
-		get: function get() {
-			// "Build Time" off frames list
-			return (0, _uiFunctions.from_frac)(this.frame_attribute('Build Time'));
-		}
-
-		// sum of CT column on subsystems
-
-	}, {
-		key: 'build_time_subsystems',
-		get: function get() {
-			return this.subsystems.filter(function (ss) {
-				return ss.is_loaded;
-			}).map(function (ss) {
-				return ss.build_time;
-			}).reduce(function (sum, value) {
-				return sum + value;
-			}, 0);
-		}
-	}, {
-		key: 'evasion',
-		get: function get() {
-			return Math.round(this.evasion_raw * 1e4) / 1e4;
-		}
-
-		// CD11
-
-	}, {
-		key: 'evasion_raw',
-		get: function get() {
-			// =(MAX(0, 30 - (BK$26*3)) / 100) * (1+((CJ$40/DD$40*10)/100))
-			// BK26 is size
-			// CJ40 is D value for Impulse Engine Pwr
-			// DD40 D mod for Impulse Engine Pwr
-			return this.evasion_size_mult * this.evasion_subsystems;
-		}
-	}, {
-		key: 'evasion_size_mult',
-		get: function get() {
-			// =(MAX(0, 30 - (BK$26*3)) / 100)
-			// for ease of programming: probability of all failing
-			return Math.max(0, 30 - this.size * 3) / 100;
-		}
-	}, {
-		key: 'evasion_subsystems',
-		get: function get() {
-			return this.subsystems.filter(function (ss) {
-				return ss.is_loaded;
-			}).map(function (ss) {
-				return ss.evasion;
-			}).filter(function (wcb) {
-				return wcb;
-			}).reduce(function (sum, value) {
-				return 1 - (1 - sum) * (1 - value);
-			}, 0);
-		}
-
-		// CD13, DV84
-
-	}, {
-		key: 'warp_core_breach',
-		get: function get() {
-			return this.warp_core_breach_subsystems;
-		}
-	}, {
-		key: 'warp_core_breach_subsystems',
-		get: function get() {
-			// for ease of programming: probability of all failing
-			return this.subsystems.filter(function (ss) {
-				return ss.is_loaded;
-			}).map(function (ss) {
-				return ss.warp_core_breach;
-			}).filter(function (wcb) {
-				return wcb;
-			}).reduce(function (sum, value) {
-				return 1 - (1 - sum) * (1 - value);
-			}, 0);
-		}
-
-		// ($BK$26^0.7 / 2)
-		// crewline
-
-	}, {
-		key: 'cost_crew_size_mod',
-		get: function get() {
-			// BK26 is design size
-			return Math.pow(this.size, 0.7) / 2;
-			// return 1/2;
-		}
-
-		// CP$18 is DR18 is design principal frame 'O-Mod' off parts list
-		// crewline
-
-	}, {
-		key: 'cost_crew_frame_mult',
-		get: function get() {
-			var _this11 = this;
-
-			var map = [['officer', 'O-Mod'], ['enlisted', 'E-Mod'], ['technician', 'T-Mod']];
-			var crew_block = map.reduce(function (res, _ref9) {
-				var _ref10 = _slicedToArray(_ref9, 2),
-				    longname = _ref10[0],
-				    shortname = _ref10[1];
-
-				res[longname] = _this11.frame_attribute(shortname);return res;
-			}, {});
-			return new Crewline(crew_block);
-		}
-
-		// T,U,V 3; CP,CQ,CR 27
-		// crewline
-
-	}, {
-		key: 'cost_crew',
-		get: function get() {
-			// ceiling of CP,CQ,CR 26
-			return this.cost_crew_raw.ceil;
-		}
-
-		// T,U,V 2
-		// crewline
-
-	}, {
-		key: 'cost_crew_raw',
-		get: function get() {
-			// CP,CQ,CR 26
-			// sum of subsystem crew costs plus module crew cost
-			return this.cost_crew_subsystems.add(this.module.cost_crew);
-		}
-	}, {
-		key: 'cost_crew_subsystems',
-		get: function get() {
-			return this.subsystems.filter(function (ss) {
-				return ss.is_loaded;
-			}).map(function (ss) {
-				return ss.cost_crew;
-			}).reduce(function (sum, value) {
-				return sum.add(value);
-			}, new Crewline({}));
-		}
-	}, {
-		key: 'power_generation',
-		get: function get() {
-			return Math.round(this.power_generation_raw);
-		}
-	}, {
-		key: 'power_generation_raw',
-		get: function get() {
-			return this.subsystems.filter(function (ss) {
-				return ss.is_loaded;
-			}).map(function (ss) {
-				return ss.power_generation;
-			}).reduce(function (sum, value) {
-				return sum + value;
-			}, 0);
-		}
-
-		// CE27 row
-
-	}, {
-		key: 'stats',
-		get: function get() {
-			return this.stats_raw.floor;
-		}
-
-		// BL26, CE26 row
-
-	}, {
-		key: 'stats_raw',
-		get: function get() {
-			return this.stats_subsystems.add(this.stats_module);
-		}
-	}, {
-		key: 'stats_subsystems',
-		get: function get() {
-			return this.subsystems.filter(function (ss) {
-				return ss.is_loaded;
-			}).map(function (ss) {
-				return ss.stats;
-			}).reduce(function (sum, value) {
-				return sum.add(value);
-			}, new Statline({}));
-		}
-	}, {
-		key: 'stats_module',
-		get: function get() {
-			return this.module.stats;
-		}
-
-		// O3, CK27
-		// scalar
-
-	}, {
-		key: 'weight_total',
-		get: function get() {
-			return Math.floor(this.weight_total_raw);
-		}
-
-		// O2, CK26
-		// scalar
-
-	}, {
-		key: 'weight_external',
-		get: function get() {
-			// =SUM(CK20:CK25)+CK$18
-			return this.weight_subsystems_external + this.module.weight_external;
-		}
-
-		// O2, CK26
-		// scalar
-
-	}, {
-		key: 'weight_internal',
-		get: function get() {
-			// =SUM(CK20:CK25)+CK$18
-			return this.weight_frame + this.weight_subsystems_internal + this.module.weight_internal;
-		}
-
-		// O2, CK26
-		// scalar
-
-	}, {
-		key: 'weight_total_raw',
-		get: function get() {
-			// =SUM(CK20:CK25)+CK$18
-			return this.weight_external + this.weight_internal;
-		}
-
-		// CK26
-
-	}, {
-		key: 'weight_subsystems_internal',
-		get: function get() {
-			// =SUM(CK20:CK25)
-			// CK20:24 is subsystem weights
-			// CK25 is module weight
-			return this.subsystems.filter(function (ss) {
-				return ss.is_loaded;
-			}).map(function (ss) {
-				return ss.weight_internal;
-			}).reduce(function (sum, value) {
-				return sum + value;
-			}, 0);
-		}
-
-		// CK26
-
-	}, {
-		key: 'weight_subsystems_external',
-		get: function get() {
-			// =SUM(CK20:CK25)
-			// CK20:24 is subsystem weights
-			// CK25 is module weight
-			return this.subsystems.filter(function (ss) {
-				return ss.is_loaded;
-			}).map(function (ss) {
-				return ss.weight_external;
-			}).reduce(function (sum, value) {
-				return sum + value;
-			}, 0);
-		}
-
-		// CK$18, DM18
-		// part frame weight
-
-	}, {
-		key: 'weight_frame',
-		get: function get() {
-			return this.frame_attribute('Wt');
-		}
-
-		// P3, CL27
-
-	}, {
-		key: 'cost_BR',
-		get: function get() {
-			// =CEILING(CL26,INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0)))
-			// ceiling(CL16, cost_BR_round)
-			// round raw BR cost to next integer multiple of the rounding interval
-			return Math.ceil(this.cost_BR_raw / this.cost_BR_round) * this.cost_BR_round;
-		}
-	}, {
-		key: 'cost_BR_round',
-		get: function get() {
-			// selects the appropriate interval to round BR to based on the class of the ship
-			// INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0))
-			//
-			// from the list of constants in AL, select the one in the row
-			// that has concat("BR cost round", CD9) in AJ
-			//
-			// CD9 is weight class
-			return BR_COST_ROUND_MAP[this.weight_class];
-		}
-
-		// CD9
-
-	}, {
-		key: 'weight_class',
-		get: function get() {
-			// =IF(DK$18 = 1, "Frigate", IF(DK$18 = 2, "Cruiser", "Explorer"))
-			return WEIGHT_CLASS_MAP[this.weight_class_raw];
-		}
-
-		// DK18
-
-	}, {
-		key: 'weight_class_raw',
-		get: function get() {
-			// "Weight Class" value off of principal frame definition
-			// integer in [1, 3]
-			return this.frame_attribute('Weight Class');
-		}
-
-		// P2, CL26
-
-	}, {
-		key: 'cost_BR_raw',
-		get: function get() {
-			// sum(subsystem BR costs) + module cost + frame cost
-			return this.cost_BR_components + this.module.cost_BR + this.cost_BR_frame;
-		}
-	}, {
-		key: 'cost_BR_components',
-		get: function get() {
-			return this.subsystems.filter(function (ss) {
-				return ss.is_loaded;
-			}).map(function (ss) {
-				return ss.cost_BR;
-			}).reduce(function (sum, value) {
-				return sum + value;
-			}, 0);
-		}
-
-		// CL18
-		// scalar
-
-	}, {
-		key: 'cost_BR_frame',
-		get: function get() {
-			// CK18 / $AL$7
-			// CK18 = DM18
-			// DM18 is frame "Wt" value
-			return this.weight_frame / BR_TO_WEIGHT_MULTIPLIER;
-		}
-
-		// CM18, DU18
-
-	}, {
-		key: 'cost_SR_frame_mult',
-		get: function get() {
-			return this.frame_attribute('SR-Mod');
-		}
-
-		// Q2, CM27
-
-	}, {
-		key: 'cost_SR',
-		get: function get() {
-			// =CEILING(CL26,INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0)))
-			// ceiling(CL16, cost_BR_round)
-			// round raw BR cost to next integer multiple of the rounding interval
-			return Math.ceil(this.cost_SR_raw / this.cost_SR_round) * this.cost_SR_round;
-		}
-
-		// Q3, CM26
-
-	}, {
-		key: 'cost_SR_raw',
-		get: function get() {
-			// sum of subsystems plus module
-			return this.cost_SR_subsystems + this.module.cost_SR;
-		}
-	}, {
-		key: 'cost_SR_subsystems',
-		get: function get() {
-			return this.subsystems.filter(function (ss) {
-				return ss.is_loaded;
-			}).map(function (ss) {
-				return ss.cost_SR;
-			}).reduce(function (sum, value) {
-				return sum + value;
-			}, 0);
-		}
-	}, {
-		key: 'cost_SR_round',
-		get: function get() {
-			return SR_COST_ROUND_MAP[this.weight_class];
-		}
-
-		// R2, CN27
-
-	}, {
-		key: 'cost_power',
-		get: function get() {
-			// round, not floor or ceil!
-			return Math.round(this.cost_power_raw);
-		}
-
-		// R3, CN26
-
-	}, {
-		key: 'cost_power_raw',
-		get: function get() {
-			return this.cost_power_subsystems + this.module.cost_power;
-		}
-	}, {
-		key: 'cost_power_subsystems',
-		get: function get() {
-			return this.subsystems.filter(function (ss) {
-				return ss.is_loaded;
-			}).map(function (ss) {
-				return ss.cost_power;
-			}).reduce(function (sum, value) {
-				return sum + value;
-			}, 0);
-		}
-
-		// BK27
-
-	}, {
-		key: 'size_round',
-		get: function get() {
-			return Math.ceil(this.size);
-		}
-
-		// BK26
-
-	}, {
-		key: 'size',
-		get: function get() {
-			// BK18 + BK88
-			return this.frame_size + this.module.size;
-		}
-
-		// BK18, "Size"
-
-	}, {
-		key: 'frame_size',
-		get: function get() {
-			// BK18 = $CV18 / $AL$6
-			// $CV18 = weight cap, DL18, equal principal frame MaxSz
-			// $AL$6 = "Size-To-Weight-Cap Multiplier", constant 300
-			return this.frame_max_size_raw / SIZE_TO_WEIGHT_CAP_MULTIPLIER;
-		}
-
-		// CV18, DL18
-
-	}, {
-		key: 'frame_max_size_raw',
-		get: function get() {
-			// 'MaxSz' item off principal frame definition
-			return this.frame_attribute('MaxSz');
-		}
-	}, {
-		key: 'pretty_statline',
-		get: function get() {
-			return this.stats.toString() + ' - ' + this.cost_BR.toString() + 'br ' + this.cost_SR.toString() + 'sr ' + ' - ' + this.weight_total.toString() + 'kt ' + '[' + this.build_time.toFixed(2) + ']yr' + ' - ' + this.cost_crew.toString();
-		}
-	}, {
-		key: 'pretty_miscstats',
-		get: function get() {
-			return 'Evasion Chance: ' + (this.evasion * 100).toFixed(2) + '%\t' + 'Warp Core Breach Chance: ' + (this.warp_core_breach * 100).toFixed(2) + '%';
-		}
-	}, {
-		key: 'pretty_summary',
-		get: function get() {
-			var ID = 'Class: ' + this.name;
-			return [ID, this.pretty_statline, this.pretty_miscstats].join('\n');
-		}
-	}, {
-		key: 'pretty_statline_raw',
-		get: function get() {
-			return this.stats_raw.toFixed(2) + ' - ' + '[' + this.cost_BR_raw.toFixed(2) + ']br [' + this.cost_SR_raw.toFixed(2) + ']sr ' + ' - ' + '[' + this.weight_total_raw.toFixed(2) + ']kt ' + '[' + this.build_time.toFixed(2) + ']yr' + ' - ' + this.cost_crew_raw.toFixed(2);
-		}
-	}, {
-		key: 'pretty_buildinfo',
-		get: function get() {
-			return 'Power[' + this.cost_power_raw.toFixed(2) + '/' + this.power_generation_raw.toFixed(2) + '] - ' + 'Internal[' + this.weight_internal.toFixed(1) + '/' + this.frame_max_size_raw + '] ' + this.subsystems.map(function (ss) {
-				return ss.name + '[' + ss.weight_internal.toFixed(1) + '/' + ss.weight_cap.toFixed(0) + ']';
-			}).join(' ');
-		}
-	}, {
-		key: 'pretty_sdb_info',
-		get: function get() {
-			return [this.pretty_statline_raw, this.pretty_buildinfo].join('\n');
-		}
-	}, {
-		key: 'pretty_dump',
-		get: function get() {}
-	}], [{
-		key: 'find_by_pretty_name',
-		value: function find_by_pretty_name(pretty_name) {
-			return function (design) {
-				return design.matches_pretty_name(pretty_name);
-			};
-		}
-	}]);
-
-	return Design;
-}();
-
-var DB = function () {
-	function DB(parts_list_json) {
-		_classCallCheck(this, DB);
-
-		this.json = parts_list_json;
-		this.name = this.json.name;
-		this.timestamp = new Date(this.json.timestamp);
-		this.parts = this.json.parts.records;
-		this.frames = this.json.frames.records;
-		this.modules = this.json.modules.records;
-		this.part_schema = new Map(this.json.parts.schema.map(function (schema) {
-			return [schema.name, schema];
-		}));
-		this.frame_schema = new Map(this.json.frames.schema.map(function (schema) {
-			return [schema.name, schema];
-		}));
-		this.module_schema = new Map(this.json.modules.schema.map(function (schema) {
-			return [schema.name, schema];
-		}));
-	}
-
-	_createClass(DB, [{
-		key: 'matches',
-		value: function matches(other) {
-			return this.name === other.name && this.timestamp === other.timestamp;
-		}
-	}, {
-		key: 'matches_pretty_name',
-		value: function matches_pretty_name(value) {
-			return this.pretty_name === value;
-		}
-	}, {
-		key: 'find_module',
-		value: function find_module(type, variant) {
-			return this.modules.find(function (elem) {
-				return elem['Type'] === type && elem['Variant'] === variant;
-			});
-		}
-	}, {
-		key: 'find_part',
-		value: function find_part(name) {
-			return this.parts.find(function (elem) {
-				return elem['Name'] === name;
-			});
-		}
-	}, {
-		key: 'find_frame',
-		value: function find_frame(name) {
-			return this.frames.find(function (elem) {
-				return elem['Name'] === name;
-			});
-		}
-	}, {
-		key: 'find_frames',
-		value: function find_frames(type) {
-			return this.frames.filter(function (elem) {
-				return elem['Type'] === type;
-			});
-		}
-	}, {
-		key: 'find_parts',
-		value: function find_parts(type) {
-			return this.parts.filter(function (elem) {
-				return elem['Type'] === type;
-			});
-		}
-	}, {
-		key: 'find_modules',
-		value: function find_modules(type) {
-			return this.modules.filter(function (elem) {
-				return elem['Type'] === type;
-			});
-		}
-	}, {
-		key: 'valid_module_types',
-		value: function valid_module_types() {
-			return [].concat(_toConsumableArray(new Set(this.modules.map(function (elem) {
-				return elem['Type'];
-			}))));
-		}
-	}, {
-		key: 'pretty_name',
-		get: function get() {
-			return this.name + ' (' + this.timestamp.toLocaleString() + ')';
-		}
-	}], [{
-		key: 'find_by_design_json',
-		value: function find_by_design_json(design_json) {
-			return function (db) {
-				return db.name === design_json['Parts List'].name && db.timestamp.getTime() === new Date(design_json['Parts List'].timestamp).getTime();
-			};
-		}
-	}, {
-		key: 'find_by_pretty_name',
-		value: function find_by_pretty_name(pretty_name) {
-			return function (db) {
-				return db.matches_pretty_name(pretty_name);
-			};
-		}
-	}]);
-
-	return DB;
-}();
-
-exports.Design = Design;
-exports.DB = DB;
-exports.Statline = Statline;
-exports.Crewline = Crewline;
-
-/***/ }),
-
-/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/component.vue":
-/*!*************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/component.vue ***!
-  \*************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _uiFunctions = __webpack_require__(/*! ./ui-functions.js */ "./src/ui-functions.js");
-
-var _statlineCell = __webpack_require__(/*! ./statline-cell.vue */ "./src/statline-cell.vue");
+var _statlineCell = __webpack_require__(/*! @/components/shipdesigner/statline-cell.vue */ "./src/components/shipdesigner/statline-cell.vue");
 
 var _statlineCell2 = _interopRequireDefault(_statlineCell);
 
@@ -2857,10 +309,10 @@ exports.default = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/design-import-export.vue":
-/*!************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/design-import-export.vue ***!
-  \************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/design-import-export.vue":
+/*!************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/design-import-export.vue ***!
+  \************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2978,7 +430,7 @@ var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _shipengine = __webpack_require__(/*! ../lib/shipengine */ "./lib/shipengine.js");
+var _shipengine = __webpack_require__(/*! @/lib/shipengine */ "./src/lib/shipengine.js");
 
 var ShipEngine = _interopRequireWildcard(_shipengine);
 
@@ -3200,10 +652,10 @@ exports.default = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/design-summary.vue":
-/*!******************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/design-summary.vue ***!
-  \******************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/design-summary.vue":
+/*!******************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/design-summary.vue ***!
+  \******************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3261,7 +713,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 
-var _uiFunctions = __webpack_require__(/*! ./ui-functions.js */ "./src/ui-functions.js");
+var _uiFunctions = __webpack_require__(/*! @/lib/ui-functions */ "./src/lib/ui-functions.js");
 
 exports.default = {
 	name: 'DesignSummary',
@@ -3292,10 +744,10 @@ exports.default = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/design.vue":
-/*!**********************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/design.vue ***!
-  \**********************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/design.vue":
+/*!**********************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/design.vue ***!
+  \**********************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3359,31 +811,31 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 
-var _principalFrameRaw = __webpack_require__(/*! ./principal-frame-raw.vue */ "./src/principal-frame-raw.vue");
+var _principalFrameRaw = __webpack_require__(/*! @/components/shipdesigner/principal-frame-raw.vue */ "./src/components/shipdesigner/principal-frame-raw.vue");
 
 var _principalFrameRaw2 = _interopRequireDefault(_principalFrameRaw);
 
-var _principalFrameFinal = __webpack_require__(/*! ./principal-frame-final.vue */ "./src/principal-frame-final.vue");
+var _principalFrameFinal = __webpack_require__(/*! @/components/shipdesigner/principal-frame-final.vue */ "./src/components/shipdesigner/principal-frame-final.vue");
 
 var _principalFrameFinal2 = _interopRequireDefault(_principalFrameFinal);
 
-var _subsystemSummary = __webpack_require__(/*! ./subsystem-summary.vue */ "./src/subsystem-summary.vue");
+var _subsystemSummary = __webpack_require__(/*! @/components/shipdesigner/subsystem-summary.vue */ "./src/components/shipdesigner/subsystem-summary.vue");
 
 var _subsystemSummary2 = _interopRequireDefault(_subsystemSummary);
 
-var _subsystemFrame = __webpack_require__(/*! ./subsystem-frame.vue */ "./src/subsystem-frame.vue");
+var _subsystemFrame = __webpack_require__(/*! @/components/shipdesigner/subsystem-frame.vue */ "./src/components/shipdesigner/subsystem-frame.vue");
 
 var _subsystemFrame2 = _interopRequireDefault(_subsystemFrame);
 
-var _subsystemSettings = __webpack_require__(/*! ./subsystem-settings.vue */ "./src/subsystem-settings.vue");
+var _subsystemSettings = __webpack_require__(/*! @/components/shipdesigner/subsystem-settings.vue */ "./src/components/shipdesigner/subsystem-settings.vue");
 
 var _subsystemSettings2 = _interopRequireDefault(_subsystemSettings);
 
-var _component = __webpack_require__(/*! ./component.vue */ "./src/component.vue");
+var _component = __webpack_require__(/*! @/components/shipdesigner/component.vue */ "./src/components/shipdesigner/component.vue");
 
 var _component2 = _interopRequireDefault(_component);
 
-var _module = __webpack_require__(/*! ./module.vue */ "./src/module.vue");
+var _module = __webpack_require__(/*! @/components/shipdesigner/module.vue */ "./src/components/shipdesigner/module.vue");
 
 var _module2 = _interopRequireDefault(_module);
 
@@ -3410,10 +862,10 @@ exports.default = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/module.vue":
-/*!**********************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/module.vue ***!
-  \**********************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/module.vue":
+/*!**********************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/module.vue ***!
+  \**********************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3424,9 +876,9 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _uiFunctions = __webpack_require__(/*! ./ui-functions.js */ "./src/ui-functions.js");
+var _uiFunctions = __webpack_require__(/*! @/lib/ui-functions */ "./src/lib/ui-functions.js");
 
-var _statlineCell = __webpack_require__(/*! ./statline-cell.vue */ "./src/statline-cell.vue");
+var _statlineCell = __webpack_require__(/*! @/components/shipdesigner/statline-cell.vue */ "./src/components/shipdesigner/statline-cell.vue");
 
 var _statlineCell2 = _interopRequireDefault(_statlineCell);
 
@@ -3557,10 +1009,10 @@ exports.default = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/principal-frame-final.vue":
-/*!*************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/principal-frame-final.vue ***!
-  \*************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/principal-frame-final.vue":
+/*!*************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/principal-frame-final.vue ***!
+  \*************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3610,11 +1062,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 
-var _statlineCell = __webpack_require__(/*! ./statline-cell.vue */ "./src/statline-cell.vue");
+var _statlineCell = __webpack_require__(/*! @/components/shipdesigner/statline-cell.vue */ "./src/components/shipdesigner/statline-cell.vue");
 
 var _statlineCell2 = _interopRequireDefault(_statlineCell);
 
-var _uiFunctions = __webpack_require__(/*! ./ui-functions.js */ "./src/ui-functions.js");
+var _uiFunctions = __webpack_require__(/*! @/lib/ui-functions */ "./src/lib/ui-functions.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3669,10 +1121,10 @@ exports.default = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/principal-frame-raw.vue":
-/*!***********************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/principal-frame-raw.vue ***!
-  \***********************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/principal-frame-raw.vue":
+/*!***********************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/principal-frame-raw.vue ***!
+  \***********************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3722,11 +1174,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 
-var _statlineCell = __webpack_require__(/*! ./statline-cell.vue */ "./src/statline-cell.vue");
+var _statlineCell = __webpack_require__(/*! @/components/shipdesigner/statline-cell.vue */ "./src/components/shipdesigner/statline-cell.vue");
 
 var _statlineCell2 = _interopRequireDefault(_statlineCell);
 
-var _uiFunctions = __webpack_require__(/*! ./ui-functions.js */ "./src/ui-functions.js");
+var _uiFunctions = __webpack_require__(/*! @/lib/ui-functions.js */ "./src/lib/ui-functions.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3792,10 +1244,10 @@ exports.default = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/setting-cell.vue":
-/*!****************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/setting-cell.vue ***!
-  \****************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/setting-cell.vue":
+/*!****************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/setting-cell.vue ***!
+  \****************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3862,10 +1314,10 @@ exports.default = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/shipdesigner.vue":
-/*!****************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/shipdesigner.vue ***!
-  \****************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/shipdesigner.vue":
+/*!****************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/shipdesigner.vue ***!
+  \****************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3876,15 +1328,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _designSummary = __webpack_require__(/*! ./design-summary.vue */ "./src/design-summary.vue");
+var _designSummary = __webpack_require__(/*! @/components/shipdesigner/design-summary.vue */ "./src/components/shipdesigner/design-summary.vue");
 
 var _designSummary2 = _interopRequireDefault(_designSummary);
 
-var _design = __webpack_require__(/*! ./design.vue */ "./src/design.vue");
+var _design = __webpack_require__(/*! @/components/shipdesigner/design.vue */ "./src/components/shipdesigner/design.vue");
 
 var _design2 = _interopRequireDefault(_design);
 
-var _designImportExport = __webpack_require__(/*! ./design-import-export.vue */ "./src/design-import-export.vue");
+var _designImportExport = __webpack_require__(/*! @/components/shipdesigner/design-import-export.vue */ "./src/components/shipdesigner/design-import-export.vue");
 
 var _designImportExport2 = _interopRequireDefault(_designImportExport);
 
@@ -3916,10 +1368,10 @@ exports.default = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/statline-cell.vue":
-/*!*****************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/statline-cell.vue ***!
-  \*****************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/statline-cell.vue":
+/*!*****************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/statline-cell.vue ***!
+  \*****************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3976,10 +1428,10 @@ exports.default = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/subsystem-frame.vue":
-/*!*******************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/subsystem-frame.vue ***!
-  \*******************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/subsystem-frame.vue":
+/*!*******************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/subsystem-frame.vue ***!
+  \*******************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3990,11 +1442,11 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _statlineCell = __webpack_require__(/*! ./statline-cell.vue */ "./src/statline-cell.vue");
+var _statlineCell = __webpack_require__(/*! @/components/shipdesigner/statline-cell.vue */ "./src/components/shipdesigner/statline-cell.vue");
 
 var _statlineCell2 = _interopRequireDefault(_statlineCell);
 
-var _uiFunctions = __webpack_require__(/*! ./ui-functions.js */ "./src/ui-functions.js");
+var _uiFunctions = __webpack_require__(/*! @/lib/ui-functions */ "./src/lib/ui-functions.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4092,10 +1544,10 @@ exports.default = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/subsystem-settings.vue":
-/*!**********************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/subsystem-settings.vue ***!
-  \**********************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/subsystem-settings.vue":
+/*!**********************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/subsystem-settings.vue ***!
+  \**********************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4106,7 +1558,7 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _settingCell = __webpack_require__(/*! ./setting-cell.vue */ "./src/setting-cell.vue");
+var _settingCell = __webpack_require__(/*! @/components/shipdesigner/setting-cell.vue */ "./src/components/shipdesigner/setting-cell.vue");
 
 var _settingCell2 = _interopRequireDefault(_settingCell);
 
@@ -4139,10 +1591,10 @@ exports.default = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/subsystem-summary.vue":
-/*!*********************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/subsystem-summary.vue ***!
-  \*********************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/subsystem-summary.vue":
+/*!*********************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/subsystem-summary.vue ***!
+  \*********************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4153,11 +1605,11 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _statlineCell = __webpack_require__(/*! ./statline-cell.vue */ "./src/statline-cell.vue");
+var _statlineCell = __webpack_require__(/*! @/components/shipdesigner/statline-cell.vue */ "./src/components/shipdesigner/statline-cell.vue");
 
 var _statlineCell2 = _interopRequireDefault(_statlineCell);
 
-var _uiFunctions = __webpack_require__(/*! ./ui-functions.js */ "./src/ui-functions.js");
+var _uiFunctions = __webpack_require__(/*! @/lib/ui-functions.js */ "./src/lib/ui-functions.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -9548,90 +7000,52 @@ module.exports = ret;
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-06bcc24c\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-settings.vue":
-/*!**********************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-06bcc24c","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-settings.vue ***!
-  \**********************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-15813b91\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/principal-frame-raw.vue":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-15813b91","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/principal-frame-raw.vue ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
 // module
-exports.push([module.i, "\n.setting-tr[data-v-06bcc24c] {\n\tbackground: #ccc;\n}\n.setting-container[data-v-06bcc24c] {\n\tdisplay: flex;\n}\n\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/subsystem-settings.vue"],"names":[],"mappings":";AAsCA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA","file":"subsystem-settings.vue","sourcesContent":["<template>\n\t<tr class=\"setting-tr\" v-if=\"has_settings\">\n\t\t<td class=\"settings-cell\" colspan=\"100\"> <!-- span all columns and we'll just fill it with settings -->\n\t\t\t<SettingCell v-for=\"setting in settings\" :key=\"setting['Name']\" :setting=\"setting\"></SettingCell>\n\t\t</td>\n\t</tr>\n</template>\n\n<script>\n\nimport SettingCell from './setting-cell.vue';\n\nexport default {\n\tname: 'SubsystemSettings',\n\tcomponents: {\n\t\tSettingCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\thas_settings() {\n\t\t\treturn this.se_subsystem.settings.length > 0;\n\t\t},\n\t\tsettings() {\n\t\t\treturn this.se_subsystem.settings;\n\t\t},\n\t},\n};\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-tr {\n\tbackground: #ccc;\n}\n\n.setting-container {\n\tdisplay: flex;\n}\n\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.principal-frame-raw[data-v-15813b91] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n.name-column[data-v-15813b91] {\n\ttext-align: right;\n\tpadding-right: 0.2em;\n}\n\n/* override global value for this one */\n.stat-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.br-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.sr-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.has-error[data-v-15813b91] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/principal-frame-raw.vue"],"names":[],"mappings":";AAgHA;CACA,iBAAA;CACA,YAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,yBAAA;CACA,gBAAA;CACA,eAAA;CACA;AAEA;CACA,kBAAA;CACA,qBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-raw.vue","sourcesContent":["<template>\n\t<tr class=\"principal-frame-raw\" v-bind:class=\"{ 'has-error': !is_valid_frame }\">\n\t\t<td class=\"name-column\" colspan=\"2\">Size: {{frame_size}}</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<select v-model=\"principal_frame\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"princ_frame_value in se_design.valid_frames\" :key=\"princ_frame_value['Name']\">{{princ_frame_value['Name']}}</option>\n\t\t\t\t<option v-if=\"!is_valid_frame\" class=\"has-error\">{{principal_frame}}</option>\n\t\t\t</select>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats_raw.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats_raw\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\t\t\n\t\t<td class=\"weight-internal-column\" :class=\"weight_summary_class\">{{se_design.weight_internal.toFixed(2)}}</td>\n\t\t<td class=\"weight-external-column\">{{se_design.weight_external.toFixed(2)}}</td>\n\n\t\t<td class=\"br-column\">{{se_design.cost_BR_raw.toFixed(2)}}</td>\n\t\t<td class=\"sr-column\">{{se_design.cost_SR_raw.toFixed(2)}}</td>\n\n\t\t<td class=\"power-cost-column\" :title=\"power_final_title\" :class=\"power_final_class\">{{se_design.cost_power_raw.toFixed(2)}}</td>\n\t\t<td class=\"power-gen-column\" :title=\"power_final_title\" :class=\"power_final_class\">{{se_design.power_generation_raw.toFixed(2)}}</td>\n\n\t\t<template v-for=\"name in crew_raw.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew_raw\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time_frame}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year_frame}} (Frame)</td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nimport { frac } from '@/lib/ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrameRaw',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tcomputed: {\n\t\tis_valid_frame() {\n\t\t\treturn this.se_design.is_valid_frame;\n\t\t},\n\t\tpower_final_title() {\n\t\t\tif (this.has_power_error) {\n\t\t\t\treturn 'Error: Power cost greater than power generation.';\n\t\t\t} else {\n\t\t\t\treturn '';\n\t\t\t}\n\t\t},\n\t\tpower_final_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_power_error,\n\t\t\t};\n\t\t},\n\t\thas_power_error() {\n\t\t\treturn this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;\n\t\t},\n\t\tweight_summary_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error() {\n\t\t\treturn this.$store.getters.se_design.weight_internal > this.$store.getters.se_design.frame_max_size_raw;\n\t\t},\n\t\tprincipal_frame: {\n\t\t\tget() {\n\t\t\t\treturn this.$store.getters.se_design.json['Principal Frame'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.getters.se_design.json['Principal Frame'] = value;\n\t\t\t},\n\t\t},\n\t\tstats_raw() {\n\t\t\treturn this.$store.getters.se_design.stats_raw;\n\t\t},\n\t\tcrew_raw() {\n\t\t\treturn this.$store.getters.se_design.cost_crew_raw;\n\t\t},\n\t\tbuild_time_frame() {\n\t\t\treturn frac(this.$store.getters.se_design.build_time_frame, 12);\n\t\t},\n\t\ttech_year_frame() {\n\t\t\treturn this.$store.getters.se_design.tech_year_frame;\n\t\t},\n\t\tframe_size() {\n\t\t\treturn this.$store.getters.se_design.frame_size.toFixed(2);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style>\n</style>\n\n<style scoped>\n.principal-frame-raw {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n\n.name-column {\n\ttext-align: right;\n\tpadding-right: 0.2em;\n}\n\n/* override global value for this one */\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-1fa46046\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-frame.vue":
-/*!*******************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-1fa46046","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-frame.vue ***!
-  \*******************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-23b102d6\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design-import-export.vue":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-23b102d6","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design-import-export.vue ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
 // module
-exports.push([module.i, "\n.subsystem-frame[data-v-1fa46046] {\n\tbackground: #ccc;\n}\n.has-error[data-v-1fa46046] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/subsystem-frame.vue"],"names":[],"mappings":";AAsGA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-frame.vue","sourcesContent":["<template>\n\n\t<tr class=\"subsystem-frame\" v-bind:class=\"{ 'has-error': !is_valid_frame }\">\n\t\t<td class=\"name-column\" colspan=\"2\">{{se_subsystem.name}}</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<select v-model=\"sub_frame\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"sub_frame_value in se_subsystem.valid_frames\" :key=\"sub_frame_value['Name']\">{{sub_frame_value['Name']}}</option>\n\t\t\t\t<option v-if=\"!is_valid_frame\" class=\"has-error\">{{sub_frame}}</option>\n\t\t\t</select>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<td :key=\"name\" class=\"stat-column\">{{stats_multiplier_pretty}}</td>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t\t<td class=\"br-column\">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>\n\t\t<td class=\"sr-column\">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>\n\n\t\t<td class=\"power-cost-column\"></td>\n\t\t<td class=\"power-gen-column\"></td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew_mult_pretty\" :name=\"name\" :ispretty=\"false\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year}} (Frame)</td>\n\t</tr>\n\n</template>\n\n\n<script>\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'SubsystemFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tis_valid_frame() {\n\t\t\treturn this.se_subsystem.is_valid_frame;\n\t\t},\n\t\tvalid_frames() {\n\t\t\treturn this.se_subsystem.valid_frames;\n\t\t},\n\t\tse_components() {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tstats_multiplier_pretty() {\n\t\t\treturn this.se_subsystem.stats_multiplier.toFixed(2) + 'x';\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tcrew_mult_pretty() {\n\t\t\treturn this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_subsystem.tech_year_frame;\n\t\t},\n\t\tsub_frame: {\n\t\t\tget() {\n\t\t\t\treturn this.se_subsystem.sub_frame;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_subsystem_frame', {\n\t\t\t\t\tvalue: value,\n\t\t\t\t\tsubsystem: this.se_subsystem,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style>\n\n</style>\n\n\n<style scoped>\n.subsystem-frame {\n\tbackground: #ccc;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n#design-bar[data-v-23b102d6] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n\n\tflex-wrap: wrap;\n}\n.design-bar-row[data-v-23b102d6] {\n\tdisplay: flex;\n\tflex-flow: row;\n}\n.design-bar-column[data-v-23b102d6] {\n\tflex: none;\n}\n.design-bar-flex-column[data-v-23b102d6] {\n\tflex: auto;\n}\n.design-bar-column[data-v-23b102d6], .design-bar-flex-column[data-v-23b102d6] {\n\tdisplay: flex;\n\tflex-flow: column;\n\tjustify-content: space-between;\n}\n#design-bar > .design-bar-column > .design-bar-cell[data-v-23b102d6] {\n\tmargin: 0.1em 0.2em;\n}\n.design-bar-cell > select[data-v-23b102d6]:only-child {\n\twidth: 100%;\n}\n.design-bar-flex-column > .design-bar-cell > select[data-v-23b102d6] {\n\twidth: 100%;\n}\n.design-bar-cell > span[data-v-23b102d6] {\n\tmargin: 0 0.2em;\n}\n.design-bar-cell > input[type=checkbox][data-v-23b102d6] {\n\tvertical-align: text-bottom;\n}\n#design-bar-status-message[data-v-23b102d6] {\n\theight: 100%;\n\ttext-align: center;\n}\n#design-bar-design-mode[data-v-23b102d6] {\n\ttext-align: right;\n}\n#design-bar-design-mode > option[data-v-23b102d6] {\n\tdirection: rtl;\n}\n#design-bar-save-button[data-v-23b102d6] {\n\twidth: 15em;\n}\n.fade[data-v-23b102d6] {\n\tanimation: fadeanim-data-v-23b102d6 3s forwards;\n}\n@keyframes fadeanim-data-v-23b102d6 {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/design-import-export.vue"],"names":[],"mappings":";AA6UA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;;CAEA,gBAAA;CACA;AAEA;CACA,cAAA;CACA,eAAA;CACA;AAEA;CACA,WAAA;CACA;AAEA;CACA,WAAA;CACA;AAEA;CACA,cAAA;CACA,kBAAA;CACA,+BAAA;CACA;AAEA;CACA,oBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,gBAAA;CACA;AAEA;CACA,4BAAA;CACA;AAEA;CACA,aAAA;CACA,mBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,eAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n\t<div id=\"design-bar\" class=\"design-bar-row\">\n\t\t<div class=\"design-bar-column\">\n\t\t\t<div class=\"design-bar-cell design-bar-row\">\n\t\t\t\t<div class=\"design-bar-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<input type=\"button\"\n\t\t\t\t\t\t\tclass=\"undo-button\"\n\t\t\t\t\t\t\t@click=\"dispatch_undo\"\n\t\t\t\t\t\t\tvalue=\"<\"/>\n\t\t\t\t\t\t<input type=\"button\"\n\t\t\t\t\t\t\tclass=\"redo-button\"\n\t\t\t\t\t\t\t@click=\"dispatch_redo\"\n\t\t\t\t\t\t\tvalue=\">\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"design-bar-flex-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\"\n\t\t\t\t\t\tid=\"design-bar-status-message\"\n\t\t\t\t\t\tref=\"status_message\"\n\t\t\t\t\t\t@animationend=\"clear_status_message()\">{{ status_message }}</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"design-bar-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<!-- hopefully temporary workaround for https://github.com/to-boldly-go/tbg-shipdesigner/issues/57 -->\n\t\t\t\t\t\t<input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell design-bar-row\">\n\t\t\t\t<div class=\"design-bar-flex-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<select v-model=\"selected_parts_list_name\">\n\t\t\t\t\t\t\t<option v-for=\"parts_list in all_parts_lists\" :key=\"parts_list.pretty_name\">\n\t\t\t\t\t\t\t\t{{parts_list.pretty_name}}\n\t\t\t\t\t\t\t</option>\n\t\t\t\t\t\t</select>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"design-bar-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<input type=\"button\" @click=\"parts_lists_load_selected\" value=\"Load parts list\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"design-bar-column\">\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<span><a :href=\"'shipdesigner.html#' + design_json_url_encoded_string\">Link to this design</a></span>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<select id=\"design-bar-design-mode\" v-model=\"selected_design_mode\" disabled=\"true\">\n\t\t\t\t\t<option value=\"none\">Mode</option>\n\t\t\t\t\t<option value=\"refit\">Refit for</option>\n\t\t\t\t\t<option value=\"compare\">Compare with</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"design-bar-flex-column\">\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<select v-model=\"selected_design_name\">\n\t\t\t\t\t<option v-for=\"blueprint in local_saves\" :key=\"blueprint.pretty_name\">\n\t\t\t\t\t\t{{blueprint.pretty_name}}\n\t\t\t\t\t</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<select v-model=\"selected_other_design_name\" :disabled=\"selected_design_mode === 'none'\">\n\t\t\t\t\t<option v-for=\"blueprint in local_saves\" :key=\"blueprint.pretty_name\">\n\t\t\t\t\t\t{{blueprint.pretty_name}}\n\t\t\t\t\t</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"design-bar-column\">\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"/>\n\t\t\t\t<input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"/>\n\n\t\t\t\t<input type=\"button\" id=\"design-bar-save-button\" @click=\"local_saves_save_design\" :value=\"save_design_error ? save_design_error : 'Save current design'\" :disabled=\"save_design_error !== null\"/>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<span>Filter:</span>\n\t\t\t\t<input type=\"checkbox\" id=\"filter-latest-for-name\" v-model=\"design_filter\" value=\"latest-for-name\" disabled=\"true\"/><label for=\"filter-latest-for-name\">Latest for name</label>\n\t\t\t\t<input type=\"checkbox\" id=\"filter-same-name\" v-model=\"design_filter\" value=\"same-name\" disabled=\"true\"/><label for=\"filter-latest-for-name\">Same name</label>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\nimport * as ShipEngine from '@/lib/shipengine';\n\nimport { mapGetters } from 'vuex';\n\nconst LOCAL_PARTS_LISTS_KEY = 'parts_lists';\nconst LOCAL_SAVES_KEY = 'local_saves';\n\nexport default {\n\tname: 'DesignImportExport',\n\tcomponents: {\n\t},\n\tdata() {\n\t\treturn {\n\t\t\t// local_saves is a straight array of blueprint objects,\n\t\t\t// exactly the same as the design_json object.\n\t\t\tlocal_saves: [],\n\t\t\t// the currently selected element of the local_saves\n\t\t\t// array. *not* the same as design_json! this is so\n\t\t\t// the user can work with the list of locally saved\n\t\t\t// blueprints without clobbering their current work.\n\t\t\tselected_save: null,\n\n\t\t\tselected_other_save: null,\n\n\t\t\tstatus_message: null,\n\n\t\t\tlocal_parts_lists: [],\n\n\t\t\tselected_parts_list: null,\n\n\t\t\tselected_design_mode: 'none',\n\n\t\t\tdesign_filter: [],\n\t\t};\n\t},\n\tcomputed: {\n\t\tsave_design_error() {\n\t\t\tif (!this.se_design.matches_parts_list(this.se_db)) {\n\t\t\t\treturn 'Save disabled: unset parts list';\n\t\t\t}\n\t\t\tif (!this.se_design.is_loaded) {\n\t\t\t\treturn 'Save disabled: Unknown parts/frames';\n\t\t\t}\n\t\t\treturn null;\n\t\t},\n\t\tselected_parts_list_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_parts_list) {\n\t\t\t\t\treturn this.selected_parts_list.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_parts_list = this.all_parts_lists.find(\n\t\t\t\t\tShipEngine.DB.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tall_parts_lists() {\n\t\t\treturn [...this.local_parts_lists, this.canon_se_db];\n\t\t},\n\t\tselected_design_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_save) {\n\t\t\t\t\treturn this.selected_save.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_save = this.local_saves.find(\n\t\t\t\t\tShipEngine.Design.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tselected_other_design_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_other_save) {\n\t\t\t\t\treturn this.selected_other_save.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_other_save = this.local_saves.find(\n\t\t\t\t\tShipEngine.Design.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tdesign_json_string() {\n\t\t\treturn JSON.stringify(this.$store.state.design_json);\n\t\t},\n\t\tdesign_json_url_encoded_string() {\n\t\t\treturn encodeURI(this.design_json_string);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'canon_se_db',\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t]),\n\t},\n\tmounted() {\n\t\tthis.parts_lists_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_PARTS_LISTS_KEY) {\n\t\t\t\tthis.parts_lists_load_from_local_storage();\n\t\t\t}\n\t\t}.bind(this));\n\n\t\tthis.local_saves_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_SAVES_KEY) {\n\t\t\t\tthis.local_saves_load_from_local_storage();\n\t\t\t}\n\t\t}.bind(this));\n\t},\n\tmethods: {\n\t\tdispatch_undo() {\n\t\t\tthis.$store.dispatch('undo');\n\t\t},\n\t\tdispatch_redo() {\n\t\t\tthis.$store.dispatch('redo');\n\t\t},\n\t\tparts_lists_load_from_local_storage() {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_parts_lists = [];\n\t\t\t\tthis.display_status_message('No parts lists to load');\n\t\t\t} else {\n\t\t\t\tthis.local_parts_lists = JSON.parse(loaded).map(\n\t\t\t\t\tpl_json => new ShipEngine.DB(pl_json)\n\t\t\t\t);\n\t\t\t\tthis.display_status_message('Parts lists loaded');\n\t\t\t}\n\t\t},\n\t\tparts_lists_load_selected() {\n\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list.json));\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.display_status_message('Parts list loaded');\n\t\t},\n\t\t\n\t\tlocal_saves_delete_selected() {\n\t\t\t// remove the selected item\n\t\t\tthis.local_saves = _.chain(this.local_saves).reject(\n\t\t\t\t(elem) => elem === this.selected_save\n\t\t\t).value();\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message('Blueprint deleted');\n\t\t},\n\t\tlocal_saves_load_selected() {\n\t\t\tconst db = this.all_parts_lists.find(\n\t\t\t\tShipEngine.DB.find_by_design_json(this.selected_save.json)\n\t\t\t);\n\t\t\tif (db) {\n\t\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(db.json));\n\t\t\t\tthis.selected_parts_list = db;\n\t\t\t}\n\n\t\t\tthis.$store.commit('set_design_json', _.cloneDeep(this.selected_save.json));\n\t\t\tthis.display_status_message('Blueprint loaded');\n\t\t},\n\t\tlocal_saves_save_design() {\n\t\t\t// If there's an error with the design, the save design button should be disabled,\n\t\t\t// but if that's somehow bypassed, this check ensures an invalid design is not saved.\n\t\t\tlet error = this.save_design_error;\n\t\t\tif (error) {\n\t\t\t\tthis.display_status_message(error);\n\t\t\t\treturn;\n\t\t\t}\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.$store.commit('timestamp_design');\n\t\t\tconst new_save = new ShipEngine.Design(this.se_db, _.cloneDeep(this.$store.state.design_json));\n\t\t\tthis.local_saves.push(new_save);\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.selected_save = new_save;\n\t\t\tthis.display_status_message('Blueprint saved');\n\t\t},\n\n\t\tlocal_saves_load_from_local_storage() {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_SAVES_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_saves = [];\n\t\t\t\tthis.display_status_message('No Blueprints to load');\n\t\t\t} else {\n\t\t\t\tthis.local_saves = JSON.parse(loaded).map((design_json) => {\n\t\t\t\t\tlet db;\n\t\t\t\t\tlet wrong_db;\n\t\t\t\t\tif (design_json['Parts List']) {\n\t\t\t\t\t\tdb = this.all_parts_lists.find(\n\t\t\t\t\t\t\tShipEngine.DB.find_by_design_json(design_json)\n\t\t\t\t\t\t);\n\t\t\t\t\t\twrong_db = db === undefined;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tdb = this.se_db;\n\t\t\t\t\t\twrong_db = false;\n\t\t\t\t\t}\n\t\t\t\t\treturn new ShipEngine.Design(db || this.se_db, design_json, wrong_db);\n\t\t\t\t});\n\t\t\t\tthis.display_status_message('Blueprints loaded');\n\t\t\t}\n\t\t},\n\t\tlocal_saves_save_to_local_storage() {\n\t\t\tlocalStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(\n\t\t\t\t_.chain(this.local_saves)\n\t\t\t\t\t.map((design) => design.json)\n\t\t\t\t\t.value()\n\t\t\t));\n\t\t},\n\n\t\tdisplay_status_message(status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'design-bar-cell';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = 'design-bar-cell fade';\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message() {\n\t\t\tthis.status_message = null;\n\t\t},\n\t\t\n\t},\n};\n</script>\n\n\n<style scoped>\n#design-bar {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n\n\tflex-wrap: wrap;\n}\n\n.design-bar-row {\n\tdisplay: flex;\n\tflex-flow: row;\n}\n\n.design-bar-column {\n\tflex: none;\n}\n\n.design-bar-flex-column {\n\tflex: auto;\n}\n\n.design-bar-column, .design-bar-flex-column {\n\tdisplay: flex;\n\tflex-flow: column;\n\tjustify-content: space-between;\n}\n\n#design-bar > .design-bar-column > .design-bar-cell {\n\tmargin: 0.1em 0.2em;\n}\n\n.design-bar-cell > select:only-child {\n\twidth: 100%;\n}\n\n.design-bar-flex-column > .design-bar-cell > select {\n\twidth: 100%;\n}\n\n.design-bar-cell > span {\n\tmargin: 0 0.2em;\n}\n\n.design-bar-cell > input[type=checkbox] {\n\tvertical-align: text-bottom;\n}\n\n#design-bar-status-message {\n\theight: 100%;\n\ttext-align: center;\n}\n\n#design-bar-design-mode {\n\ttext-align: right;\n}\n\n#design-bar-design-mode > option {\n\tdirection: rtl;\n}\n\n#design-bar-save-button {\n\twidth: 15em;\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-38841434\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design-import-export.vue":
-/*!************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-38841434","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design-import-export.vue ***!
-  \************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-241da922\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/statline-cell.vue":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-241da922","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/statline-cell.vue ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
-// imports
-
-
-// module
-exports.push([module.i, "\n#design-bar[data-v-38841434] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n\n\tflex-wrap: wrap;\n}\n.design-bar-row[data-v-38841434] {\n\tdisplay: flex;\n\tflex-flow: row;\n}\n.design-bar-column[data-v-38841434] {\n\tflex: none;\n}\n.design-bar-flex-column[data-v-38841434] {\n\tflex: auto;\n}\n.design-bar-column[data-v-38841434], .design-bar-flex-column[data-v-38841434] {\n\tdisplay: flex;\n\tflex-flow: column;\n\tjustify-content: space-between;\n}\n#design-bar > .design-bar-column > .design-bar-cell[data-v-38841434] {\n\tmargin: 0.1em 0.2em;\n}\n.design-bar-cell > select[data-v-38841434]:only-child {\n\twidth: 100%;\n}\n.design-bar-flex-column > .design-bar-cell > select[data-v-38841434] {\n\twidth: 100%;\n}\n.design-bar-cell > span[data-v-38841434] {\n\tmargin: 0 0.2em;\n}\n.design-bar-cell > input[type=checkbox][data-v-38841434] {\n\tvertical-align: text-bottom;\n}\n#design-bar-status-message[data-v-38841434] {\n\theight: 100%;\n\ttext-align: center;\n}\n#design-bar-design-mode[data-v-38841434] {\n\ttext-align: right;\n}\n#design-bar-design-mode > option[data-v-38841434] {\n\tdirection: rtl;\n}\n#design-bar-save-button[data-v-38841434] {\n\twidth: 15em;\n}\n.fade[data-v-38841434] {\n\tanimation: fadeanim-data-v-38841434 3s forwards;\n}\n@keyframes fadeanim-data-v-38841434 {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/design-import-export.vue"],"names":[],"mappings":";AA6UA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;;CAEA,gBAAA;CACA;AAEA;CACA,cAAA;CACA,eAAA;CACA;AAEA;CACA,WAAA;CACA;AAEA;CACA,WAAA;CACA;AAEA;CACA,cAAA;CACA,kBAAA;CACA,+BAAA;CACA;AAEA;CACA,oBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,gBAAA;CACA;AAEA;CACA,4BAAA;CACA;AAEA;CACA,aAAA;CACA,mBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,eAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n\t<div id=\"design-bar\" class=\"design-bar-row\">\n\t\t<div class=\"design-bar-column\">\n\t\t\t<div class=\"design-bar-cell design-bar-row\">\n\t\t\t\t<div class=\"design-bar-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<input type=\"button\"\n\t\t\t\t\t\t\tclass=\"undo-button\"\n\t\t\t\t\t\t\t@click=\"dispatch_undo\"\n\t\t\t\t\t\t\tvalue=\"<\"/>\n\t\t\t\t\t\t<input type=\"button\"\n\t\t\t\t\t\t\tclass=\"redo-button\"\n\t\t\t\t\t\t\t@click=\"dispatch_redo\"\n\t\t\t\t\t\t\tvalue=\">\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"design-bar-flex-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\"\n\t\t\t\t\t\tid=\"design-bar-status-message\"\n\t\t\t\t\t\tref=\"status_message\"\n\t\t\t\t\t\t@animationend=\"clear_status_message()\">{{ status_message }}</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"design-bar-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<!-- hopefully temporary workaround for https://github.com/to-boldly-go/tbg-shipdesigner/issues/57 -->\n\t\t\t\t\t\t<input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell design-bar-row\">\n\t\t\t\t<div class=\"design-bar-flex-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<select v-model=\"selected_parts_list_name\">\n\t\t\t\t\t\t\t<option v-for=\"parts_list in all_parts_lists\" :key=\"parts_list.pretty_name\">\n\t\t\t\t\t\t\t\t{{parts_list.pretty_name}}\n\t\t\t\t\t\t\t</option>\n\t\t\t\t\t\t</select>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"design-bar-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<input type=\"button\" @click=\"parts_lists_load_selected\" value=\"Load parts list\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"design-bar-column\">\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<span><a :href=\"'shipdesigner.html#' + design_json_url_encoded_string\">Link to this design</a></span>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<select id=\"design-bar-design-mode\" v-model=\"selected_design_mode\" disabled=\"true\">\n\t\t\t\t\t<option value=\"none\">Mode</option>\n\t\t\t\t\t<option value=\"refit\">Refit for</option>\n\t\t\t\t\t<option value=\"compare\">Compare with</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"design-bar-flex-column\">\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<select v-model=\"selected_design_name\">\n\t\t\t\t\t<option v-for=\"blueprint in local_saves\" :key=\"blueprint.pretty_name\">\n\t\t\t\t\t\t{{blueprint.pretty_name}}\n\t\t\t\t\t</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<select v-model=\"selected_other_design_name\" :disabled=\"selected_design_mode === 'none'\">\n\t\t\t\t\t<option v-for=\"blueprint in local_saves\" :key=\"blueprint.pretty_name\">\n\t\t\t\t\t\t{{blueprint.pretty_name}}\n\t\t\t\t\t</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"design-bar-column\">\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"/>\n\t\t\t\t<input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"/>\n\n\t\t\t\t<input type=\"button\" id=\"design-bar-save-button\" @click=\"local_saves_save_design\" :value=\"save_design_error ? save_design_error : 'Save current design'\" :disabled=\"save_design_error !== null\"/>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<span>Filter:</span>\n\t\t\t\t<input type=\"checkbox\" id=\"filter-latest-for-name\" v-model=\"design_filter\" value=\"latest-for-name\" disabled=\"true\"/><label for=\"filter-latest-for-name\">Latest for name</label>\n\t\t\t\t<input type=\"checkbox\" id=\"filter-same-name\" v-model=\"design_filter\" value=\"same-name\" disabled=\"true\"/><label for=\"filter-latest-for-name\">Same name</label>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\nimport * as ShipEngine from '../lib/shipengine';\n\nimport { mapGetters } from 'vuex';\n\nconst LOCAL_PARTS_LISTS_KEY = 'parts_lists';\nconst LOCAL_SAVES_KEY = 'local_saves';\n\nexport default {\n\tname: 'DesignImportExport',\n\tcomponents: {\n\t},\n\tdata() {\n\t\treturn {\n\t\t\t// local_saves is a straight array of blueprint objects,\n\t\t\t// exactly the same as the design_json object.\n\t\t\tlocal_saves: [],\n\t\t\t// the currently selected element of the local_saves\n\t\t\t// array. *not* the same as design_json! this is so\n\t\t\t// the user can work with the list of locally saved\n\t\t\t// blueprints without clobbering their current work.\n\t\t\tselected_save: null,\n\n\t\t\tselected_other_save: null,\n\n\t\t\tstatus_message: null,\n\n\t\t\tlocal_parts_lists: [],\n\n\t\t\tselected_parts_list: null,\n\n\t\t\tselected_design_mode: 'none',\n\n\t\t\tdesign_filter: [],\n\t\t};\n\t},\n\tcomputed: {\n\t\tsave_design_error() {\n\t\t\tif (!this.se_design.matches_parts_list(this.se_db)) {\n\t\t\t\treturn 'Save disabled: unset parts list';\n\t\t\t}\n\t\t\tif (!this.se_design.is_loaded) {\n\t\t\t\treturn 'Save disabled: Unknown parts/frames';\n\t\t\t}\n\t\t\treturn null;\n\t\t},\n\t\tselected_parts_list_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_parts_list) {\n\t\t\t\t\treturn this.selected_parts_list.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_parts_list = this.all_parts_lists.find(\n\t\t\t\t\tShipEngine.DB.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tall_parts_lists() {\n\t\t\treturn [...this.local_parts_lists, this.canon_se_db];\n\t\t},\n\t\tselected_design_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_save) {\n\t\t\t\t\treturn this.selected_save.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_save = this.local_saves.find(\n\t\t\t\t\tShipEngine.Design.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tselected_other_design_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_other_save) {\n\t\t\t\t\treturn this.selected_other_save.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_other_save = this.local_saves.find(\n\t\t\t\t\tShipEngine.Design.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tdesign_json_string() {\n\t\t\treturn JSON.stringify(this.$store.state.design_json);\n\t\t},\n\t\tdesign_json_url_encoded_string() {\n\t\t\treturn encodeURI(this.design_json_string);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'canon_se_db',\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t]),\n\t},\n\tmounted() {\n\t\tthis.parts_lists_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_PARTS_LISTS_KEY) {\n\t\t\t\tthis.parts_lists_load_from_local_storage();\n\t\t\t}\n\t\t}.bind(this));\n\n\t\tthis.local_saves_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_SAVES_KEY) {\n\t\t\t\tthis.local_saves_load_from_local_storage();\n\t\t\t}\n\t\t}.bind(this));\n\t},\n\tmethods: {\n\t\tdispatch_undo() {\n\t\t\tthis.$store.dispatch('undo');\n\t\t},\n\t\tdispatch_redo() {\n\t\t\tthis.$store.dispatch('redo');\n\t\t},\n\t\tparts_lists_load_from_local_storage() {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_parts_lists = [];\n\t\t\t\tthis.display_status_message('No parts lists to load');\n\t\t\t} else {\n\t\t\t\tthis.local_parts_lists = JSON.parse(loaded).map(\n\t\t\t\t\tpl_json => new ShipEngine.DB(pl_json)\n\t\t\t\t);\n\t\t\t\tthis.display_status_message('Parts lists loaded');\n\t\t\t}\n\t\t},\n\t\tparts_lists_load_selected() {\n\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list.json));\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.display_status_message('Parts list loaded');\n\t\t},\n\t\t\n\t\tlocal_saves_delete_selected() {\n\t\t\t// remove the selected item\n\t\t\tthis.local_saves = _.chain(this.local_saves).reject(\n\t\t\t\t(elem) => elem === this.selected_save\n\t\t\t).value();\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message('Blueprint deleted');\n\t\t},\n\t\tlocal_saves_load_selected() {\n\t\t\tconst db = this.all_parts_lists.find(\n\t\t\t\tShipEngine.DB.find_by_design_json(this.selected_save.json)\n\t\t\t);\n\t\t\tif (db) {\n\t\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(db.json));\n\t\t\t\tthis.selected_parts_list = db;\n\t\t\t}\n\n\t\t\tthis.$store.commit('set_design_json', _.cloneDeep(this.selected_save.json));\n\t\t\tthis.display_status_message('Blueprint loaded');\n\t\t},\n\t\tlocal_saves_save_design() {\n\t\t\t// If there's an error with the design, the save design button should be disabled,\n\t\t\t// but if that's somehow bypassed, this check ensures an invalid design is not saved.\n\t\t\tlet error = this.save_design_error;\n\t\t\tif (error) {\n\t\t\t\tthis.display_status_message(error);\n\t\t\t\treturn;\n\t\t\t}\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.$store.commit('timestamp_design');\n\t\t\tconst new_save = new ShipEngine.Design(this.se_db, _.cloneDeep(this.$store.state.design_json));\n\t\t\tthis.local_saves.push(new_save);\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.selected_save = new_save;\n\t\t\tthis.display_status_message('Blueprint saved');\n\t\t},\n\n\t\tlocal_saves_load_from_local_storage() {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_SAVES_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_saves = [];\n\t\t\t\tthis.display_status_message('No Blueprints to load');\n\t\t\t} else {\n\t\t\t\tthis.local_saves = JSON.parse(loaded).map((design_json) => {\n\t\t\t\t\tlet db;\n\t\t\t\t\tlet wrong_db;\n\t\t\t\t\tif (design_json['Parts List']) {\n\t\t\t\t\t\tdb = this.all_parts_lists.find(\n\t\t\t\t\t\t\tShipEngine.DB.find_by_design_json(design_json)\n\t\t\t\t\t\t);\n\t\t\t\t\t\twrong_db = db === undefined;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tdb = this.se_db;\n\t\t\t\t\t\twrong_db = false;\n\t\t\t\t\t}\n\t\t\t\t\treturn new ShipEngine.Design(db || this.se_db, design_json, wrong_db);\n\t\t\t\t});\n\t\t\t\tthis.display_status_message('Blueprints loaded');\n\t\t\t}\n\t\t},\n\t\tlocal_saves_save_to_local_storage() {\n\t\t\tlocalStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(\n\t\t\t\t_.chain(this.local_saves)\n\t\t\t\t\t.map((design) => design.json)\n\t\t\t\t\t.value()\n\t\t\t));\n\t\t},\n\n\t\tdisplay_status_message(status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'design-bar-cell';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = 'design-bar-cell fade';\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message() {\n\t\t\tthis.status_message = null;\n\t\t},\n\t\t\n\t},\n};\n</script>\n\n\n<style scoped>\n#design-bar {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n\n\tflex-wrap: wrap;\n}\n\n.design-bar-row {\n\tdisplay: flex;\n\tflex-flow: row;\n}\n\n.design-bar-column {\n\tflex: none;\n}\n\n.design-bar-flex-column {\n\tflex: auto;\n}\n\n.design-bar-column, .design-bar-flex-column {\n\tdisplay: flex;\n\tflex-flow: column;\n\tjustify-content: space-between;\n}\n\n#design-bar > .design-bar-column > .design-bar-cell {\n\tmargin: 0.1em 0.2em;\n}\n\n.design-bar-cell > select:only-child {\n\twidth: 100%;\n}\n\n.design-bar-flex-column > .design-bar-cell > select {\n\twidth: 100%;\n}\n\n.design-bar-cell > span {\n\tmargin: 0 0.2em;\n}\n\n.design-bar-cell > input[type=checkbox] {\n\tvertical-align: text-bottom;\n}\n\n#design-bar-status-message {\n\theight: 100%;\n\ttext-align: center;\n}\n\n#design-bar-design-mode {\n\ttext-align: right;\n}\n\n#design-bar-design-mode > option {\n\tdirection: rtl;\n}\n\n#design-bar-save-button {\n\twidth: 15em;\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n"],"sourceRoot":""}]);
-
-// exports
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-3d6f706e\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/principal-frame-final.vue":
-/*!*************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-3d6f706e","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/principal-frame-final.vue ***!
-  \*************************************************************************************************************************************************************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
-// imports
-
-
-// module
-exports.push([module.i, "\n.principal-frame-final[data-v-3d6f706e] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n.name-column-input[data-v-3d6f706e] {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.stat-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.br-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.sr-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-3d6f706e] {\n\ttext-align: center;\n}\n.has-error[data-v-3d6f706e] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/principal-frame-final.vue"],"names":[],"mappings":";AAkGA;CACA,iBAAA;CACA,YAAA;;CAEA,kBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,mBAAA;CACA;AAEA;CACA,aAAA;CACA,kBAAA;CACA,kBAAA;CACA,YAAA;CACA,mBAAA;CACA,mBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-final.vue","sourcesContent":["<template>\n\t<tr class=\"principal-frame-final\">\n\t\t<td class=\"name-column\" colspan=\"2\">\n\t\t\t<input v-model=\"ship_name\" placeholder=\"Ship Name\" class=\"name-column-input\">\n\t\t</td>\n\n\t\t<td class=\"part-column\">{{principal_frame}}</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t\t</template>\n\t\t\n\t\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_design.weight_total}}</td>\n\n\t\t<td class=\"br-column\">{{se_design.cost_BR}}</td>\n\t\t<td class=\"sr-column\">{{se_design.cost_SR}}</td>\n\n\t\t<td class=\"power-cost-column\"\n\t\t\t:title=\"power_final_title\"\n\t\t\t:class=\"power_final_class\">{{se_design.cost_power}}</td>\n\t\t<td class=\"power-gen-column\"\n\t\t\t:title=\"power_final_title\"\n\t\t\t:class=\"power_final_class\">{{se_design.power_generation}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year}}</td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tcomputed: {\n\t\tpower_final_title() {\n\t\t\tif (this.has_power_error) {\n\t\t\t\treturn 'Error: Power cost greater than power generation.';\n\t\t\t} else {\n\t\t\t\treturn '';\n\t\t\t}\n\t\t},\n\t\tpower_final_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_power_error,\n\t\t\t};\n\t\t},\n\t\thas_power_error() {\n\t\t\treturn this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;\n\t\t},\n\t\tprincipal_frame() {\n\t\t\treturn this.$store.getters.se_design.json['Principal Frame'];\n\t\t},\n\t\tstats() {\n\t\t\treturn this.$store.getters.se_design.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.$store.getters.se_design.cost_crew;\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.$store.getters.se_design.build_time, 12, true);\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.$store.getters.se_design.tech_year_max;\n\t\t},\n\t\tship_name: {\n\t\t\tget() {\n\t\t\t\treturn this.$store.getters.se_design.json['Name'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_design_name', value);\n\t\t\t},\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style scoped>\n.principal-frame-final {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n\n.name-column-input {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
-
-// exports
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-4a14dd3e\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/statline-cell.vue":
-/*!*****************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-4a14dd3e","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/statline-cell.vue ***!
-  \*****************************************************************************************************************************************************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
@@ -9643,128 +7057,166 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-6f922482\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-summary.vue":
-/*!*********************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-6f922482","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-summary.vue ***!
-  \*********************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-32dfd9a5\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/component.vue":
+/*!*************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-32dfd9a5","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/component.vue ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
 // module
-exports.push([module.i, "\n.subsystem-summary[data-v-6f922482] {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n.name-cell[data-v-6f922482] {\n\tborder-style: none;\n}\n.part-cell[data-v-6f922482] {\n\tborder-style: none;\n}\n.part-select[data-v-6f922482] {\n\twidth: 100%;\n}\n.has-error[data-v-6f922482] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/subsystem-summary.vue"],"names":[],"mappings":";AAgFA;CACA,iBAAA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-summary.vue","sourcesContent":["<template>\n\n\t<tr class=\"subsystem-summary\">\n\t\t<td class=\"name-column\"\n\t\t\t:class=\"weight_summary_class\"\n\t\t\tcolspan=\"2\">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t\t<td class=\"part-column\"></td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\" :class=\"weight_summary_class\">{{se_subsystem.weight_internal.toFixed(2)}}</td>\n\t\t<td class=\"weight-external-column\">{{se_subsystem.weight_external.toFixed(2)}}</td>\n\n\t\t<td class=\"br-column\">{{se_subsystem.cost_BR.toFixed(2)}}</td>\n\t\t<td class=\"sr-column\">{{se_subsystem.cost_SR.toFixed(2)}}</td>\n\n\t\t<td class=\"power-cost-column\">{{se_subsystem.cost_power.toFixed(2)}}</td>\n\t\t<td class=\"power-gen-column\">{{se_subsystem.power_generation.toFixed(2)}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year}}</td>\n\t</tr>\n\n</template>\n\n\n<script>\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'SubsystemSummary',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tweight_summary_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error() {\n\t\t\treturn this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;\n\t\t},\n\t\tse_components() {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_subsystem.tech_year_max;\n\t\t},\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style scoped>\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n\n.name-cell {\n\tborder-style: none;\n}\n\n.part-cell {\n\tborder-style: none;\n}\n\n.part-select {\n\twidth: 100%;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.component-tr[data-v-32dfd9a5] {\n\twidth: 100%;\n\tmargin: 0px;\n}\n.has-error[data-v-32dfd9a5] {\n\tbackground: #faa;\n}\n.has-warning[data-v-32dfd9a5] {\n\tbackground: #ffa;\n}\n.quantity-column[data-v-32dfd9a5] {\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/component.vue"],"names":[],"mappings":";AAqMA;CACA,YAAA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA","file":"component.vue","sourcesContent":["<template>\n\t<tr class=\"component-tr\" :class=\"{ 'has-error': !is_loaded }\">\n\t\t<td class=\"name-column\">{{se_component.name}}</td>\n\n\t\t<td class=\"quantity-column\" :class=\"{ 'has-error': has_quantity_error }\">\n\t\t\t<select\n\t\t\t\tv-if=\"quantity_configurable\"\n\t\t\t\tclass=\"quantity-column-select\"\n\t\t\t\tv-model=\"quantity\"\n\t\t\t\tv-on:wheel=\"quantity_select_wheel_event\"\n\t\t\t\t:class=\"{ 'has-error': has_quantity_error }\">\n\n\t\t\t\t<option v-if=\"!valid_quantities.includes(quantity)\">{{quantity}}</option>\n\t\t\t\t<option v-for=\"valid_quantity in valid_quantities\" :key=\"valid_quantity\">{{valid_quantity}}</option>\n\t\t\t</select>\n\t\t\t<span v-if=\"!quantity_configurable\">{{quantity_pretty}}</span>\n\t\t</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<select\n\t\t\t\tv-model=\"part\"\n\t\t\t\tclass=\"part-column-select\">\n\t\t\t\t<option v-for=\"part_value in valid_parts\" :key=\"part_value['Name']\">{{part_value['Name']}}</option>\n\t\t\t\t<option v-if=\"!is_valid_part\" class=\"has-error\">{{part}}</option>\n\t\t\t</select>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t\t<td class=\"br-column\">{{cost_br}}</td>\n\t\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\"></td>\n\n\t\t<td class=\"tech-year-column\"\n\t\t\t:class=\"{ ['has-warning']: is_limiting_tech_year }\"\n\t\t\t:title=\"tech_year_tooltip\"\n\t\t\t>{{tech_year}}</td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport {\n\tpretty,\n} from '@/lib/ui-functions';\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nexport default {\n\tname: 'ComponentTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_component: Object,\n\t},\n\tcomputed: {\n\t\ttech_year_tooltip() {\n\t\t\tif (this.is_limiting_tech_year) {\n\t\t\t\treturn 'This component is the latest-available part in the design.';\n\t\t\t} else {\n\t\t\t\treturn false;\n\t\t\t}\n\t\t},\n\t\tis_limiting_tech_year() {\n\t\t\treturn this.se_component.tech_year === this.se_component.subsystem.design.tech_year;\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_component.tech_year;\n\t\t},\n\t\tis_valid_part() {\n\t\t\treturn this.valid_parts\n\t\t\t\t.map((part) => part['Name'])\n\t\t\t\t.includes(this.part);\n\t\t},\n\t\thas_quantity_error() {\n\t\t\treturn this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));\n\t\t},\n\t\tpower_gen() {\n\t\t\treturn pretty(this.se_component.power_generation);\n\t\t},\n\t\tpower_cost() {\n\t\t\treturn pretty(this.se_component.cost_power);\n\t\t},\n\t\tcost_sr() {\n\t\t\treturn pretty(this.se_component.cost_SR);\n\t\t},\n\t\tcost_br() {\n\t\t\treturn pretty(this.se_component.cost_BR);\n\t\t},\n\t\tweight_internal() {\n\t\t\treturn pretty(this.se_component.weight_internal);\n\t\t},\n\t\tweight_external() {\n\t\t\treturn pretty(this.se_component.weight_external);\n\t\t},\n\t\tis_loaded() {\n\t\t\treturn this.se_component.is_loaded;\n\t\t},\n\t\tvalid_parts() {\n\t\t\treturn this.se_component.valid_parts;\n\t\t},\n\t\tquantity_configurable() {\n\t\t\treturn this.se_component.is_quantity_configurable;\n\t\t},\n\t\tquantity_pretty() {\n\t\t\tif (this.quantity === Math.round(this.quantity)) {\n\t\t\t\treturn this.quantity;\n\t\t\t} else {\n\t\t\t\treturn this.quantity.toFixed(2);\n\t\t\t}\n\t\t},\n\t\tquantity: {\n\t\t\tget() {\n\t\t\t\treturn this.se_component.quantity;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_component_quantity', {\n\t\t\t\t\tcomponent: this.se_component,\n\t\t\t\t\tvalue,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tvalid_quantities() {\n\t\t\treturn this.se_component.valid_quantities;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_component.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_component.cost_crew;\n\t\t},\n\t\tpart: {\n\t\t\tget() {\n\t\t\t\treturn this.se_component.part;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_component_part', {\n\t\t\t\t\tcomponent: this.se_component,\n\t\t\t\t\tvalue,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tis_quantity_valid() {\n\t\t\treturn (hypothesis) => this\n\t\t\t\t.valid_quantities\n\t\t\t\t.map((elem) => (elem === hypothesis))\n\t\t\t\t.reduce((acc, elem) => acc || elem);\n\t\t},\n\t},\n\tmethods: {\n\t\tincrement_quantity() {\n\t\t\tlet hypothesis = this.quantity + 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t}\n\t\t},\n\t\tdecrement_quantity() {\n\t\t\tlet hypothesis = this.quantity - 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t}\n\t\t},\n\t\tquantity_select_wheel_event(ev) {\n\t\t\tif (ev.deltaY > 0) {\n\t\t\t\tthis.decrement_quantity();\n\t\t\t} else if (ev.deltaY < 0) {\n\t\t\t\tthis.increment_quantity();\n\t\t\t}\n\t\t\tif (ev.preventDefault) {\n\t\t\t\tev.preventDefault();\n\t\t\t}\n\t\t\tev.returnValue = false;\n\t\t},\n\t},\n};\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.component-tr {\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n\n.has-warning {\n\tbackground: #ffa;\n}\n\n.quantity-column {\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-9f9c61a0\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design-summary.vue":
-/*!******************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-9f9c61a0","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design-summary.vue ***!
-  \******************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-3da5e637\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-frame.vue":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-3da5e637","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-frame.vue ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
 // module
-exports.push([module.i, "\n.design-summary[data-v-9f9c61a0] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.has-error[data-v-9f9c61a0] {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n.design-weight-summary[data-v-9f9c61a0] {\n\tmargin-left: 5px;\n}\n.design-power-summary[data-v-9f9c61a0] {\n}\n.subsystem-weight-summary[data-v-9f9c61a0] {\n\tmargin-left: 5px;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/design-summary.vue"],"names":[],"mappings":";AAmFA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA,YAAA;CACA,kBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA;AAEA;CACA,iBAAA;CACA","file":"design-summary.vue","sourcesContent":["<template>\n\t<div class=\"design-summary\">\n\t\t<div>\n\t\t\t<span>{{se_design.name}} | {{se_design.pretty_miscstats}}</span>\n\t\t\t<span> | </span>\n\t\t\t<span\n\t\t\t\t:class=\"{'has-error': has_parts_list_load_error}\"\n\t\t\t\t:title=\"parts_list_load_title\">Parts: {{parts_list_name}}</span>\n\t\t\t<span\n\t\t\t\tv-if=\"has_parts_list_load_error\"\n\t\t\t\t:class=\"{'has-error': has_parts_list_load_error}\"> (WRONG PARTS LIST! EVERYTHING MAY BE INVALID!)</span>\n\t\t</div>\n\n\t\t<div>\n\t\t\t<span>{{se_design.stats_raw.toFixed(2)}}</span>\n\t\t\t<span> | </span>\n\t\t\t<span>[{{se_design.cost_BR_raw.toFixed(2)}}]br</span>\n\t\t\t<span>[{{se_design.cost_SR_raw.toFixed(2)}}]sr</span>\n\t\t\t<span> | </span>\n\t\t\t<span>{{se_design.cost_crew_raw.toFixed(2)}}</span>\n\t\t\t<span> | </span>\n\t\t\t<span>[{{build_time}}]years</span>\n\t\t</div>\n\t\t<div>\n\t\t\t<span\n\t\t\t\tclass=\"design-power-summary\"\n\t\t\t\t:class=\"{'has-error': se_design.cost_power_raw > se_design.power_generation_raw}\"\n\t\t\t\t>Power[{{se_design.cost_power_raw.toFixed(2)}}/{{se_design.power_generation_raw.toFixed(2)}}]</span>\n\t\t\t<span\n\t\t\t\tclass=\"design-weight-summary\"\n\t\t\t\t:class=\"{'has-error': se_design.weight_internal > se_design.frame_max_size_raw}\"\n\t\t\t\t>Internal[{{se_design.weight_internal.toFixed(2)}}/{{se_design.frame_max_size_raw.toFixed(2)}}]</span>\n\t\t\t<span\n\t\t\t\tclass=\"subsystem-weight-summary\"\n\t\t\t\tv-for=\"ss in se_design.subsystems\"\n\t\t\t\t:key=\"ss.name\"\n\t\t\t\t:class=\"{'has-error': ss.weight_internal > ss.weight_cap}\"\n\t\t\t\t>{{ss.name}}[{{ss.weight_internal.toFixed(2)}}/{{ss.weight_cap.toFixed(2)}}] </span>\n\t\t</div>\n\t</div>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'DesignSummary',\n\tcomputed: {\n\t\tparts_list_name() {\n\t\t\treturn this.se_design.parts_list_pretty_name;\n\t\t},\n\t\tparts_list_load_title() {\n\t\t\tif (this.has_parts_list_load_error) {\n\t\t\t\treturn 'Could not find this parts list';\n\t\t\t} else {\n\t\t\t\treturn null;\n\t\t\t}\n\t\t},\n\t\thas_parts_list_load_error() {\n\t\t\treturn !this.se_design.matches_parts_list(this.se_db);\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.$store.getters.se_design.build_time, 12);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t]),\n\t},\n\tmethods: {\n\t\tparts_list_save_name(pl) {\n\t\t\treturn pl.name + ' (' + (new Date(pl.timestamp).toLocaleString()) + ')';\n\t\t},\n\t},\n};\n</script>\n\n\n<style scoped>\n.design-summary {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.has-error {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n\n.design-weight-summary {\n\tmargin-left: 5px;\n}\n\n.design-power-summary {\n}\n\n.subsystem-weight-summary {\n\tmargin-left: 5px;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.subsystem-frame[data-v-3da5e637] {\n\tbackground: #ccc;\n}\n.has-error[data-v-3da5e637] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/subsystem-frame.vue"],"names":[],"mappings":";AAsGA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-frame.vue","sourcesContent":["<template>\n\n\t<tr class=\"subsystem-frame\" v-bind:class=\"{ 'has-error': !is_valid_frame }\">\n\t\t<td class=\"name-column\" colspan=\"2\">{{se_subsystem.name}}</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<select v-model=\"sub_frame\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"sub_frame_value in se_subsystem.valid_frames\" :key=\"sub_frame_value['Name']\">{{sub_frame_value['Name']}}</option>\n\t\t\t\t<option v-if=\"!is_valid_frame\" class=\"has-error\">{{sub_frame}}</option>\n\t\t\t</select>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<td :key=\"name\" class=\"stat-column\">{{stats_multiplier_pretty}}</td>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t\t<td class=\"br-column\">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>\n\t\t<td class=\"sr-column\">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>\n\n\t\t<td class=\"power-cost-column\"></td>\n\t\t<td class=\"power-gen-column\"></td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew_mult_pretty\" :name=\"name\" :ispretty=\"false\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year}} (Frame)</td>\n\t</tr>\n\n</template>\n\n\n<script>\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nimport { frac } from '@/lib/ui-functions';\n\nexport default {\n\tname: 'SubsystemFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tis_valid_frame() {\n\t\t\treturn this.se_subsystem.is_valid_frame;\n\t\t},\n\t\tvalid_frames() {\n\t\t\treturn this.se_subsystem.valid_frames;\n\t\t},\n\t\tse_components() {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tstats_multiplier_pretty() {\n\t\t\treturn this.se_subsystem.stats_multiplier.toFixed(2) + 'x';\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tcrew_mult_pretty() {\n\t\t\treturn this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_subsystem.tech_year_frame;\n\t\t},\n\t\tsub_frame: {\n\t\t\tget() {\n\t\t\t\treturn this.se_subsystem.sub_frame;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_subsystem_frame', {\n\t\t\t\t\tvalue: value,\n\t\t\t\t\tsubsystem: this.se_subsystem,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style>\n\n</style>\n\n\n<style scoped>\n.subsystem-frame {\n\tbackground: #ccc;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-a8ea6a18\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/component.vue":
-/*!*************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-a8ea6a18","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/component.vue ***!
-  \*************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-483def47\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/setting-cell.vue":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-483def47","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/setting-cell.vue ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
 // module
-exports.push([module.i, "\n.component-tr[data-v-a8ea6a18] {\n\twidth: 100%;\n\tmargin: 0px;\n}\n.has-error[data-v-a8ea6a18] {\n\tbackground: #faa;\n}\n.has-warning[data-v-a8ea6a18] {\n\tbackground: #ffa;\n}\n.quantity-column[data-v-a8ea6a18] {\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/component.vue"],"names":[],"mappings":";AAqMA;CACA,YAAA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA","file":"component.vue","sourcesContent":["<template>\n\t<tr class=\"component-tr\" :class=\"{ 'has-error': !is_loaded }\">\n\t\t<td class=\"name-column\">{{se_component.name}}</td>\n\n\t\t<td class=\"quantity-column\" :class=\"{ 'has-error': has_quantity_error }\">\n\t\t\t<select\n\t\t\t\tv-if=\"quantity_configurable\"\n\t\t\t\tclass=\"quantity-column-select\"\n\t\t\t\tv-model=\"quantity\"\n\t\t\t\tv-on:wheel=\"quantity_select_wheel_event\"\n\t\t\t\t:class=\"{ 'has-error': has_quantity_error }\">\n\n\t\t\t\t<option v-if=\"!valid_quantities.includes(quantity)\">{{quantity}}</option>\n\t\t\t\t<option v-for=\"valid_quantity in valid_quantities\" :key=\"valid_quantity\">{{valid_quantity}}</option>\n\t\t\t</select>\n\t\t\t<span v-if=\"!quantity_configurable\">{{quantity_pretty}}</span>\n\t\t</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<select\n\t\t\t\tv-model=\"part\"\n\t\t\t\tclass=\"part-column-select\">\n\t\t\t\t<option v-for=\"part_value in valid_parts\" :key=\"part_value['Name']\">{{part_value['Name']}}</option>\n\t\t\t\t<option v-if=\"!is_valid_part\" class=\"has-error\">{{part}}</option>\n\t\t\t</select>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t\t<td class=\"br-column\">{{cost_br}}</td>\n\t\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\"></td>\n\n\t\t<td class=\"tech-year-column\"\n\t\t\t:class=\"{ ['has-warning']: is_limiting_tech_year }\"\n\t\t\t:title=\"tech_year_tooltip\"\n\t\t\t>{{tech_year}}</td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport {\n\tpretty,\n} from './ui-functions.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ComponentTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_component: Object,\n\t},\n\tcomputed: {\n\t\ttech_year_tooltip() {\n\t\t\tif (this.is_limiting_tech_year) {\n\t\t\t\treturn 'This component is the latest-available part in the design.';\n\t\t\t} else {\n\t\t\t\treturn false;\n\t\t\t}\n\t\t},\n\t\tis_limiting_tech_year() {\n\t\t\treturn this.se_component.tech_year === this.se_component.subsystem.design.tech_year;\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_component.tech_year;\n\t\t},\n\t\tis_valid_part() {\n\t\t\treturn this.valid_parts\n\t\t\t\t.map((part) => part['Name'])\n\t\t\t\t.includes(this.part);\n\t\t},\n\t\thas_quantity_error() {\n\t\t\treturn this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));\n\t\t},\n\t\tpower_gen() {\n\t\t\treturn pretty(this.se_component.power_generation);\n\t\t},\n\t\tpower_cost() {\n\t\t\treturn pretty(this.se_component.cost_power);\n\t\t},\n\t\tcost_sr() {\n\t\t\treturn pretty(this.se_component.cost_SR);\n\t\t},\n\t\tcost_br() {\n\t\t\treturn pretty(this.se_component.cost_BR);\n\t\t},\n\t\tweight_internal() {\n\t\t\treturn pretty(this.se_component.weight_internal);\n\t\t},\n\t\tweight_external() {\n\t\t\treturn pretty(this.se_component.weight_external);\n\t\t},\n\t\tis_loaded() {\n\t\t\treturn this.se_component.is_loaded;\n\t\t},\n\t\tvalid_parts() {\n\t\t\treturn this.se_component.valid_parts;\n\t\t},\n\t\tquantity_configurable() {\n\t\t\treturn this.se_component.is_quantity_configurable;\n\t\t},\n\t\tquantity_pretty() {\n\t\t\tif (this.quantity === Math.round(this.quantity)) {\n\t\t\t\treturn this.quantity;\n\t\t\t} else {\n\t\t\t\treturn this.quantity.toFixed(2);\n\t\t\t}\n\t\t},\n\t\tquantity: {\n\t\t\tget() {\n\t\t\t\treturn this.se_component.quantity;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_component_quantity', {\n\t\t\t\t\tcomponent: this.se_component,\n\t\t\t\t\tvalue,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tvalid_quantities() {\n\t\t\treturn this.se_component.valid_quantities;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_component.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_component.cost_crew;\n\t\t},\n\t\tpart: {\n\t\t\tget() {\n\t\t\t\treturn this.se_component.part;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_component_part', {\n\t\t\t\t\tcomponent: this.se_component,\n\t\t\t\t\tvalue,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tis_quantity_valid() {\n\t\t\treturn (hypothesis) => this\n\t\t\t\t.valid_quantities\n\t\t\t\t.map((elem) => (elem === hypothesis))\n\t\t\t\t.reduce((acc, elem) => acc || elem);\n\t\t},\n\t},\n\tmethods: {\n\t\tincrement_quantity() {\n\t\t\tlet hypothesis = this.quantity + 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t}\n\t\t},\n\t\tdecrement_quantity() {\n\t\t\tlet hypothesis = this.quantity - 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t}\n\t\t},\n\t\tquantity_select_wheel_event(ev) {\n\t\t\tif (ev.deltaY > 0) {\n\t\t\t\tthis.decrement_quantity();\n\t\t\t} else if (ev.deltaY < 0) {\n\t\t\t\tthis.increment_quantity();\n\t\t\t}\n\t\t\tif (ev.preventDefault) {\n\t\t\t\tev.preventDefault();\n\t\t\t}\n\t\t\tev.returnValue = false;\n\t\t},\n\t},\n};\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.component-tr {\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n\n.has-warning {\n\tbackground: #ffa;\n}\n\n.quantity-column {\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.setting-cell[data-v-483def47] {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n.setting-input-number[data-v-483def47] {\n\twidth: 60px;\n}\n.setting-input-bool[data-v-483def47] {\n}\n.setting-name[data-v-483def47] {\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/setting-cell.vue"],"names":[],"mappings":";AA+DA;CACA,YAAA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA;AAEA;CACA","file":"setting-cell.vue","sourcesContent":["<template>\n\t<span class=\"setting-cell\">\n\t\t<span class=\"setting-name\">{{setting_name}}</span>\n\n\t\t<select\n\t\t\tv-if=\"typeof(setting_value) === 'number'\"\n\t\t\tclass=\"setting-input-number\"\n\t\t\ttype=\"number\"\n\t\t\tv-model=\"setting_value\">\n\t\t\t<option v-for=\"num in valid_numbers\" :key=\"num\">{{num}}</option>\n\t\t</select>\n\n\t\t<input\n\t\t\tv-if=\"typeof(setting_value) === 'boolean'\"\n\t\t\tclass=\"setting-input-bool\"\n\t\t\ttype=\"checkbox\"\n\t\t\tv-model=\"setting_value\"/>\n\t</span>\n</template>\n\n<script>\n\nexport default {\n\tname: 'SettingCell',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tsetting: Object,\n\t},\n\tcomputed: {\n\t\tvalid_numbers() {\n\t\t\treturn [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];\n\t\t},\n\t\tsetting_name: {\n\t\t\tget() {\n\t\t\t\treturn this.setting['Name'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.setting['Name'] = value;\n\t\t\t},\n\t\t},\n\t\tsetting_value: {\n\t\t\tget() {\n\t\t\t\treturn this.setting['Value'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_setting', {\n\t\t\t\t\tsetting: this.setting,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n};\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-cell {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n\n.setting-input-number {\n\twidth: 60px;\n}\n\n.setting-input-bool {\n}\n\n.setting-name {\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-b52a34f6\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/module.vue":
-/*!**********************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-b52a34f6","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/module.vue ***!
-  \**********************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-4b6abc74\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/module.vue":
+/*!**********************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-4b6abc74","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/module.vue ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
 // module
-exports.push([module.i, "\n.module-tr[data-v-b52a34f6] {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n.hasloaderror[data-v-b52a34f6] {\n\tbackground: #faa;\n}\n.module-pair-span[data-v-b52a34f6] {\n\tdisplay: flex;\n}\n.module-pair-type[data-v-b52a34f6] {\n\tflex: 1 1 0;\n}\n.module-pair-variant[data-v-b52a34f6] {\n\tflex: 1 1 0;\n}\n.part-column-select[data-v-b52a34f6] {\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/module.vue"],"names":[],"mappings":";AAsIA;CACA,iBAAA;;CAEA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA","file":"module.vue","sourcesContent":["<template>\n\t<tr class=\"module-tr\" :class=\"{ hasloaderror: !is_loaded }\">\n\t\t<td class=\"name-column\" colspan=\"2\">Module</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<span class=\"module-pair-span\">\n\t\t\t<span class=\"module-pair-type\"><select v-model=\"module_type\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"module_type_value in valid_types\" :key=\"module_type_value\">{{module_type_value}}</option>\n\t\t\t</select></span>\n\t\t\t<span class=\"module-pair-variant\"><select v-model=\"module_variant\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"module_variant_value in valid_variants\" :key=\"module_variant_value['Variant']\">{{module_variant_value['Variant']}}</option>\n\t\t\t</select></span>\n\t\t\t</span>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t\t<td class=\"br-column\">{{cost_br}}</td>\n\t\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\"></td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport {\n\tpretty,\n\tfrac,\n} from './ui-functions.js';\n\nimport StatlineCell from './statline-cell.vue';\n\nexport default {\n\tname: 'ModuleTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_module: Object,\n\t},\n\tcomputed: {\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_module.build_time, 12) || '';\n\t\t},\n\t\tpower_gen() {\n\t\t\treturn pretty(this.se_module.power_generation);\n\t\t},\n\t\tpower_cost() {\n\t\t\treturn pretty(this.se_module.cost_power);\n\t\t},\n\t\tcost_sr() {\n\t\t\treturn pretty(this.se_module.cost_SR);\n\t\t},\n\t\tcost_br() {\n\t\t\treturn pretty(this.se_module.cost_BR);\n\t\t},\n\t\tweight_internal() {\n\t\t\treturn pretty(this.se_module.weight_internal);\n\t\t},\n\t\tweight_external() {\n\t\t\treturn pretty(this.se_module.weight_external);\n\t\t},\n\t\tis_loaded() {\n\t\t\treturn this.se_module.is_loaded;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_module.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_module.cost_crew;\n\t\t},\n\n\t\tvalid_types() {\n\t\t\treturn this.$store.getters.se_db.valid_module_types();\n\t\t},\n\t\tvalid_variants() {\n\t\t\treturn this.$store.getters.se_db.find_modules(this.se_module.module_type);\n\t\t},\n\t\tmodule_type: {\n\t\t\tget() {\n\t\t\t\treturn this.se_module.module_type;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_module_type', {\n\t\t\t\t\tse_db: this.$store.getters.se_db,\n\t\t\t\t\tmodule: this.se_module,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tmodule_variant: {\n\t\t\tget() {\n\t\t\t\treturn this.se_module.module_variant;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_module_variant', {\n\t\t\t\t\tmodule: this.se_module,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tlog_parts() {\n\t\t\tconsole.log('\"' + this.part + '\"');\n\t\t\tconsole.log(this.valid_parts.map((part) => part['Name']));\n\t\t\tconsole.log(this.$store.getters.se_db.find_part(this.part));\n\t\t\tthis.part = this.part;\n\t\t},\n\t},\n};\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.module-tr {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n\n.hasloaderror {\n\tbackground: #faa;\n}\n\n.module-pair-span {\n\tdisplay: flex;\n}\n\n.module-pair-type {\n\tflex: 1 1 0;\n}\n\n.module-pair-variant {\n\tflex: 1 1 0;\n}\n\n.part-column-select {\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.module-tr[data-v-4b6abc74] {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n.hasloaderror[data-v-4b6abc74] {\n\tbackground: #faa;\n}\n.module-pair-span[data-v-4b6abc74] {\n\tdisplay: flex;\n}\n.module-pair-type[data-v-4b6abc74] {\n\tflex: 1 1 0;\n}\n.module-pair-variant[data-v-4b6abc74] {\n\tflex: 1 1 0;\n}\n.part-column-select[data-v-4b6abc74] {\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/module.vue"],"names":[],"mappings":";AAsIA;CACA,iBAAA;;CAEA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA","file":"module.vue","sourcesContent":["<template>\n\t<tr class=\"module-tr\" :class=\"{ hasloaderror: !is_loaded }\">\n\t\t<td class=\"name-column\" colspan=\"2\">Module</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<span class=\"module-pair-span\">\n\t\t\t<span class=\"module-pair-type\"><select v-model=\"module_type\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"module_type_value in valid_types\" :key=\"module_type_value\">{{module_type_value}}</option>\n\t\t\t</select></span>\n\t\t\t<span class=\"module-pair-variant\"><select v-model=\"module_variant\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"module_variant_value in valid_variants\" :key=\"module_variant_value['Variant']\">{{module_variant_value['Variant']}}</option>\n\t\t\t</select></span>\n\t\t\t</span>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t\t<td class=\"br-column\">{{cost_br}}</td>\n\t\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\"></td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport {\n\tpretty,\n\tfrac,\n} from '@/lib/ui-functions';\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nexport default {\n\tname: 'ModuleTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_module: Object,\n\t},\n\tcomputed: {\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_module.build_time, 12) || '';\n\t\t},\n\t\tpower_gen() {\n\t\t\treturn pretty(this.se_module.power_generation);\n\t\t},\n\t\tpower_cost() {\n\t\t\treturn pretty(this.se_module.cost_power);\n\t\t},\n\t\tcost_sr() {\n\t\t\treturn pretty(this.se_module.cost_SR);\n\t\t},\n\t\tcost_br() {\n\t\t\treturn pretty(this.se_module.cost_BR);\n\t\t},\n\t\tweight_internal() {\n\t\t\treturn pretty(this.se_module.weight_internal);\n\t\t},\n\t\tweight_external() {\n\t\t\treturn pretty(this.se_module.weight_external);\n\t\t},\n\t\tis_loaded() {\n\t\t\treturn this.se_module.is_loaded;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_module.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_module.cost_crew;\n\t\t},\n\n\t\tvalid_types() {\n\t\t\treturn this.$store.getters.se_db.valid_module_types();\n\t\t},\n\t\tvalid_variants() {\n\t\t\treturn this.$store.getters.se_db.find_modules(this.se_module.module_type);\n\t\t},\n\t\tmodule_type: {\n\t\t\tget() {\n\t\t\t\treturn this.se_module.module_type;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_module_type', {\n\t\t\t\t\tse_db: this.$store.getters.se_db,\n\t\t\t\t\tmodule: this.se_module,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tmodule_variant: {\n\t\t\tget() {\n\t\t\t\treturn this.se_module.module_variant;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_module_variant', {\n\t\t\t\t\tmodule: this.se_module,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tlog_parts() {\n\t\t\tconsole.log('\"' + this.part + '\"');\n\t\t\tconsole.log(this.valid_parts.map((part) => part['Name']));\n\t\t\tconsole.log(this.$store.getters.se_db.find_part(this.part));\n\t\t\tthis.part = this.part;\n\t\t},\n\t},\n};\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.module-tr {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n\n.hasloaderror {\n\tbackground: #faa;\n}\n\n.module-pair-span {\n\tdisplay: flex;\n}\n\n.module-pair-type {\n\tflex: 1 1 0;\n}\n\n.module-pair-variant {\n\tflex: 1 1 0;\n}\n\n.part-column-select {\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-f5f570d0\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/setting-cell.vue":
-/*!****************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-f5f570d0","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/setting-cell.vue ***!
-  \****************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-6038f16e\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-settings.vue":
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-6038f16e","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-settings.vue ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
 // module
-exports.push([module.i, "\n.setting-cell[data-v-f5f570d0] {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n.setting-input-number[data-v-f5f570d0] {\n\twidth: 60px;\n}\n.setting-input-bool[data-v-f5f570d0] {\n}\n.setting-name[data-v-f5f570d0] {\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/setting-cell.vue"],"names":[],"mappings":";AA+DA;CACA,YAAA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA;AAEA;CACA","file":"setting-cell.vue","sourcesContent":["<template>\n\t<span class=\"setting-cell\">\n\t\t<span class=\"setting-name\">{{setting_name}}</span>\n\n\t\t<select\n\t\t\tv-if=\"typeof(setting_value) === 'number'\"\n\t\t\tclass=\"setting-input-number\"\n\t\t\ttype=\"number\"\n\t\t\tv-model=\"setting_value\">\n\t\t\t<option v-for=\"num in valid_numbers\" :key=\"num\">{{num}}</option>\n\t\t</select>\n\n\t\t<input\n\t\t\tv-if=\"typeof(setting_value) === 'boolean'\"\n\t\t\tclass=\"setting-input-bool\"\n\t\t\ttype=\"checkbox\"\n\t\t\tv-model=\"setting_value\"/>\n\t</span>\n</template>\n\n<script>\n\nexport default {\n\tname: 'SettingCell',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tsetting: Object,\n\t},\n\tcomputed: {\n\t\tvalid_numbers() {\n\t\t\treturn [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];\n\t\t},\n\t\tsetting_name: {\n\t\t\tget() {\n\t\t\t\treturn this.setting['Name'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.setting['Name'] = value;\n\t\t\t},\n\t\t},\n\t\tsetting_value: {\n\t\t\tget() {\n\t\t\t\treturn this.setting['Value'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_setting', {\n\t\t\t\t\tsetting: this.setting,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n};\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-cell {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n\n.setting-input-number {\n\twidth: 60px;\n}\n\n.setting-input-bool {\n}\n\n.setting-name {\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.setting-tr[data-v-6038f16e] {\n\tbackground: #ccc;\n}\n.setting-container[data-v-6038f16e] {\n\tdisplay: flex;\n}\n\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/subsystem-settings.vue"],"names":[],"mappings":";AAsCA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA","file":"subsystem-settings.vue","sourcesContent":["<template>\n\t<tr class=\"setting-tr\" v-if=\"has_settings\">\n\t\t<td class=\"settings-cell\" colspan=\"100\"> <!-- span all columns and we'll just fill it with settings -->\n\t\t\t<SettingCell v-for=\"setting in settings\" :key=\"setting['Name']\" :setting=\"setting\"></SettingCell>\n\t\t</td>\n\t</tr>\n</template>\n\n<script>\n\nimport SettingCell from '@/components/shipdesigner/setting-cell.vue';\n\nexport default {\n\tname: 'SubsystemSettings',\n\tcomponents: {\n\t\tSettingCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\thas_settings() {\n\t\t\treturn this.se_subsystem.settings.length > 0;\n\t\t},\n\t\tsettings() {\n\t\t\treturn this.se_subsystem.settings;\n\t\t},\n\t},\n};\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-tr {\n\tbackground: #ccc;\n}\n\n.setting-container {\n\tdisplay: flex;\n}\n\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-fef3d3c0\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/principal-frame-raw.vue":
-/*!***********************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-fef3d3c0","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/principal-frame-raw.vue ***!
-  \***********************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-6beebb70\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-summary.vue":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-6beebb70","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-summary.vue ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
 // module
-exports.push([module.i, "\n.principal-frame-raw[data-v-fef3d3c0] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n.name-column[data-v-fef3d3c0] {\n\ttext-align: right;\n\tpadding-right: 0.2em;\n}\n\n/* override global value for this one */\n.stat-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.br-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.sr-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-fef3d3c0] {\n\ttext-align: center;\n}\n.has-error[data-v-fef3d3c0] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/principal-frame-raw.vue"],"names":[],"mappings":";AAgHA;CACA,iBAAA;CACA,YAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,yBAAA;CACA,gBAAA;CACA,eAAA;CACA;AAEA;CACA,kBAAA;CACA,qBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-raw.vue","sourcesContent":["<template>\n\t<tr class=\"principal-frame-raw\" v-bind:class=\"{ 'has-error': !is_valid_frame }\">\n\t\t<td class=\"name-column\" colspan=\"2\">Size: {{frame_size}}</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<select v-model=\"principal_frame\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"princ_frame_value in se_design.valid_frames\" :key=\"princ_frame_value['Name']\">{{princ_frame_value['Name']}}</option>\n\t\t\t\t<option v-if=\"!is_valid_frame\" class=\"has-error\">{{principal_frame}}</option>\n\t\t\t</select>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats_raw.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats_raw\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\t\t\n\t\t<td class=\"weight-internal-column\" :class=\"weight_summary_class\">{{se_design.weight_internal.toFixed(2)}}</td>\n\t\t<td class=\"weight-external-column\">{{se_design.weight_external.toFixed(2)}}</td>\n\n\t\t<td class=\"br-column\">{{se_design.cost_BR_raw.toFixed(2)}}</td>\n\t\t<td class=\"sr-column\">{{se_design.cost_SR_raw.toFixed(2)}}</td>\n\n\t\t<td class=\"power-cost-column\" :title=\"power_final_title\" :class=\"power_final_class\">{{se_design.cost_power_raw.toFixed(2)}}</td>\n\t\t<td class=\"power-gen-column\" :title=\"power_final_title\" :class=\"power_final_class\">{{se_design.power_generation_raw.toFixed(2)}}</td>\n\n\t\t<template v-for=\"name in crew_raw.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew_raw\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time_frame}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year_frame}} (Frame)</td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport StatlineCell from './statline-cell.vue';\n\nimport { frac } from './ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrameRaw',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tcomputed: {\n\t\tis_valid_frame() {\n\t\t\treturn this.se_design.is_valid_frame;\n\t\t},\n\t\tpower_final_title() {\n\t\t\tif (this.has_power_error) {\n\t\t\t\treturn 'Error: Power cost greater than power generation.';\n\t\t\t} else {\n\t\t\t\treturn '';\n\t\t\t}\n\t\t},\n\t\tpower_final_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_power_error,\n\t\t\t};\n\t\t},\n\t\thas_power_error() {\n\t\t\treturn this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;\n\t\t},\n\t\tweight_summary_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error() {\n\t\t\treturn this.$store.getters.se_design.weight_internal > this.$store.getters.se_design.frame_max_size_raw;\n\t\t},\n\t\tprincipal_frame: {\n\t\t\tget() {\n\t\t\t\treturn this.$store.getters.se_design.json['Principal Frame'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.getters.se_design.json['Principal Frame'] = value;\n\t\t\t},\n\t\t},\n\t\tstats_raw() {\n\t\t\treturn this.$store.getters.se_design.stats_raw;\n\t\t},\n\t\tcrew_raw() {\n\t\t\treturn this.$store.getters.se_design.cost_crew_raw;\n\t\t},\n\t\tbuild_time_frame() {\n\t\t\treturn frac(this.$store.getters.se_design.build_time_frame, 12);\n\t\t},\n\t\ttech_year_frame() {\n\t\t\treturn this.$store.getters.se_design.tech_year_frame;\n\t\t},\n\t\tframe_size() {\n\t\t\treturn this.$store.getters.se_design.frame_size.toFixed(2);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style>\n</style>\n\n<style scoped>\n.principal-frame-raw {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n\n.name-column {\n\ttext-align: right;\n\tpadding-right: 0.2em;\n}\n\n/* override global value for this one */\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.subsystem-summary[data-v-6beebb70] {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n.name-cell[data-v-6beebb70] {\n\tborder-style: none;\n}\n.part-cell[data-v-6beebb70] {\n\tborder-style: none;\n}\n.part-select[data-v-6beebb70] {\n\twidth: 100%;\n}\n.has-error[data-v-6beebb70] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/subsystem-summary.vue"],"names":[],"mappings":";AAgFA;CACA,iBAAA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-summary.vue","sourcesContent":["<template>\n\n\t<tr class=\"subsystem-summary\">\n\t\t<td class=\"name-column\"\n\t\t\t:class=\"weight_summary_class\"\n\t\t\tcolspan=\"2\">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t\t<td class=\"part-column\"></td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\" :class=\"weight_summary_class\">{{se_subsystem.weight_internal.toFixed(2)}}</td>\n\t\t<td class=\"weight-external-column\">{{se_subsystem.weight_external.toFixed(2)}}</td>\n\n\t\t<td class=\"br-column\">{{se_subsystem.cost_BR.toFixed(2)}}</td>\n\t\t<td class=\"sr-column\">{{se_subsystem.cost_SR.toFixed(2)}}</td>\n\n\t\t<td class=\"power-cost-column\">{{se_subsystem.cost_power.toFixed(2)}}</td>\n\t\t<td class=\"power-gen-column\">{{se_subsystem.power_generation.toFixed(2)}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year}}</td>\n\t</tr>\n\n</template>\n\n\n<script>\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nimport { frac } from '@/lib/ui-functions.js';\n\nexport default {\n\tname: 'SubsystemSummary',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tweight_summary_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error() {\n\t\t\treturn this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;\n\t\t},\n\t\tse_components() {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_subsystem.tech_year_max;\n\t\t},\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style scoped>\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n\n.name-cell {\n\tborder-style: none;\n}\n\n.part-cell {\n\tborder-style: none;\n}\n\n.part-select {\n\twidth: 100%;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/component.vue":
-/*!***************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/component.vue ***!
-  \***************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-f04171c2\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design-summary.vue":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-f04171c2","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design-summary.vue ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+// imports
+
+
+// module
+exports.push([module.i, "\n.design-summary[data-v-f04171c2] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.has-error[data-v-f04171c2] {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n.design-weight-summary[data-v-f04171c2] {\n\tmargin-left: 5px;\n}\n.design-power-summary[data-v-f04171c2] {\n}\n.subsystem-weight-summary[data-v-f04171c2] {\n\tmargin-left: 5px;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/design-summary.vue"],"names":[],"mappings":";AAmFA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA,YAAA;CACA,kBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA;AAEA;CACA,iBAAA;CACA","file":"design-summary.vue","sourcesContent":["<template>\n\t<div class=\"design-summary\">\n\t\t<div>\n\t\t\t<span>{{se_design.name}} | {{se_design.pretty_miscstats}}</span>\n\t\t\t<span> | </span>\n\t\t\t<span\n\t\t\t\t:class=\"{'has-error': has_parts_list_load_error}\"\n\t\t\t\t:title=\"parts_list_load_title\">Parts: {{parts_list_name}}</span>\n\t\t\t<span\n\t\t\t\tv-if=\"has_parts_list_load_error\"\n\t\t\t\t:class=\"{'has-error': has_parts_list_load_error}\"> (WRONG PARTS LIST! EVERYTHING MAY BE INVALID!)</span>\n\t\t</div>\n\n\t\t<div>\n\t\t\t<span>{{se_design.stats_raw.toFixed(2)}}</span>\n\t\t\t<span> | </span>\n\t\t\t<span>[{{se_design.cost_BR_raw.toFixed(2)}}]br</span>\n\t\t\t<span>[{{se_design.cost_SR_raw.toFixed(2)}}]sr</span>\n\t\t\t<span> | </span>\n\t\t\t<span>{{se_design.cost_crew_raw.toFixed(2)}}</span>\n\t\t\t<span> | </span>\n\t\t\t<span>[{{build_time}}]years</span>\n\t\t</div>\n\t\t<div>\n\t\t\t<span\n\t\t\t\tclass=\"design-power-summary\"\n\t\t\t\t:class=\"{'has-error': se_design.cost_power_raw > se_design.power_generation_raw}\"\n\t\t\t\t>Power[{{se_design.cost_power_raw.toFixed(2)}}/{{se_design.power_generation_raw.toFixed(2)}}]</span>\n\t\t\t<span\n\t\t\t\tclass=\"design-weight-summary\"\n\t\t\t\t:class=\"{'has-error': se_design.weight_internal > se_design.frame_max_size_raw}\"\n\t\t\t\t>Internal[{{se_design.weight_internal.toFixed(2)}}/{{se_design.frame_max_size_raw.toFixed(2)}}]</span>\n\t\t\t<span\n\t\t\t\tclass=\"subsystem-weight-summary\"\n\t\t\t\tv-for=\"ss in se_design.subsystems\"\n\t\t\t\t:key=\"ss.name\"\n\t\t\t\t:class=\"{'has-error': ss.weight_internal > ss.weight_cap}\"\n\t\t\t\t>{{ss.name}}[{{ss.weight_internal.toFixed(2)}}/{{ss.weight_cap.toFixed(2)}}] </span>\n\t\t</div>\n\t</div>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport { frac } from '@/lib/ui-functions';\n\nexport default {\n\tname: 'DesignSummary',\n\tcomputed: {\n\t\tparts_list_name() {\n\t\t\treturn this.se_design.parts_list_pretty_name;\n\t\t},\n\t\tparts_list_load_title() {\n\t\t\tif (this.has_parts_list_load_error) {\n\t\t\t\treturn 'Could not find this parts list';\n\t\t\t} else {\n\t\t\t\treturn null;\n\t\t\t}\n\t\t},\n\t\thas_parts_list_load_error() {\n\t\t\treturn !this.se_design.matches_parts_list(this.se_db);\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.$store.getters.se_design.build_time, 12);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t]),\n\t},\n\tmethods: {\n\t\tparts_list_save_name(pl) {\n\t\t\treturn pl.name + ' (' + (new Date(pl.timestamp).toLocaleString()) + ')';\n\t\t},\n\t},\n};\n</script>\n\n\n<style scoped>\n.design-summary {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.has-error {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n\n.design-weight-summary {\n\tmargin-left: 5px;\n}\n\n.design-power-summary {\n}\n\n.subsystem-weight-summary {\n\tmargin-left: 5px;\n}\n\n</style>\n"],"sourceRoot":""}]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-ff9204c2\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/principal-frame-final.vue":
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-ff9204c2","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/principal-frame-final.vue ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+// imports
+
+
+// module
+exports.push([module.i, "\n.principal-frame-final[data-v-ff9204c2] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n.name-column-input[data-v-ff9204c2] {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.stat-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.br-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.sr-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.has-error[data-v-ff9204c2] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/principal-frame-final.vue"],"names":[],"mappings":";AAkGA;CACA,iBAAA;CACA,YAAA;;CAEA,kBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,mBAAA;CACA;AAEA;CACA,aAAA;CACA,kBAAA;CACA,kBAAA;CACA,YAAA;CACA,mBAAA;CACA,mBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-final.vue","sourcesContent":["<template>\n\t<tr class=\"principal-frame-final\">\n\t\t<td class=\"name-column\" colspan=\"2\">\n\t\t\t<input v-model=\"ship_name\" placeholder=\"Ship Name\" class=\"name-column-input\">\n\t\t</td>\n\n\t\t<td class=\"part-column\">{{principal_frame}}</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t\t</template>\n\t\t\n\t\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_design.weight_total}}</td>\n\n\t\t<td class=\"br-column\">{{se_design.cost_BR}}</td>\n\t\t<td class=\"sr-column\">{{se_design.cost_SR}}</td>\n\n\t\t<td class=\"power-cost-column\"\n\t\t\t:title=\"power_final_title\"\n\t\t\t:class=\"power_final_class\">{{se_design.cost_power}}</td>\n\t\t<td class=\"power-gen-column\"\n\t\t\t:title=\"power_final_title\"\n\t\t\t:class=\"power_final_class\">{{se_design.power_generation}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year}}</td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nimport { frac } from '@/lib/ui-functions';\n\nexport default {\n\tname: 'PrincipalFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tcomputed: {\n\t\tpower_final_title() {\n\t\t\tif (this.has_power_error) {\n\t\t\t\treturn 'Error: Power cost greater than power generation.';\n\t\t\t} else {\n\t\t\t\treturn '';\n\t\t\t}\n\t\t},\n\t\tpower_final_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_power_error,\n\t\t\t};\n\t\t},\n\t\thas_power_error() {\n\t\t\treturn this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;\n\t\t},\n\t\tprincipal_frame() {\n\t\t\treturn this.$store.getters.se_design.json['Principal Frame'];\n\t\t},\n\t\tstats() {\n\t\t\treturn this.$store.getters.se_design.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.$store.getters.se_design.cost_crew;\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.$store.getters.se_design.build_time, 12, true);\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.$store.getters.se_design.tech_year_max;\n\t\t},\n\t\tship_name: {\n\t\t\tget() {\n\t\t\t\treturn this.$store.getters.se_design.json['Name'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_design_name', value);\n\t\t\t},\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style scoped>\n.principal-frame-final {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n\n.name-column-input {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/component.vue":
+/*!***************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/component.vue ***!
+  \***************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
@@ -9776,33 +7228,33 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design.vue":
-/*!************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design.vue ***!
-  \************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design.vue":
+/*!************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design.vue ***!
+  \************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
 // module
-exports.push([module.i, "\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n\t/* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.name-column {\n}\n.part-column {\n}\n.part-column-select {\n\twidth: 100%;\n}\n.quantity-column {\n\twidth: 30px;\n}\n.quantity-column-input {\n\twidth: 100%;\n}\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.build-time-column {\n\ttext-align: center;\n}\n.tech-year-column {\n\ttext-align: center;\n}\n.design-table-head {\n}\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/design.vue"],"names":[],"mappings":";AAuFA;CACA,mBAAA;;CAEA,YAAA;CACA,YAAA;CACA,mBAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA;AAEA;CACA,qBAAA;CACA,yBAAA;CACA;AAGA;IACA,qBAAA;IACA,qBAAA;IACA,kBAAA;IACA,mBAAA;CACA","file":"design.vue","sourcesContent":["<template>\n\t<div class=\"design-table\">\n\t\t<table>\n\t\t\t<thead class=\"design-table-head\">\n\t\t\t\t<tr class=\"design-table-head-tr\">\n\t\t\t\t\t<th></th>\t<!-- name -->\n\t\t\t\t\t<th></th>\t<!-- quantity -->\n\t\t\t\t\t<th></th>\t<!-- part -->\n\t\t\t\t\t<th>C</th>\n\t\t\t\t\t<th>S</th>\n\t\t\t\t\t<th>H</th>\n\t\t\t\t\t<th>L</th>\n\t\t\t\t\t<th>P</th>\n\t\t\t\t\t<th>D</th>\n\t\t\t\t\t<th>Wt (Int</th>\n\t\t\t\t\t<th>Ext)</th>\n\t\t\t\t\t<th>BR</th>\n\t\t\t\t\t<th>SR</th>\n\t\t\t\t\t<th>Pwr Cost</th>\n\t\t\t\t\t<th>Pwr Gen</th>\n\t\t\t\t\t<th>O</th>\n\t\t\t\t\t<th>E</th>\n\t\t\t\t\t<th>T</th>\n\t\t\t\t\t<th>Build Time</th>\n\t\t\t\t\t<th>Year Available</th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody class=\"design-table-body\">\n\t\t\t\t<PrincipalFrameFinal></PrincipalFrameFinal>\n\t\t\t\t<PrincipalFrameRaw></PrincipalFrameRaw>\n\t\t\t\t<template v-for=\"se_subsystem in se_subsystems\">\n\t\t\t\t\t<tr :key=\"se_subsystem.name\" class=\"subsystem-spacer-row\"><td colspan=\"100\" height=\"30px\"></td></tr>\t<!-- empty line for spacing -->\n\t\t\t\t\t<SubsystemFrame :key=\"se_subsystem.name + '-frame'\" :se_subsystem=\"se_subsystem\"></SubsystemFrame>\n\t\t\t\t\t<SubsystemSummary :key=\"se_subsystem.name + '-summary'\" :se_subsystem=\"se_subsystem\"></SubsystemSummary>\n\t\t\t\t\t<SubsystemSettings :key=\"se_subsystem.name + '-settings'\" :se_subsystem=\"se_subsystem\"></SubsystemSettings>\n\n\t\t\t\t\t<template v-for=\"se_component in se_subsystem.components\">\n\t\t\t\t\t\t<ComponentTr :key=\"se_component.name\" :se_component=\"se_component\"></ComponentTr>\n\t\t\t\t\t</template>\n\t\t\t\t</template>\n\n\t\t\t\t<tr class=\"subsystem-spacer-row\"><td colspan=\"100\" height=\"30px\"></td></tr>\t<!-- empty line for spacing -->\n\t\t\t\t<ModuleTr :se_module=\"se_design.module\"></ModuleTr>\n\t\t\t</tbody>\n\t\t</table>\n\t</div>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport PrincipalFrameRaw from './principal-frame-raw.vue';\nimport PrincipalFrameFinal from './principal-frame-final.vue';\nimport SubsystemSummary from './subsystem-summary.vue';\nimport SubsystemFrame from './subsystem-frame.vue';\nimport SubsystemSettings from './subsystem-settings.vue';\nimport ComponentTr from './component.vue';\nimport ModuleTr from './module.vue';\n\nexport default {\n\tname: 'Design',\n\tcomponents: {\n\t\tPrincipalFrameRaw,\n\t\tPrincipalFrameFinal,\n\t\tSubsystemSummary,\n\t\tSubsystemFrame,\n\t\tSubsystemSettings,\n\t\tComponentTr,\n\t\tModuleTr,\n\t},\n\tcomputed: {\n\t\tse_subsystems() {\n\t\t\treturn this.$store.getters.se_design.subsystems;\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style>\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n\t/* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.name-column {\n}\n\n.part-column {\n}\n\n.part-column-select {\n\twidth: 100%;\n}\n\n.quantity-column {\n\twidth: 30px;\n}\n\n.quantity-column-input {\n\twidth: 100%;\n}\n\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.build-time-column {\n\ttext-align: center;\n}\n\n.tech-year-column {\n\ttext-align: center;\n}\n\n.design-table-head {\n}\n\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n\n\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n\t/* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.name-column {\n}\n.part-column {\n}\n.part-column-select {\n\twidth: 100%;\n}\n.quantity-column {\n\twidth: 30px;\n}\n.quantity-column-input {\n\twidth: 100%;\n}\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.build-time-column {\n\ttext-align: center;\n}\n.tech-year-column {\n\ttext-align: center;\n}\n.design-table-head {\n}\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/design.vue"],"names":[],"mappings":";AAuFA;CACA,mBAAA;;CAEA,YAAA;CACA,YAAA;CACA,mBAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA;AAEA;CACA,qBAAA;CACA,yBAAA;CACA;AAGA;IACA,qBAAA;IACA,qBAAA;IACA,kBAAA;IACA,mBAAA;CACA","file":"design.vue","sourcesContent":["<template>\n\t<div class=\"design-table\">\n\t\t<table>\n\t\t\t<thead class=\"design-table-head\">\n\t\t\t\t<tr class=\"design-table-head-tr\">\n\t\t\t\t\t<th></th>\t<!-- name -->\n\t\t\t\t\t<th></th>\t<!-- quantity -->\n\t\t\t\t\t<th></th>\t<!-- part -->\n\t\t\t\t\t<th>C</th>\n\t\t\t\t\t<th>S</th>\n\t\t\t\t\t<th>H</th>\n\t\t\t\t\t<th>L</th>\n\t\t\t\t\t<th>P</th>\n\t\t\t\t\t<th>D</th>\n\t\t\t\t\t<th>Wt (Int</th>\n\t\t\t\t\t<th>Ext)</th>\n\t\t\t\t\t<th>BR</th>\n\t\t\t\t\t<th>SR</th>\n\t\t\t\t\t<th>Pwr Cost</th>\n\t\t\t\t\t<th>Pwr Gen</th>\n\t\t\t\t\t<th>O</th>\n\t\t\t\t\t<th>E</th>\n\t\t\t\t\t<th>T</th>\n\t\t\t\t\t<th>Build Time</th>\n\t\t\t\t\t<th>Year Available</th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody class=\"design-table-body\">\n\t\t\t\t<PrincipalFrameFinal></PrincipalFrameFinal>\n\t\t\t\t<PrincipalFrameRaw></PrincipalFrameRaw>\n\t\t\t\t<template v-for=\"se_subsystem in se_subsystems\">\n\t\t\t\t\t<tr :key=\"se_subsystem.name\" class=\"subsystem-spacer-row\"><td colspan=\"100\" height=\"30px\"></td></tr>\t<!-- empty line for spacing -->\n\t\t\t\t\t<SubsystemFrame :key=\"se_subsystem.name + '-frame'\" :se_subsystem=\"se_subsystem\"></SubsystemFrame>\n\t\t\t\t\t<SubsystemSummary :key=\"se_subsystem.name + '-summary'\" :se_subsystem=\"se_subsystem\"></SubsystemSummary>\n\t\t\t\t\t<SubsystemSettings :key=\"se_subsystem.name + '-settings'\" :se_subsystem=\"se_subsystem\"></SubsystemSettings>\n\n\t\t\t\t\t<template v-for=\"se_component in se_subsystem.components\">\n\t\t\t\t\t\t<ComponentTr :key=\"se_component.name\" :se_component=\"se_component\"></ComponentTr>\n\t\t\t\t\t</template>\n\t\t\t\t</template>\n\n\t\t\t\t<tr class=\"subsystem-spacer-row\"><td colspan=\"100\" height=\"30px\"></td></tr>\t<!-- empty line for spacing -->\n\t\t\t\t<ModuleTr :se_module=\"se_design.module\"></ModuleTr>\n\t\t\t</tbody>\n\t\t</table>\n\t</div>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport PrincipalFrameRaw from '@/components/shipdesigner/principal-frame-raw.vue';\nimport PrincipalFrameFinal from '@/components/shipdesigner/principal-frame-final.vue';\nimport SubsystemSummary from '@/components/shipdesigner/subsystem-summary.vue';\nimport SubsystemFrame from '@/components/shipdesigner/subsystem-frame.vue';\nimport SubsystemSettings from '@/components/shipdesigner/subsystem-settings.vue';\nimport ComponentTr from '@/components/shipdesigner/component.vue';\nimport ModuleTr from '@/components/shipdesigner/module.vue';\n\nexport default {\n\tname: 'Design',\n\tcomponents: {\n\t\tPrincipalFrameRaw,\n\t\tPrincipalFrameFinal,\n\t\tSubsystemSummary,\n\t\tSubsystemFrame,\n\t\tSubsystemSettings,\n\t\tComponentTr,\n\t\tModuleTr,\n\t},\n\tcomputed: {\n\t\tse_subsystems() {\n\t\t\treturn this.$store.getters.se_design.subsystems;\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style>\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n\t/* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.name-column {\n}\n\n.part-column {\n}\n\n.part-column-select {\n\twidth: 100%;\n}\n\n.quantity-column {\n\twidth: 30px;\n}\n\n.quantity-column-input {\n\twidth: 100%;\n}\n\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.build-time-column {\n\ttext-align: center;\n}\n\n.tech-year-column {\n\ttext-align: center;\n}\n\n.design-table-head {\n}\n\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n\n\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/module.vue":
-/*!************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/module.vue ***!
-  \************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/module.vue":
+/*!************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/module.vue ***!
+  \************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
@@ -9814,14 +7266,14 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/principal-frame-raw.vue":
-/*!*************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/principal-frame-raw.vue ***!
-  \*************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/principal-frame-raw.vue":
+/*!*************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/principal-frame-raw.vue ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
@@ -9833,14 +7285,14 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/setting-cell.vue":
-/*!******************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/setting-cell.vue ***!
-  \******************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/setting-cell.vue":
+/*!******************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/setting-cell.vue ***!
+  \******************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
@@ -9852,33 +7304,33 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/shipdesigner.vue":
-/*!******************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/shipdesigner.vue ***!
-  \******************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/shipdesigner.vue":
+/*!******************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/shipdesigner.vue ***!
+  \******************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
 // module
-exports.push([module.i, "\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\tfont-size: 15px;\n}\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/src/shipdesigner.vue"],"names":[],"mappings":";AAqCA;CACA,YAAA;CACA,aAAA;;CAEA,cAAA;CACA,uBAAA;CACA,kBAAA;CACA,gBAAA;CACA;AAEA;CACA,eAAA;CACA,yBAAA;CACA;AAEA;CACA,eAAA;CACA,mBAAA,yCAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,sBAAA;CACA","file":"shipdesigner.vue","sourcesContent":["<template>\n\t<div class=\"root\">\n\t\t<div class=\"header\">\n\t\t\t<DesignSummary></DesignSummary>\n\t\t</div>\n\t\t<div class=\"design\">\n\t\t\t<Design></Design>\n\t\t</div>\n\t\t<div class=\"footer\">\n\t\t\t<DesignImportExport></DesignImportExport>\n\t\t</div>\n\t</div>\n</template>\n\n\n<script>\n\nimport DesignSummary from './design-summary.vue';\nimport Design from './design.vue';\nimport DesignImportExport from './design-import-export.vue';\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tDesignSummary,\n\t\tDesign,\n\t\tDesignImportExport,\n\t},\n\tcomputed: {\n\t},\n};\n\n</script>\n\n\n<style>\n\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\tfont-size: 15px;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\tfont-size: 15px;\n}\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/shipdesigner.vue"],"names":[],"mappings":";AAqCA;CACA,YAAA;CACA,aAAA;;CAEA,cAAA;CACA,uBAAA;CACA,kBAAA;CACA,gBAAA;CACA;AAEA;CACA,eAAA;CACA,yBAAA;CACA;AAEA;CACA,eAAA;CACA,mBAAA,yCAAA;CACA,iBAAA;CACA;AAEA;CACA,eAAA;CACA,sBAAA;CACA","file":"shipdesigner.vue","sourcesContent":["<template>\n\t<div class=\"root\">\n\t\t<div class=\"header\">\n\t\t\t<DesignSummary></DesignSummary>\n\t\t</div>\n\t\t<div class=\"design\">\n\t\t\t<Design></Design>\n\t\t</div>\n\t\t<div class=\"footer\">\n\t\t\t<DesignImportExport></DesignImportExport>\n\t\t</div>\n\t</div>\n</template>\n\n\n<script>\n\nimport DesignSummary from '@/components/shipdesigner/design-summary.vue';\nimport Design from '@/components/shipdesigner/design.vue';\nimport DesignImportExport from '@/components/shipdesigner/design-import-export.vue';\n\nexport default {\n\tname: 'app',\n\tcomponents: {\n\t\tDesignSummary,\n\t\tDesign,\n\t\tDesignImportExport,\n\t},\n\tcomputed: {\n\t},\n};\n\n</script>\n\n\n<style>\n\n.root {\n\twidth: 100%;\n\theight: 100%;\n\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-wrap: nowrap;\n\tfont-size: 15px;\n}\n\n.header {\n\tflex: 0 0 auto;\n\tborder-bottom: 2px solid;\n}\n\n.design {\n\tflex: 1 1 auto;\n\tposition: relative;/* need this to position inner content */\n\toverflow-y: auto;\n}\n\n.footer {\n\tflex: 0 0 auto;\n\tborder-top: 2px solid;\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/statline-cell.vue":
-/*!*******************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/statline-cell.vue ***!
-  \*******************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/statline-cell.vue":
+/*!*******************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/statline-cell.vue ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
@@ -9890,14 +7342,14 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-frame.vue":
-/*!*********************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-frame.vue ***!
-  \*********************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-frame.vue":
+/*!*********************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-frame.vue ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
@@ -9909,14 +7361,14 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-settings.vue":
-/*!************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-settings.vue ***!
-  \************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-settings.vue":
+/*!************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-settings.vue ***!
+  \************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
@@ -9928,14 +7380,14 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-summary.vue":
-/*!***********************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-summary.vue ***!
-  \***********************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-summary.vue":
+/*!***********************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-summary.vue ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(true);
 // imports
 
 
@@ -27715,47 +25167,10 @@ function normalizeComponent (
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-06bcc24c\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/subsystem-settings.vue":
-/*!****************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-06bcc24c","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/subsystem-settings.vue ***!
-  \****************************************************************************************************************************************************************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _vm.has_settings
-    ? _c("tr", { staticClass: "setting-tr" }, [
-        _c(
-          "td",
-          { staticClass: "settings-cell", attrs: { colspan: "100" } },
-          _vm._l(_vm.settings, function(setting) {
-            return _c("SettingCell", {
-              key: setting["Name"],
-              attrs: { setting: setting }
-            })
-          })
-        )
-      ])
-    : _vm._e()
-}
-var staticRenderFns = []
-render._withStripped = true
-
-if (false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-1fa46046\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/subsystem-frame.vue":
-/*!*************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-1fa46046","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/subsystem-frame.vue ***!
-  \*************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-15813b91\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/principal-frame-raw.vue":
+/*!*****************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-15813b91","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/principal-frame-raw.vue ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -27770,12 +25185,12 @@ var render = function() {
   return _c(
     "tr",
     {
-      staticClass: "subsystem-frame",
+      staticClass: "principal-frame-raw",
       class: { "has-error": !_vm.is_valid_frame }
     },
     [
       _c("td", { staticClass: "name-column", attrs: { colspan: "2" } }, [
-        _vm._v(_vm._s(_vm.se_subsystem.name))
+        _vm._v("Size: " + _vm._s(_vm.frame_size))
       ]),
       _vm._v(" "),
       _c("td", { staticClass: "part-column" }, [
@@ -27786,8 +25201,8 @@ var render = function() {
               {
                 name: "model",
                 rawName: "v-model",
-                value: _vm.sub_frame,
-                expression: "sub_frame"
+                value: _vm.principal_frame,
+                expression: "principal_frame"
               }
             ],
             staticClass: "part-column-select",
@@ -27801,22 +25216,22 @@ var render = function() {
                     var val = "_value" in o ? o._value : o.value
                     return val
                   })
-                _vm.sub_frame = $event.target.multiple
+                _vm.principal_frame = $event.target.multiple
                   ? $$selectedVal
                   : $$selectedVal[0]
               }
             }
           },
           [
-            _vm._l(_vm.se_subsystem.valid_frames, function(sub_frame_value) {
-              return _c("option", { key: sub_frame_value["Name"] }, [
-                _vm._v(_vm._s(sub_frame_value["Name"]))
+            _vm._l(_vm.se_design.valid_frames, function(princ_frame_value) {
+              return _c("option", { key: princ_frame_value["Name"] }, [
+                _vm._v(_vm._s(princ_frame_value["Name"]))
               ])
             }),
             _vm._v(" "),
             !_vm.is_valid_frame
               ? _c("option", { staticClass: "has-error" }, [
-                  _vm._v(_vm._s(_vm.sub_frame))
+                  _vm._v(_vm._s(_vm.principal_frame))
                 ])
               : _vm._e()
           ],
@@ -27824,47 +25239,71 @@ var render = function() {
         )
       ]),
       _vm._v(" "),
-      _vm._l(_vm.stats.names, function(name) {
+      _vm._l(_vm.stats_raw.names, function(name) {
         return [
-          _c("td", { key: name, staticClass: "stat-column" }, [
-            _vm._v(_vm._s(_vm.stats_multiplier_pretty))
-          ])
+          _c("StatlineCell", {
+            key: name,
+            attrs: { stats: _vm.stats_raw, name: name }
+          })
         ]
       }),
       _vm._v(" "),
       _c(
         "td",
-        { staticClass: "weight-internal-column", attrs: { colspan: "2" } },
-        [_vm._v(_vm._s(_vm.se_subsystem.weight_cap.toFixed(2)))]
+        {
+          staticClass: "weight-internal-column",
+          class: _vm.weight_summary_class
+        },
+        [_vm._v(_vm._s(_vm.se_design.weight_internal.toFixed(2)))]
       ),
       _vm._v(" "),
+      _c("td", { staticClass: "weight-external-column" }, [
+        _vm._v(_vm._s(_vm.se_design.weight_external.toFixed(2)))
+      ]),
+      _vm._v(" "),
       _c("td", { staticClass: "br-column" }, [
-        _vm._v(_vm._s(_vm.se_subsystem.cost_BR_frame.toFixed(2)))
+        _vm._v(_vm._s(_vm.se_design.cost_BR_raw.toFixed(2)))
       ]),
       _vm._v(" "),
       _c("td", { staticClass: "sr-column" }, [
-        _vm._v(_vm._s(_vm.se_subsystem.cost_SR_mult.toFixed(2)) + "x")
+        _vm._v(_vm._s(_vm.se_design.cost_SR_raw.toFixed(2)))
       ]),
       _vm._v(" "),
-      _c("td", { staticClass: "power-cost-column" }),
+      _c(
+        "td",
+        {
+          staticClass: "power-cost-column",
+          class: _vm.power_final_class,
+          attrs: { title: _vm.power_final_title }
+        },
+        [_vm._v(_vm._s(_vm.se_design.cost_power_raw.toFixed(2)))]
+      ),
       _vm._v(" "),
-      _c("td", { staticClass: "power-gen-column" }),
+      _c(
+        "td",
+        {
+          staticClass: "power-gen-column",
+          class: _vm.power_final_class,
+          attrs: { title: _vm.power_final_title }
+        },
+        [_vm._v(_vm._s(_vm.se_design.power_generation_raw.toFixed(2)))]
+      ),
       _vm._v(" "),
-      _vm._l(_vm.crew.names, function(name) {
+      _vm._l(_vm.crew_raw.names, function(name) {
         return [
           _c("StatlineCell", {
             key: name,
-            attrs: { stats: _vm.crew_mult_pretty, name: name, ispretty: false }
+            attrs: { stats: _vm.crew_raw, name: name }
           })
         ]
       }),
       _vm._v(" "),
       _c("td", { staticClass: "build-time-column" }, [
-        _vm._v(_vm._s(_vm.build_time))
+        _vm._v(_vm._s(_vm.build_time_frame))
       ]),
       _vm._v(" "),
       _c("td", { staticClass: "tech-year-column" }, [
-        _vm._v(_vm._s(_vm.tech_year) + " (Frame)")
+        _vm._v(_vm._s(_vm.tech_year_frame) + " (Frame)")
       ])
     ],
     2
@@ -27877,10 +25316,10 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-38841434\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/design-import-export.vue":
-/*!******************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-38841434","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/design-import-export.vue ***!
-  \******************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-23b102d6\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/design-import-export.vue":
+/*!******************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-23b102d6","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/design-import-export.vue ***!
+  \******************************************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -28265,127 +25704,10 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-3d6f706e\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/principal-frame-final.vue":
-/*!*******************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-3d6f706e","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/principal-frame-final.vue ***!
-  \*******************************************************************************************************************************************************************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "tr",
-    { staticClass: "principal-frame-final" },
-    [
-      _c("td", { staticClass: "name-column", attrs: { colspan: "2" } }, [
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.ship_name,
-              expression: "ship_name"
-            }
-          ],
-          staticClass: "name-column-input",
-          attrs: { placeholder: "Ship Name" },
-          domProps: { value: _vm.ship_name },
-          on: {
-            input: function($event) {
-              if ($event.target.composing) {
-                return
-              }
-              _vm.ship_name = $event.target.value
-            }
-          }
-        })
-      ]),
-      _vm._v(" "),
-      _c("td", { staticClass: "part-column" }, [
-        _vm._v(_vm._s(_vm.principal_frame))
-      ]),
-      _vm._v(" "),
-      _vm._l(_vm.stats.names, function(name) {
-        return [
-          _c("StatlineCell", {
-            key: name,
-            attrs: { stats: _vm.stats, name: name, fixed: 0 }
-          })
-        ]
-      }),
-      _vm._v(" "),
-      _c(
-        "td",
-        { staticClass: "weight-internal-column", attrs: { colspan: "2" } },
-        [_vm._v(_vm._s(_vm.se_design.weight_total))]
-      ),
-      _vm._v(" "),
-      _c("td", { staticClass: "br-column" }, [
-        _vm._v(_vm._s(_vm.se_design.cost_BR))
-      ]),
-      _vm._v(" "),
-      _c("td", { staticClass: "sr-column" }, [
-        _vm._v(_vm._s(_vm.se_design.cost_SR))
-      ]),
-      _vm._v(" "),
-      _c(
-        "td",
-        {
-          staticClass: "power-cost-column",
-          class: _vm.power_final_class,
-          attrs: { title: _vm.power_final_title }
-        },
-        [_vm._v(_vm._s(_vm.se_design.cost_power))]
-      ),
-      _vm._v(" "),
-      _c(
-        "td",
-        {
-          staticClass: "power-gen-column",
-          class: _vm.power_final_class,
-          attrs: { title: _vm.power_final_title }
-        },
-        [_vm._v(_vm._s(_vm.se_design.power_generation))]
-      ),
-      _vm._v(" "),
-      _vm._l(_vm.crew.names, function(name) {
-        return [
-          _c("StatlineCell", {
-            key: name,
-            attrs: { stats: _vm.crew, name: name, fixed: 0 }
-          })
-        ]
-      }),
-      _vm._v(" "),
-      _c("td", { staticClass: "build-time-column" }, [
-        _vm._v(_vm._s(_vm.build_time))
-      ]),
-      _vm._v(" "),
-      _c("td", { staticClass: "tech-year-column" }, [
-        _vm._v(_vm._s(_vm.tech_year))
-      ])
-    ],
-    2
-  )
-}
-var staticRenderFns = []
-render._withStripped = true
-
-if (false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-4a14dd3e\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/statline-cell.vue":
-/*!***********************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-4a14dd3e","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/statline-cell.vue ***!
-  \***********************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-241da922\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/statline-cell.vue":
+/*!***********************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-241da922","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/statline-cell.vue ***!
+  \***********************************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -28406,144 +25728,10 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-50f1f052\",\"hasScoped\":false,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/design.vue":
-/*!*****************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-50f1f052","hasScoped":false,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/design.vue ***!
-  \*****************************************************************************************************************************************************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "design-table" }, [
-    _c("table", [
-      _vm._m(0),
-      _vm._v(" "),
-      _c(
-        "tbody",
-        { staticClass: "design-table-body" },
-        [
-          _c("PrincipalFrameFinal"),
-          _vm._v(" "),
-          _c("PrincipalFrameRaw"),
-          _vm._v(" "),
-          _vm._l(_vm.se_subsystems, function(se_subsystem) {
-            return [
-              _c(
-                "tr",
-                { key: se_subsystem.name, staticClass: "subsystem-spacer-row" },
-                [_c("td", { attrs: { colspan: "100", height: "30px" } })]
-              ),
-              _vm._v(" "),
-              _c("SubsystemFrame", {
-                key: se_subsystem.name + "-frame",
-                attrs: { se_subsystem: se_subsystem }
-              }),
-              _vm._v(" "),
-              _c("SubsystemSummary", {
-                key: se_subsystem.name + "-summary",
-                attrs: { se_subsystem: se_subsystem }
-              }),
-              _vm._v(" "),
-              _c("SubsystemSettings", {
-                key: se_subsystem.name + "-settings",
-                attrs: { se_subsystem: se_subsystem }
-              }),
-              _vm._v(" "),
-              _vm._l(se_subsystem.components, function(se_component) {
-                return [
-                  _c("ComponentTr", {
-                    key: se_component.name,
-                    attrs: { se_component: se_component }
-                  })
-                ]
-              })
-            ]
-          }),
-          _vm._v(" "),
-          _vm._m(1),
-          _vm._v(" "),
-          _c("ModuleTr", { attrs: { se_module: _vm.se_design.module } })
-        ],
-        2
-      )
-    ])
-  ])
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", { staticClass: "design-table-head" }, [
-      _c("tr", { staticClass: "design-table-head-tr" }, [
-        _c("th"),
-        _vm._v(" "),
-        _c("th"),
-        _vm._v(" "),
-        _c("th"),
-        _vm._v(" "),
-        _c("th", [_vm._v("C")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("S")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("H")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("L")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("P")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("D")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Wt (Int")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Ext)")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("BR")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("SR")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Pwr Cost")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Pwr Gen")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("O")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("E")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("T")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Build Time")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Year Available")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("tr", { staticClass: "subsystem-spacer-row" }, [
-      _c("td", { attrs: { colspan: "100", height: "30px" } })
-    ])
-  }
-]
-render._withStripped = true
-
-if (false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-64fbfa00\",\"hasScoped\":false,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/shipdesigner.vue":
-/*!***********************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-64fbfa00","hasScoped":false,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/shipdesigner.vue ***!
-  \***********************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-2834a1af\",\"hasScoped\":false,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/shipdesigner.vue":
+/*!***********************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-2834a1af","hasScoped":false,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/shipdesigner.vue ***!
+  \***********************************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -28570,255 +25758,10 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-6f922482\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/subsystem-summary.vue":
-/*!***************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-6f922482","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/subsystem-summary.vue ***!
-  \***************************************************************************************************************************************************************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "tr",
-    { staticClass: "subsystem-summary" },
-    [
-      _c(
-        "td",
-        {
-          staticClass: "name-column",
-          class: _vm.weight_summary_class,
-          attrs: { colspan: "2" }
-        },
-        [
-          _vm._v(
-            _vm._s(_vm.se_subsystem.weight_internal.toFixed(2)) +
-              "/" +
-              _vm._s(_vm.se_subsystem.weight_cap.toFixed(2))
-          )
-        ]
-      ),
-      _vm._v(" "),
-      _c("td", { staticClass: "part-column" }),
-      _vm._v(" "),
-      _vm._l(_vm.stats.names, function(name) {
-        return [
-          _c("StatlineCell", {
-            key: name,
-            attrs: { stats: _vm.stats, name: name }
-          })
-        ]
-      }),
-      _vm._v(" "),
-      _c(
-        "td",
-        {
-          staticClass: "weight-internal-column",
-          class: _vm.weight_summary_class
-        },
-        [_vm._v(_vm._s(_vm.se_subsystem.weight_internal.toFixed(2)))]
-      ),
-      _vm._v(" "),
-      _c("td", { staticClass: "weight-external-column" }, [
-        _vm._v(_vm._s(_vm.se_subsystem.weight_external.toFixed(2)))
-      ]),
-      _vm._v(" "),
-      _c("td", { staticClass: "br-column" }, [
-        _vm._v(_vm._s(_vm.se_subsystem.cost_BR.toFixed(2)))
-      ]),
-      _vm._v(" "),
-      _c("td", { staticClass: "sr-column" }, [
-        _vm._v(_vm._s(_vm.se_subsystem.cost_SR.toFixed(2)))
-      ]),
-      _vm._v(" "),
-      _c("td", { staticClass: "power-cost-column" }, [
-        _vm._v(_vm._s(_vm.se_subsystem.cost_power.toFixed(2)))
-      ]),
-      _vm._v(" "),
-      _c("td", { staticClass: "power-gen-column" }, [
-        _vm._v(_vm._s(_vm.se_subsystem.power_generation.toFixed(2)))
-      ]),
-      _vm._v(" "),
-      _vm._l(_vm.crew.names, function(name) {
-        return [
-          _c("StatlineCell", {
-            key: name,
-            attrs: { stats: _vm.crew, name: name }
-          })
-        ]
-      }),
-      _vm._v(" "),
-      _c("td", { staticClass: "build-time-column" }, [
-        _vm._v(_vm._s(_vm.build_time))
-      ]),
-      _vm._v(" "),
-      _c("td", { staticClass: "tech-year-column" }, [
-        _vm._v(_vm._s(_vm.tech_year))
-      ])
-    ],
-    2
-  )
-}
-var staticRenderFns = []
-render._withStripped = true
-
-if (false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-9f9c61a0\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/design-summary.vue":
-/*!************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-9f9c61a0","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/design-summary.vue ***!
-  \************************************************************************************************************************************************************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "design-summary" }, [
-    _c("div", [
-      _c("span", [
-        _vm._v(
-          _vm._s(_vm.se_design.name) +
-            " | " +
-            _vm._s(_vm.se_design.pretty_miscstats)
-        )
-      ]),
-      _vm._v(" "),
-      _c("span", [_vm._v(" | ")]),
-      _vm._v(" "),
-      _c(
-        "span",
-        {
-          class: { "has-error": _vm.has_parts_list_load_error },
-          attrs: { title: _vm.parts_list_load_title }
-        },
-        [_vm._v("Parts: " + _vm._s(_vm.parts_list_name))]
-      ),
-      _vm._v(" "),
-      _vm.has_parts_list_load_error
-        ? _c(
-            "span",
-            { class: { "has-error": _vm.has_parts_list_load_error } },
-            [_vm._v(" (WRONG PARTS LIST! EVERYTHING MAY BE INVALID!)")]
-          )
-        : _vm._e()
-    ]),
-    _vm._v(" "),
-    _c("div", [
-      _c("span", [_vm._v(_vm._s(_vm.se_design.stats_raw.toFixed(2)))]),
-      _vm._v(" "),
-      _c("span", [_vm._v(" | ")]),
-      _vm._v(" "),
-      _c("span", [
-        _vm._v("[" + _vm._s(_vm.se_design.cost_BR_raw.toFixed(2)) + "]br")
-      ]),
-      _vm._v(" "),
-      _c("span", [
-        _vm._v("[" + _vm._s(_vm.se_design.cost_SR_raw.toFixed(2)) + "]sr")
-      ]),
-      _vm._v(" "),
-      _c("span", [_vm._v(" | ")]),
-      _vm._v(" "),
-      _c("span", [_vm._v(_vm._s(_vm.se_design.cost_crew_raw.toFixed(2)))]),
-      _vm._v(" "),
-      _c("span", [_vm._v(" | ")]),
-      _vm._v(" "),
-      _c("span", [_vm._v("[" + _vm._s(_vm.build_time) + "]years")])
-    ]),
-    _vm._v(" "),
-    _c(
-      "div",
-      [
-        _c(
-          "span",
-          {
-            staticClass: "design-power-summary",
-            class: {
-              "has-error":
-                _vm.se_design.cost_power_raw >
-                _vm.se_design.power_generation_raw
-            }
-          },
-          [
-            _vm._v(
-              "Power[" +
-                _vm._s(_vm.se_design.cost_power_raw.toFixed(2)) +
-                "/" +
-                _vm._s(_vm.se_design.power_generation_raw.toFixed(2)) +
-                "]"
-            )
-          ]
-        ),
-        _vm._v(" "),
-        _c(
-          "span",
-          {
-            staticClass: "design-weight-summary",
-            class: {
-              "has-error":
-                _vm.se_design.weight_internal > _vm.se_design.frame_max_size_raw
-            }
-          },
-          [
-            _vm._v(
-              "Internal[" +
-                _vm._s(_vm.se_design.weight_internal.toFixed(2)) +
-                "/" +
-                _vm._s(_vm.se_design.frame_max_size_raw.toFixed(2)) +
-                "]"
-            )
-          ]
-        ),
-        _vm._v(" "),
-        _vm._l(_vm.se_design.subsystems, function(ss) {
-          return _c(
-            "span",
-            {
-              key: ss.name,
-              staticClass: "subsystem-weight-summary",
-              class: { "has-error": ss.weight_internal > ss.weight_cap }
-            },
-            [
-              _vm._v(
-                _vm._s(ss.name) +
-                  "[" +
-                  _vm._s(ss.weight_internal.toFixed(2)) +
-                  "/" +
-                  _vm._s(ss.weight_cap.toFixed(2)) +
-                  "] "
-              )
-            ]
-          )
-        })
-      ],
-      2
-    )
-  ])
-}
-var staticRenderFns = []
-render._withStripped = true
-
-if (false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-a8ea6a18\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/component.vue":
-/*!*******************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-a8ea6a18","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/component.vue ***!
-  \*******************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-32dfd9a5\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/component.vue":
+/*!*******************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-32dfd9a5","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/component.vue ***!
+  \*******************************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -29006,10 +25949,240 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-b52a34f6\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/module.vue":
-/*!****************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-b52a34f6","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/module.vue ***!
-  \****************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-3da5e637\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/subsystem-frame.vue":
+/*!*************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-3da5e637","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/subsystem-frame.vue ***!
+  \*************************************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "tr",
+    {
+      staticClass: "subsystem-frame",
+      class: { "has-error": !_vm.is_valid_frame }
+    },
+    [
+      _c("td", { staticClass: "name-column", attrs: { colspan: "2" } }, [
+        _vm._v(_vm._s(_vm.se_subsystem.name))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "part-column" }, [
+        _c(
+          "select",
+          {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.sub_frame,
+                expression: "sub_frame"
+              }
+            ],
+            staticClass: "part-column-select",
+            on: {
+              change: function($event) {
+                var $$selectedVal = Array.prototype.filter
+                  .call($event.target.options, function(o) {
+                    return o.selected
+                  })
+                  .map(function(o) {
+                    var val = "_value" in o ? o._value : o.value
+                    return val
+                  })
+                _vm.sub_frame = $event.target.multiple
+                  ? $$selectedVal
+                  : $$selectedVal[0]
+              }
+            }
+          },
+          [
+            _vm._l(_vm.se_subsystem.valid_frames, function(sub_frame_value) {
+              return _c("option", { key: sub_frame_value["Name"] }, [
+                _vm._v(_vm._s(sub_frame_value["Name"]))
+              ])
+            }),
+            _vm._v(" "),
+            !_vm.is_valid_frame
+              ? _c("option", { staticClass: "has-error" }, [
+                  _vm._v(_vm._s(_vm.sub_frame))
+                ])
+              : _vm._e()
+          ],
+          2
+        )
+      ]),
+      _vm._v(" "),
+      _vm._l(_vm.stats.names, function(name) {
+        return [
+          _c("td", { key: name, staticClass: "stat-column" }, [
+            _vm._v(_vm._s(_vm.stats_multiplier_pretty))
+          ])
+        ]
+      }),
+      _vm._v(" "),
+      _c(
+        "td",
+        { staticClass: "weight-internal-column", attrs: { colspan: "2" } },
+        [_vm._v(_vm._s(_vm.se_subsystem.weight_cap.toFixed(2)))]
+      ),
+      _vm._v(" "),
+      _c("td", { staticClass: "br-column" }, [
+        _vm._v(_vm._s(_vm.se_subsystem.cost_BR_frame.toFixed(2)))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "sr-column" }, [
+        _vm._v(_vm._s(_vm.se_subsystem.cost_SR_mult.toFixed(2)) + "x")
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "power-cost-column" }),
+      _vm._v(" "),
+      _c("td", { staticClass: "power-gen-column" }),
+      _vm._v(" "),
+      _vm._l(_vm.crew.names, function(name) {
+        return [
+          _c("StatlineCell", {
+            key: name,
+            attrs: { stats: _vm.crew_mult_pretty, name: name, ispretty: false }
+          })
+        ]
+      }),
+      _vm._v(" "),
+      _c("td", { staticClass: "build-time-column" }, [
+        _vm._v(_vm._s(_vm.build_time))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "tech-year-column" }, [
+        _vm._v(_vm._s(_vm.tech_year) + " (Frame)")
+      ])
+    ],
+    2
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+if (false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-483def47\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/setting-cell.vue":
+/*!**********************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-483def47","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/setting-cell.vue ***!
+  \**********************************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("span", { staticClass: "setting-cell" }, [
+    _c("span", { staticClass: "setting-name" }, [
+      _vm._v(_vm._s(_vm.setting_name))
+    ]),
+    _vm._v(" "),
+    typeof _vm.setting_value === "number"
+      ? _c(
+          "select",
+          {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.setting_value,
+                expression: "setting_value"
+              }
+            ],
+            staticClass: "setting-input-number",
+            attrs: { type: "number" },
+            on: {
+              change: function($event) {
+                var $$selectedVal = Array.prototype.filter
+                  .call($event.target.options, function(o) {
+                    return o.selected
+                  })
+                  .map(function(o) {
+                    var val = "_value" in o ? o._value : o.value
+                    return val
+                  })
+                _vm.setting_value = $event.target.multiple
+                  ? $$selectedVal
+                  : $$selectedVal[0]
+              }
+            }
+          },
+          _vm._l(_vm.valid_numbers, function(num) {
+            return _c("option", { key: num }, [_vm._v(_vm._s(num))])
+          })
+        )
+      : _vm._e(),
+    _vm._v(" "),
+    typeof _vm.setting_value === "boolean"
+      ? _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.setting_value,
+              expression: "setting_value"
+            }
+          ],
+          staticClass: "setting-input-bool",
+          attrs: { type: "checkbox" },
+          domProps: {
+            checked: Array.isArray(_vm.setting_value)
+              ? _vm._i(_vm.setting_value, null) > -1
+              : _vm.setting_value
+          },
+          on: {
+            change: function($event) {
+              var $$a = _vm.setting_value,
+                $$el = $event.target,
+                $$c = $$el.checked ? true : false
+              if (Array.isArray($$a)) {
+                var $$v = null,
+                  $$i = _vm._i($$a, $$v)
+                if ($$el.checked) {
+                  $$i < 0 && (_vm.setting_value = $$a.concat([$$v]))
+                } else {
+                  $$i > -1 &&
+                    (_vm.setting_value = $$a
+                      .slice(0, $$i)
+                      .concat($$a.slice($$i + 1)))
+                }
+              } else {
+                _vm.setting_value = $$c
+              }
+            }
+          }
+        })
+      : _vm._e()
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+if (false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-4b6abc74\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/module.vue":
+/*!****************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-4b6abc74","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/module.vue ***!
+  \****************************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -29161,10 +26334,10 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-f5f570d0\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/setting-cell.vue":
-/*!**********************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-f5f570d0","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/setting-cell.vue ***!
-  \**********************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-6038f16e\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/subsystem-settings.vue":
+/*!****************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-6038f16e","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/subsystem-settings.vue ***!
+  \****************************************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -29176,88 +26349,20 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("span", { staticClass: "setting-cell" }, [
-    _c("span", { staticClass: "setting-name" }, [
-      _vm._v(_vm._s(_vm.setting_name))
-    ]),
-    _vm._v(" "),
-    typeof _vm.setting_value === "number"
-      ? _c(
-          "select",
-          {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.setting_value,
-                expression: "setting_value"
-              }
-            ],
-            staticClass: "setting-input-number",
-            attrs: { type: "number" },
-            on: {
-              change: function($event) {
-                var $$selectedVal = Array.prototype.filter
-                  .call($event.target.options, function(o) {
-                    return o.selected
-                  })
-                  .map(function(o) {
-                    var val = "_value" in o ? o._value : o.value
-                    return val
-                  })
-                _vm.setting_value = $event.target.multiple
-                  ? $$selectedVal
-                  : $$selectedVal[0]
-              }
-            }
-          },
-          _vm._l(_vm.valid_numbers, function(num) {
-            return _c("option", { key: num }, [_vm._v(_vm._s(num))])
+  return _vm.has_settings
+    ? _c("tr", { staticClass: "setting-tr" }, [
+        _c(
+          "td",
+          { staticClass: "settings-cell", attrs: { colspan: "100" } },
+          _vm._l(_vm.settings, function(setting) {
+            return _c("SettingCell", {
+              key: setting["Name"],
+              attrs: { setting: setting }
+            })
           })
         )
-      : _vm._e(),
-    _vm._v(" "),
-    typeof _vm.setting_value === "boolean"
-      ? _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.setting_value,
-              expression: "setting_value"
-            }
-          ],
-          staticClass: "setting-input-bool",
-          attrs: { type: "checkbox" },
-          domProps: {
-            checked: Array.isArray(_vm.setting_value)
-              ? _vm._i(_vm.setting_value, null) > -1
-              : _vm.setting_value
-          },
-          on: {
-            change: function($event) {
-              var $$a = _vm.setting_value,
-                $$el = $event.target,
-                $$c = $$el.checked ? true : false
-              if (Array.isArray($$a)) {
-                var $$v = null,
-                  $$i = _vm._i($$a, $$v)
-                if ($$el.checked) {
-                  $$i < 0 && (_vm.setting_value = $$a.concat([$$v]))
-                } else {
-                  $$i > -1 &&
-                    (_vm.setting_value = $$a
-                      .slice(0, $$i)
-                      .concat($$a.slice($$i + 1)))
-                }
-              } else {
-                _vm.setting_value = $$c
-              }
-            }
-          }
-        })
-      : _vm._e()
-  ])
+      ])
+    : _vm._e()
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -29266,10 +26371,10 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-fef3d3c0\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/principal-frame-raw.vue":
-/*!*****************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-fef3d3c0","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/principal-frame-raw.vue ***!
-  \*****************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-6beebb70\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/subsystem-summary.vue":
+/*!***************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-6beebb70","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/subsystem-summary.vue ***!
+  \***************************************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -29283,66 +26388,31 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "tr",
-    {
-      staticClass: "principal-frame-raw",
-      class: { "has-error": !_vm.is_valid_frame }
-    },
+    { staticClass: "subsystem-summary" },
     [
-      _c("td", { staticClass: "name-column", attrs: { colspan: "2" } }, [
-        _vm._v("Size: " + _vm._s(_vm.frame_size))
-      ]),
+      _c(
+        "td",
+        {
+          staticClass: "name-column",
+          class: _vm.weight_summary_class,
+          attrs: { colspan: "2" }
+        },
+        [
+          _vm._v(
+            _vm._s(_vm.se_subsystem.weight_internal.toFixed(2)) +
+              "/" +
+              _vm._s(_vm.se_subsystem.weight_cap.toFixed(2))
+          )
+        ]
+      ),
       _vm._v(" "),
-      _c("td", { staticClass: "part-column" }, [
-        _c(
-          "select",
-          {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.principal_frame,
-                expression: "principal_frame"
-              }
-            ],
-            staticClass: "part-column-select",
-            on: {
-              change: function($event) {
-                var $$selectedVal = Array.prototype.filter
-                  .call($event.target.options, function(o) {
-                    return o.selected
-                  })
-                  .map(function(o) {
-                    var val = "_value" in o ? o._value : o.value
-                    return val
-                  })
-                _vm.principal_frame = $event.target.multiple
-                  ? $$selectedVal
-                  : $$selectedVal[0]
-              }
-            }
-          },
-          [
-            _vm._l(_vm.se_design.valid_frames, function(princ_frame_value) {
-              return _c("option", { key: princ_frame_value["Name"] }, [
-                _vm._v(_vm._s(princ_frame_value["Name"]))
-              ])
-            }),
-            _vm._v(" "),
-            !_vm.is_valid_frame
-              ? _c("option", { staticClass: "has-error" }, [
-                  _vm._v(_vm._s(_vm.principal_frame))
-                ])
-              : _vm._e()
-          ],
-          2
-        )
-      ]),
+      _c("td", { staticClass: "part-column" }),
       _vm._v(" "),
-      _vm._l(_vm.stats_raw.names, function(name) {
+      _vm._l(_vm.stats.names, function(name) {
         return [
           _c("StatlineCell", {
             key: name,
-            attrs: { stats: _vm.stats_raw, name: name }
+            attrs: { stats: _vm.stats, name: name }
           })
         ]
       }),
@@ -29353,56 +26423,44 @@ var render = function() {
           staticClass: "weight-internal-column",
           class: _vm.weight_summary_class
         },
-        [_vm._v(_vm._s(_vm.se_design.weight_internal.toFixed(2)))]
+        [_vm._v(_vm._s(_vm.se_subsystem.weight_internal.toFixed(2)))]
       ),
       _vm._v(" "),
       _c("td", { staticClass: "weight-external-column" }, [
-        _vm._v(_vm._s(_vm.se_design.weight_external.toFixed(2)))
+        _vm._v(_vm._s(_vm.se_subsystem.weight_external.toFixed(2)))
       ]),
       _vm._v(" "),
       _c("td", { staticClass: "br-column" }, [
-        _vm._v(_vm._s(_vm.se_design.cost_BR_raw.toFixed(2)))
+        _vm._v(_vm._s(_vm.se_subsystem.cost_BR.toFixed(2)))
       ]),
       _vm._v(" "),
       _c("td", { staticClass: "sr-column" }, [
-        _vm._v(_vm._s(_vm.se_design.cost_SR_raw.toFixed(2)))
+        _vm._v(_vm._s(_vm.se_subsystem.cost_SR.toFixed(2)))
       ]),
       _vm._v(" "),
-      _c(
-        "td",
-        {
-          staticClass: "power-cost-column",
-          class: _vm.power_final_class,
-          attrs: { title: _vm.power_final_title }
-        },
-        [_vm._v(_vm._s(_vm.se_design.cost_power_raw.toFixed(2)))]
-      ),
+      _c("td", { staticClass: "power-cost-column" }, [
+        _vm._v(_vm._s(_vm.se_subsystem.cost_power.toFixed(2)))
+      ]),
       _vm._v(" "),
-      _c(
-        "td",
-        {
-          staticClass: "power-gen-column",
-          class: _vm.power_final_class,
-          attrs: { title: _vm.power_final_title }
-        },
-        [_vm._v(_vm._s(_vm.se_design.power_generation_raw.toFixed(2)))]
-      ),
+      _c("td", { staticClass: "power-gen-column" }, [
+        _vm._v(_vm._s(_vm.se_subsystem.power_generation.toFixed(2)))
+      ]),
       _vm._v(" "),
-      _vm._l(_vm.crew_raw.names, function(name) {
+      _vm._l(_vm.crew.names, function(name) {
         return [
           _c("StatlineCell", {
             key: name,
-            attrs: { stats: _vm.crew_raw, name: name }
+            attrs: { stats: _vm.crew, name: name }
           })
         ]
       }),
       _vm._v(" "),
       _c("td", { staticClass: "build-time-column" }, [
-        _vm._v(_vm._s(_vm.build_time_frame))
+        _vm._v(_vm._s(_vm.build_time))
       ]),
       _vm._v(" "),
       _c("td", { staticClass: "tech-year-column" }, [
-        _vm._v(_vm._s(_vm.tech_year_frame) + " (Frame)")
+        _vm._v(_vm._s(_vm.tech_year))
       ])
     ],
     2
@@ -29415,72 +26473,697 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-06bcc24c\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-settings.vue":
-/*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-06bcc24c","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-settings.vue ***!
-  \******************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-7d86dec6\",\"hasScoped\":false,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/design.vue":
+/*!*****************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-7d86dec6","hasScoped":false,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/design.vue ***!
+  \*****************************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "design-table" }, [
+    _c("table", [
+      _vm._m(0),
+      _vm._v(" "),
+      _c(
+        "tbody",
+        { staticClass: "design-table-body" },
+        [
+          _c("PrincipalFrameFinal"),
+          _vm._v(" "),
+          _c("PrincipalFrameRaw"),
+          _vm._v(" "),
+          _vm._l(_vm.se_subsystems, function(se_subsystem) {
+            return [
+              _c(
+                "tr",
+                { key: se_subsystem.name, staticClass: "subsystem-spacer-row" },
+                [_c("td", { attrs: { colspan: "100", height: "30px" } })]
+              ),
+              _vm._v(" "),
+              _c("SubsystemFrame", {
+                key: se_subsystem.name + "-frame",
+                attrs: { se_subsystem: se_subsystem }
+              }),
+              _vm._v(" "),
+              _c("SubsystemSummary", {
+                key: se_subsystem.name + "-summary",
+                attrs: { se_subsystem: se_subsystem }
+              }),
+              _vm._v(" "),
+              _c("SubsystemSettings", {
+                key: se_subsystem.name + "-settings",
+                attrs: { se_subsystem: se_subsystem }
+              }),
+              _vm._v(" "),
+              _vm._l(se_subsystem.components, function(se_component) {
+                return [
+                  _c("ComponentTr", {
+                    key: se_component.name,
+                    attrs: { se_component: se_component }
+                  })
+                ]
+              })
+            ]
+          }),
+          _vm._v(" "),
+          _vm._m(1),
+          _vm._v(" "),
+          _c("ModuleTr", { attrs: { se_module: _vm.se_design.module } })
+        ],
+        2
+      )
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", { staticClass: "design-table-head" }, [
+      _c("tr", { staticClass: "design-table-head-tr" }, [
+        _c("th"),
+        _vm._v(" "),
+        _c("th"),
+        _vm._v(" "),
+        _c("th"),
+        _vm._v(" "),
+        _c("th", [_vm._v("C")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("S")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("H")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("L")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("P")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("D")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Wt (Int")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Ext)")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("BR")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("SR")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Pwr Cost")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Pwr Gen")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("O")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("E")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("T")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Build Time")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Year Available")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", { staticClass: "subsystem-spacer-row" }, [
+      _c("td", { attrs: { colspan: "100", height: "30px" } })
+    ])
+  }
+]
+render._withStripped = true
+
+if (false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-f04171c2\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/design-summary.vue":
+/*!************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-f04171c2","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/design-summary.vue ***!
+  \************************************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "design-summary" }, [
+    _c("div", [
+      _c("span", [
+        _vm._v(
+          _vm._s(_vm.se_design.name) +
+            " | " +
+            _vm._s(_vm.se_design.pretty_miscstats)
+        )
+      ]),
+      _vm._v(" "),
+      _c("span", [_vm._v(" | ")]),
+      _vm._v(" "),
+      _c(
+        "span",
+        {
+          class: { "has-error": _vm.has_parts_list_load_error },
+          attrs: { title: _vm.parts_list_load_title }
+        },
+        [_vm._v("Parts: " + _vm._s(_vm.parts_list_name))]
+      ),
+      _vm._v(" "),
+      _vm.has_parts_list_load_error
+        ? _c(
+            "span",
+            { class: { "has-error": _vm.has_parts_list_load_error } },
+            [_vm._v(" (WRONG PARTS LIST! EVERYTHING MAY BE INVALID!)")]
+          )
+        : _vm._e()
+    ]),
+    _vm._v(" "),
+    _c("div", [
+      _c("span", [_vm._v(_vm._s(_vm.se_design.stats_raw.toFixed(2)))]),
+      _vm._v(" "),
+      _c("span", [_vm._v(" | ")]),
+      _vm._v(" "),
+      _c("span", [
+        _vm._v("[" + _vm._s(_vm.se_design.cost_BR_raw.toFixed(2)) + "]br")
+      ]),
+      _vm._v(" "),
+      _c("span", [
+        _vm._v("[" + _vm._s(_vm.se_design.cost_SR_raw.toFixed(2)) + "]sr")
+      ]),
+      _vm._v(" "),
+      _c("span", [_vm._v(" | ")]),
+      _vm._v(" "),
+      _c("span", [_vm._v(_vm._s(_vm.se_design.cost_crew_raw.toFixed(2)))]),
+      _vm._v(" "),
+      _c("span", [_vm._v(" | ")]),
+      _vm._v(" "),
+      _c("span", [_vm._v("[" + _vm._s(_vm.build_time) + "]years")])
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      [
+        _c(
+          "span",
+          {
+            staticClass: "design-power-summary",
+            class: {
+              "has-error":
+                _vm.se_design.cost_power_raw >
+                _vm.se_design.power_generation_raw
+            }
+          },
+          [
+            _vm._v(
+              "Power[" +
+                _vm._s(_vm.se_design.cost_power_raw.toFixed(2)) +
+                "/" +
+                _vm._s(_vm.se_design.power_generation_raw.toFixed(2)) +
+                "]"
+            )
+          ]
+        ),
+        _vm._v(" "),
+        _c(
+          "span",
+          {
+            staticClass: "design-weight-summary",
+            class: {
+              "has-error":
+                _vm.se_design.weight_internal > _vm.se_design.frame_max_size_raw
+            }
+          },
+          [
+            _vm._v(
+              "Internal[" +
+                _vm._s(_vm.se_design.weight_internal.toFixed(2)) +
+                "/" +
+                _vm._s(_vm.se_design.frame_max_size_raw.toFixed(2)) +
+                "]"
+            )
+          ]
+        ),
+        _vm._v(" "),
+        _vm._l(_vm.se_design.subsystems, function(ss) {
+          return _c(
+            "span",
+            {
+              key: ss.name,
+              staticClass: "subsystem-weight-summary",
+              class: { "has-error": ss.weight_internal > ss.weight_cap }
+            },
+            [
+              _vm._v(
+                _vm._s(ss.name) +
+                  "[" +
+                  _vm._s(ss.weight_internal.toFixed(2)) +
+                  "/" +
+                  _vm._s(ss.weight_cap.toFixed(2)) +
+                  "] "
+              )
+            ]
+          )
+        })
+      ],
+      2
+    )
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+if (false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-ff9204c2\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/principal-frame-final.vue":
+/*!*******************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-ff9204c2","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/principal-frame-final.vue ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "tr",
+    { staticClass: "principal-frame-final" },
+    [
+      _c("td", { staticClass: "name-column", attrs: { colspan: "2" } }, [
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.ship_name,
+              expression: "ship_name"
+            }
+          ],
+          staticClass: "name-column-input",
+          attrs: { placeholder: "Ship Name" },
+          domProps: { value: _vm.ship_name },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.ship_name = $event.target.value
+            }
+          }
+        })
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "part-column" }, [
+        _vm._v(_vm._s(_vm.principal_frame))
+      ]),
+      _vm._v(" "),
+      _vm._l(_vm.stats.names, function(name) {
+        return [
+          _c("StatlineCell", {
+            key: name,
+            attrs: { stats: _vm.stats, name: name, fixed: 0 }
+          })
+        ]
+      }),
+      _vm._v(" "),
+      _c(
+        "td",
+        { staticClass: "weight-internal-column", attrs: { colspan: "2" } },
+        [_vm._v(_vm._s(_vm.se_design.weight_total))]
+      ),
+      _vm._v(" "),
+      _c("td", { staticClass: "br-column" }, [
+        _vm._v(_vm._s(_vm.se_design.cost_BR))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "sr-column" }, [
+        _vm._v(_vm._s(_vm.se_design.cost_SR))
+      ]),
+      _vm._v(" "),
+      _c(
+        "td",
+        {
+          staticClass: "power-cost-column",
+          class: _vm.power_final_class,
+          attrs: { title: _vm.power_final_title }
+        },
+        [_vm._v(_vm._s(_vm.se_design.cost_power))]
+      ),
+      _vm._v(" "),
+      _c(
+        "td",
+        {
+          staticClass: "power-gen-column",
+          class: _vm.power_final_class,
+          attrs: { title: _vm.power_final_title }
+        },
+        [_vm._v(_vm._s(_vm.se_design.power_generation))]
+      ),
+      _vm._v(" "),
+      _vm._l(_vm.crew.names, function(name) {
+        return [
+          _c("StatlineCell", {
+            key: name,
+            attrs: { stats: _vm.crew, name: name, fixed: 0 }
+          })
+        ]
+      }),
+      _vm._v(" "),
+      _c("td", { staticClass: "build-time-column" }, [
+        _vm._v(_vm._s(_vm.build_time))
+      ]),
+      _vm._v(" "),
+      _c("td", { staticClass: "tech-year-column" }, [
+        _vm._v(_vm._s(_vm.tech_year))
+      ])
+    ],
+    2
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+if (false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-15813b91\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/principal-frame-raw.vue":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-15813b91","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/principal-frame-raw.vue ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-06bcc24c","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./subsystem-settings.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-06bcc24c\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-settings.vue");
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-15813b91","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./principal-frame-raw.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-15813b91\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/principal-frame-raw.vue");
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("be53c058", content, false, {});
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("a22654e4", content, false, {});
 // Hot Module Replacement
 if(false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-1fa46046\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-frame.vue":
-/*!***************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-1fa46046","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-frame.vue ***!
-  \***************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-23b102d6\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design-import-export.vue":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-23b102d6","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design-import-export.vue ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-1fa46046","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./subsystem-frame.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-1fa46046\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-frame.vue");
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-23b102d6","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./design-import-export.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-23b102d6\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design-import-export.vue");
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("498849ee", content, false, {});
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("759309fa", content, false, {});
 // Hot Module Replacement
 if(false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-38841434\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design-import-export.vue":
-/*!********************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-38841434","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design-import-export.vue ***!
-  \********************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-241da922\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/statline-cell.vue":
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-241da922","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/statline-cell.vue ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-38841434","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./design-import-export.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-38841434\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design-import-export.vue");
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-241da922","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./statline-cell.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-241da922\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/statline-cell.vue");
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("0262eeda", content, false, {});
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("8f941dbe", content, false, {});
 // Hot Module Replacement
 if(false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-3d6f706e\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/principal-frame-final.vue":
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-32dfd9a5\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/component.vue":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-32dfd9a5","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/component.vue ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-32dfd9a5","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./component.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-32dfd9a5\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/component.vue");
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("72d86be0", content, false, {});
+// Hot Module Replacement
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-3da5e637\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-frame.vue":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-3da5e637","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-frame.vue ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-3da5e637","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./subsystem-frame.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-3da5e637\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-frame.vue");
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("f1ff0578", content, false, {});
+// Hot Module Replacement
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-483def47\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/setting-cell.vue":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-483def47","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/setting-cell.vue ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-483def47","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./setting-cell.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-483def47\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/setting-cell.vue");
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("1c945a0f", content, false, {});
+// Hot Module Replacement
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-4b6abc74\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/module.vue":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-4b6abc74","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/module.vue ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-4b6abc74","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./module.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-4b6abc74\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/module.vue");
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("ca41a39e", content, false, {});
+// Hot Module Replacement
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-6038f16e\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-settings.vue":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-6038f16e","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-settings.vue ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-6038f16e","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./subsystem-settings.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-6038f16e\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-settings.vue");
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("ecaf16a2", content, false, {});
+// Hot Module Replacement
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-6beebb70\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-summary.vue":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-6beebb70","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-summary.vue ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-6beebb70","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./subsystem-summary.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-6beebb70\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-summary.vue");
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("1690966c", content, false, {});
+// Hot Module Replacement
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-f04171c2\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design-summary.vue":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-f04171c2","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design-summary.vue ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-f04171c2","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./design-summary.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-f04171c2\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design-summary.vue");
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("c4fa6252", content, false, {});
+// Hot Module Replacement
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-ff9204c2\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/principal-frame-final.vue":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-ff9204c2","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/principal-frame-final.vue ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-ff9204c2","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./principal-frame-final.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-ff9204c2\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/principal-frame-final.vue");
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("763cef3e", content, false, {});
+// Hot Module Replacement
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/component.vue":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/component.vue ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./component.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/component.vue");
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("7ce5ca4a", content, false, {});
+// Hot Module Replacement
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design.vue":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design.vue ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./design.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design.vue");
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("b87029ae", content, false, {});
+// Hot Module Replacement
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/module.vue":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/module.vue ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./module.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/module.vue");
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("c5a5642e", content, false, {});
+// Hot Module Replacement
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/principal-frame-raw.vue":
 /*!*********************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-3d6f706e","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/principal-frame-final.vue ***!
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/principal-frame-raw.vue ***!
   \*********************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -29488,62 +27171,20 @@ if(false) {}
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-3d6f706e","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./principal-frame-final.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-3d6f706e\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/principal-frame-final.vue");
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./principal-frame-raw.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/principal-frame-raw.vue");
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("23e1e8f3", content, false, {});
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("93cfd81a", content, false, {});
 // Hot Module Replacement
 if(false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-4a14dd3e\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/statline-cell.vue":
-/*!*************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-4a14dd3e","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/statline-cell.vue ***!
-  \*************************************************************************************************************************************************************************************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-4a14dd3e","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./statline-cell.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-4a14dd3e\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/statline-cell.vue");
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("63cb7ddb", content, false, {});
-// Hot Module Replacement
-if(false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-6f922482\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-summary.vue":
-/*!*****************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-6f922482","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-summary.vue ***!
-  \*****************************************************************************************************************************************************************************************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-6f922482","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./subsystem-summary.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-6f922482\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-summary.vue");
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("15905b19", content, false, {});
-// Hot Module Replacement
-if(false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-9f9c61a0\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design-summary.vue":
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/setting-cell.vue":
 /*!**************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-9f9c61a0","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design-summary.vue ***!
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/setting-cell.vue ***!
   \**************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -29551,83 +27192,104 @@ if(false) {}
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-9f9c61a0","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./design-summary.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-9f9c61a0\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design-summary.vue");
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./setting-cell.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/setting-cell.vue");
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("73fb47f7", content, false, {});
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("4ecdb4ee", content, false, {});
 // Hot Module Replacement
 if(false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-a8ea6a18\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/component.vue":
-/*!*********************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-a8ea6a18","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/component.vue ***!
-  \*********************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/shipdesigner.vue":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/shipdesigner.vue ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-a8ea6a18","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./component.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-a8ea6a18\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/component.vue");
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./shipdesigner.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/shipdesigner.vue");
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("d11255b8", content, false, {});
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("0c2e9c89", content, false, {});
 // Hot Module Replacement
 if(false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-b52a34f6\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/module.vue":
-/*!******************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-b52a34f6","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/module.vue ***!
-  \******************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/statline-cell.vue":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/statline-cell.vue ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-b52a34f6","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./module.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-b52a34f6\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/module.vue");
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./statline-cell.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/statline-cell.vue");
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("6c104e34", content, false, {});
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("71b8e822", content, false, {});
 // Hot Module Replacement
 if(false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-f5f570d0\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/setting-cell.vue":
-/*!************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-f5f570d0","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/setting-cell.vue ***!
-  \************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-frame.vue":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-frame.vue ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-f5f570d0","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./setting-cell.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-f5f570d0\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/setting-cell.vue");
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./subsystem-frame.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-frame.vue");
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("142c16f6", content, false, {});
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("6e972f82", content, false, {});
 // Hot Module Replacement
 if(false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-fef3d3c0\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/principal-frame-raw.vue":
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-settings.vue":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-settings.vue ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./subsystem-settings.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-settings.vue");
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("4d674089", content, false, {});
+// Hot Module Replacement
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-summary.vue":
 /*!*******************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-fef3d3c0","scoped":true,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/principal-frame-raw.vue ***!
+  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-summary.vue ***!
   \*******************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -29635,222 +27297,12 @@ if(false) {}
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"id":"data-v-fef3d3c0","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./principal-frame-raw.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-fef3d3c0\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/principal-frame-raw.vue");
+var content = __webpack_require__(/*! !../../../node_modules/css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./subsystem-summary.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-summary.vue");
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("0d70c38e", content, false, {});
-// Hot Module Replacement
-if(false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/component.vue":
-/*!***********************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/component.vue ***!
-  \***********************************************************************************************************************************************************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./component.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/component.vue");
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("3858a3ec", content, false, {});
-// Hot Module Replacement
-if(false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design.vue":
-/*!********************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design.vue ***!
-  \********************************************************************************************************************************************************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./design.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design.vue");
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("2329951a", content, false, {});
-// Hot Module Replacement
-if(false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/module.vue":
-/*!********************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/module.vue ***!
-  \********************************************************************************************************************************************************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./module.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/module.vue");
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("bfeae44c", content, false, {});
-// Hot Module Replacement
-if(false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/principal-frame-raw.vue":
-/*!*********************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/principal-frame-raw.vue ***!
-  \*********************************************************************************************************************************************************************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./principal-frame-raw.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/principal-frame-raw.vue");
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("f684b73c", content, false, {});
-// Hot Module Replacement
-if(false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/setting-cell.vue":
-/*!**************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/setting-cell.vue ***!
-  \**************************************************************************************************************************************************************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./setting-cell.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/setting-cell.vue");
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("aaf7c88c", content, false, {});
-// Hot Module Replacement
-if(false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/shipdesigner.vue":
-/*!**************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/shipdesigner.vue ***!
-  \**************************************************************************************************************************************************************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./shipdesigner.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/shipdesigner.vue");
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("e6604a8c", content, false, {});
-// Hot Module Replacement
-if(false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/statline-cell.vue":
-/*!***************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/statline-cell.vue ***!
-  \***************************************************************************************************************************************************************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./statline-cell.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/statline-cell.vue");
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("1a05bd9e", content, false, {});
-// Hot Module Replacement
-if(false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-frame.vue":
-/*!*****************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-frame.vue ***!
-  \*****************************************************************************************************************************************************************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./subsystem-frame.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-frame.vue");
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("44608a2e", content, false, {});
-// Hot Module Replacement
-if(false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-settings.vue":
-/*!********************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-settings.vue ***!
-  \********************************************************************************************************************************************************************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./subsystem-settings.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-settings.vue");
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("5d1bbffa", content, false, {});
-// Hot Module Replacement
-if(false) {}
-
-/***/ }),
-
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-summary.vue":
-/*!*******************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader!./node_modules/css-loader?sourceMap!./node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-summary.vue ***!
-  \*******************************************************************************************************************************************************************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(/*! !../node_modules/css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./subsystem-summary.vue */ "./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-summary.vue");
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var add = __webpack_require__(/*! ../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("7eabcca1", content, false, {});
+var add = __webpack_require__(/*! ../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("2cffd71c", content, false, {});
 // Hot Module Replacement
 if(false) {}
 
@@ -39182,25 +36634,25 @@ module.exports = function(module) {
 
 /***/ }),
 
-/***/ "./src/component.vue":
-/*!***************************!*\
-  !*** ./src/component.vue ***!
-  \***************************/
+/***/ "./src/components/shipdesigner/component.vue":
+/*!***************************************************!*\
+  !*** ./src/components/shipdesigner/component.vue ***!
+  \***************************************************/
 /*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_component_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../node_modules/vue-loader/lib/selector?type=script&index=0!./component.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/component.vue");
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_component_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../../../node_modules/vue-loader/lib/selector?type=script&index=0!./component.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/component.vue");
 /* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_component_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_component_vue__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_component_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_component_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_a8ea6a18_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_component_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-a8ea6a18","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../node_modules/vue-loader/lib/selector?type=template&index=0!./component.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-a8ea6a18\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/component.vue");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
+/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_32dfd9a5_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_component_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-32dfd9a5","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../../../node_modules/vue-loader/lib/selector?type=template&index=0!./component.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-32dfd9a5\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/component.vue");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
 var disposed = false
 function injectStyle (context) {
   if (disposed) return
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=0!./component.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/component.vue")
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-a8ea6a18","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=1!./component.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-a8ea6a18\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/component.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=0!./component.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/component.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-32dfd9a5","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=1!./component.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-32dfd9a5\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/component.vue")
 }
 /* script */
 
@@ -39212,20 +36664,20 @@ var __vue_template_functional__ = false
 /* styles */
 var __vue_styles__ = injectStyle
 /* scopeId */
-var __vue_scopeId__ = "data-v-a8ea6a18"
+var __vue_scopeId__ = "data-v-32dfd9a5"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 
 var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_component_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_a8ea6a18_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_component_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_a8ea6a18_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_component_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_32dfd9a5_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_component_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_32dfd9a5_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_component_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/component.vue"
+Component.options.__file = "src/components/shipdesigner/component.vue"
 
 /* hot reload */
 if (false) {}
@@ -39235,24 +36687,24 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./src/design-import-export.vue":
-/*!**************************************!*\
-  !*** ./src/design-import-export.vue ***!
-  \**************************************/
+/***/ "./src/components/shipdesigner/design-import-export.vue":
+/*!**************************************************************!*\
+  !*** ./src/components/shipdesigner/design-import-export.vue ***!
+  \**************************************************************/
 /*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_import_export_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../node_modules/vue-loader/lib/selector?type=script&index=0!./design-import-export.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/design-import-export.vue");
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_import_export_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../../../node_modules/vue-loader/lib/selector?type=script&index=0!./design-import-export.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/design-import-export.vue");
 /* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_import_export_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_import_export_vue__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_import_export_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_import_export_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_38841434_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_import_export_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-38841434","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../node_modules/vue-loader/lib/selector?type=template&index=0!./design-import-export.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-38841434\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/design-import-export.vue");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
+/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_23b102d6_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_import_export_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-23b102d6","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../../../node_modules/vue-loader/lib/selector?type=template&index=0!./design-import-export.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-23b102d6\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/design-import-export.vue");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
 var disposed = false
 function injectStyle (context) {
   if (disposed) return
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-38841434","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=0!./design-import-export.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-38841434\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design-import-export.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-23b102d6","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=0!./design-import-export.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-23b102d6\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design-import-export.vue")
 }
 /* script */
 
@@ -39264,20 +36716,20 @@ var __vue_template_functional__ = false
 /* styles */
 var __vue_styles__ = injectStyle
 /* scopeId */
-var __vue_scopeId__ = "data-v-38841434"
+var __vue_scopeId__ = "data-v-23b102d6"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 
 var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_import_export_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_38841434_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_import_export_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_38841434_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_import_export_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_23b102d6_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_import_export_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_23b102d6_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_import_export_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/design-import-export.vue"
+Component.options.__file = "src/components/shipdesigner/design-import-export.vue"
 
 /* hot reload */
 if (false) {}
@@ -39287,24 +36739,24 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./src/design-summary.vue":
-/*!********************************!*\
-  !*** ./src/design-summary.vue ***!
-  \********************************/
+/***/ "./src/components/shipdesigner/design-summary.vue":
+/*!********************************************************!*\
+  !*** ./src/components/shipdesigner/design-summary.vue ***!
+  \********************************************************/
 /*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_summary_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../node_modules/vue-loader/lib/selector?type=script&index=0!./design-summary.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/design-summary.vue");
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_summary_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../../../node_modules/vue-loader/lib/selector?type=script&index=0!./design-summary.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/design-summary.vue");
 /* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_summary_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_summary_vue__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_summary_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_summary_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_9f9c61a0_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_summary_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-9f9c61a0","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../node_modules/vue-loader/lib/selector?type=template&index=0!./design-summary.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-9f9c61a0\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/design-summary.vue");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
+/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_f04171c2_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_summary_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-f04171c2","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../../../node_modules/vue-loader/lib/selector?type=template&index=0!./design-summary.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-f04171c2\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/design-summary.vue");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
 var disposed = false
 function injectStyle (context) {
   if (disposed) return
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-9f9c61a0","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=0!./design-summary.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-9f9c61a0\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design-summary.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-f04171c2","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=0!./design-summary.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-f04171c2\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design-summary.vue")
 }
 /* script */
 
@@ -39316,20 +36768,20 @@ var __vue_template_functional__ = false
 /* styles */
 var __vue_styles__ = injectStyle
 /* scopeId */
-var __vue_scopeId__ = "data-v-9f9c61a0"
+var __vue_scopeId__ = "data-v-f04171c2"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 
 var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_summary_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_9f9c61a0_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_summary_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_9f9c61a0_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_summary_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_f04171c2_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_summary_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_f04171c2_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_summary_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/design-summary.vue"
+Component.options.__file = "src/components/shipdesigner/design-summary.vue"
 
 /* hot reload */
 if (false) {}
@@ -39339,24 +36791,24 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./src/design.vue":
-/*!************************!*\
-  !*** ./src/design.vue ***!
-  \************************/
+/***/ "./src/components/shipdesigner/design.vue":
+/*!************************************************!*\
+  !*** ./src/components/shipdesigner/design.vue ***!
+  \************************************************/
 /*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../node_modules/vue-loader/lib/selector?type=script&index=0!./design.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/design.vue");
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../../../node_modules/vue-loader/lib/selector?type=script&index=0!./design.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/design.vue");
 /* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_vue__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_50f1f052_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-50f1f052","hasScoped":false,"optionsId":"0","buble":{"transforms":{}}}!../node_modules/vue-loader/lib/selector?type=template&index=0!./design.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-50f1f052\",\"hasScoped\":false,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/design.vue");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
+/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_7d86dec6_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-7d86dec6","hasScoped":false,"optionsId":"0","buble":{"transforms":{}}}!../../../node_modules/vue-loader/lib/selector?type=template&index=0!./design.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-7d86dec6\",\"hasScoped\":false,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/design.vue");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
 var disposed = false
 function injectStyle (context) {
   if (disposed) return
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=0!./design.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/design.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=0!./design.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/design.vue")
 }
 /* script */
 
@@ -39374,14 +36826,14 @@ var __vue_module_identifier__ = null
 
 var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_design_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_50f1f052_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_50f1f052_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_7d86dec6_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_7d86dec6_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_design_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/design.vue"
+Component.options.__file = "src/components/shipdesigner/design.vue"
 
 /* hot reload */
 if (false) {}
@@ -39391,25 +36843,25 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./src/module.vue":
-/*!************************!*\
-  !*** ./src/module.vue ***!
-  \************************/
+/***/ "./src/components/shipdesigner/module.vue":
+/*!************************************************!*\
+  !*** ./src/components/shipdesigner/module.vue ***!
+  \************************************************/
 /*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_module_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../node_modules/vue-loader/lib/selector?type=script&index=0!./module.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/module.vue");
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_module_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../../../node_modules/vue-loader/lib/selector?type=script&index=0!./module.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/module.vue");
 /* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_module_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_module_vue__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_module_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_module_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_b52a34f6_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_module_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-b52a34f6","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../node_modules/vue-loader/lib/selector?type=template&index=0!./module.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-b52a34f6\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/module.vue");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
+/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_4b6abc74_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_module_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-4b6abc74","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../../../node_modules/vue-loader/lib/selector?type=template&index=0!./module.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-4b6abc74\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/module.vue");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
 var disposed = false
 function injectStyle (context) {
   if (disposed) return
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=0!./module.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/module.vue")
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-b52a34f6","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=1!./module.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-b52a34f6\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/module.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=0!./module.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/module.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-4b6abc74","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=1!./module.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-4b6abc74\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/module.vue")
 }
 /* script */
 
@@ -39421,20 +36873,20 @@ var __vue_template_functional__ = false
 /* styles */
 var __vue_styles__ = injectStyle
 /* scopeId */
-var __vue_scopeId__ = "data-v-b52a34f6"
+var __vue_scopeId__ = "data-v-4b6abc74"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 
 var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_module_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_b52a34f6_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_module_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_b52a34f6_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_module_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_4b6abc74_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_module_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_4b6abc74_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_module_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/module.vue"
+Component.options.__file = "src/components/shipdesigner/module.vue"
 
 /* hot reload */
 if (false) {}
@@ -39444,24 +36896,24 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./src/principal-frame-final.vue":
-/*!***************************************!*\
-  !*** ./src/principal-frame-final.vue ***!
-  \***************************************/
+/***/ "./src/components/shipdesigner/principal-frame-final.vue":
+/*!***************************************************************!*\
+  !*** ./src/components/shipdesigner/principal-frame-final.vue ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_final_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../node_modules/vue-loader/lib/selector?type=script&index=0!./principal-frame-final.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/principal-frame-final.vue");
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_final_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../../../node_modules/vue-loader/lib/selector?type=script&index=0!./principal-frame-final.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/principal-frame-final.vue");
 /* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_final_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_final_vue__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_final_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_final_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_3d6f706e_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_final_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-3d6f706e","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../node_modules/vue-loader/lib/selector?type=template&index=0!./principal-frame-final.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-3d6f706e\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/principal-frame-final.vue");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
+/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_ff9204c2_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_final_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-ff9204c2","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../../../node_modules/vue-loader/lib/selector?type=template&index=0!./principal-frame-final.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-ff9204c2\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/principal-frame-final.vue");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
 var disposed = false
 function injectStyle (context) {
   if (disposed) return
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-3d6f706e","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=0!./principal-frame-final.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-3d6f706e\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/principal-frame-final.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-ff9204c2","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=0!./principal-frame-final.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-ff9204c2\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/principal-frame-final.vue")
 }
 /* script */
 
@@ -39473,20 +36925,20 @@ var __vue_template_functional__ = false
 /* styles */
 var __vue_styles__ = injectStyle
 /* scopeId */
-var __vue_scopeId__ = "data-v-3d6f706e"
+var __vue_scopeId__ = "data-v-ff9204c2"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 
 var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_final_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_3d6f706e_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_final_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_3d6f706e_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_final_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_ff9204c2_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_final_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_ff9204c2_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_final_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/principal-frame-final.vue"
+Component.options.__file = "src/components/shipdesigner/principal-frame-final.vue"
 
 /* hot reload */
 if (false) {}
@@ -39496,25 +36948,25 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./src/principal-frame-raw.vue":
-/*!*************************************!*\
-  !*** ./src/principal-frame-raw.vue ***!
-  \*************************************/
+/***/ "./src/components/shipdesigner/principal-frame-raw.vue":
+/*!*************************************************************!*\
+  !*** ./src/components/shipdesigner/principal-frame-raw.vue ***!
+  \*************************************************************/
 /*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_raw_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../node_modules/vue-loader/lib/selector?type=script&index=0!./principal-frame-raw.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/principal-frame-raw.vue");
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_raw_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../../../node_modules/vue-loader/lib/selector?type=script&index=0!./principal-frame-raw.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/principal-frame-raw.vue");
 /* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_raw_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_raw_vue__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_raw_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_raw_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_fef3d3c0_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_raw_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-fef3d3c0","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../node_modules/vue-loader/lib/selector?type=template&index=0!./principal-frame-raw.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-fef3d3c0\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/principal-frame-raw.vue");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
+/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_15813b91_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_raw_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-15813b91","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../../../node_modules/vue-loader/lib/selector?type=template&index=0!./principal-frame-raw.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-15813b91\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/principal-frame-raw.vue");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
 var disposed = false
 function injectStyle (context) {
   if (disposed) return
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=0!./principal-frame-raw.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/principal-frame-raw.vue")
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-fef3d3c0","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=1!./principal-frame-raw.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-fef3d3c0\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/principal-frame-raw.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=0!./principal-frame-raw.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/principal-frame-raw.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-15813b91","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=1!./principal-frame-raw.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-15813b91\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/principal-frame-raw.vue")
 }
 /* script */
 
@@ -39526,20 +36978,20 @@ var __vue_template_functional__ = false
 /* styles */
 var __vue_styles__ = injectStyle
 /* scopeId */
-var __vue_scopeId__ = "data-v-fef3d3c0"
+var __vue_scopeId__ = "data-v-15813b91"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 
 var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_principal_frame_raw_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_fef3d3c0_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_raw_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_fef3d3c0_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_raw_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_15813b91_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_raw_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_15813b91_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_principal_frame_raw_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/principal-frame-raw.vue"
+Component.options.__file = "src/components/shipdesigner/principal-frame-raw.vue"
 
 /* hot reload */
 if (false) {}
@@ -39549,25 +37001,25 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./src/setting-cell.vue":
-/*!******************************!*\
-  !*** ./src/setting-cell.vue ***!
-  \******************************/
+/***/ "./src/components/shipdesigner/setting-cell.vue":
+/*!******************************************************!*\
+  !*** ./src/components/shipdesigner/setting-cell.vue ***!
+  \******************************************************/
 /*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_setting_cell_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../node_modules/vue-loader/lib/selector?type=script&index=0!./setting-cell.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/setting-cell.vue");
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_setting_cell_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../../../node_modules/vue-loader/lib/selector?type=script&index=0!./setting-cell.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/setting-cell.vue");
 /* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_setting_cell_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_setting_cell_vue__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_setting_cell_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_setting_cell_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_f5f570d0_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_setting_cell_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-f5f570d0","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../node_modules/vue-loader/lib/selector?type=template&index=0!./setting-cell.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-f5f570d0\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/setting-cell.vue");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
+/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_483def47_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_setting_cell_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-483def47","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../../../node_modules/vue-loader/lib/selector?type=template&index=0!./setting-cell.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-483def47\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/setting-cell.vue");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
 var disposed = false
 function injectStyle (context) {
   if (disposed) return
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=0!./setting-cell.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/setting-cell.vue")
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-f5f570d0","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=1!./setting-cell.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-f5f570d0\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/setting-cell.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=0!./setting-cell.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/setting-cell.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-483def47","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=1!./setting-cell.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-483def47\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/setting-cell.vue")
 }
 /* script */
 
@@ -39579,26 +37031,2898 @@ var __vue_template_functional__ = false
 /* styles */
 var __vue_styles__ = injectStyle
 /* scopeId */
-var __vue_scopeId__ = "data-v-f5f570d0"
+var __vue_scopeId__ = "data-v-483def47"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 
 var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_setting_cell_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_f5f570d0_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_setting_cell_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_f5f570d0_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_setting_cell_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_483def47_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_setting_cell_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_483def47_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_setting_cell_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/setting-cell.vue"
+Component.options.__file = "src/components/shipdesigner/setting-cell.vue"
 
 /* hot reload */
 if (false) {}
 
 /* harmony default export */ __webpack_exports__["default"] = (Component.exports);
 
+
+/***/ }),
+
+/***/ "./src/components/shipdesigner/shipdesigner.vue":
+/*!******************************************************!*\
+  !*** ./src/components/shipdesigner/shipdesigner.vue ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../../../node_modules/vue-loader/lib/selector?type=script&index=0!./shipdesigner.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/shipdesigner.vue");
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_2834a1af_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-2834a1af","hasScoped":false,"optionsId":"0","buble":{"transforms":{}}}!../../../node_modules/vue-loader/lib/selector?type=template&index=0!./shipdesigner.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-2834a1af\",\"hasScoped\":false,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/shipdesigner.vue");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
+var disposed = false
+function injectStyle (context) {
+  if (disposed) return
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=0!./shipdesigner.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/shipdesigner.vue")
+}
+/* script */
+
+
+/* template */
+
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+
+var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_2834a1af_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_2834a1af_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "src/components/shipdesigner/shipdesigner.vue"
+
+/* hot reload */
+if (false) {}
+
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
+
+
+/***/ }),
+
+/***/ "./src/components/shipdesigner/statline-cell.vue":
+/*!*******************************************************!*\
+  !*** ./src/components/shipdesigner/statline-cell.vue ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../../../node_modules/vue-loader/lib/selector?type=script&index=0!./statline-cell.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/statline-cell.vue");
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_241da922_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-241da922","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../../../node_modules/vue-loader/lib/selector?type=template&index=0!./statline-cell.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-241da922\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/statline-cell.vue");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
+var disposed = false
+function injectStyle (context) {
+  if (disposed) return
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=0!./statline-cell.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/statline-cell.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-241da922","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=1!./statline-cell.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-241da922\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/statline-cell.vue")
+}
+/* script */
+
+
+/* template */
+
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-241da922"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+
+var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_241da922_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_241da922_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "src/components/shipdesigner/statline-cell.vue"
+
+/* hot reload */
+if (false) {}
+
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
+
+
+/***/ }),
+
+/***/ "./src/components/shipdesigner/subsystem-frame.vue":
+/*!*********************************************************!*\
+  !*** ./src/components/shipdesigner/subsystem-frame.vue ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../../../node_modules/vue-loader/lib/selector?type=script&index=0!./subsystem-frame.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/subsystem-frame.vue");
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_3da5e637_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-3da5e637","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../../../node_modules/vue-loader/lib/selector?type=template&index=0!./subsystem-frame.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-3da5e637\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/subsystem-frame.vue");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
+var disposed = false
+function injectStyle (context) {
+  if (disposed) return
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=0!./subsystem-frame.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-frame.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-3da5e637","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=1!./subsystem-frame.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-3da5e637\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-frame.vue")
+}
+/* script */
+
+
+/* template */
+
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-3da5e637"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+
+var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_3da5e637_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_3da5e637_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "src/components/shipdesigner/subsystem-frame.vue"
+
+/* hot reload */
+if (false) {}
+
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
+
+
+/***/ }),
+
+/***/ "./src/components/shipdesigner/subsystem-settings.vue":
+/*!************************************************************!*\
+  !*** ./src/components/shipdesigner/subsystem-settings.vue ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../../../node_modules/vue-loader/lib/selector?type=script&index=0!./subsystem-settings.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/subsystem-settings.vue");
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_6038f16e_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-6038f16e","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../../../node_modules/vue-loader/lib/selector?type=template&index=0!./subsystem-settings.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-6038f16e\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/subsystem-settings.vue");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
+var disposed = false
+function injectStyle (context) {
+  if (disposed) return
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=0!./subsystem-settings.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-settings.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-6038f16e","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=1!./subsystem-settings.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-6038f16e\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-settings.vue")
+}
+/* script */
+
+
+/* template */
+
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-6038f16e"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+
+var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_6038f16e_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_6038f16e_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "src/components/shipdesigner/subsystem-settings.vue"
+
+/* hot reload */
+if (false) {}
+
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
+
+
+/***/ }),
+
+/***/ "./src/components/shipdesigner/subsystem-summary.vue":
+/*!***********************************************************!*\
+  !*** ./src/components/shipdesigner/subsystem-summary.vue ***!
+  \***********************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../../../node_modules/vue-loader/lib/selector?type=script&index=0!./subsystem-summary.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/shipdesigner/subsystem-summary.vue");
+/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_6beebb70_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-6beebb70","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../../../node_modules/vue-loader/lib/selector?type=template&index=0!./subsystem-summary.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-6beebb70\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/shipdesigner/subsystem-summary.vue");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
+var disposed = false
+function injectStyle (context) {
+  if (disposed) return
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-6beebb70","scoped":true,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=0!./subsystem-summary.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-6beebb70\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/components/shipdesigner/subsystem-summary.vue")
+  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../../../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../../../node_modules/vue-loader/lib/selector?type=styles&index=1!./subsystem-summary.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/components/shipdesigner/subsystem-summary.vue")
+}
+/* script */
+
+
+/* template */
+
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-6beebb70"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+
+var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_6beebb70_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
+  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_6beebb70_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "src/components/shipdesigner/subsystem-summary.vue"
+
+/* hot reload */
+if (false) {}
+
+/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
+
+
+/***/ }),
+
+/***/ "./src/lib/namedvector.js":
+/*!********************************!*\
+  !*** ./src/lib/namedvector.js ***!
+  \********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var NamedVector = function () {
+	function NamedVector(val, shortnames) {
+		var _this = this;
+
+		_classCallCheck(this, NamedVector);
+
+		this.shortnames = shortnames;
+		if (typeof val === 'number') {
+			this.names.forEach(function (name) {
+				_this[name] = val;
+			});
+		} else {
+			this.names.forEach(function (name) {
+				_this[name] = val[name] || 0;
+			});
+		}
+	}
+
+	_createClass(NamedVector, [{
+		key: 'toFixed',
+		value: function toFixed(n) {
+			var _this2 = this;
+
+			return this.names.map(function (name) {
+				return _this2.shortnames[name].toUpperCase() + '[' + _this2[name].toFixed(n) + ']';
+			}).join(' ');
+		}
+	}, {
+		key: 'toString',
+		value: function toString() {
+			var _this3 = this;
+
+			return this.names.map(function (name) {
+				return _this3.shortnames[name].toUpperCase() + _this3[name].toString();
+			}).join(' ');
+		}
+	}, {
+		key: 'add',
+		value: function add(other) {
+			return this.op(NamedVector.op_add, other);
+		}
+	}, {
+		key: 'mult',
+		value: function mult(other) {
+			return this.op(NamedVector.op_mult, other);
+		}
+	}, {
+		key: 'div',
+		value: function div(other) {
+			return this.op(NamedVector.op_div, other);
+		}
+	}, {
+		key: 'apply',
+		value: function apply(fun) {
+			var _this4 = this;
+
+			return new this.constructor(this.names.reduce(function (acc, name) {
+				acc[name] = fun(_this4[name]);
+				return acc;
+			}, {}));
+		}
+	}, {
+		key: 'op',
+		value: function op(fun, other) {
+			var _this5 = this;
+
+			if (typeof other === 'number') {
+				return new this.constructor(this.names.reduce(function (acc, name) {
+					acc[name] = fun(_this5[name], other);
+					return acc;
+				}, {}));
+			} else {
+				return new this.constructor(this.names.reduce(function (acc, name) {
+					acc[name] = fun(_this5[name], other[name]);
+					return acc;
+				}, {}));
+			}
+		}
+	}, {
+		key: 'names',
+		get: function get() {
+			return Object.keys(this.shortnames);
+		}
+	}, {
+		key: 'floor',
+		get: function get() {
+			return this.apply(Math.floor);
+		}
+	}, {
+		key: 'ceil',
+		get: function get() {
+			return this.apply(Math.ceil);
+		}
+	}], [{
+		key: 'op_add',
+		value: function op_add(a, b) {
+			return a + b;
+		}
+	}, {
+		key: 'op_mult',
+		value: function op_mult(a, b) {
+			return a * b;
+		}
+	}, {
+		key: 'op_div',
+		value: function op_div(a, b) {
+			return a / b;
+		}
+	}]);
+
+	return NamedVector;
+}();
+
+exports.NamedVector = NamedVector;
+
+/***/ }),
+
+/***/ "./src/lib/shipengine.js":
+/*!*******************************!*\
+  !*** ./src/lib/shipengine.js ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.Crewline = exports.Statline = exports.DB = exports.Design = undefined;
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _uiFunctions = __webpack_require__(/*! @/lib/ui-functions.js */ "./src/lib/ui-functions.js");
+
+var _namedvector = __webpack_require__(/*! @/lib/namedvector.js */ "./src/lib/namedvector.js");
+
+var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+// AL6, $AL$6
+var SIZE_TO_WEIGHT_CAP_MULTIPLIER = 300;
+
+// AL7
+var BR_TO_WEIGHT_MULTIPLIER = 10;
+
+var SUBSYSTEM_SORT_ORDER = {
+	'Tactical': 1,
+	'Operations': 2,
+	'Hull': 3,
+	'Engineering': 4,
+	'Warp Core': 5
+};
+
+var BR_COST_ROUND_MAP = {
+	'Frigate': 5,
+	'Cruiser': 10,
+	'Explorer': 10
+};
+
+var SR_COST_ROUND_MAP = {
+	'Frigate': 5,
+	'Cruiser': 5,
+	'Explorer': 10
+};
+
+// =IF(DK$18 = 1, "Frigate", IF(DK$18 = 2, "Cruiser", "Explorer"))
+var WEIGHT_CLASS_MAP = {
+	1: 'Frigate',
+	2: 'Cruiser',
+	3: 'Explorer'
+};
+
+var SUBSYSTEM_NAME_MAP = {
+	'Tactical': 'Tac Mod',
+	'Engineering': 'Eng. Mod',
+	'Hull': 'Hull Mod',
+	'Operations': 'Ops Mod',
+	'Warp Core': 'Core Mod'
+};
+
+// REFACTOR: change the names of these to be less abbreviated
+// (effectiveness instead of effect, for example)
+var COMPONENT_MODIFIERS = {
+	'Primary Phasers': {
+		'Effect Qty?': true,
+		'combat': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Secondary Phasers': {
+		'Effect Qty?': true,
+		'combat': 1 / 4,
+		'Cost Mod': 1 / 4,
+		'Crew Mod': 1 / 4
+	},
+	'Torpedo System': {
+		'Effect Qty?': true,
+		'combat': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Short-Range Sensors': {
+		'Effect Qty?': true,
+		'combat': 1 / 2,
+		'science': 1 / 2,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Targeting Computer': {
+		'Effect Qty?': true,
+		'combat': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Deflector Shields': {
+		'Effect Qty?': true,
+		'shields': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Backup Deflectors': {
+		'Effect Qty?': true,
+		'shields': 1 / 5,
+		'Cost Mod': 1 / 5,
+		'Crew Mod': 1 / 5
+	},
+	'Impulse Engine Pwr': {
+		'Effect Qty?': true,
+		'combat': 1 / 4,
+		'defense': 4 / 5,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+
+	'Long-Range Sensors': {
+		'Effect Qty?': true,
+		'science': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Navigational Sensors': {
+		'Effect Qty?': true,
+		'science': 1,
+		'defense': 1 / 6,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Survey Sensors': {
+		'Effect Qty?': true,
+		'science': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Science Labs': {
+		'Effect Qty?': true,
+		'science': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Computer Core': {
+		'Effect Qty?': true,
+		'combat': 1 / 4,
+		'science': 1 / 4,
+		'hull': 1 / 10,
+		'shields': 1 / 7,
+		'presence': 1 / 6,
+		'defense': 1 / 8,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Operating System': {
+		'Effect Qty?': true,
+		'combat': 1 / 8,
+		'science': 1 / 8,
+		'shields': 1 / 14,
+		'defense': 1 / 10,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Secondary Core': {
+		'Effect Qty?': true,
+		'combat': 1 / 16,
+		'science': 1 / 16,
+		'shields': 1 / 28,
+		'defense': 1 / 40,
+		'Cost Mod': 1 / 2,
+		'Crew Mod': 1 / 4
+	},
+	'Diplomatic Package': {
+		'Effect Qty?': true,
+		'presence': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Recreation Package': {
+		'Effect Qty?': true,
+		'presence': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Sickbay': {
+		'Effect Qty?': true,
+		'science': 1 / 2,
+		'presence': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+
+	'Hull System': {
+		'Effect Qty?': true,
+		'hull': 1,
+		'Cost Mod': 1,
+		'Scale Wt?': 1,
+		'Crew Mod': 1
+	},
+
+	'Structural Integrity Fields': {
+		'Effect Qty?': true,
+		'hull': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Navigational Deflector': {
+		'Effect Qty?': false,
+		'science': 1 / 3,
+		'shields': 1 / 7,
+		'defense': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Nacelle System': {
+		'Effect Qty?': true,
+		'defense': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Replication Package': {
+		'Effect Qty?': true,
+		'science': 1 / 10,
+		'presence': 1 / 4,
+		'defense': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Fuel & Matter Stores': {
+		'Effect Qty?': false,
+		'defense': 1,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+
+	'Warp Core Type': {
+		'Effect Qty?': true,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'M/AM Injectors': {
+		'Effect Qty?': true,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Coolant Systems': {
+		'Effect Qty?': true,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'EPS Manifold System': {
+		'Effect Qty?': false,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	},
+	'Eject System': {
+		'Effect Qty?': false,
+		'Cost Mod': 1,
+		'Crew Mod': 1
+	}
+};
+
+// AI, AJ, AK block
+// GL column onward
+var COMPONENT_PART_CLASSIFICATIONS = {
+	'Primary Phasers': 'Phasers',
+	'Secondary Phasers': 'Phasers',
+	'Torpedo System': 'Torpedoes',
+	'Short-Range Sensors': 'Short-Range Sensors',
+	'Targeting Computer': 'Targeting Computers',
+	'Deflector Shields': 'Deflector Shields',
+	'Backup Deflectors': 'Deflector Shields',
+	'Impulse Engine Pwr': 'Impulse Engine Power',
+	'Long-Range Sensors': 'Long-Range Sensors',
+	'Navigational Sensors': 'Navigational Sensors',
+	'Survey Sensors': 'Survey Sensors',
+	'Science Labs': 'Science Labs',
+	'Computer Core': 'Computer Cores',
+	'Operating System': 'Operating System',
+	'Secondary Core': 'Computer Cores',
+	'Diplomatic Package': 'Diplomatic Packages',
+	'Recreation Package': 'Recreation Packages',
+	'Sickbay': 'Sickbays',
+	'Hull System': 'Hull System',
+	'Structural Integrity Fields': 'Structural Integrity Fields',
+	'Navigational Deflector': 'Navigational Deflectors',
+	'Nacelle System': 'Nacelles',
+	'Replication Package': 'Replication Packages',
+	'Fuel & Matter Stores': 'Fuel & Matter Stores',
+	'Warp Core Type': 'Warp Core Types',
+	'M/AM Injectors': 'Matter/Anti-Matter Injectors',
+	'Coolant Systems': 'Coolant Systems',
+	'EPS Manifold System': 'EPS Manifold System',
+	'Eject System': 'Eject System'
+};
+
+var Crewline = function (_NamedVector) {
+	_inherits(Crewline, _NamedVector);
+
+	_createClass(Crewline, null, [{
+		key: 'shortnames',
+		get: function get() {
+			return {
+				'officer': 'O',
+				'enlisted': 'E',
+				'technician': 'T'
+			};
+		}
+	}]);
+
+	function Crewline(val) {
+		_classCallCheck(this, Crewline);
+
+		return _possibleConstructorReturn(this, (Crewline.__proto__ || Object.getPrototypeOf(Crewline)).call(this, val, Crewline.shortnames));
+	}
+
+	return Crewline;
+}(_namedvector.NamedVector);
+
+var Statline = function (_NamedVector2) {
+	_inherits(Statline, _NamedVector2);
+
+	_createClass(Statline, null, [{
+		key: 'shortnames',
+		get: function get() {
+			return {
+				'combat': 'C',
+				'science': 'S',
+				'hull': 'H',
+				'shields': 'L',
+				'presence': 'P',
+				'defense': 'D'
+			};
+		}
+	}]);
+
+	function Statline(val) {
+		_classCallCheck(this, Statline);
+
+		return _possibleConstructorReturn(this, (Statline.__proto__ || Object.getPrototypeOf(Statline)).call(this, val, Statline.shortnames));
+	}
+
+	return Statline;
+}(_namedvector.NamedVector);
+
+var DesignComponent = function () {
+	function DesignComponent(db, subsystem, design_component_json) {
+		_classCallCheck(this, DesignComponent);
+
+		this.json = design_component_json;
+
+		this.db = db;
+		this.name = this.json['Name'];
+
+		// parent
+		this.subsystem = subsystem;
+
+		// CY block
+		// statline
+		this.component_modifier = COMPONENT_MODIFIERS[this.name];
+
+		// BL block
+		// statline
+		this.part_def = this.db.find_part(this.json['Part']);
+		if (!this.part_def) {
+			console.log("WARNING: Could not find '" + this.name + "' part named '" + this.json['Part'] + "'");
+		}
+	}
+
+	_createClass(DesignComponent, [{
+		key: 'attribute',
+		value: function attribute(name) {
+			if (!this.part_def) {
+				if (this.db.part_schema.get(name).edit_type === 'number') {
+					return 0;
+				} else {
+					return '';
+				}
+			}
+			return this.part_def[name];
+		}
+	}, {
+		key: 'is_loaded',
+		get: function get() {
+			return !!this.part_def;
+		}
+	}, {
+		key: 'tech_year',
+		get: function get() {
+			return this.attribute('Year Available (SF)');
+		}
+	}, {
+		key: 'part',
+		get: function get() {
+			return this.json['Part'];
+		},
+		set: function set(value) {
+			this.json['Part'] = value;
+			if (this.is_no_part) {
+				this.quantity_calcs.set(parseInt(0));
+			}
+		}
+	}, {
+		key: 'is_no_part',
+		get: function get() {
+			return this.json['Part'].match(/No .+/) !== null;
+		}
+
+		// BK column
+		// scalar
+
+	}, {
+		key: 'quantity',
+		get: function get() {
+			return this.quantity_calcs.get();
+		},
+		set: function set(value) {
+			if (this.is_quantity_configurable) {
+				this.quantity_calcs.set(parseInt(value));
+				if (value === 0) {
+					var no_part = this.valid_parts.find(function (part) {
+						return part['Name'].match(/No .+/) !== null;
+					});
+					if (no_part) {
+						this.json['Part'] = no_part['Name'];
+					}
+				}
+			}
+		}
+	}, {
+		key: 'is_quantity_configurable',
+		get: function get() {
+			return this.quantity_calcs.is_configurable() && !this.is_no_part;
+		}
+	}, {
+		key: 'valid_quantities',
+		get: function get() {
+			if (this.is_quantity_configurable) {
+				return this.quantity_calcs.options();
+			} else {
+				return [];
+			}
+		}
+	}, {
+		key: 'quantity_calcs',
+		get: function get() {
+			var _this3 = this;
+
+			switch (this.name) {
+				case 'Computer Core':
+				case 'Operating System':
+				case 'Navigational Deflector':
+				case 'Fuel & Matter Stores':
+				case 'EPS Manifold System':
+					return {
+						is_configurable: function is_configurable() {
+							return false;
+						},
+						get: function get() {
+							return _this3.subsystem.design.size_round;
+						}
+					};
+				case 'M/AM Injectors':
+				case 'Coolant Systems':
+					return {
+						is_configurable: function is_configurable() {
+							return false;
+						},
+						get: function get() {
+							var warp_core_type = _this3.subsystem.component('Warp Core Type');
+							if (!warp_core_type || !warp_core_type.is_loaded) {
+								return 0;
+							}
+							return warp_core_type.quantity;
+						}
+					};
+				case 'Targeting Computer':
+				case 'Nacelle System':
+				case 'Eject System':
+					return {
+						is_configurable: function is_configurable() {
+							return false;
+						},
+						get: function get() {
+							if (_this3.is_no_part) {
+								return 0;
+							} else {
+								return 1;
+							}
+						}
+					};
+				default:
+					return {
+						is_configurable: function is_configurable() {
+							return true;
+						},
+						get: function get() {
+							return _this3.json['Quantity'];
+						},
+						set: function set(value) {
+							_this3.json['Quantity'] = value;
+						},
+						options: function options() {
+							switch (_this3.name) {
+								case 'Replication Package':
+									return [].concat(_toConsumableArray(Array(_this3.subsystem.design.size_round + 1).keys()));
+								case 'Secondary Core':
+									return [0, 1, 2];
+								case 'Structural Integrity Fields':
+									{
+										var hull_count = _this3.subsystem.design.subsystem('Hull').component('Hull System').quantity;
+										var hull_grade_civilian = _this3.part.match(/Civilian Grade$/);
+										var sif_max_count = hull_count * (hull_grade_civilian ? 1 : 2);
+										return [].concat(_toConsumableArray(Array(sif_max_count + 1).keys()));
+									}
+								default:
+									return [].concat(_toConsumableArray(Array(26).keys()));
+							}
+						}
+					};
+			}
+		}
+
+		// Requires H navigational deflector:
+		// * Large Frigate Engineering Subframe
+		// * Large or Medium Cruiser Engineering Subframe
+		// * All Explorer
+
+	}, {
+		key: 'requires_heavy_navigational_deflector',
+		get: function get() {
+			return this.subsystem.design.weight_class === 'Explorer' || this.subsystem.design.weight_class === 'Cruiser' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Lg | Md /) || this.subsystem.design.weight_class === 'Frigate' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Lg /);
+		}
+
+		// Requires L navigational deflector:
+		// * Small or Medium Frigate Engineering Subframe
+		// * Small Cruiser Engineering Subframe
+
+	}, {
+		key: 'requires_light_navigational_deflector',
+		get: function get() {
+			return this.subsystem.design.weight_class === 'Cruiser' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Sm /) || this.subsystem.design.weight_class === 'Frigate' && this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Md | Sm /);
+		}
+	}, {
+		key: 'valid_parts',
+		get: function get() {
+			var parts_of_type = this.db.find_parts(COMPONENT_PART_CLASSIFICATIONS[this.name]).filter(function (part) {
+				return !part['Name'].match(/^x/);
+			});
+
+			switch (this.name) {
+				case 'Navigational Deflector':
+					if (this.requires_heavy_navigational_deflector) {
+						parts_of_type = parts_of_type.filter(function (part) {
+							return part['Name'].match(/\[H\]/);
+						});
+					}
+					if (this.requires_light_navigational_deflector) {
+						parts_of_type = parts_of_type.filter(function (part) {
+							return part['Name'].match(/\[L\]/);
+						});
+					}
+					break;
+				default:
+					break;
+			}
+			return parts_of_type;
+		}
+	}, {
+		key: 'evasion',
+		get: function get() {
+			if (this.name === 'Impulse Engine Pwr') {
+				// (1+((CJ$40/DD$40*10)/100))
+				//
+				// that's the effect with the component modifer divided
+				// out and some junk to convert it to a probability
+				//
+				var evasion_effect = this.effect * this.subsystem.stats_multiplier;
+				return 1 + evasion_effect / 10;
+			} else {
+				return false;
+			}
+		}
+	}, {
+		key: 'warp_core_breach',
+		get: function get() {
+			if (this.name === 'Eject System') {
+				return this.attribute('Reliability');
+			} else {
+				return false;
+			}
+		}
+
+		// CP-CR block
+		// crewline
+
+	}, {
+		key: 'cost_crew',
+		get: function get() {
+			// =DS31 * IF(VALUE($BK31)=0,1,(1+(LOG($BK31))*2)) * ($BK$26^0.7 / 2) * CP$29 * $DH31
+			//
+			// DS31 is officer cost off sheet
+			// $BK31 is quantity
+			//
+			// $BK$26 is design size
+			//
+			// CP$29 is subsystem officer multiplier
+			// $DH31 is component crew modifier
+			return [this.cost_crew_raw, this.subsystem.cost_crew_frame_mult, this.crew_mod, this.cost_crew_quantity_mod, this.subsystem.design.cost_crew_size_mod].reduce(function (sum, value) {
+				return sum.mult(value);
+			}, new Crewline(1));
+		}
+
+		// IF(VALUE($BK31)=0,
+		// 1,
+		// (1+(LOG($BK31))*2))
+		// crewline
+
+	}, {
+		key: 'cost_crew_quantity_mod',
+		get: function get() {
+			if (this.quantity) {
+				return 1 + 2 * Math.log(this.quantity) / Math.log(10);
+			} else {
+				return 1;
+			}
+		}
+	}, {
+		key: 'cost_crew_raw',
+		get: function get() {
+			var _this4 = this;
+
+			var map = [['officer', 'O'], ['enlisted', 'E'], ['technician', 'T']];
+			var crew_block = map.reduce(function (res, _ref) {
+				var _ref2 = _slicedToArray(_ref, 2),
+				    longname = _ref2[0],
+				    shortname = _ref2[1];
+
+				res[longname] = _this4.attribute(shortname);return res;
+			}, {});
+			return new Crewline(crew_block);
+		}
+	}, {
+		key: 'crew_mod',
+		get: function get() {
+			return new Crewline(this.component_modifier['Crew Mod'] || 1);
+		}
+	}, {
+		key: 'power_generation',
+		get: function get() {
+			if (this.name === 'Warp Core Type') {
+				// CD79
+				// CD is effect
+				return this.effect;
+			}
+			var warp_core_type = this.subsystem.component('Warp Core Type');
+			if (!warp_core_type || !warp_core_type.is_loaded) {
+				return 0;
+			}
+			switch (this.name) {
+				case 'M/AM Injectors':
+					// =1 + (CD81 / 100 * CO$79)
+					// CD is effect
+					// CD$79 is the effect for the "Warp Core Type" component
+					return 1 + this.effect * warp_core_type.effect / 100.0;
+				case 'Coolant Systems':
+					// =1 + (CD82 / 100 * CO$79)
+					return 1 + this.effect * warp_core_type.effect / 100.0;
+				case 'EPS Manifold System':
+					// =1 + (CD83 / 100 * CO$79)
+					return 1 + this.effect * warp_core_type.effect / 100.0;
+				default:
+					return 0;
+			}
+		}
+
+		// CN column
+
+	}, {
+		key: 'cost_power',
+		get: function get() {
+			// =(DP31 + DQ31*BK$26 + DR31*BK31) * DG31
+			// DP is 'Pwr O/H' column off parts sheet
+
+			// DQ is 'Scale Pwr' column off parts sheet
+			// BK$26 is design size
+
+			// DR is 'Unit Power' column off parts sheet
+			// BK is part quantity
+
+			// DG is 'Cost Mod' column off COMPONENT_MODIFIERS
+
+			// the two Nacelle lines look like this:
+			// =(DP70 + DR70*BK70) * DG70
+			// =DQ70 * BK$26 * DG70
+			// these sum together to the same as the normal case, so need
+			// not be special-cased!
+
+			return (this.cost_power_overhead + this.cost_power_scale * this.subsystem.design.size + this.cost_power_unit * this.quantity) * this.cost_mod;
+		}
+
+		// DP column
+
+	}, {
+		key: 'cost_power_overhead',
+		get: function get() {
+			return this.attribute('Pwr O/H');
+		}
+
+		// DQ
+
+	}, {
+		key: 'cost_power_scale',
+		get: function get() {
+			return this.attribute('Scale Pwr');
+		}
+
+		// DR
+
+	}, {
+		key: 'cost_power_unit',
+		get: function get() {
+			return this.attribute('Unit Power');
+		}
+
+		// CM column
+
+	}, {
+		key: 'cost_SR',
+		get: function get() {
+			// =CK31 * DO31 * CM$29
+			// CM29 is subsystem frame 'SR Cost x'
+			// CK31 is weight
+			// DO31 is SR Cost x off the part list
+			return (this.weight_internal + this.weight_external) * this.cost_SR_mult * this.subsystem.cost_SR_mult;
+		}
+
+		// DO31
+
+	}, {
+		key: 'cost_SR_mult',
+		get: function get() {
+			// SR Cost x off the part list
+			return this.attribute('SR Cost x');
+		}
+
+		// CL column
+
+	}, {
+		key: 'cost_BR',
+		get: function get() {
+			// total weight divided by br to weight mult
+			return (this.weight_internal + this.weight_external) / BR_TO_WEIGHT_MULTIPLIER;
+		}
+
+		// CK column
+		// scalar
+
+	}, {
+		key: 'weight_internal',
+		get: function get() {
+			// =(DL31 + IF(DF31,DM31*BK$26,DN31)*BK31) * DE31 * DG31
+			// DL31 is "Weight O/H", weight overhead, off parts list
+			// DF31 is "Scale Wt?" component configuration
+			// DM31 is "Scale Weight" off parts list
+			// BK$26 is frame size?, BK18+BK25
+			// DN31 is "Unit Weight" off parts list
+			// BK31 is part quantity
+			// DE31 is "Wt Custom" component configuration
+			// DG31 is "Cost Mod" component configuration
+			switch (this.name) {
+				case 'Nacelle System':
+					// "Nacelle Distribution" line in spreadsheet
+					return this.weight_overhead_raw * this.weight_custom * this.cost_mod;
+				default:
+					return this.weight_raw * this.weight_custom * this.cost_mod;
+			}
+		}
+
+		// CK column
+		// scalar
+
+	}, {
+		key: 'weight_external',
+		get: function get() {
+			// =(DL31 + IF(DF31,DM31*BK$26,DN31)*BK31) * DE31 * DG31
+			// DL31 is "Weight O/H", weight overhead, off parts list
+			// DF31 is "Scale Wt?" component configuration
+			// DM31 is "Scale Weight" off parts list
+			// BK$26 is frame size?, BK18+BK25
+			// DN31 is "Unit Weight" off parts list
+			// BK31 is part quantity
+			// DE31 is "Wt Custom" component configuration
+			// DG31 is "Cost Mod" component configuration
+			switch (this.name) {
+				case 'Nacelle System':
+					// "Nacelle System" line in spreadsheet
+					// DN70 * BK70 * DE70 * DG70
+					return this.weight_unit_raw * this.quantity * this.weight_custom * this.cost_mod;
+				default:
+					return 0;
+			}
+		}
+
+		// (DL31 + IF(DF31,DM31*BK$26,DN31)*BK31)
+		// scalar
+		//
+		// the weight of the component before component and size modifiers
+		// are applied
+
+	}, {
+		key: 'weight_raw',
+		get: function get() {
+			return this.weight_overhead_raw + this.weight_per_unit * this.quantity;
+		}
+	}, {
+		key: 'cost_mod',
+		get: function get() {
+			return this.component_modifier['Cost Mod'] || 1;
+		}
+
+		// IF(DF31,
+		// DM31*BK$26,
+		// DN31)
+
+	}, {
+		key: 'weight_per_unit',
+		get: function get() {
+			if (this.component_modifier['Scale Wt?']) {
+				return this.weight_scale_raw * this.subsystem.design.size;
+			} else {
+				return this.weight_unit_raw;
+			}
+		}
+
+		// DL31
+
+	}, {
+		key: 'weight_overhead_raw',
+		get: function get() {
+			return this.attribute('Weight O/H');
+		}
+
+		// DM31
+
+	}, {
+		key: 'weight_scale_raw',
+		get: function get() {
+			return this.attribute('Scale Weight');
+		}
+
+		// DN31
+
+	}, {
+		key: 'weight_unit_raw',
+		get: function get() {
+			return this.attribute('Unit Weight');
+		}
+
+		// DK column
+		// scalar
+
+	}, {
+		key: 'raw_effect',
+		get: function get() {
+			return this.attribute('Effect');
+		}
+
+		// CE block
+		// statline
+
+	}, {
+		key: 'stats',
+		get: function get() {
+			// CD column * CY block * CE$29 row
+			//
+			// effect for this part * frame effect multiplier * the
+			// component's statline modifier
+			return new Statline(this.component_modifier).mult(this.effect * this.subsystem.stats_multiplier);
+		}
+
+		// CD column
+		// scalar
+
+	}, {
+		key: 'effect',
+		get: function get() {
+			switch (this.subsystem.name) {
+				case 'Warp Core':
+					// =DK79 * IF(CX79,1+3.5*log10(0.7*BK79+0.3),1) * CW79 * CD$77
+					//
+					// raw effect * quantity mult * custom effect * frame effect modifier
+					return this.raw_effect * this.effect_custom * this.qty_mult * this.subsystem.stats_multiplier;
+				default:
+					// =DK31 * IF(CX31,1+3.5*log10(0.7*BK31+0.3),1) * CW31
+					//
+					// raw effect from parts list * quantity multiplier * custom effect
+					return this.raw_effect * this.effect_custom * this.qty_mult;
+			}
+		}
+
+		// IF(CX31,
+		// 1 + 3.5 * log10(0.7 * BK31 + 0.3)
+		// ,1)
+		//
+		// scalar
+
+	}, {
+		key: 'qty_mult',
+		get: function get() {
+			if (this.uses_effect_qty) {
+				return 1 + 3.5 * Math.log(0.7 * this.quantity + 0.3) / Math.log(10);
+			} else {
+				return 1;
+			}
+		}
+
+		// boolean
+
+	}, {
+		key: 'uses_effect_qty',
+		get: function get() {
+			return this.component_modifier['Effect Qty?'];
+		}
+
+		// DE column
+		// scalar
+		//
+		// Additional custom multiplier on weight (and thus also BR/SR) -
+		// can be formula as long as it doesn't reference any cell on this
+		// row
+
+	}, {
+		key: 'weight_custom',
+		get: function get() {
+			if (this.name === 'Primary Phasers') {
+				return this.setting_phaser_array_weight_multiplier;
+			}
+			if (this.name === 'Secondary Phasers') {
+				return this.setting_phaser_array_weight_multiplier;
+			}
+			if (this.name === 'Torpedo System') {
+				return this.setting_burst_launcher_weight_multiplier;
+			}
+			return 1;
+		}
+
+		// CW column
+		//
+		// scalar
+		//
+		// comment on sheet: Additional custom multiplier on effect - can
+		// be formula as long as it doesn't reference any cell on this row
+
+	}, {
+		key: 'effect_custom',
+		get: function get() {
+			if (this.name === 'Primary Phasers') {
+				// =(1-(BK$26/100)) * IF($D$33,2,1)
+				// BK$26 = BK18 + BK25
+				// BK18 is design size
+
+				// $D$33 is "phaser arrays Y/N"
+
+				// AL6 is size to weight multiplier
+
+				// return (0.97 / 2) * ;
+
+				return this.phaser_size_mult * this.setting_phaser_array_combat_multiplier;
+			}
+			if (this.name === 'Secondary Phasers') {
+				return this.phaser_size_mult * this.setting_phaser_array_combat_multiplier;
+			}
+			if (this.name === 'Torpedo System') {
+				// =IF($D$35, 1.5, 1)
+				// $D$35 is burst launchers Y/N
+				return this.setting_burst_launcher_combat_multiplier;
+			}
+			// if nothing else, no change
+			return 1;
+		}
+	}, {
+		key: 'phaser_size_mult',
+		get: function get() {
+			return 1 - this.subsystem.design.size / 100.0;
+		}
+	}, {
+		key: 'setting_phaser_array_weight_multiplier',
+		get: function get() {
+			if (this.subsystem.get_setting('Phaser Arrays')) {
+				return 1.5;
+			} else {
+				return 1.0;
+			}
+		}
+	}, {
+		key: 'setting_phaser_array_combat_multiplier',
+		get: function get() {
+			if (this.subsystem.get_setting('Phaser Arrays')) {
+				return 2.0;
+			} else {
+				return 1.0;
+			}
+		}
+	}, {
+		key: 'setting_burst_launcher_combat_multiplier',
+		get: function get() {
+			if (this.subsystem.get_setting('Burst Launchers')) {
+				return 1.5;
+			} else {
+				return 1.0;
+			}
+		}
+	}, {
+		key: 'setting_burst_launcher_weight_multiplier',
+		get: function get() {
+			if (this.subsystem.get_setting('Burst Launchers')) {
+				return 1.5;
+			} else {
+				return 1.0;
+			}
+		}
+	}]);
+
+	return DesignComponent;
+}();
+
+var DesignSubsystem = function () {
+	function DesignSubsystem(db, design, design_subsystem_json) {
+		var _this5 = this;
+
+		_classCallCheck(this, DesignSubsystem);
+
+		this.json = design_subsystem_json;
+		this.db = db;
+		this.name = this.json['Name'];
+		this.design = design;
+		this.settings = this.json['Settings'];
+		this.sub_frame_def = this.db.find_frame(this.json['Sub-Frame']);
+		if (!this.sub_frame_def) {
+			console.log("WARNING: Could not find '" + this.name + "' subframe named '" + this.json['Sub-Frame'] + "'");
+		}
+		this.components = this.json['Components'].map(function (comp_json) {
+			return new DesignComponent(_this5.db, _this5, comp_json);
+		});
+	}
+
+	_createClass(DesignSubsystem, [{
+		key: 'frame_attribute',
+		value: function frame_attribute(name) {
+			if (!this.sub_frame_def) {
+				if (this.db.frame_schema.get(name).edit_type === 'number') {
+					return 0;
+				} else {
+					return '';
+				}
+			}
+			return this.sub_frame_def[name];
+		}
+	}, {
+		key: 'get_setting',
+		value: function get_setting(key) {
+			return this.settings.find(function (elem) {
+				return elem['Name'] === key;
+			})['Value'];
+		}
+	}, {
+		key: 'component',
+		value: function component(component_name) {
+			return this.components.find(function (comp) {
+				return comp.name === component_name;
+			});
+		}
+
+		// CN column, 29 etc
+
+	}, {
+		key: 'is_valid_frame',
+		get: function get() {
+			return !!this.sub_frame_def;
+		}
+	}, {
+		key: 'is_loaded',
+		get: function get() {
+			return this.is_valid_frame && this.components.every(function (comp) {
+				return comp.is_loaded;
+			});
+		}
+	}, {
+		key: 'tech_year_frame',
+		get: function get() {
+			return this.frame_attribute('Year Available (SF)');
+		}
+	}, {
+		key: 'tech_year_max',
+		get: function get() {
+			var years = _lodash2.default.chain(this.components).filter(function (comp) {
+				return comp.is_loaded;
+			}).map(function (comp) {
+				return Number(comp.tech_year);
+			}).filter(function (n) {
+				return n;
+			}).value();
+			var max = _lodash2.default.max(years);
+			if (!max) {
+				return this.tech_year_frame;
+			}
+			if (!Number(this.tech_year_frame)) {
+				return max;
+			}
+			return Math.max(max, this.tech_year_frame);
+		}
+	}, {
+		key: 'sub_frame',
+		get: function get() {
+			return this.json['Sub-Frame'];
+		},
+		set: function set(value) {
+			this.json['Sub-Frame'] = value;
+		}
+	}, {
+		key: 'valid_frames',
+		get: function get() {
+			var _this6 = this;
+
+			return this.db.find_frames(this.name).filter(function (frame) {
+				return frame['Weight Class'] === _this6.design.weight_class_raw;
+			}).filter(function (frame) {
+				return !frame['Name'].match(/^x/);
+			});
+		}
+
+		// CV20, CV41
+
+	}, {
+		key: 'weight_cap',
+		get: function get() {
+			// sum of CV31-40 plus CV29
+			return this.weight_cap_components + this.weight_cap_frame;
+		}
+
+		// CV column
+
+	}, {
+		key: 'weight_cap_components',
+		get: function get() {
+			// these can't be filled in the C8 sheet
+			return 0;
+		}
+
+		// CV29
+
+	}, {
+		key: 'weight_cap_frame',
+		get: function get() {
+			// =(DL29/100) * CV$18
+			return this.max_size_frame * this.design.frame_max_size_raw / 100;
+		}
+	}, {
+		key: 'max_size_frame',
+		get: function get() {
+			// "MaxSz" off frame def
+			return this.frame_attribute('MaxSz');
+		}
+	}, {
+		key: 'warp_core_breach',
+		get: function get() {
+			return this.components.filter(function (comp) {
+				return comp.is_loaded;
+			}).map(function (comp) {
+				return comp.warp_core_breach;
+			}).filter(function (val) {
+				return val !== false;
+			}).reduce(function (sum, value) {
+				return 1 - (1 - sum) * (1 - value);
+			}, 0);
+		}
+	}, {
+		key: 'evasion',
+		get: function get() {
+			// CJ40 is D value for Impulse Engine Pwr
+			// DD40 D mod for Impulse Engine Pwr
+			return this.components.filter(function (comp) {
+				return comp.is_loaded;
+			}).map(function (comp) {
+				return comp.evasion;
+			}).filter(function (val) {
+				return val !== false;
+			}).reduce(function (sum, value) {
+				return 1 - (1 - sum) * (1 - value);
+			}, 0);
+		}
+
+		// CT column, subsystems
+
+	}, {
+		key: 'build_time',
+		get: function get() {
+			// =SUM(CT31:CT40)+CT29
+			//
+			// but the component values are all blank - no way for them to
+			// be filled, and parts don't have build times - so this is
+			// just CT29
+			//
+			// CT29 is DN29 is the build time value straight off the
+			// frames list
+			return (0, _uiFunctions.from_frac)(this.frame_attribute('Build Time'));
+		}
+
+		// DS31-DSU31 row
+		// crewline
+
+	}, {
+		key: 'cost_crew_frame_mult',
+		get: function get() {
+			// CP$18 * DR29
+			// CP$18 is DR18 is design principal frame 'O-Mod' off parts list
+			// DR29 is subframe 'O-Mod' off parts list
+			return this.cost_crew_frame_mult_raw.mult(this.design.cost_crew_frame_mult);
+		}
+
+		// DR29 is subframe 'O-Mod' off parts list
+		// crewline
+
+	}, {
+		key: 'cost_crew_frame_mult_raw',
+		get: function get() {
+			var _this7 = this;
+
+			var map = [['officer', 'O-Mod'], ['enlisted', 'E-Mod'], ['technician', 'T-Mod']];
+			var crew_block = map.reduce(function (res, _ref3) {
+				var _ref4 = _slicedToArray(_ref3, 2),
+				    longname = _ref4[0],
+				    shortname = _ref4[1];
+
+				res[longname] = _this7.frame_attribute(shortname);return res;
+			}, {});
+			return new Crewline(crew_block);
+		}
+
+		// CP, CQ, CR block
+		// crewline
+
+	}, {
+		key: 'cost_crew',
+		get: function get() {
+			// straight sum of components
+			return this.components.filter(function (comp) {
+				return comp.is_loaded;
+			}).map(function (comp) {
+				return comp.cost_crew;
+			}).reduce(function (sum, value) {
+				return sum.add(value);
+			}, new Crewline({}));
+		}
+
+		// CO column
+		// scalar
+
+	}, {
+		key: 'power_generation',
+		get: function get() {
+			switch (this.name) {
+				case 'Warp Core':
+					return this.power_generation_components + this.setting_safety_performance;
+				default:
+					return this.power_generation_components;
+			}
+		}
+	}, {
+		key: 'power_generation_components',
+		get: function get() {
+			return this.components.filter(function (comp) {
+				return comp.is_loaded;
+			}).map(function (comp) {
+				return comp.power_generation;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'setting_safety_performance',
+		get: function get() {
+			// =-BK80 * POWER(2,(ABS(BK80)/2)) / 100 * CO$79
+			// BK80 is D80 is Safety/Performance slider value
+			// CD$79 is warp core effect
+			var warp_core_type = this.component('Warp Core Type');
+			if (!warp_core_type || !warp_core_type.is_loaded) {
+				return 0;
+			}
+			return -this.get_setting('Safety/Performance') * warp_core_type.effect * (Math.pow(2.0, Math.abs(this.get_setting('Safety/Performance'))) / 2.0) / 100.0;
+		}
+	}, {
+		key: 'cost_power',
+		get: function get() {
+			return this.cost_power_components;
+		}
+	}, {
+		key: 'cost_power_components',
+		get: function get() {
+			return this.components.filter(function (comp) {
+				return comp.is_loaded;
+			}).map(function (comp) {
+				return comp.cost_power;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+
+		// CM column, 29 etc
+
+	}, {
+		key: 'cost_SR_mult',
+		get: function get() {
+			// =CM18 * DU29
+			// CM18 is principal frame SR cost
+			// DU29 is 'SR-Mod' straight off part list
+			return this.cost_SR_mult_raw * this.design.cost_SR_frame_mult;
+		}
+	}, {
+		key: 'cost_SR_mult_raw',
+		get: function get() {
+			return this.frame_attribute('SR-Mod');
+		}
+
+		// CM column, 20:24, 41 etc
+
+	}, {
+		key: 'cost_SR',
+		get: function get() {
+			// straight sum of component costs
+			return this.components.filter(function (comp) {
+				return comp.is_loaded;
+			}).map(function (comp) {
+				return comp.cost_SR;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+
+		// sum of component costs plus the frame cost
+
+	}, {
+		key: 'cost_BR',
+		get: function get() {
+			return this.cost_BR_components + this.cost_BR_frame;
+		}
+
+		// CL column
+		// CK column / br to weight mult
+
+	}, {
+		key: 'cost_BR_frame',
+		get: function get() {
+			return this.weight_frame / BR_TO_WEIGHT_MULTIPLIER;
+		}
+	}, {
+		key: 'cost_BR_components',
+		get: function get() {
+			return this.components.filter(function (comp) {
+				return comp.is_loaded;
+			}).map(function (comp) {
+				return comp.cost_BR;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+
+		// CK20:CK25 column, [CK41, CK57, CK63, ...]
+		// scalar
+
+	}, {
+		key: 'weight_external',
+		get: function get() {
+			// =SUM(CK31:CK40)+CK29
+			return this.weight_components_external;
+		}
+
+		// CK20:CK25 column, [CK41, CK57, CK63, ...]
+		// scalar
+
+	}, {
+		key: 'weight_internal',
+		get: function get() {
+			// =SUM(CK31:CK40)+CK29
+			return this.weight_frame + this.weight_components_internal;
+		}
+
+		// CK29, DM29 if populated, DM29 is weight straight off frames list
+		// scalar
+
+	}, {
+		key: 'weight_frame',
+		get: function get() {
+			return this.frame_attribute('Wt') || 0;
+		}
+
+		// =SUM(CK31:CK40)
+		// scalar
+
+	}, {
+		key: 'weight_components_external',
+		get: function get() {
+			return this.components.filter(function (comp) {
+				return comp.is_loaded;
+			}).map(function (comp) {
+				return comp.weight_external;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+
+		// =SUM(CK31:CK40)
+		// scalar
+
+	}, {
+		key: 'weight_components_internal',
+		get: function get() {
+			return this.components.filter(function (comp) {
+				return comp.is_loaded;
+			}).map(function (comp) {
+				return comp.weight_internal;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+
+		// get weight_multiplier() {
+		// 	return this.frame_attribute('') || 0;
+		// };
+
+		// [CE41 row;CE57 row;CE63 row] block
+
+	}, {
+		key: 'stats',
+		get: function get() {
+			return this.components.filter(function (comp) {
+				return comp.is_loaded;
+			}).map(function (comp) {
+				return comp.stats;
+			}).reduce(function (sum, value) {
+				return sum.add(value);
+			}, new Statline({}));
+		}
+
+		// CE29, CD29, DO29
+
+	}, {
+		key: 'stats_multiplier',
+		get: function get() {
+			// =IF(BI29="",0,DGET('[C8] Frames'!$A:$R,DO$28,{"Type","Name";"="&$AJ29,"="&BI29}))
+			// BI29 is frame name
+			// if no frame, then 0
+			// if frame, then look up "tac mod" field in frames list
+			return this.frame_attribute(SUBSYSTEM_NAME_MAP[this.name]);
+		}
+	}]);
+
+	return DesignSubsystem;
+}();
+
+var Module = function () {
+	function Module(db, design, design_module_json) {
+		_classCallCheck(this, Module);
+
+		this.json = design_module_json;
+		this.db = db;
+		this.design = design;
+		this.module_def = this.db.find_module(this.json['Type'], this.json['Variant']);
+		if (!this.module_def) {
+			console.log("WARNING: Could not find module of type '" + this.json['Type'] + "' and variant '" + this.json['Variant'] + "'");
+		}
+	}
+
+	_createClass(Module, [{
+		key: 'attribute',
+		value: function attribute(name) {
+			if (!this.module_def) {
+				if (this.db.module_schema.get(name).edit_type === 'number') {
+					return 0;
+				} else {
+					return '';
+				}
+			}
+			return this.module_def[name];
+		}
+	}, {
+		key: 'is_loaded',
+		get: function get() {
+			return !!this.module_def;
+		}
+	}, {
+		key: 'module_variant',
+		get: function get() {
+			return this.json['Variant'];
+		},
+		set: function set(value) {
+			this.json['Variant'] = value;
+		}
+	}, {
+		key: 'valid_variants',
+		get: function get() {
+			return this.db.find_modules(this.attribute('Type'));
+		}
+	}, {
+		key: 'module_type',
+		get: function get() {
+			return this.json['Type'];
+		},
+		set: function set(value) {
+			this.json['Type'] = value;
+		}
+
+		// CT88, DN88
+
+	}, {
+		key: 'build_time',
+		get: function get() {
+			// straight off modules list
+			return (0, _uiFunctions.from_frac)(this.attribute('Build Time'));
+		}
+
+		// CP-CR 88, DS-DU88
+		// crewline
+
+	}, {
+		key: 'cost_crew',
+		get: function get() {
+			var _this8 = this;
+
+			// straight off parts list
+			var map = [['officer', 'O'], ['enlisted', 'E'], ['technician', 'T']];
+			var stat_block = map.reduce(function (res, _ref5) {
+				var _ref6 = _slicedToArray(_ref5, 2),
+				    longname = _ref6[0],
+				    shortname = _ref6[1];
+
+				res[longname] = _this8.attribute(shortname);return res;
+			}, {});
+			return new Crewline(stat_block);
+		}
+
+		// CN25, CN88, DP88, straight from parts list
+
+	}, {
+		key: 'cost_power',
+		get: function get() {
+			return this.attribute('Power Cost');
+		}
+
+		// CM25, CM88, DO88
+		// straight off parts list
+
+	}, {
+		key: 'cost_SR',
+		get: function get() {
+			return this.attribute('SR Cost');
+		}
+
+		// CL25, CL88
+
+	}, {
+		key: 'cost_BR',
+		get: function get() {
+			// CK88 / AL7
+			// CK88 is weight
+			// AL7 is the br to weight constant
+			return this.weight_total / BR_TO_WEIGHT_MULTIPLIER;
+		}
+
+		// CE88 row, CY88 row
+		// statline
+
+	}, {
+		key: 'stats',
+		get: function get() {
+			var _this9 = this;
+
+			// pulled straight out of module definition
+			var map = [['combat', 'C'], ['science', 'S'], ['hull', 'H'], ['shields', 'L'], ['presence', 'P'], ['defense', 'D']];
+			var stat_block = map.reduce(function (res, _ref7) {
+				var _ref8 = _slicedToArray(_ref7, 2),
+				    longname = _ref8[0],
+				    shortname = _ref8[1];
+
+				res[longname] = _this9.attribute(shortname);return res;
+			}, {});
+			return new Statline(stat_block);
+		}
+
+		// CK25, CK88, DM88
+		// scalar
+		// "Weight" value off module definition
+
+	}, {
+		key: 'weight_total',
+		get: function get() {
+			return this.weight_internal + this.weight_external;
+		}
+	}, {
+		key: 'weight_internal',
+		get: function get() {
+			return 0;
+		}
+	}, {
+		key: 'weight_external',
+		get: function get() {
+			return this.attribute('Weight');
+		}
+
+		// BK25, BK88
+		// scalar
+
+	}, {
+		key: 'size',
+		get: function get() {
+			// BK25 = rollbar size?, BK88
+			// BK88 = rollbar size? = $CV88 / $AL$6
+			return this.size_raw / SIZE_TO_WEIGHT_CAP_MULTIPLIER;
+		}
+
+		// CV88, DL88
+		// scalar
+
+	}, {
+		key: 'size_raw',
+		get: function get() {
+			// $CV88 = DL88 = module weight cap? = module weight cap from "Weight Cap" element of module
+			return this.attribute('Weight Cap');
+		}
+	}]);
+
+	return Module;
+}();
+
+var Design = function () {
+	function Design(db, design_json) {
+		var _this10 = this;
+
+		var wrong_db = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+		_classCallCheck(this, Design);
+
+		this.json = design_json;
+		this.db = db;
+		this.wrong_db = wrong_db;
+		this.name = this.json['Name'];
+		this.timestamp = new Date(this.json['Blueprint Date']);
+		if (this.json['Parts List']) {
+			this.parts_list_name = this.json['Parts List'].name;
+			this.parts_list_timestamp = new Date(this.json['Parts List'].timestamp);
+		} else {
+			this.parts_list_name = this.db.name;
+			this.parts_list_timestamp = this.db.timestamp;
+		}
+		this.princ_frame_def = this.db.find_frame(this.json['Principal Frame']);
+		if (!this.princ_frame_def) {
+			console.log("WARNING: Could not find principal frame named '" + this.json['Principal Frame'] + "'");
+		}
+		this.subsystems = this.json['Subsystems'].map(function (ss_json) {
+			return new DesignSubsystem(_this10.db, _this10, ss_json);
+		}).sort(function (ssa, ssb) {
+			return SUBSYSTEM_SORT_ORDER[ssa.name] > SUBSYSTEM_SORT_ORDER[ssb.name];
+		});
+		this.module = new Module(db, this, this.json['Module']);
+	}
+
+	_createClass(Design, [{
+		key: 'matches_pretty_name',
+		value: function matches_pretty_name(value) {
+			return this.pretty_name === value;
+		}
+	}, {
+		key: 'matches_design',
+		value: function matches_design(other) {
+			return this.name === other.name && this.timestamp === other.timestamp;
+		}
+	}, {
+		key: 'matches_parts_list',
+		value: function matches_parts_list(parts_db) {
+			return this.parts_list_name === parts_db.name && this.parts_list_timestamp.getTime() === parts_db.timestamp.getTime();
+		}
+	}, {
+		key: 'frame_attribute',
+		value: function frame_attribute(name) {
+			if (!this.princ_frame_def) {
+				if (this.db.frame_schema.get(name).edit_type === 'number') {
+					return 0;
+				} else {
+					return '';
+				}
+			}
+			return this.princ_frame_def[name];
+		}
+	}, {
+		key: 'subsystem',
+		value: function subsystem(subsystem_name) {
+			return this.subsystems.find(function (ss) {
+				return ss.name === subsystem_name;
+			});
+		}
+	}, {
+		key: 'is_valid_frame',
+		get: function get() {
+			return !!this.princ_frame_def;
+		}
+	}, {
+		key: 'is_loaded',
+		get: function get() {
+			return this.is_valid_frame && this.subsystems.every(function (ss) {
+				return ss.is_loaded;
+			}) && this.module.is_loaded;
+		}
+	}, {
+		key: 'pretty_name',
+		get: function get() {
+			return this.name + ' (' + this.timestamp.toLocaleString() + ')' + ' [' + this.pretty_name_stats + ']';
+		}
+	}, {
+		key: 'pretty_name_stats',
+		get: function get() {
+			if (this.wrong_db) {
+				return 'parts list missing';
+			} else {
+				return this.stats.toString();
+			}
+		}
+	}, {
+		key: 'has_parts_list_info',
+		get: function get() {
+			return this.parts_list_name.length && this.parts_list_timestamp;
+		}
+	}, {
+		key: 'parts_list_pretty_name',
+		get: function get() {
+			return this.parts_list_name + ' (' + this.parts_list_timestamp.toLocaleString() + ')';
+		}
+	}, {
+		key: 'tech_year_frame',
+		get: function get() {
+			return this.frame_attribute('Year Available (SF)');
+		}
+	}, {
+		key: 'tech_year_max',
+		get: function get() {
+			var years = _lodash2.default.chain(this.subsystems).filter(function (ss) {
+				return ss.is_loaded;
+			}).map(function (ss) {
+				return Number(ss.tech_year_max);
+			}).filter(function (n) {
+				return n;
+			}).value();
+			var max = _lodash2.default.max(years);
+			if (!max) {
+				return this.tech_year_frame;
+			}
+			if (!Number(this.tech_year_frame)) {
+				return max;
+			}
+			return Math.max(max, this.tech_year_frame);
+		}
+	}, {
+		key: 'valid_frames',
+		get: function get() {
+			return this.db.find_frames('Frame');
+		}
+
+		// CT27, CT26
+
+	}, {
+		key: 'build_time',
+		get: function get() {
+			return Math.ceil(this.build_time_raw * 12) / 12;
+		}
+
+		// CT26
+
+	}, {
+		key: 'build_time_raw',
+		get: function get() {
+			// =SUM(CT20:CT25)+CT$18
+			return this.build_time_frame + this.build_time_subsystems + this.module.build_time;
+		}
+
+		// CT18, DN18
+
+	}, {
+		key: 'build_time_frame',
+		get: function get() {
+			// "Build Time" off frames list
+			return (0, _uiFunctions.from_frac)(this.frame_attribute('Build Time'));
+		}
+
+		// sum of CT column on subsystems
+
+	}, {
+		key: 'build_time_subsystems',
+		get: function get() {
+			return this.subsystems.filter(function (ss) {
+				return ss.is_loaded;
+			}).map(function (ss) {
+				return ss.build_time;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'evasion',
+		get: function get() {
+			return Math.round(this.evasion_raw * 1e4) / 1e4;
+		}
+
+		// CD11
+
+	}, {
+		key: 'evasion_raw',
+		get: function get() {
+			// =(MAX(0, 30 - (BK$26*3)) / 100) * (1+((CJ$40/DD$40*10)/100))
+			// BK26 is size
+			// CJ40 is D value for Impulse Engine Pwr
+			// DD40 D mod for Impulse Engine Pwr
+			return this.evasion_size_mult * this.evasion_subsystems;
+		}
+	}, {
+		key: 'evasion_size_mult',
+		get: function get() {
+			// =(MAX(0, 30 - (BK$26*3)) / 100)
+			// for ease of programming: probability of all failing
+			return Math.max(0, 30 - this.size * 3) / 100;
+		}
+	}, {
+		key: 'evasion_subsystems',
+		get: function get() {
+			return this.subsystems.filter(function (ss) {
+				return ss.is_loaded;
+			}).map(function (ss) {
+				return ss.evasion;
+			}).filter(function (wcb) {
+				return wcb;
+			}).reduce(function (sum, value) {
+				return 1 - (1 - sum) * (1 - value);
+			}, 0);
+		}
+
+		// CD13, DV84
+
+	}, {
+		key: 'warp_core_breach',
+		get: function get() {
+			return this.warp_core_breach_subsystems;
+		}
+	}, {
+		key: 'warp_core_breach_subsystems',
+		get: function get() {
+			// for ease of programming: probability of all failing
+			return this.subsystems.filter(function (ss) {
+				return ss.is_loaded;
+			}).map(function (ss) {
+				return ss.warp_core_breach;
+			}).filter(function (wcb) {
+				return wcb;
+			}).reduce(function (sum, value) {
+				return 1 - (1 - sum) * (1 - value);
+			}, 0);
+		}
+
+		// ($BK$26^0.7 / 2)
+		// crewline
+
+	}, {
+		key: 'cost_crew_size_mod',
+		get: function get() {
+			// BK26 is design size
+			return Math.pow(this.size, 0.7) / 2;
+			// return 1/2;
+		}
+
+		// CP$18 is DR18 is design principal frame 'O-Mod' off parts list
+		// crewline
+
+	}, {
+		key: 'cost_crew_frame_mult',
+		get: function get() {
+			var _this11 = this;
+
+			var map = [['officer', 'O-Mod'], ['enlisted', 'E-Mod'], ['technician', 'T-Mod']];
+			var crew_block = map.reduce(function (res, _ref9) {
+				var _ref10 = _slicedToArray(_ref9, 2),
+				    longname = _ref10[0],
+				    shortname = _ref10[1];
+
+				res[longname] = _this11.frame_attribute(shortname);return res;
+			}, {});
+			return new Crewline(crew_block);
+		}
+
+		// T,U,V 3; CP,CQ,CR 27
+		// crewline
+
+	}, {
+		key: 'cost_crew',
+		get: function get() {
+			// ceiling of CP,CQ,CR 26
+			return this.cost_crew_raw.ceil;
+		}
+
+		// T,U,V 2
+		// crewline
+
+	}, {
+		key: 'cost_crew_raw',
+		get: function get() {
+			// CP,CQ,CR 26
+			// sum of subsystem crew costs plus module crew cost
+			return this.cost_crew_subsystems.add(this.module.cost_crew);
+		}
+	}, {
+		key: 'cost_crew_subsystems',
+		get: function get() {
+			return this.subsystems.filter(function (ss) {
+				return ss.is_loaded;
+			}).map(function (ss) {
+				return ss.cost_crew;
+			}).reduce(function (sum, value) {
+				return sum.add(value);
+			}, new Crewline({}));
+		}
+	}, {
+		key: 'power_generation',
+		get: function get() {
+			return Math.round(this.power_generation_raw);
+		}
+	}, {
+		key: 'power_generation_raw',
+		get: function get() {
+			return this.subsystems.filter(function (ss) {
+				return ss.is_loaded;
+			}).map(function (ss) {
+				return ss.power_generation;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+
+		// CE27 row
+
+	}, {
+		key: 'stats',
+		get: function get() {
+			return this.stats_raw.floor;
+		}
+
+		// BL26, CE26 row
+
+	}, {
+		key: 'stats_raw',
+		get: function get() {
+			return this.stats_subsystems.add(this.stats_module);
+		}
+	}, {
+		key: 'stats_subsystems',
+		get: function get() {
+			return this.subsystems.filter(function (ss) {
+				return ss.is_loaded;
+			}).map(function (ss) {
+				return ss.stats;
+			}).reduce(function (sum, value) {
+				return sum.add(value);
+			}, new Statline({}));
+		}
+	}, {
+		key: 'stats_module',
+		get: function get() {
+			return this.module.stats;
+		}
+
+		// O3, CK27
+		// scalar
+
+	}, {
+		key: 'weight_total',
+		get: function get() {
+			return Math.floor(this.weight_total_raw);
+		}
+
+		// O2, CK26
+		// scalar
+
+	}, {
+		key: 'weight_external',
+		get: function get() {
+			// =SUM(CK20:CK25)+CK$18
+			return this.weight_subsystems_external + this.module.weight_external;
+		}
+
+		// O2, CK26
+		// scalar
+
+	}, {
+		key: 'weight_internal',
+		get: function get() {
+			// =SUM(CK20:CK25)+CK$18
+			return this.weight_frame + this.weight_subsystems_internal + this.module.weight_internal;
+		}
+
+		// O2, CK26
+		// scalar
+
+	}, {
+		key: 'weight_total_raw',
+		get: function get() {
+			// =SUM(CK20:CK25)+CK$18
+			return this.weight_external + this.weight_internal;
+		}
+
+		// CK26
+
+	}, {
+		key: 'weight_subsystems_internal',
+		get: function get() {
+			// =SUM(CK20:CK25)
+			// CK20:24 is subsystem weights
+			// CK25 is module weight
+			return this.subsystems.filter(function (ss) {
+				return ss.is_loaded;
+			}).map(function (ss) {
+				return ss.weight_internal;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+
+		// CK26
+
+	}, {
+		key: 'weight_subsystems_external',
+		get: function get() {
+			// =SUM(CK20:CK25)
+			// CK20:24 is subsystem weights
+			// CK25 is module weight
+			return this.subsystems.filter(function (ss) {
+				return ss.is_loaded;
+			}).map(function (ss) {
+				return ss.weight_external;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+
+		// CK$18, DM18
+		// part frame weight
+
+	}, {
+		key: 'weight_frame',
+		get: function get() {
+			return this.frame_attribute('Wt');
+		}
+
+		// P3, CL27
+
+	}, {
+		key: 'cost_BR',
+		get: function get() {
+			// =CEILING(CL26,INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0)))
+			// ceiling(CL16, cost_BR_round)
+			// round raw BR cost to next integer multiple of the rounding interval
+			return Math.ceil(this.cost_BR_raw / this.cost_BR_round) * this.cost_BR_round;
+		}
+	}, {
+		key: 'cost_BR_round',
+		get: function get() {
+			// selects the appropriate interval to round BR to based on the class of the ship
+			// INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0))
+			//
+			// from the list of constants in AL, select the one in the row
+			// that has concat("BR cost round", CD9) in AJ
+			//
+			// CD9 is weight class
+			return BR_COST_ROUND_MAP[this.weight_class];
+		}
+
+		// CD9
+
+	}, {
+		key: 'weight_class',
+		get: function get() {
+			// =IF(DK$18 = 1, "Frigate", IF(DK$18 = 2, "Cruiser", "Explorer"))
+			return WEIGHT_CLASS_MAP[this.weight_class_raw];
+		}
+
+		// DK18
+
+	}, {
+		key: 'weight_class_raw',
+		get: function get() {
+			// "Weight Class" value off of principal frame definition
+			// integer in [1, 3]
+			return this.frame_attribute('Weight Class');
+		}
+
+		// P2, CL26
+
+	}, {
+		key: 'cost_BR_raw',
+		get: function get() {
+			// sum(subsystem BR costs) + module cost + frame cost
+			return this.cost_BR_components + this.module.cost_BR + this.cost_BR_frame;
+		}
+	}, {
+		key: 'cost_BR_components',
+		get: function get() {
+			return this.subsystems.filter(function (ss) {
+				return ss.is_loaded;
+			}).map(function (ss) {
+				return ss.cost_BR;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+
+		// CL18
+		// scalar
+
+	}, {
+		key: 'cost_BR_frame',
+		get: function get() {
+			// CK18 / $AL$7
+			// CK18 = DM18
+			// DM18 is frame "Wt" value
+			return this.weight_frame / BR_TO_WEIGHT_MULTIPLIER;
+		}
+
+		// CM18, DU18
+
+	}, {
+		key: 'cost_SR_frame_mult',
+		get: function get() {
+			return this.frame_attribute('SR-Mod');
+		}
+
+		// Q2, CM27
+
+	}, {
+		key: 'cost_SR',
+		get: function get() {
+			// =CEILING(CL26,INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0)))
+			// ceiling(CL16, cost_BR_round)
+			// round raw BR cost to next integer multiple of the rounding interval
+			return Math.ceil(this.cost_SR_raw / this.cost_SR_round) * this.cost_SR_round;
+		}
+
+		// Q3, CM26
+
+	}, {
+		key: 'cost_SR_raw',
+		get: function get() {
+			// sum of subsystems plus module
+			return this.cost_SR_subsystems + this.module.cost_SR;
+		}
+	}, {
+		key: 'cost_SR_subsystems',
+		get: function get() {
+			return this.subsystems.filter(function (ss) {
+				return ss.is_loaded;
+			}).map(function (ss) {
+				return ss.cost_SR;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+	}, {
+		key: 'cost_SR_round',
+		get: function get() {
+			return SR_COST_ROUND_MAP[this.weight_class];
+		}
+
+		// R2, CN27
+
+	}, {
+		key: 'cost_power',
+		get: function get() {
+			// round, not floor or ceil!
+			return Math.round(this.cost_power_raw);
+		}
+
+		// R3, CN26
+
+	}, {
+		key: 'cost_power_raw',
+		get: function get() {
+			return this.cost_power_subsystems + this.module.cost_power;
+		}
+	}, {
+		key: 'cost_power_subsystems',
+		get: function get() {
+			return this.subsystems.filter(function (ss) {
+				return ss.is_loaded;
+			}).map(function (ss) {
+				return ss.cost_power;
+			}).reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+		}
+
+		// BK27
+
+	}, {
+		key: 'size_round',
+		get: function get() {
+			return Math.ceil(this.size);
+		}
+
+		// BK26
+
+	}, {
+		key: 'size',
+		get: function get() {
+			// BK18 + BK88
+			return this.frame_size + this.module.size;
+		}
+
+		// BK18, "Size"
+
+	}, {
+		key: 'frame_size',
+		get: function get() {
+			// BK18 = $CV18 / $AL$6
+			// $CV18 = weight cap, DL18, equal principal frame MaxSz
+			// $AL$6 = "Size-To-Weight-Cap Multiplier", constant 300
+			return this.frame_max_size_raw / SIZE_TO_WEIGHT_CAP_MULTIPLIER;
+		}
+
+		// CV18, DL18
+
+	}, {
+		key: 'frame_max_size_raw',
+		get: function get() {
+			// 'MaxSz' item off principal frame definition
+			return this.frame_attribute('MaxSz');
+		}
+	}, {
+		key: 'pretty_statline',
+		get: function get() {
+			return this.stats.toString() + ' - ' + this.cost_BR.toString() + 'br ' + this.cost_SR.toString() + 'sr ' + ' - ' + this.weight_total.toString() + 'kt ' + '[' + this.build_time.toFixed(2) + ']yr' + ' - ' + this.cost_crew.toString();
+		}
+	}, {
+		key: 'pretty_miscstats',
+		get: function get() {
+			return 'Evasion Chance: ' + (this.evasion * 100).toFixed(2) + '%\t' + 'Warp Core Breach Chance: ' + (this.warp_core_breach * 100).toFixed(2) + '%';
+		}
+	}, {
+		key: 'pretty_summary',
+		get: function get() {
+			var ID = 'Class: ' + this.name;
+			return [ID, this.pretty_statline, this.pretty_miscstats].join('\n');
+		}
+	}, {
+		key: 'pretty_statline_raw',
+		get: function get() {
+			return this.stats_raw.toFixed(2) + ' - ' + '[' + this.cost_BR_raw.toFixed(2) + ']br [' + this.cost_SR_raw.toFixed(2) + ']sr ' + ' - ' + '[' + this.weight_total_raw.toFixed(2) + ']kt ' + '[' + this.build_time.toFixed(2) + ']yr' + ' - ' + this.cost_crew_raw.toFixed(2);
+		}
+	}, {
+		key: 'pretty_buildinfo',
+		get: function get() {
+			return 'Power[' + this.cost_power_raw.toFixed(2) + '/' + this.power_generation_raw.toFixed(2) + '] - ' + 'Internal[' + this.weight_internal.toFixed(1) + '/' + this.frame_max_size_raw + '] ' + this.subsystems.map(function (ss) {
+				return ss.name + '[' + ss.weight_internal.toFixed(1) + '/' + ss.weight_cap.toFixed(0) + ']';
+			}).join(' ');
+		}
+	}, {
+		key: 'pretty_sdb_info',
+		get: function get() {
+			return [this.pretty_statline_raw, this.pretty_buildinfo].join('\n');
+		}
+	}, {
+		key: 'pretty_dump',
+		get: function get() {}
+	}], [{
+		key: 'find_by_pretty_name',
+		value: function find_by_pretty_name(pretty_name) {
+			return function (design) {
+				return design.matches_pretty_name(pretty_name);
+			};
+		}
+	}]);
+
+	return Design;
+}();
+
+var DB = function () {
+	function DB(parts_list_json) {
+		_classCallCheck(this, DB);
+
+		this.json = parts_list_json;
+		this.name = this.json.name;
+		this.timestamp = new Date(this.json.timestamp);
+		this.parts = this.json.parts.records;
+		this.frames = this.json.frames.records;
+		this.modules = this.json.modules.records;
+		this.part_schema = new Map(this.json.parts.schema.map(function (schema) {
+			return [schema.name, schema];
+		}));
+		this.frame_schema = new Map(this.json.frames.schema.map(function (schema) {
+			return [schema.name, schema];
+		}));
+		this.module_schema = new Map(this.json.modules.schema.map(function (schema) {
+			return [schema.name, schema];
+		}));
+	}
+
+	_createClass(DB, [{
+		key: 'matches',
+		value: function matches(other) {
+			return this.name === other.name && this.timestamp === other.timestamp;
+		}
+	}, {
+		key: 'matches_pretty_name',
+		value: function matches_pretty_name(value) {
+			return this.pretty_name === value;
+		}
+	}, {
+		key: 'find_module',
+		value: function find_module(type, variant) {
+			return this.modules.find(function (elem) {
+				return elem['Type'] === type && elem['Variant'] === variant;
+			});
+		}
+	}, {
+		key: 'find_part',
+		value: function find_part(name) {
+			return this.parts.find(function (elem) {
+				return elem['Name'] === name;
+			});
+		}
+	}, {
+		key: 'find_frame',
+		value: function find_frame(name) {
+			return this.frames.find(function (elem) {
+				return elem['Name'] === name;
+			});
+		}
+	}, {
+		key: 'find_frames',
+		value: function find_frames(type) {
+			return this.frames.filter(function (elem) {
+				return elem['Type'] === type;
+			});
+		}
+	}, {
+		key: 'find_parts',
+		value: function find_parts(type) {
+			return this.parts.filter(function (elem) {
+				return elem['Type'] === type;
+			});
+		}
+	}, {
+		key: 'find_modules',
+		value: function find_modules(type) {
+			return this.modules.filter(function (elem) {
+				return elem['Type'] === type;
+			});
+		}
+	}, {
+		key: 'valid_module_types',
+		value: function valid_module_types() {
+			return [].concat(_toConsumableArray(new Set(this.modules.map(function (elem) {
+				return elem['Type'];
+			}))));
+		}
+	}, {
+		key: 'pretty_name',
+		get: function get() {
+			return this.name + ' (' + this.timestamp.toLocaleString() + ')';
+		}
+	}], [{
+		key: 'find_by_design_json',
+		value: function find_by_design_json(design_json) {
+			return function (db) {
+				return db.name === design_json['Parts List'].name && db.timestamp.getTime() === new Date(design_json['Parts List'].timestamp).getTime();
+			};
+		}
+	}, {
+		key: 'find_by_pretty_name',
+		value: function find_by_pretty_name(pretty_name) {
+			return function (db) {
+				return db.matches_pretty_name(pretty_name);
+			};
+		}
+	}]);
+
+	return DB;
+}();
+
+exports.Design = Design;
+exports.DB = DB;
+exports.Statline = Statline;
+exports.Crewline = Crewline;
+
+/***/ }),
+
+/***/ "./src/lib/ui-functions.js":
+/*!*********************************!*\
+  !*** ./src/lib/ui-functions.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+function frac(val, base, mixed) {
+	if (mixed === undefined || mixed) {
+		var integral = Math.floor(val);
+		var fractional = Math.round((val - integral) * base);
+		while (fractional >= base) {
+			integral += 1;
+			fractional -= base;
+		}
+		var integral_print = '';
+		if (integral) {
+			integral_print = integral.toString();
+		}
+		var fractional_print = '';
+		if (fractional) {
+			fractional_print = fractional.toString() + '/' + base.toString();
+		}
+		return [integral_print, fractional_print].join(' ') || 0;
+	} else {
+		return Math.round(val * base).toString() + '/' + base.toString();
+	}
+}
+
+function from_frac(str) {
+	var m = /(\d+ )?(\d+)\/(\d+)/.exec(str);
+	if (!m) {
+		return null;
+	}
+	var whole = m[1] ? Number.parseInt(m[1]) : 0;
+	var numer = Number.parseInt(m[2]);
+	var denom = Number.parseInt(m[3]);
+	return whole + numer / denom;
+}
+
+function pretty(val, n) {
+	if (Math.abs(val) > 0) {
+		return val.toFixed(2);
+	} else {
+		return n || '';
+	}
+}
+
+exports.pretty = pretty;
+exports.frac = frac;
+exports.from_frac = from_frac;
 
 /***/ }),
 
@@ -39618,10 +39942,6 @@ var _vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.runtime.e
 
 var _vue2 = _interopRequireDefault(_vue);
 
-var _shipdesigner = __webpack_require__(/*! ./shipdesigner.vue */ "./src/shipdesigner.vue");
-
-var _shipdesigner2 = _interopRequireDefault(_shipdesigner);
-
 var _vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 
 var _vuex2 = _interopRequireDefault(_vuex);
@@ -39630,15 +39950,19 @@ var _bluebird = __webpack_require__(/*! bluebird */ "./node_modules/bluebird/js/
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
-var _shipengine = __webpack_require__(/*! ../lib/shipengine.js */ "./lib/shipengine.js");
+var _shipdesigner = __webpack_require__(/*! @/components/shipdesigner/shipdesigner.vue */ "./src/components/shipdesigner/shipdesigner.vue");
+
+var _shipdesigner2 = _interopRequireDefault(_shipdesigner);
+
+var _shipengine = __webpack_require__(/*! @/lib/shipengine.js */ "./src/lib/shipengine.js");
 
 var ShipEngine = _interopRequireWildcard(_shipengine);
 
-var _swb_kepler_recreation = __webpack_require__(/*! ../dist/swb_kepler_recreation.json */ "./dist/swb_kepler_recreation.json");
+var _swb_kepler_recreation = __webpack_require__(/*! #/swb_kepler_recreation.json */ "./dist/swb_kepler_recreation.json");
 
 var _swb_kepler_recreation2 = _interopRequireDefault(_swb_kepler_recreation);
 
-var _canon_parts_list = __webpack_require__(/*! ../dist/canon_parts_list.json */ "./dist/canon_parts_list.json");
+var _canon_parts_list = __webpack_require__(/*! #/canon_parts_list.json */ "./dist/canon_parts_list.json");
 
 var _canon_parts_list2 = _interopRequireDefault(_canon_parts_list);
 
@@ -39951,330 +40275,6 @@ new _vue2.default({
 	},
 	store: store
 });
-
-/***/ }),
-
-/***/ "./src/shipdesigner.vue":
-/*!******************************!*\
-  !*** ./src/shipdesigner.vue ***!
-  \******************************/
-/*! no static exports found */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../node_modules/vue-loader/lib/selector?type=script&index=0!./shipdesigner.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/shipdesigner.vue");
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_64fbfa00_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-64fbfa00","hasScoped":false,"optionsId":"0","buble":{"transforms":{}}}!../node_modules/vue-loader/lib/selector?type=template&index=0!./shipdesigner.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-64fbfa00\",\"hasScoped\":false,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/shipdesigner.vue");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
-var disposed = false
-function injectStyle (context) {
-  if (disposed) return
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=0!./shipdesigner.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/shipdesigner.vue")
-}
-/* script */
-
-
-/* template */
-
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = null
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-
-var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_64fbfa00_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_64fbfa00_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_shipdesigner_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "src/shipdesigner.vue"
-
-/* hot reload */
-if (false) {}
-
-/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
-
-
-/***/ }),
-
-/***/ "./src/statline-cell.vue":
-/*!*******************************!*\
-  !*** ./src/statline-cell.vue ***!
-  \*******************************/
-/*! no static exports found */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../node_modules/vue-loader/lib/selector?type=script&index=0!./statline-cell.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/statline-cell.vue");
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_4a14dd3e_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-4a14dd3e","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../node_modules/vue-loader/lib/selector?type=template&index=0!./statline-cell.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-4a14dd3e\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/statline-cell.vue");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
-var disposed = false
-function injectStyle (context) {
-  if (disposed) return
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=0!./statline-cell.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/statline-cell.vue")
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-4a14dd3e","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=1!./statline-cell.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-4a14dd3e\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/statline-cell.vue")
-}
-/* script */
-
-
-/* template */
-
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-4a14dd3e"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-
-var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_4a14dd3e_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_4a14dd3e_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_statline_cell_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "src/statline-cell.vue"
-
-/* hot reload */
-if (false) {}
-
-/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
-
-
-/***/ }),
-
-/***/ "./src/subsystem-frame.vue":
-/*!*********************************!*\
-  !*** ./src/subsystem-frame.vue ***!
-  \*********************************/
-/*! no static exports found */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../node_modules/vue-loader/lib/selector?type=script&index=0!./subsystem-frame.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/subsystem-frame.vue");
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_1fa46046_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-1fa46046","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../node_modules/vue-loader/lib/selector?type=template&index=0!./subsystem-frame.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-1fa46046\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/subsystem-frame.vue");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
-var disposed = false
-function injectStyle (context) {
-  if (disposed) return
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=0!./subsystem-frame.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-frame.vue")
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-1fa46046","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=1!./subsystem-frame.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-1fa46046\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-frame.vue")
-}
-/* script */
-
-
-/* template */
-
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-1fa46046"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-
-var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_1fa46046_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_1fa46046_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_frame_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "src/subsystem-frame.vue"
-
-/* hot reload */
-if (false) {}
-
-/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
-
-
-/***/ }),
-
-/***/ "./src/subsystem-settings.vue":
-/*!************************************!*\
-  !*** ./src/subsystem-settings.vue ***!
-  \************************************/
-/*! no static exports found */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../node_modules/vue-loader/lib/selector?type=script&index=0!./subsystem-settings.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/subsystem-settings.vue");
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_06bcc24c_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-06bcc24c","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../node_modules/vue-loader/lib/selector?type=template&index=0!./subsystem-settings.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-06bcc24c\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/subsystem-settings.vue");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
-var disposed = false
-function injectStyle (context) {
-  if (disposed) return
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=0!./subsystem-settings.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-settings.vue")
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-06bcc24c","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=1!./subsystem-settings.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-06bcc24c\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-settings.vue")
-}
-/* script */
-
-
-/* template */
-
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-06bcc24c"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-
-var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_06bcc24c_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_06bcc24c_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_settings_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "src/subsystem-settings.vue"
-
-/* hot reload */
-if (false) {}
-
-/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
-
-
-/***/ }),
-
-/***/ "./src/subsystem-summary.vue":
-/*!***********************************!*\
-  !*** ./src/subsystem-summary.vue ***!
-  \***********************************/
-/*! no static exports found */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !babel-loader!../node_modules/vue-loader/lib/selector?type=script&index=0!./subsystem-summary.vue */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/subsystem-summary.vue");
-/* harmony import */ var _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_template_compiler_index_id_data_v_6f922482_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/vue-loader/lib/template-compiler/index?{"id":"data-v-6f922482","hasScoped":true,"optionsId":"0","buble":{"transforms":{}}}!../node_modules/vue-loader/lib/selector?type=template&index=0!./subsystem-summary.vue */ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-6f922482\",\"hasScoped\":true,\"optionsId\":\"0\",\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/subsystem-summary.vue");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/vue-loader/lib/runtime/component-normalizer */ "./node_modules/vue-loader/lib/runtime/component-normalizer.js");
-var disposed = false
-function injectStyle (context) {
-  if (disposed) return
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"id":"data-v-6f922482","scoped":true,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=0!./subsystem-summary.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"id\":\"data-v-6f922482\",\"scoped\":true,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./src/subsystem-summary.vue")
-  __webpack_require__(/*! !vue-style-loader!css-loader?sourceMap!../node_modules/vue-loader/lib/style-compiler/index?{"optionsId":"0","vue":true,"scoped":false,"sourceMap":true}!../node_modules/vue-loader/lib/selector?type=styles&index=1!./subsystem-summary.vue */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js?sourceMap!./node_modules/vue-loader/lib/style-compiler/index.js?{\"optionsId\":\"0\",\"vue\":true,\"scoped\":false,\"sourceMap\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=1!./src/subsystem-summary.vue")
-}
-/* script */
-
-
-/* template */
-
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-6f922482"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-
-var Component = Object(_node_modules_vue_loader_lib_runtime_component_normalizer__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_0___default.a,
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_6f922482_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_1__["render"],
-  _node_modules_vue_loader_lib_template_compiler_index_id_data_v_6f922482_hasScoped_true_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_subsystem_summary_vue__WEBPACK_IMPORTED_MODULE_1__["staticRenderFns"],
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "src/subsystem-summary.vue"
-
-/* hot reload */
-if (false) {}
-
-/* harmony default export */ __webpack_exports__["default"] = (Component.exports);
-
-
-/***/ }),
-
-/***/ "./src/ui-functions.js":
-/*!*****************************!*\
-  !*** ./src/ui-functions.js ***!
-  \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-function frac(val, base, mixed) {
-	if (mixed === undefined || mixed) {
-		var integral = Math.floor(val);
-		var fractional = Math.round((val - integral) * base);
-		while (fractional >= base) {
-			integral += 1;
-			fractional -= base;
-		}
-		var integral_print = '';
-		if (integral) {
-			integral_print = integral.toString();
-		}
-		var fractional_print = '';
-		if (fractional) {
-			fractional_print = fractional.toString() + '/' + base.toString();
-		}
-		return [integral_print, fractional_print].join(' ') || 0;
-	} else {
-		return Math.round(val * base).toString() + '/' + base.toString();
-	}
-}
-
-function from_frac(str) {
-	var m = /(\d+ )?(\d+)\/(\d+)/.exec(str);
-	if (!m) {
-		return null;
-	}
-	var whole = m[1] ? Number.parseInt(m[1]) : 0;
-	var numer = Number.parseInt(m[2]);
-	var denom = Number.parseInt(m[3]);
-	return whole + numer / denom;
-}
-
-function pretty(val, n) {
-	if (Math.abs(val) > 0) {
-		return val.toFixed(2);
-	} else {
-		return n || '';
-	}
-}
-
-exports.pretty = pretty;
-exports.frac = frac;
-exports.from_frac = from_frac;
 
 /***/ })
 
