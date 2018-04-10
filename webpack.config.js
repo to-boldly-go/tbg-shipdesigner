@@ -1,11 +1,13 @@
 const path = require('path');
 
-const config = {
-	entry: {
-		'shipdesigner': './src/shipdesigner.js',
-		'partbuilder': './src/partbuilder.js',
-		'csvimporter': './src/csvimporter.js',
+const common = {
+	devServer: {
+		contentBase: path.join(__dirname, "dist"),
+		port: 8001,
+		host: '0.0.0.0',
+		disableHostCheck: true,
 	},
+	devtool: 'cheap-module-source-map',
 	resolve: {
 		modules: [
 			path.resolve('./src'),
@@ -15,17 +17,6 @@ const config = {
 			'@': path.resolve('src'),
 			'#': path.resolve('dist'),
 		},
-	},
-	output: {
-		path: path.resolve(__dirname, 'dist'),
-		filename: '[name].js',
-	},
-	devtool: 'cheap-module-source-map',
-	devServer: {
-		contentBase: path.join(__dirname, "dist"),
-		port: 8001,
-		host: '0.0.0.0',
-		disableHostCheck: true,
 	},
 	module: {
 		rules: [
@@ -63,4 +54,30 @@ const config = {
 	mode: "development",
 };
 
-module.exports = config;
+const webapp = {
+	entry: {
+		'shipdesigner': './src/shipdesigner.js',
+		'partbuilder': './src/partbuilder.js',
+		'csvimporter': './src/csvimporter.js',
+	},
+	output: {
+		path: path.resolve(__dirname, 'dist'),
+		filename: '[name].js',
+	},
+};
+
+const scripts = {
+	entry: {
+		'import-parts': './src/scripts/import-parts.js',
+	},
+    target: 'node',
+	output: {
+		path: path.resolve(__dirname, 'bin'),
+		filename: '[name].js',
+	},
+};
+
+module.exports = [
+	Object.assign({}, common, webapp),
+	Object.assign({}, common, scripts),
+];

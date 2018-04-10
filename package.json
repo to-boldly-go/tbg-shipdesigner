@@ -9,7 +9,7 @@
         "vuex": "^3.0.1"
     },
     "scripts": {
-        "import-parts": "babel-node scripts/import-parts.js",
+        "import-parts": "node bin/import-parts.js",
         "webpack": "webpack",
         "watch": "webpack --progress --watch",
         "start": "webpack-dev-server",
