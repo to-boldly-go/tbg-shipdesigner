@@ -14,16 +14,24 @@ function frac(val, base, mixed) {
 		if (fractional) {
 			fractional_print = fractional.toString() + '/' + base.toString();
 		}
-		return [integral_print, fractional_print].join(' ') || 0;
+		if (integral_print && fractional_print) {
+			return integral_print + ' ' + fractional_print;
+		} else if (integral_print) {
+			return integral_print;
+		} else if (fractional_print) {
+			return fractional_print;
+		} else {
+			return '0';
+		}
 	} else {
 		return Math.round(val * base).toString() + '/' + base.toString();
 	}
 }
 
 function from_frac(str) {
-	let m = /(\d+ )?(\d+)\/(\d+)/.exec(str);
+	let m = /(\d+?\s+)?(\d+)\s*\/\s*(\d+)/.exec(str);
 	if (!m) {
-		return null;
+		return Number.parseFloat(str);
 	}
 	let whole = m[1] ? Number.parseInt(m[1]) : 0;
 	let numer = Number.parseInt(m[2]);
