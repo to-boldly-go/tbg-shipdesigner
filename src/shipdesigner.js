@@ -3,9 +3,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import Promise from 'bluebird';
-Promise.longStackTraces();
-
 Vue.use(Vuex);
 
 import ShipDesigner from '@/components/shipdesigner/shipdesigner.vue';
