@@ -112,7 +112,7 @@ export default {
 				return Number(this.part[this.field.name]);
 			},
 			set(value) {
-				let new_value = Number(typeof (value) === 'string' ? value.trim() : 0);
+				let new_value = Number(value);
 				if (this.value_number !== new_value) {
 					this.$store.commit('edit_part', {
 						part: this.part,
