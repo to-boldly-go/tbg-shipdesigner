@@ -78,9 +78,9 @@ export default {
 			}
 		},
 		display_value() {
+			const v = this.part[this.field.name];
 			switch (this.field.edit_type) {
 			case 'number': {
-				const v = this.part[this.field.name];
 				if (v === undefined || v === null || Number.isNaN(v)) {
 					return '';
 				} else if (typeof(v.valueOf()) === 'number') {
@@ -91,64 +91,44 @@ export default {
 				}
 			}
 			case 'string':
-				return this.part[this.field.name];
+				return v;
 			}
 		},
 		value: {
 			get() {
-				switch (this.field.edit_type) {
-				case 'number':
-					return this.value_number;
-				case 'string':
-					return this.value_string;
-				}
-			},
-			set(value) {
-				switch (this.field.edit_type) {
-				case 'number':
-					this.value_number = value;
-					break;
-				case 'string':
-					this.value_string = value;
-					break;
-				}
-			},
-		},
-		value_number: {
-			get() {
-				let v = this.part[this.field.name];
-				if (v === undefined || v === null || Number.isNaN(v)) {
-					return '';
+				const v = this.part[this.field.name];
+				if (this.field.edit_type === 'number') {
+					if (v === undefined || v === null || Number.isNaN(v)) {
+						return '';
+					} else {
+						return Number(v);
+					}
 				} else {
-					return Number(v);
+					return v;
 				}
 			},
 			set(value) {
-				let v = this.part[this.field.name];
+				const v = this.part[this.field.name];
 				if ((v === undefined || v === null) && value === '') {
 					return;
 				}
-				let new_value = Number(value);
-				if (Number(v) !== new_value && !Number.isNaN(new_value)) {
-					this.$store.commit('edit_part', {
-						part: this.part,
-						field: this.field.name,
-						value: new_value,
-					});
-				}
-			},
-		},
-		value_string: {
-			get() {
-				return this.part[this.field.name];
-			},
-			set(value) {
-				if (this.value_string !== value) {
-					this.$store.commit('edit_part', {
-						part: this.part,
-						field: this.field.name,
-						value: value,
-					});
+				if (this.field.edit_type === 'number') {
+					const new_value = Number(value);
+					if (Number(v) !== new_value && !Number.isNaN(new_value)) {
+						this.$store.commit('edit_part', {
+							part: this.part,
+							field: this.field.name,
+							value: new_value,
+						});
+					}
+				} else {
+					if (v !== value) {
+						this.$store.commit('edit_part', {
+							part: this.part,
+							field: this.field.name,
+							value: value,
+						});
+					}
 				}
 			},
 		},
