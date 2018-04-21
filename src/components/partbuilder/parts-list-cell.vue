@@ -12,6 +12,7 @@
 		<input
 			v-if="is_editing"
 			class="edit-input"
+			:style="computed_input_style"
 			ref="input"
 			type="text"
 			@blur="commit_edit"
@@ -54,6 +55,11 @@ export default {
 				'width': this.field.width.toString() + 'px',
 				'text-align': this.field.align,
 			}, this.computed_font);
+		},
+		computed_input_style() {
+			return {
+				'text-align': this.field.align,
+			};
 		},
 		computed_font() {
 			let style = this.field.style;
@@ -179,11 +185,11 @@ export default {
 
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+	-webkit-appearance: none;
+	margin: 0;
 }
 input[type="number"] {
-    -moz-appearance: textfield;
+	-moz-appearance: textfield;
 }
 
 .cell {
@@ -200,7 +206,7 @@ input[type="number"] {
 	padding: 0px;
 	border-width: 0;
 	width: 100%;
-    box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 
