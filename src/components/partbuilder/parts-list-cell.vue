@@ -74,9 +74,10 @@ export default {
 		display_value() {
 			switch (this.field.edit_type) {
 			case 'number': {
-				// return this.part[this.field.name];
 				const v = this.part[this.field.name];
-				if (typeof(v) === 'number') {
+				if (v === undefined || v === null || Number.isNaN(v)) {
+					return '';
+				} else if (typeof(v.valueOf()) === 'number') {
 					const f = v.toFixed(this.field.fixed);
 					return f.replace(/(\..*?)(0+)$/, (match, p1, p2) => p1 + ' '.repeat(p2.length)).replace(/\. ( *)/, '.0$1');
 				} else {
@@ -109,11 +110,20 @@ export default {
 		},
 		value_number: {
 			get() {
-				return Number(this.part[this.field.name]);
+				let v = this.part[this.field.name];
+				if (v === undefined || v === null || Number.isNaN(v)) {
+					return '';
+				} else {
+					return Number(v);
+				}
 			},
 			set(value) {
+				let v = this.part[this.field.name];
+				if ((v === undefined || v === null) && value === '') {
+					return;
+				}
 				let new_value = Number(value);
-				if (this.value_number !== new_value) {
+				if (Number(v) !== new_value && !Number.isNaN(new_value)) {
 					this.$store.commit('edit_part', {
 						part: this.part,
 						field: this.field.name,
