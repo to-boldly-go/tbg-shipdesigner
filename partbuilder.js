@@ -202,6 +202,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
 
 
 exports.default = {
@@ -236,6 +237,11 @@ exports.default = {
 				'text-align': this.field.align
 			}, this.computed_font);
 		},
+		computed_input_style: function computed_input_style() {
+			return {
+				'text-align': this.field.align
+			};
+		},
 		computed_font: function computed_font() {
 			var _ref;
 
@@ -252,12 +258,13 @@ exports.default = {
 			}
 		},
 		display_value: function display_value() {
+			var v = this.part[this.field.name];
 			switch (this.field.edit_type) {
 				case 'number':
 					{
-						// return this.part[this.field.name];
-						var v = this.part[this.field.name];
-						if (typeof v === 'number') {
+						if (v === undefined || v === null || Number.isNaN(v)) {
+							return '';
+						} else if (typeof v.valueOf() === 'number') {
 							var f = v.toFixed(this.field.fixed);
 							return f.replace(/(\..*?)(0+)$/, function (match, p1, p2) {
 								return p1 + ' '.repeat(p2.length);
@@ -267,56 +274,45 @@ exports.default = {
 						}
 					}
 				case 'string':
-					return this.part[this.field.name];
+					return v;
 			}
 		},
 
 		value: {
 			get: function get() {
-				switch (this.field.edit_type) {
-					case 'number':
-						return this.value_number;
-					case 'string':
-						return this.value_string;
+				var v = this.part[this.field.name];
+				if (this.field.edit_type === 'number') {
+					if (v === undefined || v === null || Number.isNaN(v)) {
+						return '';
+					} else {
+						return Number(v);
+					}
+				} else {
+					return v;
 				}
 			},
 			set: function set(value) {
-				switch (this.field.edit_type) {
-					case 'number':
-						this.value_number = value;
-						break;
-					case 'string':
-						this.value_string = value;
-						break;
+				var v = this.part[this.field.name];
+				if ((v === undefined || v === null) && value === '') {
+					return;
 				}
-			}
-		},
-		value_number: {
-			get: function get() {
-				return Number(this.part[this.field.name]);
-			},
-			set: function set(value) {
-				var new_value = Number(value);
-				if (this.value_number !== new_value) {
-					this.$store.commit('edit_part', {
-						part: this.part,
-						field: this.field.name,
-						value: new_value
-					});
-				}
-			}
-		},
-		value_string: {
-			get: function get() {
-				return this.part[this.field.name];
-			},
-			set: function set(value) {
-				if (this.value_string !== value) {
-					this.$store.commit('edit_part', {
-						part: this.part,
-						field: this.field.name,
-						value: value
-					});
+				if (this.field.edit_type === 'number') {
+					var new_value = Number(value);
+					if (Number(v) !== new_value && !Number.isNaN(new_value)) {
+						this.$store.commit('edit_part', {
+							part: this.part,
+							field: this.field.name,
+							value: new_value
+						});
+					}
+				} else {
+					if (v !== value) {
+						this.$store.commit('edit_part', {
+							part: this.part,
+							field: this.field.name,
+							value: value
+						});
+					}
 				}
 			}
 		}
@@ -6265,7 +6261,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\ninput[type=\"number\"][data-v-3bd7525d]::-webkit-outer-spin-button,\ninput[type=\"number\"][data-v-3bd7525d]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\ninput[type=\"number\"][data-v-3bd7525d] {\n    -moz-appearance: textfield;\n}\n.cell[data-v-3bd7525d] {\n\tborder: 1px solid #eee;\n\tcursor: cell;\n}\n.display-span[data-v-3bd7525d] {\n\twidth: 100%;\n\twhite-space: pre;\n}\n.edit-input[data-v-3bd7525d] {\n\tpadding: 0px;\n\tborder-width: 0;\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/partbuilder/src/components/partbuilder/parts-list-cell.vue"],"names":[],"mappings":";AAyKA;;IAEA,yBAAA;IACA,UAAA;CACA;AACA;IACA,2BAAA;CACA;AAEA;CACA,uBAAA;CACA,aAAA;CACA;AAEA;CACA,YAAA;CACA,iBAAA;CACA;AAEA;CACA,aAAA;CACA,gBAAA;CACA,YAAA;IACA,uBAAA;CACA","file":"parts-list-cell.vue","sourcesContent":["<template>\n\t<td class=\"cell\"\n\t\t@click=\"edit_cell\"\n\t\t@focus=\"edit_cell\"\n\t\ttabindex=\"0\"\n\t\t:style=\"computed_style\">\n\n\t\t<span\n\t\t\tclass=\"display-span\"\n\t\t\tv-show=\"!is_editing\">{{display_value}}</span>\n\t\t\n\t\t<input\n\t\t\tv-if=\"is_editing\"\n\t\t\tclass=\"edit-input\"\n\t\t\tref=\"input\"\n\t\t\ttype=\"text\"\n\t\t\t@blur=\"commit_edit\"\n\t\t\t@keydown=\"on_keydown\"\n\t\t\tv-focus\n\t\t\tv-model=\"temp_value\"/>\n\t</td>\n</template>\n\n<script>\n\nexport default {\n\tname: 'PartsListCell',\n\tcomponents: {\n\t},\n\tdirectives: {\n\t\tfocus: {\n\t\t\tinserted(el) {\n\t\t\t\tel.focus();\n\t\t\t},\n\t\t},\n\t},\n\tprops: {\n\t\tpart: {\n\t\t\ttype: Object,\n\t\t},\n\t\tfield: {\n\t\t\ttype: Object,\n\t\t},\n\t},\n\tdata() {\n\t\treturn {\n\t\t\tis_editing: false,\n\t\t\ttemp_value: null,\n\t\t};\n\t},\n\tcomputed: {\n\t\tcomputed_style() {\n\t\t\treturn Object.assign({\n\t\t\t\t'width': this.field.width.toString() + 'px',\n\t\t\t\t'text-align': this.field.align,\n\t\t\t}, this.computed_font);\n\t\t},\n\t\tcomputed_font() {\n\t\t\tlet style = this.field.style;\n\t\t\tif (!style && this.field.fixed) {\n\t\t\t\tstyle = 'fixed';\n\t\t\t}\n\t\t\tswitch (style) {\n\t\t\tcase 'fixed':\n\t\t\t\treturn {\n\t\t\t\t\t['font-family']: \"'Roboto Mono', monospace\",\n\t\t\t\t\t['font-size']: '12px',\n\t\t\t\t};\n\t\t\tcase 'variable':\n\t\t\tdefault:\n\t\t\t\treturn {};\n\t\t\t}\n\t\t},\n\t\tdisplay_value() {\n\t\t\tswitch (this.field.edit_type) {\n\t\t\tcase 'number': {\n\t\t\t\t// return this.part[this.field.name];\n\t\t\t\tconst v = this.part[this.field.name];\n\t\t\t\tif (typeof(v) === 'number') {\n\t\t\t\t\tconst f = v.toFixed(this.field.fixed);\n\t\t\t\t\treturn f.replace(/(\\..*?)(0+)$/, (match, p1, p2) => p1 + ' '.repeat(p2.length)).replace(/\\. ( *)/, '.0$1');\n\t\t\t\t} else {\n\t\t\t\t\treturn v;\n\t\t\t\t}\n\t\t\t}\n\t\t\tcase 'string':\n\t\t\t\treturn this.part[this.field.name];\n\t\t\t}\n\t\t},\n\t\tvalue: {\n\t\t\tget() {\n\t\t\t\tswitch (this.field.edit_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\treturn this.value_number;\n\t\t\t\tcase 'string':\n\t\t\t\t\treturn this.value_string;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tswitch (this.field.edit_type) {\n\t\t\t\tcase 'number':\n\t\t\t\t\tthis.value_number = value;\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'string':\n\t\t\t\t\tthis.value_string = value;\n\t\t\t\t\tbreak;\n\t\t\t\t}\n\t\t\t},\n\t\t},\n\t\tvalue_number: {\n\t\t\tget() {\n\t\t\t\treturn Number(this.part[this.field.name]);\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tlet new_value = Number(value);\n\t\t\t\tif (this.value_number !== new_value) {\n\t\t\t\t\tthis.$store.commit('edit_part', {\n\t\t\t\t\t\tpart: this.part,\n\t\t\t\t\t\tfield: this.field.name,\n\t\t\t\t\t\tvalue: new_value,\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t},\n\t\t},\n\t\tvalue_string: {\n\t\t\tget() {\n\t\t\t\treturn this.part[this.field.name];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tif (this.value_string !== value) {\n\t\t\t\t\tthis.$store.commit('edit_part', {\n\t\t\t\t\t\tpart: this.part,\n\t\t\t\t\t\tfield: this.field.name,\n\t\t\t\t\t\tvalue: value,\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\ton_keydown(ev) {\n\t\t\tswitch (ev.key) {\n\t\t\tcase 'Enter':\n\t\t\t\t// leave focus and let the app save changes\n\t\t\t\tthis.commit_edit();\n\t\t\t\tbreak;\n\t\t\tcase 'Escape':\n\t\t\t\tthis.abort_edit();\n\t\t\t\tbreak;\n\t\t\t}\n\t\t},\n\t\tabort_edit() {\n\t\t\tthis.temp_value = this.value;\n\t\t\tthis.is_editing = false;\n\t\t},\n\t\tedit_cell(ev) {\n\t\t\tthis.is_editing = true;\n\t\t\tthis.temp_value = this.value;\n\t\t},\n\t\tcommit_edit(ev) {\n\t\t\tthis.is_editing = false;\n\t\t\tthis.value = this.temp_value;\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\ninput[type=\"number\"]::-webkit-outer-spin-button,\ninput[type=\"number\"]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\ninput[type=\"number\"] {\n    -moz-appearance: textfield;\n}\n\n.cell {\n\tborder: 1px solid #eee;\n\tcursor: cell;\n}\n\n.display-span {\n\twidth: 100%;\n\twhite-space: pre;\n}\n\n.edit-input {\n\tpadding: 0px;\n\tborder-width: 0;\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\ninput[type=\"number\"][data-v-3bd7525d]::-webkit-outer-spin-button,\ninput[type=\"number\"][data-v-3bd7525d]::-webkit-inner-spin-button {\n\t-webkit-appearance: none;\n\tmargin: 0;\n}\ninput[type=\"number\"][data-v-3bd7525d] {\n\t-moz-appearance: textfield;\n}\n.cell[data-v-3bd7525d] {\n\tborder: 1px solid #eee;\n\tcursor: cell;\n}\n.display-span[data-v-3bd7525d] {\n\twidth: 100%;\n\twhite-space: pre;\n}\n.edit-input[data-v-3bd7525d] {\n\tpadding: 0px;\n\tborder-width: 0;\n\twidth: 100%;\n\tbox-sizing: border-box;\n}\n\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/partbuilder/src/components/partbuilder/parts-list-cell.vue"],"names":[],"mappings":";AAqKA;;CAEA,yBAAA;CACA,UAAA;CACA;AACA;CACA,2BAAA;CACA;AAEA;CACA,uBAAA;CACA,aAAA;CACA;AAEA;CACA,YAAA;CACA,iBAAA;CACA;AAEA;CACA,aAAA;CACA,gBAAA;CACA,YAAA;CACA,uBAAA;CACA","file":"parts-list-cell.vue","sourcesContent":["<template>\n\t<td class=\"cell\"\n\t\t@click=\"edit_cell\"\n\t\t@focus=\"edit_cell\"\n\t\ttabindex=\"0\"\n\t\t:style=\"computed_style\">\n\n\t\t<span\n\t\t\tclass=\"display-span\"\n\t\t\tv-show=\"!is_editing\">{{display_value}}</span>\n\t\t\n\t\t<input\n\t\t\tv-if=\"is_editing\"\n\t\t\tclass=\"edit-input\"\n\t\t\t:style=\"computed_input_style\"\n\t\t\tref=\"input\"\n\t\t\ttype=\"text\"\n\t\t\t@blur=\"commit_edit\"\n\t\t\t@keydown=\"on_keydown\"\n\t\t\tv-focus\n\t\t\tv-model=\"temp_value\"/>\n\t</td>\n</template>\n\n<script>\n\nexport default {\n\tname: 'PartsListCell',\n\tcomponents: {\n\t},\n\tdirectives: {\n\t\tfocus: {\n\t\t\tinserted(el) {\n\t\t\t\tel.focus();\n\t\t\t},\n\t\t},\n\t},\n\tprops: {\n\t\tpart: {\n\t\t\ttype: Object,\n\t\t},\n\t\tfield: {\n\t\t\ttype: Object,\n\t\t},\n\t},\n\tdata() {\n\t\treturn {\n\t\t\tis_editing: false,\n\t\t\ttemp_value: null,\n\t\t};\n\t},\n\tcomputed: {\n\t\tcomputed_style() {\n\t\t\treturn Object.assign({\n\t\t\t\t'width': this.field.width.toString() + 'px',\n\t\t\t\t'text-align': this.field.align,\n\t\t\t}, this.computed_font);\n\t\t},\n\t\tcomputed_input_style() {\n\t\t\treturn {\n\t\t\t\t'text-align': this.field.align,\n\t\t\t};\n\t\t},\n\t\tcomputed_font() {\n\t\t\tlet style = this.field.style;\n\t\t\tif (!style && this.field.fixed) {\n\t\t\t\tstyle = 'fixed';\n\t\t\t}\n\t\t\tswitch (style) {\n\t\t\tcase 'fixed':\n\t\t\t\treturn {\n\t\t\t\t\t['font-family']: \"'Roboto Mono', monospace\",\n\t\t\t\t\t['font-size']: '12px',\n\t\t\t\t};\n\t\t\tcase 'variable':\n\t\t\tdefault:\n\t\t\t\treturn {};\n\t\t\t}\n\t\t},\n\t\tdisplay_value() {\n\t\t\tconst v = this.part[this.field.name];\n\t\t\tswitch (this.field.edit_type) {\n\t\t\tcase 'number': {\n\t\t\t\tif (v === undefined || v === null || Number.isNaN(v)) {\n\t\t\t\t\treturn '';\n\t\t\t\t} else if (typeof(v.valueOf()) === 'number') {\n\t\t\t\t\tconst f = v.toFixed(this.field.fixed);\n\t\t\t\t\treturn f.replace(/(\\..*?)(0+)$/, (match, p1, p2) => p1 + ' '.repeat(p2.length)).replace(/\\. ( *)/, '.0$1');\n\t\t\t\t} else {\n\t\t\t\t\treturn v;\n\t\t\t\t}\n\t\t\t}\n\t\t\tcase 'string':\n\t\t\t\treturn v;\n\t\t\t}\n\t\t},\n\t\tvalue: {\n\t\t\tget() {\n\t\t\t\tconst v = this.part[this.field.name];\n\t\t\t\tif (this.field.edit_type === 'number') {\n\t\t\t\t\tif (v === undefined || v === null || Number.isNaN(v)) {\n\t\t\t\t\t\treturn '';\n\t\t\t\t\t} else {\n\t\t\t\t\t\treturn Number(v);\n\t\t\t\t\t}\n\t\t\t\t} else {\n\t\t\t\t\treturn v;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tconst v = this.part[this.field.name];\n\t\t\t\tif ((v === undefined || v === null) && value === '') {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (this.field.edit_type === 'number') {\n\t\t\t\t\tconst new_value = Number(value);\n\t\t\t\t\tif (Number(v) !== new_value && !Number.isNaN(new_value)) {\n\t\t\t\t\t\tthis.$store.commit('edit_part', {\n\t\t\t\t\t\t\tpart: this.part,\n\t\t\t\t\t\t\tfield: this.field.name,\n\t\t\t\t\t\t\tvalue: new_value,\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t} else {\n\t\t\t\t\tif (v !== value) {\n\t\t\t\t\t\tthis.$store.commit('edit_part', {\n\t\t\t\t\t\t\tpart: this.part,\n\t\t\t\t\t\t\tfield: this.field.name,\n\t\t\t\t\t\t\tvalue: value,\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\ton_keydown(ev) {\n\t\t\tswitch (ev.key) {\n\t\t\tcase 'Enter':\n\t\t\t\t// leave focus and let the app save changes\n\t\t\t\tthis.commit_edit();\n\t\t\t\tbreak;\n\t\t\tcase 'Escape':\n\t\t\t\tthis.abort_edit();\n\t\t\t\tbreak;\n\t\t\t}\n\t\t},\n\t\tabort_edit() {\n\t\t\tthis.temp_value = this.value;\n\t\t\tthis.is_editing = false;\n\t\t},\n\t\tedit_cell(ev) {\n\t\t\tthis.is_editing = true;\n\t\t\tthis.temp_value = this.value;\n\t\t},\n\t\tcommit_edit(ev) {\n\t\t\tthis.is_editing = false;\n\t\t\tthis.value = this.temp_value;\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\ninput[type=\"number\"]::-webkit-outer-spin-button,\ninput[type=\"number\"]::-webkit-inner-spin-button {\n\t-webkit-appearance: none;\n\tmargin: 0;\n}\ninput[type=\"number\"] {\n\t-moz-appearance: textfield;\n}\n\n.cell {\n\tborder: 1px solid #eee;\n\tcursor: cell;\n}\n\n.display-span {\n\twidth: 100%;\n\twhite-space: pre;\n}\n\n.edit-input {\n\tpadding: 0px;\n\tborder-width: 0;\n\twidth: 100%;\n\tbox-sizing: border-box;\n}\n\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -6398,7 +6394,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-cell.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-cell.vue","sourceRoot":""}]);
 
 // exports
 
@@ -24302,6 +24298,7 @@ var render = function() {
             ],
             ref: "input",
             staticClass: "edit-input",
+            style: _vm.computed_input_style,
             attrs: { type: "text" },
             domProps: { value: _vm.temp_value },
             on: {
@@ -34684,7 +34681,7 @@ var store = new _vuex2.default.Store({
 			state.parts_list.timestamp = timestamp.toISOString();
 		},
 		edit_part: function edit_part(state, payload) {
-			payload.part[payload.field] = payload.value;
+			_vue2.default.set(payload.part, payload.field, payload.value);
 		},
 		sort_parts_list_by: function sort_parts_list_by(state, field) {
 			if (state.display.current_sort.field === field) {
