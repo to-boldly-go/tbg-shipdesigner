@@ -53,7 +53,7 @@ const store = new Vuex.Store({
 			state.parts_list.timestamp = timestamp.toISOString();
 		},
 		edit_part(state, payload) {
-			payload.part[payload.field] = payload.value;
+			Vue.set(payload.part, payload.field, payload.value);
 		},
 		sort_parts_list_by(state, field) {
 			if (state.display.current_sort.field === field) {
