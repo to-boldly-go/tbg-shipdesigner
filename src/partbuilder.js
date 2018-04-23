@@ -82,7 +82,7 @@ const store = new Vuex.Store({
 		},
 		delete_part(state, payload) {
 			let selected_parts = state.parts_list[state.display.selected].records;
-			const idx = selected_parts.findIndex((part) => part['Name'] === payload);
+			const idx = selected_parts.findIndex(part => (part['Type'] === payload['Type']) && (part['Name'] === payload['Name']) && (part['Variant'] === payload['Variant']));
 			if (idx >= 0) {
 				selected_parts.splice(idx, 1);
 			}

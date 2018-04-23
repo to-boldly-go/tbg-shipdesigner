@@ -46,10 +46,14 @@ export default {
 	},
 	methods: {
 		delete_this_part() {
-			this.$store.commit('delete_part', this.part['Name']);
+			this.$store.commit('delete_part', {
+				'Type': this.part['Type'],
+				'Name': this.part['Name'],
+				'Variant': this.part['Variant'],
+			});
 		},
 		copy_this_part() {
-			const idx = this.selected_parts.findIndex((part) => part['Name'] === this.part['Name']);
+			const idx = this.selected_parts.findIndex(part => (part['Type'] === this.part['Type']) && (part['Name'] === this.part['Name']) && (part['Variant'] === this.part['Variant']));
 			if (idx >= 0) {
 				let clone = _.cloneDeep(this.part);
 				clone['Name'] += ' copy';
