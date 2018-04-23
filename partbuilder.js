@@ -917,13 +917,17 @@ exports.default = {
 	}, (0, _vuex.mapGetters)(['selected_schema', 'selected_parts'])),
 	methods: {
 		delete_this_part: function delete_this_part() {
-			this.$store.commit('delete_part', this.part['Name']);
+			this.$store.commit('delete_part', {
+				'Type': this.part['Type'],
+				'Name': this.part['Name'],
+				'Variant': this.part['Variant']
+			});
 		},
 		copy_this_part: function copy_this_part() {
 			var _this3 = this;
 
 			var idx = this.selected_parts.findIndex(function (part) {
-				return part['Name'] === _this3.part['Name'];
+				return part['Type'] === _this3.part['Type'] && part['Name'] === _this3.part['Name'] && part['Variant'] === _this3.part['Variant'];
 			});
 			if (idx >= 0) {
 				var clone = _lodash2.default.cloneDeep(this.part);
@@ -6318,7 +6322,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.part[data-v-8d490724] {\n}\n.has-error[data-v-8d490724] {\n\tbackground: #faa;\n}\n.delete-cell[data-v-8d490724] {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n.delete-button[data-v-8d490724] {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n.copy-cell[data-v-8d490724] {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n.copy-button[data-v-8d490724] {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/partbuilder/src/components/partbuilder/parts-list-part.vue"],"names":[],"mappings":";AAgEA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,YAAA;CACA,uBAAA;CACA;AAEA;CACA,WAAA;CACA,gBAAA;;CAEA,YAAA;IACA,uBAAA;CACA;AAEA;CACA,YAAA;CACA,uBAAA;CACA;AAEA;CACA,WAAA;CACA,gBAAA;;CAEA,YAAA;IACA,uBAAA;CACA","file":"parts-list-part.vue","sourcesContent":["<template>\n\t<tr class=\"part\">\n\t\t<PartsListCell\n\t\t\tv-for=\"field in selected_schema\"\n\t\t\t:class=\"list_class(field)\"\n\t\t\t:key=\"field.name\"\n\t\t\t:part=\"part\"\n\t\t\t:field=\"field\">\n\t\t</PartsListCell>\n\t\t<td class=\"delete-cell\"><input type=\"button\" class=\"delete-button\" value=\"X\" @click=\"delete_this_part\"></td>\n\t\t<td class=\"copy-cell\"><input type=\"button\" class=\"copy-button\" value=\"+\" @click=\"copy_this_part\"></td>\n\t</tr>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nimport { mapGetters } from 'vuex';\n\nimport PartsListCell from '@/components/partbuilder/parts-list-cell.vue';\n\nexport default {\n\tname: 'PartsListPart',\n\tcomponents: {\n\t\tPartsListCell,\n\t},\n\tprops: {\n\t\tpart: Object,\n\t},\n\tcomputed: {\n\t\thas_duplicate_name_error() {\n\t\t\tconst f = (part) => _.pick(part, ['Name', 'Variant', 'Type']);\n\t\t\tconst comp = (part) => _.isEqual(f(part), f(this.part));\n\t\t\treturn this.selected_parts.filter(comp).length > 1;\n\t\t},\n\t\tlist_class() {\n\t\t\treturn (field) => ({\n\t\t\t\t'has-error': (field.id === 'name') && (this.has_duplicate_name_error),\n\t\t\t});\n\t\t},\n\t\t...mapGetters([\n\t\t\t'selected_schema',\n\t\t\t'selected_parts',\n\t\t]),\n\t},\n\tmethods: {\n\t\tdelete_this_part() {\n\t\t\tthis.$store.commit('delete_part', this.part['Name']);\n\t\t},\n\t\tcopy_this_part() {\n\t\t\tconst idx = this.selected_parts.findIndex((part) => part['Name'] === this.part['Name']);\n\t\t\tif (idx >= 0) {\n\t\t\t\tlet clone = _.cloneDeep(this.part);\n\t\t\t\tclone['Name'] += ' copy';\n\t\t\t\tthis.$store.commit('add_part', clone);\n\t\t\t}\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.part {\n}\n\n.has-error {\n\tbackground: #faa;\n}\n\n.delete-cell {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n\n.delete-button {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n.copy-cell {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n\n.copy-button {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.part[data-v-8d490724] {\n}\n.has-error[data-v-8d490724] {\n\tbackground: #faa;\n}\n.delete-cell[data-v-8d490724] {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n.delete-button[data-v-8d490724] {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n.copy-cell[data-v-8d490724] {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n.copy-button[data-v-8d490724] {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/partbuilder/src/components/partbuilder/parts-list-part.vue"],"names":[],"mappings":";AAoEA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,YAAA;CACA,uBAAA;CACA;AAEA;CACA,WAAA;CACA,gBAAA;;CAEA,YAAA;IACA,uBAAA;CACA;AAEA;CACA,YAAA;CACA,uBAAA;CACA;AAEA;CACA,WAAA;CACA,gBAAA;;CAEA,YAAA;IACA,uBAAA;CACA","file":"parts-list-part.vue","sourcesContent":["<template>\n\t<tr class=\"part\">\n\t\t<PartsListCell\n\t\t\tv-for=\"field in selected_schema\"\n\t\t\t:class=\"list_class(field)\"\n\t\t\t:key=\"field.name\"\n\t\t\t:part=\"part\"\n\t\t\t:field=\"field\">\n\t\t</PartsListCell>\n\t\t<td class=\"delete-cell\"><input type=\"button\" class=\"delete-button\" value=\"X\" @click=\"delete_this_part\"></td>\n\t\t<td class=\"copy-cell\"><input type=\"button\" class=\"copy-button\" value=\"+\" @click=\"copy_this_part\"></td>\n\t</tr>\n</template>\n\n<script>\n\nimport _ from 'lodash';\n\nimport { mapGetters } from 'vuex';\n\nimport PartsListCell from '@/components/partbuilder/parts-list-cell.vue';\n\nexport default {\n\tname: 'PartsListPart',\n\tcomponents: {\n\t\tPartsListCell,\n\t},\n\tprops: {\n\t\tpart: Object,\n\t},\n\tcomputed: {\n\t\thas_duplicate_name_error() {\n\t\t\tconst f = (part) => _.pick(part, ['Name', 'Variant', 'Type']);\n\t\t\tconst comp = (part) => _.isEqual(f(part), f(this.part));\n\t\t\treturn this.selected_parts.filter(comp).length > 1;\n\t\t},\n\t\tlist_class() {\n\t\t\treturn (field) => ({\n\t\t\t\t'has-error': (field.id === 'name') && (this.has_duplicate_name_error),\n\t\t\t});\n\t\t},\n\t\t...mapGetters([\n\t\t\t'selected_schema',\n\t\t\t'selected_parts',\n\t\t]),\n\t},\n\tmethods: {\n\t\tdelete_this_part() {\n\t\t\tthis.$store.commit('delete_part', {\n\t\t\t\t'Type': this.part['Type'],\n\t\t\t\t'Name': this.part['Name'],\n\t\t\t\t'Variant': this.part['Variant'],\n\t\t\t});\n\t\t},\n\t\tcopy_this_part() {\n\t\t\tconst idx = this.selected_parts.findIndex(part => (part['Type'] === this.part['Type']) && (part['Name'] === this.part['Name']) && (part['Variant'] === this.part['Variant']));\n\t\t\tif (idx >= 0) {\n\t\t\t\tlet clone = _.cloneDeep(this.part);\n\t\t\t\tclone['Name'] += ' copy';\n\t\t\t\tthis.$store.commit('add_part', clone);\n\t\t\t}\n\t\t},\n\t},\n};\n</script>\n\n<style scoped>\n\n.part {\n}\n\n.has-error {\n\tbackground: #faa;\n}\n\n.delete-cell {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n\n.delete-button {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n.copy-cell {\n\twidth: 30px;\n\tborder: 1px solid #eee;\n}\n\n.copy-button {\n\tpadding: 0;\n\tborder-width: 0;\n\n\twidth: 100%;\n    box-sizing: border-box;\n}\n\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -6470,7 +6474,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-part.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"parts-list-part.vue","sourceRoot":""}]);
 
 // exports
 
@@ -34711,7 +34715,7 @@ var store = new _vuex2.default.Store({
 		delete_part: function delete_part(state, payload) {
 			var selected_parts = state.parts_list[state.display.selected].records;
 			var idx = selected_parts.findIndex(function (part) {
-				return part['Name'] === payload;
+				return part['Type'] === payload['Type'] && part['Name'] === payload['Name'] && part['Variant'] === payload['Variant'];
 			});
 			if (idx >= 0) {
 				selected_parts.splice(idx, 1);
