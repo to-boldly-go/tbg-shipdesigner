@@ -34611,8 +34611,6 @@ if (false) {}
 "use strict";
 
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -34695,22 +34693,12 @@ var store = new _vuex2.default.Store({
 				state.display.current_sort.ascending = true;
 			}
 
-			var selected_parts = state.parts_list[state.display.selected].records;
-
-			switch (_typeof(selected_parts[0][field])) {
-				case 'number':
-					selected_parts.sort(function (a, b) {
-						var invert = state.display.current_sort.ascending ? 1 : -1;
-						return (a[field] - b[field]) * invert;
-					});
-					break;
-				case 'string':
-					selected_parts.sort(function (a, b) {
-						var invert = state.display.current_sort.ascending ? 1 : -1;
-						return a[field].localeCompare(b[field]) * invert;
-					});
-					break;
-			}
+			// Note: using _.orderBy rather than default .sort for both convenience
+			// and the fact that _.orderBy is a stable sort.
+			var selected_category = state.parts_list[state.display.selected];
+			selected_category.records = _lodash2.default.orderBy(selected_category.records, [function (part) {
+				return part[field];
+			}], [state.display.current_sort.ascending ? 'asc' : 'desc']);
 		},
 		delete_part: function delete_part(state, payload) {
 			var selected_parts = state.parts_list[state.display.selected].records;
