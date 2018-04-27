@@ -229,7 +229,7 @@ export default {
 }
 
 .compare-base-value {
-	background: #ffff00;
+	background: #aa80ff;
 }
 
 .has-error {
