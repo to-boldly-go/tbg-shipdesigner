@@ -29,17 +29,17 @@
 		<div>
 			<span
 				class="design-power-summary"
-				:class="{'has-error': !se_design.compare_base && se_design.cost_power_raw > se_design.power_generation_raw}"
+				:class="{'has-error': !se_design.omit_validation && se_design.cost_power_raw > se_design.power_generation_raw}"
 				>Power[{{se_design.cost_power_raw.toFixed(2)}}/{{se_design.power_generation_raw.toFixed(2)}}]</span>
 			<span
 				class="design-weight-summary"
-				:class="{'has-error': !se_design.compare_base && se_design.weight_internal > se_design.frame_max_size_raw}"
+				:class="{'has-error': !se_design.omit_validation && se_design.weight_internal > se_design.frame_max_size_raw}"
 				>Internal[{{se_design.weight_internal.toFixed(2)}}/{{se_design.frame_max_size_raw.toFixed(2)}}]</span>
 			<span
 				class="subsystem-weight-summary"
 				v-for="ss in se_design.subsystems"
 				:key="ss.name"
-				:class="{'has-error': !ss.compare_base && ss.weight_internal > ss.weight_cap}"
+				:class="{'has-error': !ss.omit_validation && ss.weight_internal > ss.weight_cap}"
 				>{{ss.name}}[{{ss.weight_internal.toFixed(2)}}/{{ss.weight_cap.toFixed(2)}}] </span>
 		</div>
 	</div>

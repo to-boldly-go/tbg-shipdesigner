@@ -58,7 +58,7 @@ export default {
 			};
 		},
 		has_weight_error() {
-			return !this.se_subsystem.compare_base && this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;
+			return !this.se_subsystem.omit_validation && this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;
 		},
 		se_components() {
 			return this.se_subsystem.components;

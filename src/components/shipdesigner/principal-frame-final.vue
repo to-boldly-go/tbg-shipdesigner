@@ -65,7 +65,7 @@ export default {
 			};
 		},
 		has_power_error() {
-			return !this.se_design.compare_base && this.se_design.cost_power_raw > this.se_design.power_generation_raw;
+			return !this.se_design.omit_validation && this.se_design.cost_power_raw > this.se_design.power_generation_raw;
 		},
 		principal_frame() {
 			return this.se_design.principal_frame;

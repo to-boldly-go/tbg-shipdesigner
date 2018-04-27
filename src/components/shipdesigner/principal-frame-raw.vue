@@ -77,7 +77,7 @@ export default {
 			};
 		},
 		has_power_error() {
-			return !this.se_design.compare_base && this.se_design.cost_power_raw > this.se_design.power_generation_raw;
+			return !this.se_design.omit_validation && this.se_design.cost_power_raw > this.se_design.power_generation_raw;
 		},
 		weight_summary_class() {
 			return {
@@ -85,7 +85,7 @@ export default {
 			};
 		},
 		has_weight_error() {
-			return !this.se_design.compare_base && this.se_design.weight_internal > this.se_design.frame_max_size_raw;
+			return !this.se_design.omit_validation && this.se_design.weight_internal > this.se_design.frame_max_size_raw;
 		},
 		principal_frame: {
 			get() {

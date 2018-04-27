@@ -942,6 +942,7 @@ class DesignComponent {
 		[comp, comp_base] = DesignComponent.defaults(comp, comp_base);
 
 		let compare_extensions = {
+			omit_validation: true,
 			compare_base: comp_base,
 
 			// Don't do compare logic on quantity
@@ -1345,6 +1346,7 @@ class DesignSubsystem {
 			});
 
 		let compare_extensions = {
+			omit_validation: true,
 			compare_base: subsystem_base,
 			components,
 			settings,
@@ -1532,6 +1534,7 @@ class Module {
 
 	static compare(module, module_base) {
 		let compare_extensions = {
+			omit_validation: true,
 			compare_base: module_base,
 		};
 
@@ -2098,6 +2101,7 @@ class Design {
 		let module = Module.compare(design.module, design_base.module);
 
 		let compare_extensions = {
+			omit_validation: true,
 			compare_base: design_base,
 			subsystems,
 			module,
