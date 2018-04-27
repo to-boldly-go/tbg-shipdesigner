@@ -34247,8 +34247,7 @@ var DesignSubsystem = function () {
 			var settings = (0, _langUtils.zipByAndWith)(subsystem.settings, subsystem_base.settings, function (setting) {
 				return setting['Name'];
 			}, function (setting, setting_base) {
-				setting.compare_base = setting_base;
-				return setting;
+				return DesignSubsystem.setting_refit(setting, setting_base, refit_valid);
 			});
 
 			function refit_cost(cost_prop) {
@@ -34307,8 +34306,7 @@ var DesignSubsystem = function () {
 			var settings = (0, _langUtils.zipByAndWith)(subsystem.settings, subsystem_base.settings, function (setting) {
 				return setting['Name'];
 			}, function (setting, setting_base) {
-				setting.compare_base = setting_base;
-				return setting;
+				return DesignSubsystem.setting_compare(setting, setting_base);
 			});
 
 			var compare_extensions = {
@@ -34327,6 +34325,49 @@ var DesignSubsystem = function () {
 				},
 				set: function set(target, prop, value) {
 					return Reflect.set(subsystem, prop, value);
+				}
+			});
+		}
+	}, {
+		key: 'setting_refit',
+		value: function setting_refit(setting, setting_base, refit_valid) {
+			var refit_extensions = {
+				refit_valid: refit_valid,
+				compare_base: setting_base
+			};
+
+			// Proxy is mostly for adding compare_base without polluting original setting object
+			return new Proxy(refit_extensions, {
+				get: function get(target, prop) {
+					if (prop in target && prop !== 'constructor') {
+						return target[prop];
+					}
+					return setting[prop];
+				},
+				set: function set(target, prop, value) {
+					return Reflect.set(setting, prop, value);
+				}
+			});
+		}
+	}, {
+		key: 'setting_compare',
+		value: function setting_compare(setting, setting_base) {
+			var compare_extensions = {
+				omit_validation: true,
+				compare_base: setting_base
+			};
+
+			// Proxy is mostly for adding compare_base without polluting original setting object
+			return new Proxy(compare_extensions, {
+				get: function get(target, prop) {
+					if (prop in target && prop !== 'constructor') {
+						return target[prop];
+					}
+					// Don't do compare logic on any setting property
+					return setting[prop];
+				},
+				set: function set(target, prop, value) {
+					return Reflect.set(setting, prop, value);
 				}
 			});
 		}
