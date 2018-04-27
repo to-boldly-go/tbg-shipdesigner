@@ -236,6 +236,8 @@ export default {
 			}
 		}.bind(this));
 
+		this.select_parts_list_from_design(this.$store.state.design_json);
+
 		this.local_saves_load_from_local_storage();
 		window.addEventListener('storage', function(ev) {
 			if (ev.key === LOCAL_SAVES_KEY) {
@@ -267,7 +269,14 @@ export default {
 			this.$store.commit('set_design_parts_list');
 			this.display_status_message('Parts list loaded');
 		},
-		
+		select_parts_list_from_design(design_json) {
+			const db = this.all_parts_lists.find(ShipEngine.DB.find_by_design_json(design_json));
+			if (db) {
+				this.$store.commit('set_parts_list', _.cloneDeep(db.json));
+				this.selected_parts_list = db;
+			}
+		},
+
 		local_saves_delete_selected() {
 			// remove the selected item
 			this.local_saves = _.chain(this.local_saves).reject(
@@ -277,14 +286,7 @@ export default {
 			this.display_status_message('Blueprint deleted');
 		},
 		local_saves_load_selected() {
-			const db = this.all_parts_lists.find(
-				ShipEngine.DB.find_by_design_json(this.selected_save.json)
-			);
-			if (db) {
-				this.$store.commit('set_parts_list', _.cloneDeep(db.json));
-				this.selected_parts_list = db;
-			}
-
+			this.select_parts_list_from_design(this.selected_save.json);
 			this.$store.commit('set_design_json', _.cloneDeep(this.selected_save.json));
 			this.display_status_message('Blueprint loaded');
 		},
