@@ -63,22 +63,12 @@ const store = new Vuex.Store({
 				state.display.current_sort.ascending = true;
 			}
 
-			let selected_parts = state.parts_list[state.display.selected].records;
-
-			switch (typeof(selected_parts[0][field])) {
-			case 'number':
-				selected_parts.sort((a, b) => {
-					let invert = state.display.current_sort.ascending ? 1 : -1;
-					return (a[field] - b[field]) * invert;
-				});
-				break;
-			case 'string':
-				selected_parts.sort((a, b) => {
-					let invert = state.display.current_sort.ascending ? 1 : -1;
-					return a[field].localeCompare(b[field]) * invert;
-				});
-				break;
-			}
+			// Note: using _.orderBy rather than default .sort for both convenience
+			// and the fact that _.orderBy is a stable sort.
+			let selected_category = state.parts_list[state.display.selected];
+			selected_category.records = _.orderBy(selected_category.records,
+				[part => part[field]],
+				[state.display.current_sort.ascending ? 'asc' : 'desc']);
 		},
 		delete_part(state, payload) {
 			let selected_parts = state.parts_list[state.display.selected].records;
