@@ -56,7 +56,7 @@
 
 			<div class="design-bar-cell">
 				<input type="checkbox" v-model="design_mode_enabled"/>
-				<select id="design-bar-design-mode" v-model="selected_design_mode" :disabled="!design_mode_enabled">
+				<select id="design-bar-design-mode" v-model="design_mode" :disabled="!design_mode_enabled">
 					<option value="none" disabled>Select Mode</option>
 					<option value="refit">Refit for</option>
 					<option value="compare">Compare with</option>
@@ -74,8 +74,8 @@
 			</div>
 
 			<div class="design-bar-cell">
-				<select v-model="selected_other_design_name" :disabled="selected_design_mode === 'none'">
-					<option v-for="blueprint in local_saves" :key="blueprint.pretty_name">
+				<select v-model="selected_other_design_name" :disabled="design_mode === 'none'">
+					<option v-for="blueprint in design_mode_local_saves" :key="blueprint.pretty_name">
 						{{blueprint.pretty_name}}
 					</option>
 				</select>
@@ -116,8 +116,7 @@ export default {
 	},
 	data() {
 		return {
-			// local_saves is a straight array of blueprint objects,
-			// exactly the same as the design_json object.
+			// local_saves is a straight array of blueprint objects (ShipEngine.Design objects).
 			local_saves: [],
 			// the currently selected element of the local_saves
 			// array. *not* the same as design_json! this is so
@@ -132,9 +131,6 @@ export default {
 			local_parts_lists: [],
 
 			selected_parts_list: null,
-
-			design_mode_enabled: false,
-			design_mode: 'none',
 
 			design_filter: [],
 		};
@@ -189,18 +185,36 @@ export default {
 				}
 			},
 			set(value) {
-				this.selected_other_save = this.local_saves.find(
+				let other_save = this.local_saves.find(
 					ShipEngine.Design.find_by_pretty_name(value)
 				);
+				if (this.selected_other_save !== other_save) {
+					this.selected_other_save = other_save;
+					this.$store.commit('set_other_design_json', other_save.json);
+				}
 			},
 		},
-		selected_design_mode: {
+		design_mode_enabled: {
 			get() {
-				return this.design_mode_enabled ? this.design_mode : 'none';
+				return this.$store.state.design_mode_enabled;
 			},
 			set(value) {
-				this.design_mode = this.design_mode_enabled ? value : 'none';
+				this.$store.commit('set_design_mode_enabled', value);
 			},
+		},
+		design_mode: {
+			get() {
+				return this.$store.state.design_mode;
+			},
+			set(value) {
+				this.$store.commit('set_design_mode', value);
+			},
+		},
+		design_mode_local_saves() {
+			if (this.design_mode !== 'refit') {
+				return this.local_saves;
+			}
+			return this.local_saves.filter(save => ShipEngine.Design.refit_valid(this.se_design, save));
 		},
 		design_json_string() {
 			return JSON.stringify(this.$store.state.design_json);

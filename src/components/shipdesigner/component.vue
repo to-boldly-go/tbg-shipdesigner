@@ -2,7 +2,11 @@
 	<tr class="component-tr" :class="{ 'has-error': !is_loaded }">
 		<td class="name-column">{{se_component.name}}</td>
 
-		<td class="quantity-column" :class="{ 'has-error': has_quantity_error }">
+		<td :class="{
+				'quantity-column': true,
+				'has-error': has_quantity_error,
+				'compare-base-value': se_component.compare_base && se_component.quantity !== se_component.compare_base.quantity,
+			}">
 			<select
 				v-if="quantity_configurable"
 				class="quantity-column-select"
@@ -11,16 +15,29 @@
 				:class="{ 'has-error': has_quantity_error }">
 
 				<option v-if="!valid_quantities.includes(quantity)">{{quantity}}</option>
-				<option v-for="valid_quantity in valid_quantities" :key="valid_quantity">{{valid_quantity}}</option>
+				<option
+					v-for="valid_quantity in valid_quantities"
+					:key="valid_quantity"
+					:class="{ 'compare-base-value': se_component.compare_base && valid_quantity === se_component.compare_base.quantity }">
+					{{valid_quantity}}
+				</option>
 			</select>
 			<span v-if="!quantity_configurable">{{quantity_pretty}}</span>
 		</td>
 
-		<td class="part-column">
+		<td :class="{
+				'part-column': true,
+				'compare-base-value': se_component.compare_base && se_component.part !== se_component.compare_base.part,
+			}">
 			<select
 				v-model="part"
 				class="part-column-select">
-				<option v-for="part_value in valid_parts" :key="part_value['Name']">{{part_value['Name']}}</option>
+				<option
+					v-for="part_value in valid_parts"
+					:key="part_value['Name']"
+					:class="{ 'compare-base-value': se_component.compare_base && part_value['Name'] === se_component.compare_base.part }">
+					{{part_value['Name']}}
+				</option>
 				<option v-if="!is_valid_part" class="has-error">{{part}}</option>
 			</select>
 		</td>
@@ -32,8 +49,13 @@
 		<td class="weight-internal-column">{{weight_internal}}</td>
 		<td class="weight-external-column">{{weight_external}}</td>
 
-		<td class="br-column">{{cost_br}}</td>
-		<td class="sr-column">{{cost_sr}}</td>
+		<td class="br-column">{{cost_BR}}</td>
+		<td class="sr-column">{{cost_SR}}</td>
+
+		<template v-if="se_component.refit_valid">
+			<td class="br-column">{{refit_cost_BR}}</td>
+			<td class="sr-column">{{refit_cost_SR}}</td>
+		</template>
 
 		<td class="power-cost-column">{{power_cost}}</td>
 		<td class="power-gen-column">{{power_gen}}</td>
@@ -96,11 +118,17 @@ export default {
 		power_cost() {
 			return pretty(this.se_component.cost_power);
 		},
-		cost_sr() {
+		cost_BR() {
+			return pretty(this.se_component.cost_BR);
+		},
+		cost_SR() {
 			return pretty(this.se_component.cost_SR);
 		},
-		cost_br() {
-			return pretty(this.se_component.cost_BR);
+		refit_cost_BR() {
+			return pretty(this.se_component.refit_cost_BR);
+		},
+		refit_cost_SR() {
+			return pretty(this.se_component.refit_cost_SR);
 		},
 		weight_internal() {
 			return pretty(this.se_component.weight_internal);
@@ -198,6 +226,10 @@ export default {
 .component-tr {
 	width: 100%;
 	margin: 0px;
+}
+
+.compare-base-value {
+	background: #aa80ff;
 }
 
 .has-error {

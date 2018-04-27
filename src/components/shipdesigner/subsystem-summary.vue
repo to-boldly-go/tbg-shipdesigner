@@ -17,6 +17,11 @@
 		<td class="br-column">{{se_subsystem.cost_BR.toFixed(2)}}</td>
 		<td class="sr-column">{{se_subsystem.cost_SR.toFixed(2)}}</td>
 
+		<template v-if="se_subsystem.refit_valid">
+			<td class="br-column">{{se_subsystem.refit_cost_BR.toFixed(2)}}</td>
+			<td class="sr-column">{{se_subsystem.refit_cost_SR.toFixed(2)}}</td>
+		</template>
+
 		<td class="power-cost-column">{{se_subsystem.cost_power.toFixed(2)}}</td>
 		<td class="power-gen-column">{{se_subsystem.power_generation.toFixed(2)}}</td>
 
@@ -53,7 +58,7 @@ export default {
 			};
 		},
 		has_weight_error() {
-			return this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;
+			return !this.se_subsystem.omit_validation && this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;
 		},
 		se_components() {
 			return this.se_subsystem.components;

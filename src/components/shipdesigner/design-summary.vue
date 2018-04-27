@@ -16,6 +16,11 @@
 			<span> | </span>
 			<span>[{{se_design.cost_BR_raw.toFixed(2)}}]br</span>
 			<span>[{{se_design.cost_SR_raw.toFixed(2)}}]sr</span>
+			<template v-if="se_design.refit_valid">
+				<span> | Refit </span>
+				<span>[{{se_design.refit_cost_BR_raw.toFixed(2)}}]br</span>
+				<span>[{{se_design.refit_cost_SR_raw.toFixed(2)}}]sr</span>
+			</template>
 			<span> | </span>
 			<span>{{se_design.cost_crew_raw.toFixed(2)}}</span>
 			<span> | </span>
@@ -24,17 +29,17 @@
 		<div>
 			<span
 				class="design-power-summary"
-				:class="{'has-error': se_design.cost_power_raw > se_design.power_generation_raw}"
+				:class="{'has-error': !se_design.omit_validation && se_design.cost_power_raw > se_design.power_generation_raw}"
 				>Power[{{se_design.cost_power_raw.toFixed(2)}}/{{se_design.power_generation_raw.toFixed(2)}}]</span>
 			<span
 				class="design-weight-summary"
-				:class="{'has-error': se_design.weight_internal > se_design.frame_max_size_raw}"
+				:class="{'has-error': !se_design.omit_validation && se_design.weight_internal > se_design.frame_max_size_raw}"
 				>Internal[{{se_design.weight_internal.toFixed(2)}}/{{se_design.frame_max_size_raw.toFixed(2)}}]</span>
 			<span
 				class="subsystem-weight-summary"
 				v-for="ss in se_design.subsystems"
 				:key="ss.name"
-				:class="{'has-error': ss.weight_internal > ss.weight_cap}"
+				:class="{'has-error': !ss.omit_validation && ss.weight_internal > ss.weight_cap}"
 				>{{ss.name}}[{{ss.weight_internal.toFixed(2)}}/{{ss.weight_cap.toFixed(2)}}] </span>
 		</div>
 	</div>

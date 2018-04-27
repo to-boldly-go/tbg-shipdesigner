@@ -16,6 +16,10 @@
 					<th>Ext)</th>
 					<th>BR</th>
 					<th>SR</th>
+					<template v-if="se_design.refit_valid">
+						<th>Refit BR</th>
+						<th>Refit SR</th>
+					</template>
 					<th>Pwr Cost</th>
 					<th>Pwr Gen</th>
 					<th>O</th>

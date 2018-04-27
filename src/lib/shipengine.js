@@ -1,4 +1,5 @@
 import { from_frac } from '@/lib/ui-functions.js';
+import { zipByAndWith } from '@/lib/lang-utils.js';
 import { NamedVector } from '@/lib/namedvector.js';
 import _ from 'lodash';
 
@@ -27,6 +28,10 @@ const SR_COST_ROUND_MAP = {
 	'Cruiser': 5,
 	'Explorer': 10,
 };
+
+const REFIT_BR_COST_ROUND = 5;
+
+const REFIT_SR_COST_ROUND = 5;
 
 // =IF(DK$18 = 1, "Frigate", IF(DK$18 = 2, "Cruiser", "Explorer"))
 const WEIGHT_CLASS_MAP = {
@@ -876,6 +881,89 @@ class DesignComponent {
 			return 1.0;
 		}
 	}
+
+	static defaults(comp1, comp2) {
+		if (!comp1 || !comp2) {
+			let comp = comp1 || comp2;
+			let default_comp = new DesignComponent(comp.db, comp.subsystem, {
+				'Name': comp.name,
+			});
+			return [comp1 || default_comp, comp2 || default_comp];
+		} else {
+			return [comp1, comp2];
+		}
+	}
+
+	static refit(comp, comp_base, refit_valid) {
+		[comp, comp_base] = DesignComponent.defaults(comp, comp_base);
+
+		function refit_cost(cost_prop) {
+			let cost = comp[cost_prop];
+			let base_cost = comp_base[cost_prop];
+			if (comp.part === comp_base.part) {
+				if (cost >= base_cost) {
+					return cost - base_cost;
+				} else {
+					return (cost - base_cost) / 2;
+				}
+			} else {
+				return cost - base_cost / 2;
+			}
+		}
+
+		let refit_extensions = {
+			refit_valid,
+			compare_base: comp_base,
+
+			get refit_cost_BR() {
+				return refit_cost('cost_BR');
+			},
+
+			get refit_cost_SR() {
+				return refit_cost('cost_SR');
+			},
+		};
+
+		return new Proxy(refit_extensions, {
+			get(target, prop) {
+				if (prop in target && prop !== 'constructor') {
+					return target[prop];
+				}
+				return comp[prop];
+			},
+
+			set(target, prop, value) {
+				return Reflect.set(comp, prop, value);
+			},
+		});
+	}
+
+	static compare(comp, comp_base) {
+		[comp, comp_base] = DesignComponent.defaults(comp, comp_base);
+
+		let compare_extensions = {
+			omit_validation: true,
+			compare_base: comp_base,
+
+			// Don't do compare logic on quantity
+			get quantity() {
+				return comp.quantity;
+			},
+		};
+
+		return new Proxy(compare_extensions, {
+			get(target, prop) {
+				if (prop in target && prop !== 'constructor') {
+					return target[prop];
+				}
+				return Design.generic_base_compare(comp[prop], comp_base[prop]);
+			},
+
+			set(target, prop, value) {
+				return Reflect.set(comp, prop, value);
+			},
+		});
+	}
 }
 
 class DesignSubsystem {
@@ -1182,6 +1270,101 @@ class DesignSubsystem {
 		// if frame, then look up "tac mod" field in frames list
 		return this.frame_attribute(SUBSYSTEM_NAME_MAP[this.name]);
 	}
+
+	static defaults(subsystem1, subsystem2) {
+		if (!subsystem1 || !subsystem2) {
+			let subsystem = subsystem1 || subsystem2;
+			let default_subsystem = new DesignSubsystem(subsystem.db, subsystem.design, {
+				'Name': subsystem.name,
+				'Settings': subsystem.settings.map(setting => ({'Name': setting['Name']})),
+				'Components': subsystem.components.map(comp => DesignComponent.defaults(null, comp)[0]),
+			});
+			return [subsystem1 || default_subsystem, subsystem2 || default_subsystem];
+		} else {
+			return [subsystem1, subsystem2];
+		}
+	}
+
+	static refit(subsystem, subsystem_base, refit_valid) {
+		[subsystem, subsystem_base] = DesignSubsystem.defaults(subsystem, subsystem_base);
+		// don't assume order or existence of each component
+		let components = zipByAndWith(subsystem.components, subsystem_base.components, comp => comp.name,
+			(comp, comp_base) => DesignComponent.refit(comp, comp_base, refit_valid));
+		// also don't assume order or existence of each setting
+		let settings = zipByAndWith(subsystem.settings, subsystem_base.settings, setting => setting['Name'],
+			(setting, setting_base) => {
+				setting.compare_base = setting_base;
+				return setting;
+			});
+
+		function refit_cost(cost_prop) {
+			return components
+				.filter(comp => comp.is_loaded)
+				.map(comp => comp['refit_' + cost_prop])
+				.reduce((sum, value) => sum + value, 0);
+		}
+
+		let refit_extensions = {
+			refit_valid,
+			compare_base: subsystem_base,
+			components,
+			settings,
+
+			get refit_cost_BR() {
+				return refit_cost('cost_BR');
+			},
+
+			get refit_cost_SR() {
+				return refit_cost('cost_SR');
+			},
+		};
+
+		return new Proxy(refit_extensions, {
+			get(target, prop) {
+				if (prop in target && prop !== 'constructor') {
+					return target[prop];
+				}
+				return subsystem[prop];
+			},
+
+			set(target, prop, value) {
+				return Reflect.set(subsystem, prop, value);
+			},
+		});
+	}
+
+	static compare(subsystem, subsystem_base) {
+		[subsystem, subsystem_base] = DesignSubsystem.defaults(subsystem, subsystem_base);
+		// don't assume order or existence of each component
+		let components = zipByAndWith(subsystem.components, subsystem_base.components, comp => comp.name,
+			(comp, comp_base) => DesignComponent.compare(comp, comp_base));
+		// also don't assume order or existence of each setting
+		let settings = zipByAndWith(subsystem.settings, subsystem_base.settings, setting => setting['Name'],
+			(setting, setting_base) => {
+				setting.compare_base = setting_base;
+				return setting;
+			});
+
+		let compare_extensions = {
+			omit_validation: true,
+			compare_base: subsystem_base,
+			components,
+			settings,
+		};
+
+		return new Proxy(compare_extensions, {
+			get(target, prop) {
+				if (prop in target && prop !== 'constructor') {
+					return target[prop];
+				}
+				return Design.generic_base_compare(subsystem[prop], subsystem_base[prop]);
+			},
+
+			set(target, prop, value) {
+				return Reflect.set(subsystem, prop, value);
+			},
+		});
+	}
 }
 
 class Module {
@@ -1313,6 +1496,61 @@ class Module {
 		// $CV88 = DL88 = module weight cap? = module weight cap from "Weight Cap" element of module
 		return this.attribute('Weight Cap');
 	}
+
+	static refit(module, module_base, refit_valid) {
+		function refit_cost(cost_prop) {
+			if (module.module_type === module_base.module_type && module.module_variant === module_base.module_variant) {
+				return 0;
+			}
+			return module[cost_prop] - module_base[cost_prop] / 2;
+		}
+
+		let refit_extensions = {
+			refit_valid,
+			compare_base: module_base,
+
+			get refit_cost_BR() {
+				return refit_cost('cost_BR');
+			},
+
+			get refit_cost_SR() {
+				return refit_cost('cost_SR');
+			},
+		};
+
+		return new Proxy(refit_extensions, {
+			get(target, prop) {
+				if (prop in target && prop !== 'constructor') {
+					return target[prop];
+				}
+				return module[prop];
+			},
+
+			set(target, prop, value) {
+				return Reflect.set(module, prop, value);
+			},
+		});
+	}
+
+	static compare(module, module_base) {
+		let compare_extensions = {
+			omit_validation: true,
+			compare_base: module_base,
+		};
+
+		return new Proxy(compare_extensions, {
+			get(target, prop) {
+				if (prop in target && prop !== 'constructor') {
+					return target[prop];
+				}
+				return Design.generic_base_compare(module[prop], module_base[prop]);
+			},
+
+			set(target, prop, value) {
+				return Reflect.set(module, prop, value);
+			},
+		});
+	}
 }
 
 
@@ -1379,6 +1617,10 @@ class Design {
 		return this.is_valid_frame && this.subsystems.every(ss => ss.is_loaded) && this.module.is_loaded;
 	}
 
+	get frame_name_map() {
+		return _.fromPairs([['Principal', this.json['Principal Frame']], ...this.json['Subsystems'].map(ss_json => [ss_json['Name'], ss_json['Sub-Frame']])]);
+	}
+
 	get pretty_name() {
 		return this.name
 			+ ' (' + this.timestamp.toLocaleString() + ')'
@@ -1399,6 +1641,14 @@ class Design {
 
 	get parts_list_pretty_name() {
 		return this.parts_list_name + ' (' + this.parts_list_timestamp.toLocaleString() + ')';
+	}
+
+	get principal_frame() {
+		return this.json['Principal Frame'];
+	}
+
+	set principal_frame(value) {
+		this.json['Principal Frame'] = value;
 	}
 
 	get tech_year_frame() {
@@ -1786,6 +2036,117 @@ class Design {
 	}
 
 	get pretty_dump() {
+	}
+
+	static refit_valid(design, design_base) {
+		return _.isEqual(design.frame_name_map, design_base.frame_name_map);
+	}
+
+	static refit(design, design_base) {
+		let refit_valid = Design.refit_valid(design, design_base);
+		// don't assume existence of each subsystem
+		let subsystems = zipByAndWith(design.subsystems, design_base.subsystems, ss => ss.name,
+			(ss, ss_base) => DesignSubsystem.refit(ss, ss_base, refit_valid));
+		let module = Module.refit(design.module, design_base.module, refit_valid);
+
+		function refit_cost(cost_prop) {
+			const ss_cost = subsystems
+				.filter(ss => ss.is_loaded)
+				.map(ss => ss['refit_' + cost_prop])
+				.reduce((sum, value) => sum + value, 0);
+			return ss_cost + module['refit_' + cost_prop];
+		}
+
+		let refit_extensions = {
+			refit_valid,
+			compare_base: design_base,
+			subsystems,
+			module,
+
+			get refit_cost_BR() {
+				return Math.ceil(this.refit_cost_BR_raw / REFIT_BR_COST_ROUND) * REFIT_BR_COST_ROUND;
+			},
+
+			get refit_cost_BR_raw() {
+				return refit_cost('cost_BR');
+			},
+
+			get refit_cost_SR() {
+				return Math.ceil(this.refit_cost_SR_raw / REFIT_SR_COST_ROUND) * REFIT_SR_COST_ROUND;
+			},
+
+			get refit_cost_SR_raw() {
+				return refit_cost('cost_SR');
+			},
+		};
+
+		return new Proxy(refit_extensions, {
+			get(target, prop) {
+				if (prop in target && prop !== 'constructor') {
+					return target[prop];
+				}
+				return design[prop];
+			},
+
+			set(target, prop, value) {
+				return Reflect.set(design, prop, value);
+			},
+		});
+	}
+
+	static compare(design, design_base) {
+		// don't assume existence of each subsystem
+		let subsystems = zipByAndWith(design.subsystems, design_base.subsystems, ss => ss.name,
+			(ss, ss_base) => DesignSubsystem.compare(ss, ss_base));
+		let module = Module.compare(design.module, design_base.module);
+
+		let compare_extensions = {
+			omit_validation: true,
+			compare_base: design_base,
+			subsystems,
+			module,
+		};
+
+		return new Proxy(compare_extensions, {
+			get(target, prop) {
+				if (prop in target && prop !== 'constructor') {
+					return target[prop];
+				}
+				return Design.generic_base_compare(design[prop], design_base[prop]);
+			},
+
+			set(target, prop, value) {
+				return Reflect.set(design, prop, value);
+			},
+		});
+	}
+
+	static generic_base_compare(v1, v2) {
+		if (v1 === undefined && v2 === undefined) {
+			return undefined;
+		}
+		if (_.isNil(v1) && _.isNil(v2)) {
+			return null;
+		}
+		if (_.isNil(v1)) {
+			if (_.isNumber(v2)) {
+				return -v2;
+			}
+			if (v2 instanceof NamedVector) {
+				return v2.mult(-1);
+			}
+			return v2;
+		}
+		if (_.isNil(v2)) {
+			return v1;
+		}
+		if (_.isNumber(v1)) {
+			return v1 - v2;
+		}
+		if (v1 instanceof NamedVector) {
+			return v1.op((a, b) => a - b, v2);
+		}
+		return v1;
 	}
 }
 
