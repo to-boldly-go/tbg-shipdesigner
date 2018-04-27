@@ -1292,10 +1292,7 @@ class DesignSubsystem {
 			(comp, comp_base) => DesignComponent.refit(comp, comp_base, refit_valid));
 		// also don't assume order or existence of each setting
 		let settings = zipByAndWith(subsystem.settings, subsystem_base.settings, setting => setting['Name'],
-			(setting, setting_base) => {
-				setting.compare_base = setting_base;
-				return setting;
-			});
+			(setting, setting_base) => DesignSubsystem.setting_refit(setting, setting_base, refit_valid));
 
 		function refit_cost(cost_prop) {
 			return components
@@ -1340,10 +1337,7 @@ class DesignSubsystem {
 			(comp, comp_base) => DesignComponent.compare(comp, comp_base));
 		// also don't assume order or existence of each setting
 		let settings = zipByAndWith(subsystem.settings, subsystem_base.settings, setting => setting['Name'],
-			(setting, setting_base) => {
-				setting.compare_base = setting_base;
-				return setting;
-			});
+			(setting, setting_base) => DesignSubsystem.setting_compare(setting, setting_base));
 
 		let compare_extensions = {
 			omit_validation: true,
@@ -1362,6 +1356,49 @@ class DesignSubsystem {
 
 			set(target, prop, value) {
 				return Reflect.set(subsystem, prop, value);
+			},
+		});
+	}
+
+	static setting_refit(setting, setting_base, refit_valid) {
+		let refit_extensions = {
+			refit_valid,
+			compare_base: setting_base,
+		};
+
+		// Proxy is mostly for adding compare_base without polluting original setting object
+		return new Proxy(refit_extensions, {
+			get(target, prop) {
+				if (prop in target && prop !== 'constructor') {
+					return target[prop];
+				}
+				return setting[prop];
+			},
+
+			set(target, prop, value) {
+				return Reflect.set(setting, prop, value);
+			},
+		});
+	}
+
+	static setting_compare(setting, setting_base) {
+		let compare_extensions = {
+			omit_validation: true,
+			compare_base: setting_base,
+		};
+
+		// Proxy is mostly for adding compare_base without polluting original setting object
+		return new Proxy(compare_extensions, {
+			get(target, prop) {
+				if (prop in target && prop !== 'constructor') {
+					return target[prop];
+				}
+				// Don't do compare logic on any setting property
+				return setting[prop];
+			},
+
+			set(target, prop, value) {
+				return Reflect.set(setting, prop, value);
 			},
 		});
 	}
