@@ -2,13 +2,27 @@
 	<tr class="module-tr" :class="{ hasloaderror: !is_loaded }">
 		<td class="name-column" colspan="2">Module</td>
 
-		<td class="part-column">
+		<td :class="{
+				'part-column': true,
+				'compare-base-value': se_module.compare_base &&
+					(se_module.module_type !== se_module.compare_base.module_type || se_module.module_variant !== se_module.compare_base.module_variant),
+			}">
 			<span class="module-pair-span">
 			<span class="module-pair-type"><select v-model="module_type" class="part-column-select">
-				<option v-for="module_type_value in valid_types" :key="module_type_value">{{module_type_value}}</option>
+				<option
+					v-for="module_type_value in valid_types"
+					:key="module_type_value"
+					:class="{ 'compare-base-value': se_module.compare_base && module_type_value === se_module.compare_base.module_type }">
+					{{module_type_value}}
+				</option>
 			</select></span>
 			<span class="module-pair-variant"><select v-model="module_variant" class="part-column-select">
-				<option v-for="module_variant_value in valid_variants" :key="module_variant_value['Variant']">{{module_variant_value['Variant']}}</option>
+				<option
+					v-for="module_variant_value in valid_variants"
+					:key="module_variant_value['Variant']"
+					:class="{ 'compare-base-value': se_module.compare_base && module_variant_value['Variant'] === se_module.compare_base.module_variant }">
+					{{module_variant_value['Variant']}}
+				</option>
 			</select></span>
 			</span>
 		</td>
@@ -20,8 +34,13 @@
 		<td class="weight-internal-column">{{weight_internal}}</td>
 		<td class="weight-external-column">{{weight_external}}</td>
 
-		<td class="br-column">{{cost_br}}</td>
-		<td class="sr-column">{{cost_sr}}</td>
+		<td class="br-column">{{cost_BR}}</td>
+		<td class="sr-column">{{cost_SR}}</td>
+
+		<template v-if="se_module.refit_valid">
+			<td class="br-column">{{refit_cost_BR}}</td>
+			<td class="sr-column">{{refit_cost_SR}}</td>
+		</template>
 
 		<td class="power-cost-column">{{power_cost}}</td>
 		<td class="power-gen-column">{{power_gen}}</td>
@@ -64,11 +83,17 @@ export default {
 		power_cost() {
 			return pretty(this.se_module.cost_power);
 		},
-		cost_sr() {
+		cost_BR() {
+			return pretty(this.se_module.cost_BR);
+		},
+		cost_SR() {
 			return pretty(this.se_module.cost_SR);
 		},
-		cost_br() {
-			return pretty(this.se_module.cost_BR);
+		refit_cost_BR() {
+			return pretty(this.se_module.refit_cost_BR);
+		},
+		refit_cost_SR() {
+			return pretty(this.se_module.refit_cost_SR);
 		},
 		weight_internal() {
 			return pretty(this.se_module.weight_internal);
@@ -136,6 +161,10 @@ export default {
 	background: #ccc;
 
 	width: 100%;
+}
+
+.compare-base-value {
+	background: #ffff00;
 }
 
 .hasloaderror {

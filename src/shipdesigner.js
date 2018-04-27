@@ -23,8 +23,14 @@ if (hash) {
 const store = new Vuex.Store({
 	state: {
 		design_json,
+		other_design_json: null, // TODO: allow url to include a base design for refits?
+
 		parts_list: canon_parts_list,
 		canon_parts_list,
+
+		design_mode_enabled: false,
+		design_mode: null,
+
 		undo: {
 			current: -1,
 			history: [],
@@ -32,7 +38,17 @@ const store = new Vuex.Store({
 	},
 	getters: {
 		se_design(state, getters) {
-			return new ShipEngine.Design(getters.se_db, state.design_json);
+			let design = new ShipEngine.Design(getters.se_db, state.design_json);
+			if (state.design_mode_enabled && state.other_design_json !== null) {
+				let other_design = new ShipEngine.Design(getters.se_db, state.other_design_json);
+				if (state.design_mode === 'refit') {
+					return ShipEngine.Design.refit(design, other_design);
+				}
+				if (state.design_mode === 'compare') {
+					return ShipEngine.Design.compare(design, other_design);
+				}
+			}
+			return design;
 		},
 		se_db(state, getters) {
 			return new ShipEngine.DB(state.parts_list);
@@ -298,6 +314,17 @@ const store = new Vuex.Store({
 		},
 		set_design_json_redo(state, payload) {
 			state.design_json = payload.new_data;
+		},
+
+		set_other_design_json(state, payload) {
+			state.other_design_json = payload;
+		},
+
+		set_design_mode_enabled(state, payload) {
+			state.design_mode_enabled = payload;
+		},
+		set_design_mode(state, payload) {
+			state.design_mode = payload;
 		},
 	},
 });

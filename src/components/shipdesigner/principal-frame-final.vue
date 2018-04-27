@@ -15,6 +15,11 @@
 		<td class="br-column">{{se_design.cost_BR}}</td>
 		<td class="sr-column">{{se_design.cost_SR}}</td>
 
+		<template v-if="se_design.refit_valid">
+			<td class="br-column">{{se_design.refit_cost_BR}}</td>
+			<td class="sr-column">{{se_design.refit_cost_SR}}</td>
+		</template>
+
 		<td class="power-cost-column"
 			:title="power_final_title"
 			:class="power_final_class">{{se_design.cost_power}}</td>
@@ -60,26 +65,26 @@ export default {
 			};
 		},
 		has_power_error() {
-			return this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;
+			return !this.se_design.compare_base && this.se_design.cost_power_raw > this.se_design.power_generation_raw;
 		},
 		principal_frame() {
-			return this.$store.getters.se_design.json['Principal Frame'];
+			return this.se_design.principal_frame;
 		},
 		stats() {
-			return this.$store.getters.se_design.stats;
+			return this.se_design.stats;
 		},
 		crew() {
-			return this.$store.getters.se_design.cost_crew;
+			return this.se_design.cost_crew;
 		},
 		build_time() {
-			return frac(this.$store.getters.se_design.build_time, 12, true);
+			return frac(this.se_design.build_time, 12, true);
 		},
 		tech_year() {
-			return this.$store.getters.se_design.tech_year_max;
+			return this.se_design.tech_year_max;
 		},
 		ship_name: {
 			get() {
-				return this.$store.getters.se_design.json['Name'];
+				return this.se_design.json['Name'];
 			},
 			set(value) {
 				this.$store.commit('set_design_name', value);
