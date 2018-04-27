@@ -169,6 +169,28 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 exports.default = {
@@ -207,11 +229,17 @@ exports.default = {
 		power_cost: function power_cost() {
 			return (0, _uiFunctions.pretty)(this.se_component.cost_power);
 		},
-		cost_sr: function cost_sr() {
+		cost_BR: function cost_BR() {
+			return (0, _uiFunctions.pretty)(this.se_component.cost_BR);
+		},
+		cost_SR: function cost_SR() {
 			return (0, _uiFunctions.pretty)(this.se_component.cost_SR);
 		},
-		cost_br: function cost_br() {
-			return (0, _uiFunctions.pretty)(this.se_component.cost_BR);
+		refit_cost_BR: function refit_cost_BR() {
+			return (0, _uiFunctions.pretty)(this.se_component.refit_cost_BR);
+		},
+		refit_cost_SR: function refit_cost_SR() {
+			return (0, _uiFunctions.pretty)(this.se_component.refit_cost_SR);
 		},
 		weight_internal: function weight_internal() {
 			return (0, _uiFunctions.pretty)(this.se_component.weight_internal);
@@ -451,8 +479,7 @@ exports.default = {
 	components: {},
 	data: function data() {
 		return {
-			// local_saves is a straight array of blueprint objects,
-			// exactly the same as the design_json object.
+			// local_saves is a straight array of blueprint objects (ShipEngine.Design objects).
 			local_saves: [],
 			// the currently selected element of the local_saves
 			// array. *not* the same as design_json! this is so
@@ -467,9 +494,6 @@ exports.default = {
 			local_parts_lists: [],
 
 			selected_parts_list: null,
-
-			design_mode_enabled: false,
-			design_mode: 'none',
 
 			design_filter: []
 		};
@@ -523,16 +547,38 @@ exports.default = {
 				}
 			},
 			set: function set(value) {
-				this.selected_other_save = this.local_saves.find(ShipEngine.Design.find_by_pretty_name(value));
+				var other_save = this.local_saves.find(ShipEngine.Design.find_by_pretty_name(value));
+				if (this.selected_other_save !== other_save) {
+					this.selected_other_save = other_save;
+					this.$store.commit('set_other_design_json', other_save.json);
+				}
 			}
 		},
-		selected_design_mode: {
+		design_mode_enabled: {
 			get: function get() {
-				return this.design_mode_enabled ? this.design_mode : 'none';
+				return this.$store.state.design_mode_enabled;
 			},
 			set: function set(value) {
-				this.design_mode = this.design_mode_enabled ? value : 'none';
+				this.$store.commit('set_design_mode_enabled', value);
 			}
+		},
+		design_mode: {
+			get: function get() {
+				return this.$store.state.design_mode;
+			},
+			set: function set(value) {
+				this.$store.commit('set_design_mode', value);
+			}
+		},
+		design_mode_local_saves: function design_mode_local_saves() {
+			var _this = this;
+
+			if (this.design_mode !== 'refit') {
+				return this.local_saves;
+			}
+			return this.local_saves.filter(function (save) {
+				return ShipEngine.Design.refit_valid(_this.se_design, save);
+			});
 		},
 		design_json_string: function design_json_string() {
 			return JSON.stringify(this.$store.state.design_json);
@@ -582,11 +628,11 @@ exports.default = {
 			this.display_status_message('Parts list loaded');
 		},
 		local_saves_delete_selected: function local_saves_delete_selected() {
-			var _this = this;
+			var _this2 = this;
 
 			// remove the selected item
 			this.local_saves = _lodash2.default.chain(this.local_saves).reject(function (elem) {
-				return elem === _this.selected_save;
+				return elem === _this2.selected_save;
 			}).value();
 			this.local_saves_save_to_local_storage();
 			this.display_status_message('Blueprint deleted');
@@ -618,7 +664,7 @@ exports.default = {
 			this.display_status_message('Blueprint saved');
 		},
 		local_saves_load_from_local_storage: function local_saves_load_from_local_storage() {
-			var _this2 = this;
+			var _this3 = this;
 
 			var loaded = localStorage.getItem(LOCAL_SAVES_KEY);
 			if (loaded === null) {
@@ -629,13 +675,13 @@ exports.default = {
 					var db = void 0;
 					var wrong_db = void 0;
 					if (design_json['Parts List']) {
-						db = _this2.all_parts_lists.find(ShipEngine.DB.find_by_design_json(design_json));
+						db = _this3.all_parts_lists.find(ShipEngine.DB.find_by_design_json(design_json));
 						wrong_db = db === undefined;
 					} else {
-						db = _this2.se_db;
+						db = _this3.se_db;
 						wrong_db = false;
 					}
-					return new ShipEngine.Design(db || _this2.se_db, design_json, wrong_db);
+					return new ShipEngine.Design(db || _this3.se_db, design_json, wrong_db);
 				});
 				this.display_status_message('Blueprints loaded');
 			}
@@ -677,6 +723,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; //
+//
+//
+//
+//
+//
 //
 //
 //
@@ -769,6 +820,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; //
+//
+//
+//
+//
 //
 //
 //
@@ -933,6 +988,25 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 exports.default = {
@@ -953,11 +1027,17 @@ exports.default = {
 		power_cost: function power_cost() {
 			return (0, _uiFunctions.pretty)(this.se_module.cost_power);
 		},
-		cost_sr: function cost_sr() {
+		cost_BR: function cost_BR() {
+			return (0, _uiFunctions.pretty)(this.se_module.cost_BR);
+		},
+		cost_SR: function cost_SR() {
 			return (0, _uiFunctions.pretty)(this.se_module.cost_SR);
 		},
-		cost_br: function cost_br() {
-			return (0, _uiFunctions.pretty)(this.se_module.cost_BR);
+		refit_cost_BR: function refit_cost_BR() {
+			return (0, _uiFunctions.pretty)(this.se_module.refit_cost_BR);
+		},
+		refit_cost_SR: function refit_cost_SR() {
+			return (0, _uiFunctions.pretty)(this.se_module.refit_cost_SR);
 		},
 		weight_internal: function weight_internal() {
 			return (0, _uiFunctions.pretty)(this.se_module.weight_internal);
@@ -1068,6 +1148,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 var _vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
@@ -1099,27 +1184,27 @@ exports.default = {
 			};
 		},
 		has_power_error: function has_power_error() {
-			return this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;
+			return !this.se_design.omit_validation && this.se_design.cost_power_raw > this.se_design.power_generation_raw;
 		},
 		principal_frame: function principal_frame() {
-			return this.$store.getters.se_design.json['Principal Frame'];
+			return this.se_design.principal_frame;
 		},
 		stats: function stats() {
-			return this.$store.getters.se_design.stats;
+			return this.se_design.stats;
 		},
 		crew: function crew() {
-			return this.$store.getters.se_design.cost_crew;
+			return this.se_design.cost_crew;
 		},
 		build_time: function build_time() {
-			return (0, _uiFunctions.frac)(this.$store.getters.se_design.build_time, 12, true);
+			return (0, _uiFunctions.frac)(this.se_design.build_time, 12, true);
 		},
 		tech_year: function tech_year() {
-			return this.$store.getters.se_design.tech_year_max;
+			return this.se_design.tech_year_max;
 		},
 
 		ship_name: {
 			get: function get() {
-				return this.$store.getters.se_design.json['Name'];
+				return this.se_design.json['Name'];
 			},
 			set: function set(value) {
 				this.$store.commit('set_design_name', value);
@@ -1146,6 +1231,20 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -1214,7 +1313,7 @@ exports.default = {
 			};
 		},
 		has_power_error: function has_power_error() {
-			return this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;
+			return !this.se_design.omit_validation && this.se_design.cost_power_raw > this.se_design.power_generation_raw;
 		},
 		weight_summary_class: function weight_summary_class() {
 			return {
@@ -1222,31 +1321,31 @@ exports.default = {
 			};
 		},
 		has_weight_error: function has_weight_error() {
-			return this.$store.getters.se_design.weight_internal > this.$store.getters.se_design.frame_max_size_raw;
+			return !this.se_design.omit_validation && this.se_design.weight_internal > this.se_design.frame_max_size_raw;
 		},
 
 		principal_frame: {
 			get: function get() {
-				return this.$store.getters.se_design.json['Principal Frame'];
+				return this.se_design.principal_frame;
 			},
 			set: function set(value) {
-				this.$store.getters.se_design.json['Principal Frame'] = value;
+				this.se_design.principal_frame = value;
 			}
 		},
 		stats_raw: function stats_raw() {
-			return this.$store.getters.se_design.stats_raw;
+			return this.se_design.stats_raw;
 		},
 		crew_raw: function crew_raw() {
-			return this.$store.getters.se_design.cost_crew_raw;
+			return this.se_design.cost_crew_raw;
 		},
 		build_time_frame: function build_time_frame() {
-			return (0, _uiFunctions.frac)(this.$store.getters.se_design.build_time_frame, 12);
+			return (0, _uiFunctions.frac)(this.se_design.build_time_frame, 12);
 		},
 		tech_year_frame: function tech_year_frame() {
-			return this.$store.getters.se_design.tech_year_frame;
+			return this.se_design.tech_year_frame;
 		},
 		frame_size: function frame_size() {
-			return this.$store.getters.se_design.frame_size.toFixed(2);
+			return this.se_design.frame_size.toFixed(2);
 		}
 	}, (0, _vuex.mapGetters)(['se_design'])),
 	methods: {}
@@ -1287,6 +1386,12 @@ Object.defineProperty(exports, "__esModule", {
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 exports.default = {
@@ -1299,15 +1404,10 @@ exports.default = {
 		valid_numbers: function valid_numbers() {
 			return [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];
 		},
-
-		setting_name: {
-			get: function get() {
-				return this.setting['Name'];
-			},
-			set: function set(value) {
-				this.setting['Name'] = value;
-			}
+		setting_name: function setting_name() {
+			return this.setting['Name'];
 		},
+
 		setting_value: {
 			get: function get() {
 				return this.setting['Value'];
@@ -1460,6 +1560,20 @@ var _uiFunctions = __webpack_require__(/*! @/lib/ui-functions */ "./src/lib/ui-f
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -1657,6 +1771,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 exports.default = {
@@ -1674,7 +1793,7 @@ exports.default = {
 			};
 		},
 		has_weight_error: function has_weight_error() {
-			return this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;
+			return !this.se_subsystem.omit_validation && this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;
 		},
 		se_components: function se_components() {
 			return this.se_subsystem.components;
@@ -1709,7 +1828,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.principal-frame-raw[data-v-15813b91] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n.name-column[data-v-15813b91] {\n\ttext-align: right;\n\tpadding-right: 0.2em;\n}\n\n/* override global value for this one */\n.stat-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.br-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.sr-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.has-error[data-v-15813b91] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/principal-frame-raw.vue"],"names":[],"mappings":";AAgHA;CACA,iBAAA;CACA,YAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,yBAAA;CACA,gBAAA;CACA,eAAA;CACA;AAEA;CACA,kBAAA;CACA,qBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-raw.vue","sourcesContent":["<template>\n\t<tr class=\"principal-frame-raw\" v-bind:class=\"{ 'has-error': !is_valid_frame }\">\n\t\t<td class=\"name-column\" colspan=\"2\">Size: {{frame_size}}</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<select v-model=\"principal_frame\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"princ_frame_value in se_design.valid_frames\" :key=\"princ_frame_value['Name']\">{{princ_frame_value['Name']}}</option>\n\t\t\t\t<option v-if=\"!is_valid_frame\" class=\"has-error\">{{principal_frame}}</option>\n\t\t\t</select>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats_raw.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats_raw\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\t\t\n\t\t<td class=\"weight-internal-column\" :class=\"weight_summary_class\">{{se_design.weight_internal.toFixed(2)}}</td>\n\t\t<td class=\"weight-external-column\">{{se_design.weight_external.toFixed(2)}}</td>\n\n\t\t<td class=\"br-column\">{{se_design.cost_BR_raw.toFixed(2)}}</td>\n\t\t<td class=\"sr-column\">{{se_design.cost_SR_raw.toFixed(2)}}</td>\n\n\t\t<td class=\"power-cost-column\" :title=\"power_final_title\" :class=\"power_final_class\">{{se_design.cost_power_raw.toFixed(2)}}</td>\n\t\t<td class=\"power-gen-column\" :title=\"power_final_title\" :class=\"power_final_class\">{{se_design.power_generation_raw.toFixed(2)}}</td>\n\n\t\t<template v-for=\"name in crew_raw.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew_raw\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time_frame}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year_frame}} (Frame)</td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nimport { frac } from '@/lib/ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrameRaw',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tcomputed: {\n\t\tis_valid_frame() {\n\t\t\treturn this.se_design.is_valid_frame;\n\t\t},\n\t\tpower_final_title() {\n\t\t\tif (this.has_power_error) {\n\t\t\t\treturn 'Error: Power cost greater than power generation.';\n\t\t\t} else {\n\t\t\t\treturn '';\n\t\t\t}\n\t\t},\n\t\tpower_final_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_power_error,\n\t\t\t};\n\t\t},\n\t\thas_power_error() {\n\t\t\treturn this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;\n\t\t},\n\t\tweight_summary_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error() {\n\t\t\treturn this.$store.getters.se_design.weight_internal > this.$store.getters.se_design.frame_max_size_raw;\n\t\t},\n\t\tprincipal_frame: {\n\t\t\tget() {\n\t\t\t\treturn this.$store.getters.se_design.json['Principal Frame'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.getters.se_design.json['Principal Frame'] = value;\n\t\t\t},\n\t\t},\n\t\tstats_raw() {\n\t\t\treturn this.$store.getters.se_design.stats_raw;\n\t\t},\n\t\tcrew_raw() {\n\t\t\treturn this.$store.getters.se_design.cost_crew_raw;\n\t\t},\n\t\tbuild_time_frame() {\n\t\t\treturn frac(this.$store.getters.se_design.build_time_frame, 12);\n\t\t},\n\t\ttech_year_frame() {\n\t\t\treturn this.$store.getters.se_design.tech_year_frame;\n\t\t},\n\t\tframe_size() {\n\t\t\treturn this.$store.getters.se_design.frame_size.toFixed(2);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style>\n</style>\n\n<style scoped>\n.principal-frame-raw {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n\n.name-column {\n\ttext-align: right;\n\tpadding-right: 0.2em;\n}\n\n/* override global value for this one */\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.principal-frame-raw[data-v-15813b91] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n.name-column[data-v-15813b91] {\n\ttext-align: right;\n\tpadding-right: 0.2em;\n}\n\n/* override global value for this one */\n.stat-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.br-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.sr-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-15813b91] {\n\ttext-align: center;\n}\n.compare-base-value[data-v-15813b91] {\n\tbackground: #aa80ff;\n}\n.has-error[data-v-15813b91] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/principal-frame-raw.vue"],"names":[],"mappings":";AA8HA;CACA,iBAAA;CACA,YAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,yBAAA;CACA,gBAAA;CACA,eAAA;CACA;AAEA;CACA,kBAAA;CACA,qBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,oBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-raw.vue","sourcesContent":["<template>\n\t<tr class=\"principal-frame-raw\" v-bind:class=\"{ 'has-error': !is_valid_frame }\">\n\t\t<td class=\"name-column\" colspan=\"2\">Size: {{frame_size}}</td>\n\n\t\t<td v-if=\"!se_design.refit_valid\" :class=\"{\n\t\t\t\t'part-column': true,\n\t\t\t\t'compare-base-value': se_design.compare_base && se_design.principal_frame !== se_design.compare_base.principal_frame,\n\t\t\t}\">\n\t\t\t<select v-model=\"principal_frame\" class=\"part-column-select\">\n\t\t\t\t<option\n\t\t\t\t\tv-for=\"princ_frame_value in se_design.valid_frames\"\n\t\t\t\t\t:key=\"princ_frame_value['Name']\"\n\t\t\t\t\t:class=\"{ 'compare-base-value': se_design.compare_base && princ_frame_value['Name'] === se_design.compare_base.principal_frame }\">\n\t\t\t\t\t{{princ_frame_value['Name']}}\n\t\t\t\t</option>\n\t\t\t\t<option v-if=\"!is_valid_frame\" class=\"has-error\">{{principal_frame}}</option>\n\t\t\t</select>\n\t\t</td>\n\t\t<td v-else>{{principal_frame}}</td>\n\n\t\t<template v-for=\"name in stats_raw.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats_raw\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\t\t\n\t\t<td class=\"weight-internal-column\" :class=\"weight_summary_class\">{{se_design.weight_internal.toFixed(2)}}</td>\n\t\t<td class=\"weight-external-column\">{{se_design.weight_external.toFixed(2)}}</td>\n\n\t\t<td class=\"br-column\">{{se_design.cost_BR_raw.toFixed(2)}}</td>\n\t\t<td class=\"sr-column\">{{se_design.cost_SR_raw.toFixed(2)}}</td>\n\n\t\t<template v-if=\"se_design.refit_valid\">\n\t\t\t<td class=\"br-column\">{{se_design.refit_cost_BR_raw.toFixed(2)}}</td>\n\t\t\t<td class=\"sr-column\">{{se_design.refit_cost_SR_raw.toFixed(2)}}</td>\n\t\t</template>\n\n\t\t<td class=\"power-cost-column\" :title=\"power_final_title\" :class=\"power_final_class\">{{se_design.cost_power_raw.toFixed(2)}}</td>\n\t\t<td class=\"power-gen-column\" :title=\"power_final_title\" :class=\"power_final_class\">{{se_design.power_generation_raw.toFixed(2)}}</td>\n\n\t\t<template v-for=\"name in crew_raw.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew_raw\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time_frame}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year_frame}} (Frame)</td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nimport { frac } from '@/lib/ui-functions.js';\n\nexport default {\n\tname: 'PrincipalFrameRaw',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tcomputed: {\n\t\tis_valid_frame() {\n\t\t\treturn this.se_design.is_valid_frame;\n\t\t},\n\t\tpower_final_title() {\n\t\t\tif (this.has_power_error) {\n\t\t\t\treturn 'Error: Power cost greater than power generation.';\n\t\t\t} else {\n\t\t\t\treturn '';\n\t\t\t}\n\t\t},\n\t\tpower_final_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_power_error,\n\t\t\t};\n\t\t},\n\t\thas_power_error() {\n\t\t\treturn !this.se_design.omit_validation && this.se_design.cost_power_raw > this.se_design.power_generation_raw;\n\t\t},\n\t\tweight_summary_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error() {\n\t\t\treturn !this.se_design.omit_validation && this.se_design.weight_internal > this.se_design.frame_max_size_raw;\n\t\t},\n\t\tprincipal_frame: {\n\t\t\tget() {\n\t\t\t\treturn this.se_design.principal_frame;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.se_design.principal_frame = value;\n\t\t\t},\n\t\t},\n\t\tstats_raw() {\n\t\t\treturn this.se_design.stats_raw;\n\t\t},\n\t\tcrew_raw() {\n\t\t\treturn this.se_design.cost_crew_raw;\n\t\t},\n\t\tbuild_time_frame() {\n\t\t\treturn frac(this.se_design.build_time_frame, 12);\n\t\t},\n\t\ttech_year_frame() {\n\t\t\treturn this.se_design.tech_year_frame;\n\t\t},\n\t\tframe_size() {\n\t\t\treturn this.se_design.frame_size.toFixed(2);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style>\n</style>\n\n<style scoped>\n.principal-frame-raw {\n\tbackground: #111;\n\tcolor: #fff;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\t/* position: relative; */\n\t/* left: 2px; */\n\t/* top: 2px; */\n}\n\n.name-column {\n\ttext-align: right;\n\tpadding-right: 0.2em;\n}\n\n/* override global value for this one */\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n.compare-base-value {\n\tbackground: #aa80ff;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -1728,7 +1847,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n#design-bar[data-v-23b102d6] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n\n\tflex-wrap: wrap;\n}\n.design-bar-row[data-v-23b102d6] {\n\tdisplay: flex;\n\tflex-flow: row;\n}\n.design-bar-column[data-v-23b102d6] {\n\tflex: none;\n}\n.design-bar-flex-column[data-v-23b102d6] {\n\tflex: auto;\n}\n.design-bar-column[data-v-23b102d6], .design-bar-flex-column[data-v-23b102d6] {\n\tdisplay: flex;\n\tflex-flow: column;\n\tjustify-content: space-around;\n}\n#design-bar > .design-bar-column > .design-bar-cell[data-v-23b102d6] {\n\tmargin: 0.1em 0.2em;\n}\n.design-bar-cell > select[data-v-23b102d6]:only-child {\n\twidth: 100%;\n}\n.design-bar-flex-column > .design-bar-cell > select[data-v-23b102d6] {\n\twidth: 100%;\n}\n.design-bar-cell > span[data-v-23b102d6] {\n\tmargin: 0 0.2em;\n}\n.design-bar-cell > input[type=checkbox][data-v-23b102d6] {\n\tvertical-align: text-bottom;\n}\n#design-bar-status-message[data-v-23b102d6] {\n\theight: 100%;\n\ttext-align: center;\n}\n#design-bar-design-mode[data-v-23b102d6] {\n\ttext-align: right;\n}\n#design-bar-design-mode > option[data-v-23b102d6] {\n\tdirection: rtl;\n}\n#design-bar-save-button[data-v-23b102d6] {\n\twidth: 15em;\n}\n.fade[data-v-23b102d6] {\n\tanimation: fadeanim-data-v-23b102d6 3s forwards;\n}\n@keyframes fadeanim-data-v-23b102d6 {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/design-import-export.vue"],"names":[],"mappings":";AAuVA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;;CAEA,gBAAA;CACA;AAEA;CACA,cAAA;CACA,eAAA;CACA;AAEA;CACA,WAAA;CACA;AAEA;CACA,WAAA;CACA;AAEA;CACA,cAAA;CACA,kBAAA;CACA,8BAAA;CACA;AAEA;CACA,oBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,gBAAA;CACA;AAEA;CACA,4BAAA;CACA;AAEA;CACA,aAAA;CACA,mBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,eAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n\t<div id=\"design-bar\" class=\"design-bar-row\">\n\t\t<div class=\"design-bar-column\">\n\t\t\t<div class=\"design-bar-cell design-bar-row\">\n\t\t\t\t<div class=\"design-bar-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<input type=\"button\"\n\t\t\t\t\t\t\tclass=\"undo-button\"\n\t\t\t\t\t\t\t@click=\"dispatch_undo\"\n\t\t\t\t\t\t\tvalue=\"<\"/>\n\t\t\t\t\t\t<input type=\"button\"\n\t\t\t\t\t\t\tclass=\"redo-button\"\n\t\t\t\t\t\t\t@click=\"dispatch_redo\"\n\t\t\t\t\t\t\tvalue=\">\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"design-bar-flex-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\"\n\t\t\t\t\t\tid=\"design-bar-status-message\"\n\t\t\t\t\t\tref=\"status_message\"\n\t\t\t\t\t\t@animationend=\"clear_status_message()\">{{ status_message }}</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"design-bar-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<!-- hopefully temporary workaround for https://github.com/to-boldly-go/tbg-shipdesigner/issues/57 -->\n\t\t\t\t\t\t<input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell design-bar-row\">\n\t\t\t\t<div class=\"design-bar-flex-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<select v-model=\"selected_parts_list_name\">\n\t\t\t\t\t\t\t<option v-for=\"parts_list in all_parts_lists\" :key=\"parts_list.pretty_name\">\n\t\t\t\t\t\t\t\t{{parts_list.pretty_name}}\n\t\t\t\t\t\t\t</option>\n\t\t\t\t\t\t</select>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"design-bar-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<input type=\"button\" @click=\"parts_lists_load_selected\" value=\"Load parts list\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"design-bar-column\">\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<span><a :href=\"'shipdesigner.html#' + design_json_url_encoded_string\">Link to this design</a></span>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<input type=\"checkbox\" v-model=\"design_mode_enabled\"/>\n\t\t\t\t<select id=\"design-bar-design-mode\" v-model=\"selected_design_mode\" :disabled=\"!design_mode_enabled\">\n\t\t\t\t\t<option value=\"none\" disabled>Select Mode</option>\n\t\t\t\t\t<option value=\"refit\">Refit for</option>\n\t\t\t\t\t<option value=\"compare\">Compare with</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"design-bar-flex-column\">\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<select v-model=\"selected_design_name\">\n\t\t\t\t\t<option v-for=\"blueprint in local_saves\" :key=\"blueprint.pretty_name\">\n\t\t\t\t\t\t{{blueprint.pretty_name}}\n\t\t\t\t\t</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<select v-model=\"selected_other_design_name\" :disabled=\"selected_design_mode === 'none'\">\n\t\t\t\t\t<option v-for=\"blueprint in local_saves\" :key=\"blueprint.pretty_name\">\n\t\t\t\t\t\t{{blueprint.pretty_name}}\n\t\t\t\t\t</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"design-bar-column\">\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"/>\n\t\t\t\t<input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"/>\n\n\t\t\t\t<input type=\"button\" id=\"design-bar-save-button\" @click=\"local_saves_save_design\" :value=\"save_design_error ? save_design_error : 'Save current design'\" :disabled=\"save_design_error !== null\"/>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<span>Filter:</span>\n\t\t\t\t<input type=\"checkbox\" id=\"filter-latest-for-name\" v-model=\"design_filter\" value=\"latest-for-name\" disabled=\"true\"/><label for=\"filter-latest-for-name\">Latest for name</label>\n\t\t\t\t<input type=\"checkbox\" id=\"filter-same-name\" v-model=\"design_filter\" value=\"same-name\" disabled=\"true\"/><label for=\"filter-latest-for-name\">Same name</label>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\nimport * as ShipEngine from '@/lib/shipengine';\n\nimport { mapGetters } from 'vuex';\n\nconst LOCAL_PARTS_LISTS_KEY = 'parts_lists';\nconst LOCAL_SAVES_KEY = 'local_saves';\n\nexport default {\n\tname: 'DesignImportExport',\n\tcomponents: {\n\t},\n\tdata() {\n\t\treturn {\n\t\t\t// local_saves is a straight array of blueprint objects,\n\t\t\t// exactly the same as the design_json object.\n\t\t\tlocal_saves: [],\n\t\t\t// the currently selected element of the local_saves\n\t\t\t// array. *not* the same as design_json! this is so\n\t\t\t// the user can work with the list of locally saved\n\t\t\t// blueprints without clobbering their current work.\n\t\t\tselected_save: null,\n\n\t\t\tselected_other_save: null,\n\n\t\t\tstatus_message: null,\n\n\t\t\tlocal_parts_lists: [],\n\n\t\t\tselected_parts_list: null,\n\n\t\t\tdesign_mode_enabled: false,\n\t\t\tdesign_mode: 'none',\n\n\t\t\tdesign_filter: [],\n\t\t};\n\t},\n\tcomputed: {\n\t\tsave_design_error() {\n\t\t\tif (!this.se_design.matches_parts_list(this.se_db)) {\n\t\t\t\treturn 'Save disabled: unset parts list';\n\t\t\t}\n\t\t\tif (!this.se_design.is_loaded) {\n\t\t\t\treturn 'Save disabled: Unknown parts/frames';\n\t\t\t}\n\t\t\treturn null;\n\t\t},\n\t\tselected_parts_list_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_parts_list) {\n\t\t\t\t\treturn this.selected_parts_list.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_parts_list = this.all_parts_lists.find(\n\t\t\t\t\tShipEngine.DB.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tall_parts_lists() {\n\t\t\treturn [...this.local_parts_lists, this.canon_se_db];\n\t\t},\n\t\tselected_design_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_save) {\n\t\t\t\t\treturn this.selected_save.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_save = this.local_saves.find(\n\t\t\t\t\tShipEngine.Design.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tselected_other_design_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_other_save) {\n\t\t\t\t\treturn this.selected_other_save.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_other_save = this.local_saves.find(\n\t\t\t\t\tShipEngine.Design.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tselected_design_mode: {\n\t\t\tget() {\n\t\t\t\treturn this.design_mode_enabled ? this.design_mode : 'none';\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.design_mode = this.design_mode_enabled ? value : 'none';\n\t\t\t},\n\t\t},\n\t\tdesign_json_string() {\n\t\t\treturn JSON.stringify(this.$store.state.design_json);\n\t\t},\n\t\tdesign_json_url_encoded_string() {\n\t\t\treturn encodeURI(this.design_json_string);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'canon_se_db',\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t]),\n\t},\n\tmounted() {\n\t\tthis.parts_lists_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_PARTS_LISTS_KEY) {\n\t\t\t\tthis.parts_lists_load_from_local_storage();\n\t\t\t}\n\t\t}.bind(this));\n\n\t\tthis.local_saves_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_SAVES_KEY) {\n\t\t\t\tthis.local_saves_load_from_local_storage();\n\t\t\t}\n\t\t}.bind(this));\n\t},\n\tmethods: {\n\t\tdispatch_undo() {\n\t\t\tthis.$store.dispatch('undo');\n\t\t},\n\t\tdispatch_redo() {\n\t\t\tthis.$store.dispatch('redo');\n\t\t},\n\t\tparts_lists_load_from_local_storage() {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_parts_lists = [];\n\t\t\t\tthis.display_status_message('No parts lists to load');\n\t\t\t} else {\n\t\t\t\tthis.local_parts_lists = JSON.parse(loaded).map(\n\t\t\t\t\tpl_json => new ShipEngine.DB(pl_json)\n\t\t\t\t);\n\t\t\t\tthis.display_status_message('Parts lists loaded');\n\t\t\t}\n\t\t},\n\t\tparts_lists_load_selected() {\n\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list.json));\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.display_status_message('Parts list loaded');\n\t\t},\n\t\t\n\t\tlocal_saves_delete_selected() {\n\t\t\t// remove the selected item\n\t\t\tthis.local_saves = _.chain(this.local_saves).reject(\n\t\t\t\t(elem) => elem === this.selected_save\n\t\t\t).value();\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message('Blueprint deleted');\n\t\t},\n\t\tlocal_saves_load_selected() {\n\t\t\tconst db = this.all_parts_lists.find(\n\t\t\t\tShipEngine.DB.find_by_design_json(this.selected_save.json)\n\t\t\t);\n\t\t\tif (db) {\n\t\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(db.json));\n\t\t\t\tthis.selected_parts_list = db;\n\t\t\t}\n\n\t\t\tthis.$store.commit('set_design_json', _.cloneDeep(this.selected_save.json));\n\t\t\tthis.display_status_message('Blueprint loaded');\n\t\t},\n\t\tlocal_saves_save_design() {\n\t\t\t// If there's an error with the design, the save design button should be disabled,\n\t\t\t// but if that's somehow bypassed, this check ensures an invalid design is not saved.\n\t\t\tlet error = this.save_design_error;\n\t\t\tif (error) {\n\t\t\t\tthis.display_status_message(error);\n\t\t\t\treturn;\n\t\t\t}\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.$store.commit('timestamp_design');\n\t\t\tconst new_save = new ShipEngine.Design(this.se_db, _.cloneDeep(this.$store.state.design_json));\n\t\t\tthis.local_saves.push(new_save);\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.selected_save = new_save;\n\t\t\tthis.display_status_message('Blueprint saved');\n\t\t},\n\n\t\tlocal_saves_load_from_local_storage() {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_SAVES_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_saves = [];\n\t\t\t\tthis.display_status_message('No Blueprints to load');\n\t\t\t} else {\n\t\t\t\tthis.local_saves = JSON.parse(loaded).map((design_json) => {\n\t\t\t\t\tlet db;\n\t\t\t\t\tlet wrong_db;\n\t\t\t\t\tif (design_json['Parts List']) {\n\t\t\t\t\t\tdb = this.all_parts_lists.find(\n\t\t\t\t\t\t\tShipEngine.DB.find_by_design_json(design_json)\n\t\t\t\t\t\t);\n\t\t\t\t\t\twrong_db = db === undefined;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tdb = this.se_db;\n\t\t\t\t\t\twrong_db = false;\n\t\t\t\t\t}\n\t\t\t\t\treturn new ShipEngine.Design(db || this.se_db, design_json, wrong_db);\n\t\t\t\t});\n\t\t\t\tthis.display_status_message('Blueprints loaded');\n\t\t\t}\n\t\t},\n\t\tlocal_saves_save_to_local_storage() {\n\t\t\tlocalStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(\n\t\t\t\t_.chain(this.local_saves)\n\t\t\t\t\t.map((design) => design.json)\n\t\t\t\t\t.value()\n\t\t\t));\n\t\t},\n\n\t\tdisplay_status_message(status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'design-bar-cell';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = 'design-bar-cell fade';\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message() {\n\t\t\tthis.status_message = null;\n\t\t},\n\t\t\n\t},\n};\n</script>\n\n\n<style scoped>\n#design-bar {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n\n\tflex-wrap: wrap;\n}\n\n.design-bar-row {\n\tdisplay: flex;\n\tflex-flow: row;\n}\n\n.design-bar-column {\n\tflex: none;\n}\n\n.design-bar-flex-column {\n\tflex: auto;\n}\n\n.design-bar-column, .design-bar-flex-column {\n\tdisplay: flex;\n\tflex-flow: column;\n\tjustify-content: space-around;\n}\n\n#design-bar > .design-bar-column > .design-bar-cell {\n\tmargin: 0.1em 0.2em;\n}\n\n.design-bar-cell > select:only-child {\n\twidth: 100%;\n}\n\n.design-bar-flex-column > .design-bar-cell > select {\n\twidth: 100%;\n}\n\n.design-bar-cell > span {\n\tmargin: 0 0.2em;\n}\n\n.design-bar-cell > input[type=checkbox] {\n\tvertical-align: text-bottom;\n}\n\n#design-bar-status-message {\n\theight: 100%;\n\ttext-align: center;\n}\n\n#design-bar-design-mode {\n\ttext-align: right;\n}\n\n#design-bar-design-mode > option {\n\tdirection: rtl;\n}\n\n#design-bar-save-button {\n\twidth: 15em;\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n#design-bar[data-v-23b102d6] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n\n\tflex-wrap: wrap;\n}\n.design-bar-row[data-v-23b102d6] {\n\tdisplay: flex;\n\tflex-flow: row;\n}\n.design-bar-column[data-v-23b102d6] {\n\tflex: none;\n}\n.design-bar-flex-column[data-v-23b102d6] {\n\tflex: auto;\n}\n.design-bar-column[data-v-23b102d6], .design-bar-flex-column[data-v-23b102d6] {\n\tdisplay: flex;\n\tflex-flow: column;\n\tjustify-content: space-around;\n}\n#design-bar > .design-bar-column > .design-bar-cell[data-v-23b102d6] {\n\tmargin: 0.1em 0.2em;\n}\n.design-bar-cell > select[data-v-23b102d6]:only-child {\n\twidth: 100%;\n}\n.design-bar-flex-column > .design-bar-cell > select[data-v-23b102d6] {\n\twidth: 100%;\n}\n.design-bar-cell > span[data-v-23b102d6] {\n\tmargin: 0 0.2em;\n}\n.design-bar-cell > input[type=checkbox][data-v-23b102d6] {\n\tvertical-align: text-bottom;\n}\n#design-bar-status-message[data-v-23b102d6] {\n\theight: 100%;\n\ttext-align: center;\n}\n#design-bar-design-mode[data-v-23b102d6] {\n\ttext-align: right;\n}\n#design-bar-design-mode > option[data-v-23b102d6] {\n\tdirection: rtl;\n}\n#design-bar-save-button[data-v-23b102d6] {\n\twidth: 15em;\n}\n.fade[data-v-23b102d6] {\n\tanimation: fadeanim-data-v-23b102d6 3s forwards;\n}\n@keyframes fadeanim-data-v-23b102d6 {\nfrom {\n}\nto {\n\t\tcolor: transparent;\n}\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/design-import-export.vue"],"names":[],"mappings":";AAqWA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;;CAEA,gBAAA;CACA;AAEA;CACA,cAAA;CACA,eAAA;CACA;AAEA;CACA,WAAA;CACA;AAEA;CACA,WAAA;CACA;AAEA;CACA,cAAA;CACA,kBAAA;CACA,8BAAA;CACA;AAEA;CACA,oBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,gBAAA;CACA;AAEA;CACA,4BAAA;CACA;AAEA;CACA,aAAA;CACA,mBAAA;CACA;AAEA;CACA,kBAAA;CACA;AAEA;CACA,eAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,gDAAA;CACA;AAEA;AACA;CACA;AACA;EACA,mBAAA;CACA;CACA","file":"design-import-export.vue","sourcesContent":["<template>\n\t<div id=\"design-bar\" class=\"design-bar-row\">\n\t\t<div class=\"design-bar-column\">\n\t\t\t<div class=\"design-bar-cell design-bar-row\">\n\t\t\t\t<div class=\"design-bar-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<input type=\"button\"\n\t\t\t\t\t\t\tclass=\"undo-button\"\n\t\t\t\t\t\t\t@click=\"dispatch_undo\"\n\t\t\t\t\t\t\tvalue=\"<\"/>\n\t\t\t\t\t\t<input type=\"button\"\n\t\t\t\t\t\t\tclass=\"redo-button\"\n\t\t\t\t\t\t\t@click=\"dispatch_redo\"\n\t\t\t\t\t\t\tvalue=\">\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"design-bar-flex-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\"\n\t\t\t\t\t\tid=\"design-bar-status-message\"\n\t\t\t\t\t\tref=\"status_message\"\n\t\t\t\t\t\t@animationend=\"clear_status_message()\">{{ status_message }}</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"design-bar-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<!-- hopefully temporary workaround for https://github.com/to-boldly-go/tbg-shipdesigner/issues/57 -->\n\t\t\t\t\t\t<input type=\"button\" @click=\"local_saves_load_from_local_storage\" value=\"Refresh\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell design-bar-row\">\n\t\t\t\t<div class=\"design-bar-flex-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<select v-model=\"selected_parts_list_name\">\n\t\t\t\t\t\t\t<option v-for=\"parts_list in all_parts_lists\" :key=\"parts_list.pretty_name\">\n\t\t\t\t\t\t\t\t{{parts_list.pretty_name}}\n\t\t\t\t\t\t\t</option>\n\t\t\t\t\t\t</select>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"design-bar-column\">\n\t\t\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t\t\t<input type=\"button\" @click=\"parts_lists_load_selected\" value=\"Load parts list\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"design-bar-column\">\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<span><a :href=\"'shipdesigner.html#' + design_json_url_encoded_string\">Link to this design</a></span>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<input type=\"checkbox\" v-model=\"design_mode_enabled\"/>\n\t\t\t\t<select id=\"design-bar-design-mode\" v-model=\"design_mode\" :disabled=\"!design_mode_enabled\">\n\t\t\t\t\t<option value=\"none\" disabled>Select Mode</option>\n\t\t\t\t\t<option value=\"refit\">Refit for</option>\n\t\t\t\t\t<option value=\"compare\">Compare with</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"design-bar-flex-column\">\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<select v-model=\"selected_design_name\">\n\t\t\t\t\t<option v-for=\"blueprint in local_saves\" :key=\"blueprint.pretty_name\">\n\t\t\t\t\t\t{{blueprint.pretty_name}}\n\t\t\t\t\t</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<select v-model=\"selected_other_design_name\" :disabled=\"design_mode === 'none'\">\n\t\t\t\t\t<option v-for=\"blueprint in design_mode_local_saves\" :key=\"blueprint.pretty_name\">\n\t\t\t\t\t\t{{blueprint.pretty_name}}\n\t\t\t\t\t</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"design-bar-column\">\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<input type=\"button\" @click=\"local_saves_load_selected\" value=\"Load save\"/>\n\t\t\t\t<input type=\"button\" @click=\"local_saves_delete_selected\" value=\"Delete save\"/>\n\n\t\t\t\t<input type=\"button\" id=\"design-bar-save-button\" @click=\"local_saves_save_design\" :value=\"save_design_error ? save_design_error : 'Save current design'\" :disabled=\"save_design_error !== null\"/>\n\t\t\t</div>\n\n\t\t\t<div class=\"design-bar-cell\">\n\t\t\t\t<span>Filter:</span>\n\t\t\t\t<input type=\"checkbox\" id=\"filter-latest-for-name\" v-model=\"design_filter\" value=\"latest-for-name\" disabled=\"true\"/><label for=\"filter-latest-for-name\">Latest for name</label>\n\t\t\t\t<input type=\"checkbox\" id=\"filter-same-name\" v-model=\"design_filter\" value=\"same-name\" disabled=\"true\"/><label for=\"filter-latest-for-name\">Same name</label>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n\n<script>\n\nimport _ from 'lodash';\nimport * as ShipEngine from '@/lib/shipengine';\n\nimport { mapGetters } from 'vuex';\n\nconst LOCAL_PARTS_LISTS_KEY = 'parts_lists';\nconst LOCAL_SAVES_KEY = 'local_saves';\n\nexport default {\n\tname: 'DesignImportExport',\n\tcomponents: {\n\t},\n\tdata() {\n\t\treturn {\n\t\t\t// local_saves is a straight array of blueprint objects (ShipEngine.Design objects).\n\t\t\tlocal_saves: [],\n\t\t\t// the currently selected element of the local_saves\n\t\t\t// array. *not* the same as design_json! this is so\n\t\t\t// the user can work with the list of locally saved\n\t\t\t// blueprints without clobbering their current work.\n\t\t\tselected_save: null,\n\n\t\t\tselected_other_save: null,\n\n\t\t\tstatus_message: null,\n\n\t\t\tlocal_parts_lists: [],\n\n\t\t\tselected_parts_list: null,\n\n\t\t\tdesign_filter: [],\n\t\t};\n\t},\n\tcomputed: {\n\t\tsave_design_error() {\n\t\t\tif (!this.se_design.matches_parts_list(this.se_db)) {\n\t\t\t\treturn 'Save disabled: unset parts list';\n\t\t\t}\n\t\t\tif (!this.se_design.is_loaded) {\n\t\t\t\treturn 'Save disabled: Unknown parts/frames';\n\t\t\t}\n\t\t\treturn null;\n\t\t},\n\t\tselected_parts_list_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_parts_list) {\n\t\t\t\t\treturn this.selected_parts_list.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_parts_list = this.all_parts_lists.find(\n\t\t\t\t\tShipEngine.DB.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tall_parts_lists() {\n\t\t\treturn [...this.local_parts_lists, this.canon_se_db];\n\t\t},\n\t\tselected_design_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_save) {\n\t\t\t\t\treturn this.selected_save.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.selected_save = this.local_saves.find(\n\t\t\t\t\tShipEngine.Design.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t},\n\t\t},\n\t\tselected_other_design_name: {\n\t\t\tget() {\n\t\t\t\tif (this.selected_other_save) {\n\t\t\t\t\treturn this.selected_other_save.pretty_name;\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tlet other_save = this.local_saves.find(\n\t\t\t\t\tShipEngine.Design.find_by_pretty_name(value)\n\t\t\t\t);\n\t\t\t\tif (this.selected_other_save !== other_save) {\n\t\t\t\t\tthis.selected_other_save = other_save;\n\t\t\t\t\tthis.$store.commit('set_other_design_json', other_save.json);\n\t\t\t\t}\n\t\t\t},\n\t\t},\n\t\tdesign_mode_enabled: {\n\t\t\tget() {\n\t\t\t\treturn this.$store.state.design_mode_enabled;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_design_mode_enabled', value);\n\t\t\t},\n\t\t},\n\t\tdesign_mode: {\n\t\t\tget() {\n\t\t\t\treturn this.$store.state.design_mode;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_design_mode', value);\n\t\t\t},\n\t\t},\n\t\tdesign_mode_local_saves() {\n\t\t\tif (this.design_mode !== 'refit') {\n\t\t\t\treturn this.local_saves;\n\t\t\t}\n\t\t\treturn this.local_saves.filter(save => ShipEngine.Design.refit_valid(this.se_design, save));\n\t\t},\n\t\tdesign_json_string() {\n\t\t\treturn JSON.stringify(this.$store.state.design_json);\n\t\t},\n\t\tdesign_json_url_encoded_string() {\n\t\t\treturn encodeURI(this.design_json_string);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'canon_se_db',\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t]),\n\t},\n\tmounted() {\n\t\tthis.parts_lists_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_PARTS_LISTS_KEY) {\n\t\t\t\tthis.parts_lists_load_from_local_storage();\n\t\t\t}\n\t\t}.bind(this));\n\n\t\tthis.local_saves_load_from_local_storage();\n\t\twindow.addEventListener('storage', function(ev) {\n\t\t\tif (ev.key === LOCAL_SAVES_KEY) {\n\t\t\t\tthis.local_saves_load_from_local_storage();\n\t\t\t}\n\t\t}.bind(this));\n\t},\n\tmethods: {\n\t\tdispatch_undo() {\n\t\t\tthis.$store.dispatch('undo');\n\t\t},\n\t\tdispatch_redo() {\n\t\t\tthis.$store.dispatch('redo');\n\t\t},\n\t\tparts_lists_load_from_local_storage() {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_parts_lists = [];\n\t\t\t\tthis.display_status_message('No parts lists to load');\n\t\t\t} else {\n\t\t\t\tthis.local_parts_lists = JSON.parse(loaded).map(\n\t\t\t\t\tpl_json => new ShipEngine.DB(pl_json)\n\t\t\t\t);\n\t\t\t\tthis.display_status_message('Parts lists loaded');\n\t\t\t}\n\t\t},\n\t\tparts_lists_load_selected() {\n\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list.json));\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.display_status_message('Parts list loaded');\n\t\t},\n\t\t\n\t\tlocal_saves_delete_selected() {\n\t\t\t// remove the selected item\n\t\t\tthis.local_saves = _.chain(this.local_saves).reject(\n\t\t\t\t(elem) => elem === this.selected_save\n\t\t\t).value();\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.display_status_message('Blueprint deleted');\n\t\t},\n\t\tlocal_saves_load_selected() {\n\t\t\tconst db = this.all_parts_lists.find(\n\t\t\t\tShipEngine.DB.find_by_design_json(this.selected_save.json)\n\t\t\t);\n\t\t\tif (db) {\n\t\t\t\tthis.$store.commit('set_parts_list', _.cloneDeep(db.json));\n\t\t\t\tthis.selected_parts_list = db;\n\t\t\t}\n\n\t\t\tthis.$store.commit('set_design_json', _.cloneDeep(this.selected_save.json));\n\t\t\tthis.display_status_message('Blueprint loaded');\n\t\t},\n\t\tlocal_saves_save_design() {\n\t\t\t// If there's an error with the design, the save design button should be disabled,\n\t\t\t// but if that's somehow bypassed, this check ensures an invalid design is not saved.\n\t\t\tlet error = this.save_design_error;\n\t\t\tif (error) {\n\t\t\t\tthis.display_status_message(error);\n\t\t\t\treturn;\n\t\t\t}\n\t\t\tthis.$store.commit('set_design_parts_list');\n\t\t\tthis.$store.commit('timestamp_design');\n\t\t\tconst new_save = new ShipEngine.Design(this.se_db, _.cloneDeep(this.$store.state.design_json));\n\t\t\tthis.local_saves.push(new_save);\n\t\t\tthis.local_saves_save_to_local_storage();\n\t\t\tthis.selected_save = new_save;\n\t\t\tthis.display_status_message('Blueprint saved');\n\t\t},\n\n\t\tlocal_saves_load_from_local_storage() {\n\t\t\tconst loaded = localStorage.getItem(LOCAL_SAVES_KEY);\n\t\t\tif (loaded === null) {\n\t\t\t\tthis.local_saves = [];\n\t\t\t\tthis.display_status_message('No Blueprints to load');\n\t\t\t} else {\n\t\t\t\tthis.local_saves = JSON.parse(loaded).map((design_json) => {\n\t\t\t\t\tlet db;\n\t\t\t\t\tlet wrong_db;\n\t\t\t\t\tif (design_json['Parts List']) {\n\t\t\t\t\t\tdb = this.all_parts_lists.find(\n\t\t\t\t\t\t\tShipEngine.DB.find_by_design_json(design_json)\n\t\t\t\t\t\t);\n\t\t\t\t\t\twrong_db = db === undefined;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tdb = this.se_db;\n\t\t\t\t\t\twrong_db = false;\n\t\t\t\t\t}\n\t\t\t\t\treturn new ShipEngine.Design(db || this.se_db, design_json, wrong_db);\n\t\t\t\t});\n\t\t\t\tthis.display_status_message('Blueprints loaded');\n\t\t\t}\n\t\t},\n\t\tlocal_saves_save_to_local_storage() {\n\t\t\tlocalStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(\n\t\t\t\t_.chain(this.local_saves)\n\t\t\t\t\t.map((design) => design.json)\n\t\t\t\t\t.value()\n\t\t\t));\n\t\t},\n\n\t\tdisplay_status_message(status) {\n\t\t\tthis.status_message = status;\n\t\t\tthis.$refs.status_message.className = 'design-bar-cell';\n\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\twindow.requestAnimationFrame(function(time) {\n\t\t\t\t\tthis.$refs.status_message.className = 'design-bar-cell fade';\n\t\t\t\t}.bind(this));\n\t\t\t}.bind(this));\n\t\t},\n\t\tclear_status_message() {\n\t\t\tthis.status_message = null;\n\t\t},\n\t\t\n\t},\n};\n</script>\n\n\n<style scoped>\n#design-bar {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n\n\tflex-wrap: wrap;\n}\n\n.design-bar-row {\n\tdisplay: flex;\n\tflex-flow: row;\n}\n\n.design-bar-column {\n\tflex: none;\n}\n\n.design-bar-flex-column {\n\tflex: auto;\n}\n\n.design-bar-column, .design-bar-flex-column {\n\tdisplay: flex;\n\tflex-flow: column;\n\tjustify-content: space-around;\n}\n\n#design-bar > .design-bar-column > .design-bar-cell {\n\tmargin: 0.1em 0.2em;\n}\n\n.design-bar-cell > select:only-child {\n\twidth: 100%;\n}\n\n.design-bar-flex-column > .design-bar-cell > select {\n\twidth: 100%;\n}\n\n.design-bar-cell > span {\n\tmargin: 0 0.2em;\n}\n\n.design-bar-cell > input[type=checkbox] {\n\tvertical-align: text-bottom;\n}\n\n#design-bar-status-message {\n\theight: 100%;\n\ttext-align: center;\n}\n\n#design-bar-design-mode {\n\ttext-align: right;\n}\n\n#design-bar-design-mode > option {\n\tdirection: rtl;\n}\n\n#design-bar-save-button {\n\twidth: 15em;\n}\n\n.fade {\n\tanimation: fadeanim 3s forwards;\n}\n\n@keyframes fadeanim {\n\tfrom {\n\t}\n\tto {\n\t\tcolor: transparent;\n\t}\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -1766,7 +1885,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.component-tr[data-v-32dfd9a5] {\n\twidth: 100%;\n\tmargin: 0px;\n}\n.has-error[data-v-32dfd9a5] {\n\tbackground: #faa;\n}\n.has-warning[data-v-32dfd9a5] {\n\tbackground: #ffa;\n}\n.quantity-column[data-v-32dfd9a5] {\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/component.vue"],"names":[],"mappings":";AAqMA;CACA,YAAA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA","file":"component.vue","sourcesContent":["<template>\n\t<tr class=\"component-tr\" :class=\"{ 'has-error': !is_loaded }\">\n\t\t<td class=\"name-column\">{{se_component.name}}</td>\n\n\t\t<td class=\"quantity-column\" :class=\"{ 'has-error': has_quantity_error }\">\n\t\t\t<select\n\t\t\t\tv-if=\"quantity_configurable\"\n\t\t\t\tclass=\"quantity-column-select\"\n\t\t\t\tv-model=\"quantity\"\n\t\t\t\tv-on:wheel=\"quantity_select_wheel_event\"\n\t\t\t\t:class=\"{ 'has-error': has_quantity_error }\">\n\n\t\t\t\t<option v-if=\"!valid_quantities.includes(quantity)\">{{quantity}}</option>\n\t\t\t\t<option v-for=\"valid_quantity in valid_quantities\" :key=\"valid_quantity\">{{valid_quantity}}</option>\n\t\t\t</select>\n\t\t\t<span v-if=\"!quantity_configurable\">{{quantity_pretty}}</span>\n\t\t</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<select\n\t\t\t\tv-model=\"part\"\n\t\t\t\tclass=\"part-column-select\">\n\t\t\t\t<option v-for=\"part_value in valid_parts\" :key=\"part_value['Name']\">{{part_value['Name']}}</option>\n\t\t\t\t<option v-if=\"!is_valid_part\" class=\"has-error\">{{part}}</option>\n\t\t\t</select>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t\t<td class=\"br-column\">{{cost_br}}</td>\n\t\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\"></td>\n\n\t\t<td class=\"tech-year-column\"\n\t\t\t:class=\"{ ['has-warning']: is_limiting_tech_year }\"\n\t\t\t:title=\"tech_year_tooltip\"\n\t\t\t>{{tech_year}}</td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport {\n\tpretty,\n} from '@/lib/ui-functions';\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nexport default {\n\tname: 'ComponentTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_component: Object,\n\t},\n\tcomputed: {\n\t\ttech_year_tooltip() {\n\t\t\tif (this.is_limiting_tech_year) {\n\t\t\t\treturn 'This component is the latest-available part in the design.';\n\t\t\t} else {\n\t\t\t\treturn false;\n\t\t\t}\n\t\t},\n\t\tis_limiting_tech_year() {\n\t\t\treturn this.se_component.tech_year === this.se_component.subsystem.design.tech_year;\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_component.tech_year;\n\t\t},\n\t\tis_valid_part() {\n\t\t\treturn this.valid_parts\n\t\t\t\t.map((part) => part['Name'])\n\t\t\t\t.includes(this.part);\n\t\t},\n\t\thas_quantity_error() {\n\t\t\treturn this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));\n\t\t},\n\t\tpower_gen() {\n\t\t\treturn pretty(this.se_component.power_generation);\n\t\t},\n\t\tpower_cost() {\n\t\t\treturn pretty(this.se_component.cost_power);\n\t\t},\n\t\tcost_sr() {\n\t\t\treturn pretty(this.se_component.cost_SR);\n\t\t},\n\t\tcost_br() {\n\t\t\treturn pretty(this.se_component.cost_BR);\n\t\t},\n\t\tweight_internal() {\n\t\t\treturn pretty(this.se_component.weight_internal);\n\t\t},\n\t\tweight_external() {\n\t\t\treturn pretty(this.se_component.weight_external);\n\t\t},\n\t\tis_loaded() {\n\t\t\treturn this.se_component.is_loaded;\n\t\t},\n\t\tvalid_parts() {\n\t\t\treturn this.se_component.valid_parts;\n\t\t},\n\t\tquantity_configurable() {\n\t\t\treturn this.se_component.is_quantity_configurable;\n\t\t},\n\t\tquantity_pretty() {\n\t\t\tif (this.quantity === Math.round(this.quantity)) {\n\t\t\t\treturn this.quantity;\n\t\t\t} else {\n\t\t\t\treturn this.quantity.toFixed(2);\n\t\t\t}\n\t\t},\n\t\tquantity: {\n\t\t\tget() {\n\t\t\t\treturn this.se_component.quantity;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_component_quantity', {\n\t\t\t\t\tcomponent: this.se_component,\n\t\t\t\t\tvalue,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tvalid_quantities() {\n\t\t\treturn this.se_component.valid_quantities;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_component.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_component.cost_crew;\n\t\t},\n\t\tpart: {\n\t\t\tget() {\n\t\t\t\treturn this.se_component.part;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_component_part', {\n\t\t\t\t\tcomponent: this.se_component,\n\t\t\t\t\tvalue,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tis_quantity_valid() {\n\t\t\treturn (hypothesis) => this\n\t\t\t\t.valid_quantities\n\t\t\t\t.map((elem) => (elem === hypothesis))\n\t\t\t\t.reduce((acc, elem) => acc || elem);\n\t\t},\n\t},\n\tmethods: {\n\t\tincrement_quantity() {\n\t\t\tlet hypothesis = this.quantity + 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t}\n\t\t},\n\t\tdecrement_quantity() {\n\t\t\tlet hypothesis = this.quantity - 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t}\n\t\t},\n\t\tquantity_select_wheel_event(ev) {\n\t\t\tif (ev.deltaY > 0) {\n\t\t\t\tthis.decrement_quantity();\n\t\t\t} else if (ev.deltaY < 0) {\n\t\t\t\tthis.increment_quantity();\n\t\t\t}\n\t\t\tif (ev.preventDefault) {\n\t\t\t\tev.preventDefault();\n\t\t\t}\n\t\t\tev.returnValue = false;\n\t\t},\n\t},\n};\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.component-tr {\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n\n.has-warning {\n\tbackground: #ffa;\n}\n\n.quantity-column {\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.component-tr[data-v-32dfd9a5] {\n\twidth: 100%;\n\tmargin: 0px;\n}\n.compare-base-value[data-v-32dfd9a5] {\n\tbackground: #aa80ff;\n}\n.has-error[data-v-32dfd9a5] {\n\tbackground: #faa;\n}\n.has-warning[data-v-32dfd9a5] {\n\tbackground: #ffa;\n}\n.quantity-column[data-v-32dfd9a5] {\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/component.vue"],"names":[],"mappings":";AAiOA;CACA,YAAA;CACA,YAAA;CACA;AAEA;CACA,oBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA","file":"component.vue","sourcesContent":["<template>\n\t<tr class=\"component-tr\" :class=\"{ 'has-error': !is_loaded }\">\n\t\t<td class=\"name-column\">{{se_component.name}}</td>\n\n\t\t<td :class=\"{\n\t\t\t\t'quantity-column': true,\n\t\t\t\t'has-error': has_quantity_error,\n\t\t\t\t'compare-base-value': se_component.compare_base && se_component.quantity !== se_component.compare_base.quantity,\n\t\t\t}\">\n\t\t\t<select\n\t\t\t\tv-if=\"quantity_configurable\"\n\t\t\t\tclass=\"quantity-column-select\"\n\t\t\t\tv-model=\"quantity\"\n\t\t\t\tv-on:wheel=\"quantity_select_wheel_event\"\n\t\t\t\t:class=\"{ 'has-error': has_quantity_error }\">\n\n\t\t\t\t<option v-if=\"!valid_quantities.includes(quantity)\">{{quantity}}</option>\n\t\t\t\t<option\n\t\t\t\t\tv-for=\"valid_quantity in valid_quantities\"\n\t\t\t\t\t:key=\"valid_quantity\"\n\t\t\t\t\t:class=\"{ 'compare-base-value': se_component.compare_base && valid_quantity === se_component.compare_base.quantity }\">\n\t\t\t\t\t{{valid_quantity}}\n\t\t\t\t</option>\n\t\t\t</select>\n\t\t\t<span v-if=\"!quantity_configurable\">{{quantity_pretty}}</span>\n\t\t</td>\n\n\t\t<td :class=\"{\n\t\t\t\t'part-column': true,\n\t\t\t\t'compare-base-value': se_component.compare_base && se_component.part !== se_component.compare_base.part,\n\t\t\t}\">\n\t\t\t<select\n\t\t\t\tv-model=\"part\"\n\t\t\t\tclass=\"part-column-select\">\n\t\t\t\t<option\n\t\t\t\t\tv-for=\"part_value in valid_parts\"\n\t\t\t\t\t:key=\"part_value['Name']\"\n\t\t\t\t\t:class=\"{ 'compare-base-value': se_component.compare_base && part_value['Name'] === se_component.compare_base.part }\">\n\t\t\t\t\t{{part_value['Name']}}\n\t\t\t\t</option>\n\t\t\t\t<option v-if=\"!is_valid_part\" class=\"has-error\">{{part}}</option>\n\t\t\t</select>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t\t<td class=\"br-column\">{{cost_BR}}</td>\n\t\t<td class=\"sr-column\">{{cost_SR}}</td>\n\n\t\t<template v-if=\"se_component.refit_valid\">\n\t\t\t<td class=\"br-column\">{{refit_cost_BR}}</td>\n\t\t\t<td class=\"sr-column\">{{refit_cost_SR}}</td>\n\t\t</template>\n\n\t\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\"></td>\n\n\t\t<td class=\"tech-year-column\"\n\t\t\t:class=\"{ ['has-warning']: is_limiting_tech_year }\"\n\t\t\t:title=\"tech_year_tooltip\"\n\t\t\t>{{tech_year}}</td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport {\n\tpretty,\n} from '@/lib/ui-functions';\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nexport default {\n\tname: 'ComponentTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_component: Object,\n\t},\n\tcomputed: {\n\t\ttech_year_tooltip() {\n\t\t\tif (this.is_limiting_tech_year) {\n\t\t\t\treturn 'This component is the latest-available part in the design.';\n\t\t\t} else {\n\t\t\t\treturn false;\n\t\t\t}\n\t\t},\n\t\tis_limiting_tech_year() {\n\t\t\treturn this.se_component.tech_year === this.se_component.subsystem.design.tech_year;\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_component.tech_year;\n\t\t},\n\t\tis_valid_part() {\n\t\t\treturn this.valid_parts\n\t\t\t\t.map((part) => part['Name'])\n\t\t\t\t.includes(this.part);\n\t\t},\n\t\thas_quantity_error() {\n\t\t\treturn this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));\n\t\t},\n\t\tpower_gen() {\n\t\t\treturn pretty(this.se_component.power_generation);\n\t\t},\n\t\tpower_cost() {\n\t\t\treturn pretty(this.se_component.cost_power);\n\t\t},\n\t\tcost_BR() {\n\t\t\treturn pretty(this.se_component.cost_BR);\n\t\t},\n\t\tcost_SR() {\n\t\t\treturn pretty(this.se_component.cost_SR);\n\t\t},\n\t\trefit_cost_BR() {\n\t\t\treturn pretty(this.se_component.refit_cost_BR);\n\t\t},\n\t\trefit_cost_SR() {\n\t\t\treturn pretty(this.se_component.refit_cost_SR);\n\t\t},\n\t\tweight_internal() {\n\t\t\treturn pretty(this.se_component.weight_internal);\n\t\t},\n\t\tweight_external() {\n\t\t\treturn pretty(this.se_component.weight_external);\n\t\t},\n\t\tis_loaded() {\n\t\t\treturn this.se_component.is_loaded;\n\t\t},\n\t\tvalid_parts() {\n\t\t\treturn this.se_component.valid_parts;\n\t\t},\n\t\tquantity_configurable() {\n\t\t\treturn this.se_component.is_quantity_configurable;\n\t\t},\n\t\tquantity_pretty() {\n\t\t\tif (this.quantity === Math.round(this.quantity)) {\n\t\t\t\treturn this.quantity;\n\t\t\t} else {\n\t\t\t\treturn this.quantity.toFixed(2);\n\t\t\t}\n\t\t},\n\t\tquantity: {\n\t\t\tget() {\n\t\t\t\treturn this.se_component.quantity;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_component_quantity', {\n\t\t\t\t\tcomponent: this.se_component,\n\t\t\t\t\tvalue,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tvalid_quantities() {\n\t\t\treturn this.se_component.valid_quantities;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_component.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_component.cost_crew;\n\t\t},\n\t\tpart: {\n\t\t\tget() {\n\t\t\t\treturn this.se_component.part;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_component_part', {\n\t\t\t\t\tcomponent: this.se_component,\n\t\t\t\t\tvalue,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tis_quantity_valid() {\n\t\t\treturn (hypothesis) => this\n\t\t\t\t.valid_quantities\n\t\t\t\t.map((elem) => (elem === hypothesis))\n\t\t\t\t.reduce((acc, elem) => acc || elem);\n\t\t},\n\t},\n\tmethods: {\n\t\tincrement_quantity() {\n\t\t\tlet hypothesis = this.quantity + 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t}\n\t\t},\n\t\tdecrement_quantity() {\n\t\t\tlet hypothesis = this.quantity - 1;\n\t\t\tif (this.is_quantity_valid(hypothesis)) {\n\t\t\t\tthis.quantity = hypothesis;\n\t\t\t}\n\t\t},\n\t\tquantity_select_wheel_event(ev) {\n\t\t\tif (ev.deltaY > 0) {\n\t\t\t\tthis.decrement_quantity();\n\t\t\t} else if (ev.deltaY < 0) {\n\t\t\t\tthis.increment_quantity();\n\t\t\t}\n\t\t\tif (ev.preventDefault) {\n\t\t\t\tev.preventDefault();\n\t\t\t}\n\t\t\tev.returnValue = false;\n\t\t},\n\t},\n};\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.component-tr {\n\twidth: 100%;\n\tmargin: 0px;\n}\n\n.compare-base-value {\n\tbackground: #aa80ff;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n\n.has-warning {\n\tbackground: #ffa;\n}\n\n.quantity-column {\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -1785,7 +1904,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.subsystem-frame[data-v-3da5e637] {\n\tbackground: #ccc;\n}\n.has-error[data-v-3da5e637] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/subsystem-frame.vue"],"names":[],"mappings":";AAsGA;CACA,iBAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-frame.vue","sourcesContent":["<template>\n\n\t<tr class=\"subsystem-frame\" v-bind:class=\"{ 'has-error': !is_valid_frame }\">\n\t\t<td class=\"name-column\" colspan=\"2\">{{se_subsystem.name}}</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<select v-model=\"sub_frame\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"sub_frame_value in se_subsystem.valid_frames\" :key=\"sub_frame_value['Name']\">{{sub_frame_value['Name']}}</option>\n\t\t\t\t<option v-if=\"!is_valid_frame\" class=\"has-error\">{{sub_frame}}</option>\n\t\t\t</select>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<td :key=\"name\" class=\"stat-column\">{{stats_multiplier_pretty}}</td>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t\t<td class=\"br-column\">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>\n\t\t<td class=\"sr-column\">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>\n\n\t\t<td class=\"power-cost-column\"></td>\n\t\t<td class=\"power-gen-column\"></td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew_mult_pretty\" :name=\"name\" :ispretty=\"false\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year}} (Frame)</td>\n\t</tr>\n\n</template>\n\n\n<script>\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nimport { frac } from '@/lib/ui-functions';\n\nexport default {\n\tname: 'SubsystemFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tis_valid_frame() {\n\t\t\treturn this.se_subsystem.is_valid_frame;\n\t\t},\n\t\tvalid_frames() {\n\t\t\treturn this.se_subsystem.valid_frames;\n\t\t},\n\t\tse_components() {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tstats_multiplier_pretty() {\n\t\t\treturn this.se_subsystem.stats_multiplier.toFixed(2) + 'x';\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tcrew_mult_pretty() {\n\t\t\treturn this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_subsystem.tech_year_frame;\n\t\t},\n\t\tsub_frame: {\n\t\t\tget() {\n\t\t\t\treturn this.se_subsystem.sub_frame;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_subsystem_frame', {\n\t\t\t\t\tvalue: value,\n\t\t\t\t\tsubsystem: this.se_subsystem,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style>\n\n</style>\n\n\n<style scoped>\n.subsystem-frame {\n\tbackground: #ccc;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.subsystem-frame[data-v-3da5e637] {\n\tbackground: #ccc;\n}\n.compare-base-value[data-v-3da5e637] {\n\tbackground: #aa80ff;\n}\n.has-error[data-v-3da5e637] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/subsystem-frame.vue"],"names":[],"mappings":";AAoHA;CACA,iBAAA;CACA;AAEA;CACA,oBAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-frame.vue","sourcesContent":["<template>\n\n\t<tr class=\"subsystem-frame\" v-bind:class=\"{ 'has-error': !is_valid_frame }\">\n\t\t<td class=\"name-column\" colspan=\"2\">{{se_subsystem.name}}</td>\n\n\t\t<td v-if=\"!se_subsystem.refit_valid\" :class=\"{\n\t\t\t\t'part-column': true,\n\t\t\t\t'compare-base-value': se_subsystem.compare_base && se_subsystem.sub_frame !== se_subsystem.compare_base.sub_frame,\n\t\t\t}\">\n\t\t\t<select v-model=\"sub_frame\" class=\"part-column-select\">\n\t\t\t\t<option\n\t\t\t\t\tv-for=\"sub_frame_value in se_subsystem.valid_frames\"\n\t\t\t\t\t:key=\"sub_frame_value['Name']\"\n\t\t\t\t\t:class=\"{ 'compare-base-value': se_subsystem.compare_base && sub_frame_value['Name'] === se_subsystem.compare_base.sub_frame }\">\n\t\t\t\t\t{{sub_frame_value['Name']}}\n\t\t\t\t</option>\n\t\t\t\t<option v-if=\"!is_valid_frame\" class=\"has-error\">{{sub_frame}}</option>\n\t\t\t</select>\n\t\t</td>\n\t\t<td v-else>{{sub_frame}}</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<td :key=\"name\" class=\"stat-column\">{{stats_multiplier_pretty}}</td>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t\t<td class=\"br-column\">{{se_subsystem.cost_BR_frame.toFixed(2)}}</td>\n\t\t<td class=\"sr-column\">{{se_subsystem.cost_SR_mult.toFixed(2)}}x</td>\n\n\t\t<template v-if=\"se_subsystem.refit_valid\">\n\t\t\t<td class=\"br-column\"></td>\n\t\t\t<td class=\"sr-column\"></td>\n\t\t</template>\n\n\t\t<td class=\"power-cost-column\"></td>\n\t\t<td class=\"power-gen-column\"></td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew_mult_pretty\" :name=\"name\" :ispretty=\"false\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year}} (Frame)</td>\n\t</tr>\n\n</template>\n\n\n<script>\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nimport { frac } from '@/lib/ui-functions';\n\nexport default {\n\tname: 'SubsystemFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tis_valid_frame() {\n\t\t\treturn this.se_subsystem.is_valid_frame;\n\t\t},\n\t\tvalid_frames() {\n\t\t\treturn this.se_subsystem.valid_frames;\n\t\t},\n\t\tse_components() {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tstats_multiplier_pretty() {\n\t\t\treturn this.se_subsystem.stats_multiplier.toFixed(2) + 'x';\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tcrew_mult_pretty() {\n\t\t\treturn this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_subsystem.tech_year_frame;\n\t\t},\n\t\tsub_frame: {\n\t\t\tget() {\n\t\t\t\treturn this.se_subsystem.sub_frame;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_subsystem_frame', {\n\t\t\t\t\tvalue: value,\n\t\t\t\t\tsubsystem: this.se_subsystem,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style>\n\n</style>\n\n\n<style scoped>\n.subsystem-frame {\n\tbackground: #ccc;\n}\n\n.compare-base-value {\n\tbackground: #aa80ff;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -1804,7 +1923,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.setting-cell[data-v-483def47] {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n.setting-input-number[data-v-483def47] {\n\twidth: 60px;\n}\n.setting-input-bool[data-v-483def47] {\n}\n.setting-name[data-v-483def47] {\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/setting-cell.vue"],"names":[],"mappings":";AA+DA;CACA,YAAA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA;AAEA;CACA","file":"setting-cell.vue","sourcesContent":["<template>\n\t<span class=\"setting-cell\">\n\t\t<span class=\"setting-name\">{{setting_name}}</span>\n\n\t\t<select\n\t\t\tv-if=\"typeof(setting_value) === 'number'\"\n\t\t\tclass=\"setting-input-number\"\n\t\t\ttype=\"number\"\n\t\t\tv-model=\"setting_value\">\n\t\t\t<option v-for=\"num in valid_numbers\" :key=\"num\">{{num}}</option>\n\t\t</select>\n\n\t\t<input\n\t\t\tv-if=\"typeof(setting_value) === 'boolean'\"\n\t\t\tclass=\"setting-input-bool\"\n\t\t\ttype=\"checkbox\"\n\t\t\tv-model=\"setting_value\"/>\n\t</span>\n</template>\n\n<script>\n\nexport default {\n\tname: 'SettingCell',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tsetting: Object,\n\t},\n\tcomputed: {\n\t\tvalid_numbers() {\n\t\t\treturn [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];\n\t\t},\n\t\tsetting_name: {\n\t\t\tget() {\n\t\t\t\treturn this.setting['Name'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.setting['Name'] = value;\n\t\t\t},\n\t\t},\n\t\tsetting_value: {\n\t\t\tget() {\n\t\t\t\treturn this.setting['Value'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_setting', {\n\t\t\t\t\tsetting: this.setting,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n};\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-cell {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n\n.setting-input-number {\n\twidth: 60px;\n}\n\n.setting-input-bool {\n}\n\n.setting-name {\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.setting-cell[data-v-483def47] {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n.setting-input-number[data-v-483def47] {\n\twidth: 60px;\n}\n.setting-input-bool[data-v-483def47] {\n}\n.setting-name[data-v-483def47] {\n}\n.compare-base-value[data-v-483def47] {\n\tbackground: #aa80ff;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/setting-cell.vue"],"names":[],"mappings":";AAgEA;CACA,YAAA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA,oBAAA;CACA","file":"setting-cell.vue","sourcesContent":["<template>\n\t<span :class=\"{\n\t\t\t'setting-cell': true,\n\t\t\t'compare-base-value': setting.compare_base && setting['Value'] !== setting.compare_base['Value'],\n\t\t}\">\n\t\t<span class=\"setting-name\">{{setting_name}}</span>\n\n\t\t<select\n\t\t\tv-if=\"typeof(setting_value) === 'number'\"\n\t\t\tclass=\"setting-input-number\"\n\t\t\ttype=\"number\"\n\t\t\tv-model=\"setting_value\">\n\t\t\t<option\n\t\t\t\tv-for=\"num in valid_numbers\"\n\t\t\t\t:key=\"num\"\n\t\t\t\t:class=\"{ 'compare-base-value': setting.compare_base && num === setting.compare_base['Value'] }\">{{num}}</option>\n\t\t</select>\n\n\t\t<input\n\t\t\tv-if=\"typeof(setting_value) === 'boolean'\"\n\t\t\tclass=\"setting-input-bool\"\n\t\t\ttype=\"checkbox\"\n\t\t\tv-model=\"setting_value\"/>\n\t</span>\n</template>\n\n<script>\n\nexport default {\n\tname: 'SettingCell',\n\tcomponents: {\n\t},\n\tprops: {\n\t\tsetting: Object,\n\t},\n\tcomputed: {\n\t\tvalid_numbers() {\n\t\t\treturn [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];\n\t\t},\n\t\tsetting_name() {\n\t\t\treturn this.setting['Name'];\n\t\t},\n\t\tsetting_value: {\n\t\t\tget() {\n\t\t\t\treturn this.setting['Value'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_setting', {\n\t\t\t\t\tsetting: this.setting,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n};\n\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n\n.setting-cell {\n\tflex: 1 1 0;\n\tmargin-right: 13px;\n}\n\n.setting-input-number {\n\twidth: 60px;\n}\n\n.setting-input-bool {\n}\n\n.setting-name {\n}\n\n.compare-base-value {\n\tbackground: #aa80ff;\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -1823,7 +1942,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.module-tr[data-v-4b6abc74] {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n.hasloaderror[data-v-4b6abc74] {\n\tbackground: #faa;\n}\n.module-pair-span[data-v-4b6abc74] {\n\tdisplay: flex;\n}\n.module-pair-type[data-v-4b6abc74] {\n\tflex: 1 1 0;\n}\n.module-pair-variant[data-v-4b6abc74] {\n\tflex: 1 1 0;\n}\n.part-column-select[data-v-4b6abc74] {\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/module.vue"],"names":[],"mappings":";AAsIA;CACA,iBAAA;;CAEA,YAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA","file":"module.vue","sourcesContent":["<template>\n\t<tr class=\"module-tr\" :class=\"{ hasloaderror: !is_loaded }\">\n\t\t<td class=\"name-column\" colspan=\"2\">Module</td>\n\n\t\t<td class=\"part-column\">\n\t\t\t<span class=\"module-pair-span\">\n\t\t\t<span class=\"module-pair-type\"><select v-model=\"module_type\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"module_type_value in valid_types\" :key=\"module_type_value\">{{module_type_value}}</option>\n\t\t\t</select></span>\n\t\t\t<span class=\"module-pair-variant\"><select v-model=\"module_variant\" class=\"part-column-select\">\n\t\t\t\t<option v-for=\"module_variant_value in valid_variants\" :key=\"module_variant_value['Variant']\">{{module_variant_value['Variant']}}</option>\n\t\t\t</select></span>\n\t\t\t</span>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t\t<td class=\"br-column\">{{cost_br}}</td>\n\t\t<td class=\"sr-column\">{{cost_sr}}</td>\n\n\t\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\"></td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport {\n\tpretty,\n\tfrac,\n} from '@/lib/ui-functions';\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nexport default {\n\tname: 'ModuleTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_module: Object,\n\t},\n\tcomputed: {\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_module.build_time, 12) || '';\n\t\t},\n\t\tpower_gen() {\n\t\t\treturn pretty(this.se_module.power_generation);\n\t\t},\n\t\tpower_cost() {\n\t\t\treturn pretty(this.se_module.cost_power);\n\t\t},\n\t\tcost_sr() {\n\t\t\treturn pretty(this.se_module.cost_SR);\n\t\t},\n\t\tcost_br() {\n\t\t\treturn pretty(this.se_module.cost_BR);\n\t\t},\n\t\tweight_internal() {\n\t\t\treturn pretty(this.se_module.weight_internal);\n\t\t},\n\t\tweight_external() {\n\t\t\treturn pretty(this.se_module.weight_external);\n\t\t},\n\t\tis_loaded() {\n\t\t\treturn this.se_module.is_loaded;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_module.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_module.cost_crew;\n\t\t},\n\n\t\tvalid_types() {\n\t\t\treturn this.$store.getters.se_db.valid_module_types();\n\t\t},\n\t\tvalid_variants() {\n\t\t\treturn this.$store.getters.se_db.find_modules(this.se_module.module_type);\n\t\t},\n\t\tmodule_type: {\n\t\t\tget() {\n\t\t\t\treturn this.se_module.module_type;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_module_type', {\n\t\t\t\t\tse_db: this.$store.getters.se_db,\n\t\t\t\t\tmodule: this.se_module,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tmodule_variant: {\n\t\t\tget() {\n\t\t\t\treturn this.se_module.module_variant;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_module_variant', {\n\t\t\t\t\tmodule: this.se_module,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tlog_parts() {\n\t\t\tconsole.log('\"' + this.part + '\"');\n\t\t\tconsole.log(this.valid_parts.map((part) => part['Name']));\n\t\t\tconsole.log(this.$store.getters.se_db.find_part(this.part));\n\t\t\tthis.part = this.part;\n\t\t},\n\t},\n};\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.module-tr {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n\n.hasloaderror {\n\tbackground: #faa;\n}\n\n.module-pair-span {\n\tdisplay: flex;\n}\n\n.module-pair-type {\n\tflex: 1 1 0;\n}\n\n.module-pair-variant {\n\tflex: 1 1 0;\n}\n\n.part-column-select {\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.module-tr[data-v-4b6abc74] {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n.compare-base-value[data-v-4b6abc74] {\n\tbackground: #aa80ff;\n}\n.hasloaderror[data-v-4b6abc74] {\n\tbackground: #faa;\n}\n.module-pair-span[data-v-4b6abc74] {\n\tdisplay: flex;\n}\n.module-pair-type[data-v-4b6abc74] {\n\tflex: 1 1 0;\n}\n.module-pair-variant[data-v-4b6abc74] {\n\tflex: 1 1 0;\n}\n.part-column-select[data-v-4b6abc74] {\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/module.vue"],"names":[],"mappings":";AA+JA;CACA,iBAAA;;CAEA,YAAA;CACA;AAEA;CACA,oBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA,cAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA","file":"module.vue","sourcesContent":["<template>\n\t<tr class=\"module-tr\" :class=\"{ hasloaderror: !is_loaded }\">\n\t\t<td class=\"name-column\" colspan=\"2\">Module</td>\n\n\t\t<td :class=\"{\n\t\t\t\t'part-column': true,\n\t\t\t\t'compare-base-value': se_module.compare_base &&\n\t\t\t\t\t(se_module.module_type !== se_module.compare_base.module_type || se_module.module_variant !== se_module.compare_base.module_variant),\n\t\t\t}\">\n\t\t\t<span class=\"module-pair-span\">\n\t\t\t<span class=\"module-pair-type\"><select v-model=\"module_type\" class=\"part-column-select\">\n\t\t\t\t<option\n\t\t\t\t\tv-for=\"module_type_value in valid_types\"\n\t\t\t\t\t:key=\"module_type_value\"\n\t\t\t\t\t:class=\"{ 'compare-base-value': se_module.compare_base && module_type_value === se_module.compare_base.module_type }\">\n\t\t\t\t\t{{module_type_value}}\n\t\t\t\t</option>\n\t\t\t</select></span>\n\t\t\t<span class=\"module-pair-variant\"><select v-model=\"module_variant\" class=\"part-column-select\">\n\t\t\t\t<option\n\t\t\t\t\tv-for=\"module_variant_value in valid_variants\"\n\t\t\t\t\t:key=\"module_variant_value['Variant']\"\n\t\t\t\t\t:class=\"{ 'compare-base-value': se_module.compare_base && module_variant_value['Variant'] === se_module.compare_base.module_variant }\">\n\t\t\t\t\t{{module_variant_value['Variant']}}\n\t\t\t\t</option>\n\t\t\t</select></span>\n\t\t\t</span>\n\t\t</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\">{{weight_internal}}</td>\n\t\t<td class=\"weight-external-column\">{{weight_external}}</td>\n\n\t\t<td class=\"br-column\">{{cost_BR}}</td>\n\t\t<td class=\"sr-column\">{{cost_SR}}</td>\n\n\t\t<template v-if=\"se_module.refit_valid\">\n\t\t\t<td class=\"br-column\">{{refit_cost_BR}}</td>\n\t\t\t<td class=\"sr-column\">{{refit_cost_SR}}</td>\n\t\t</template>\n\n\t\t<td class=\"power-cost-column\">{{power_cost}}</td>\n\t\t<td class=\"power-gen-column\">{{power_gen}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\"></td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport {\n\tpretty,\n\tfrac,\n} from '@/lib/ui-functions';\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nexport default {\n\tname: 'ModuleTr',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_module: Object,\n\t},\n\tcomputed: {\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_module.build_time, 12) || '';\n\t\t},\n\t\tpower_gen() {\n\t\t\treturn pretty(this.se_module.power_generation);\n\t\t},\n\t\tpower_cost() {\n\t\t\treturn pretty(this.se_module.cost_power);\n\t\t},\n\t\tcost_BR() {\n\t\t\treturn pretty(this.se_module.cost_BR);\n\t\t},\n\t\tcost_SR() {\n\t\t\treturn pretty(this.se_module.cost_SR);\n\t\t},\n\t\trefit_cost_BR() {\n\t\t\treturn pretty(this.se_module.refit_cost_BR);\n\t\t},\n\t\trefit_cost_SR() {\n\t\t\treturn pretty(this.se_module.refit_cost_SR);\n\t\t},\n\t\tweight_internal() {\n\t\t\treturn pretty(this.se_module.weight_internal);\n\t\t},\n\t\tweight_external() {\n\t\t\treturn pretty(this.se_module.weight_external);\n\t\t},\n\t\tis_loaded() {\n\t\t\treturn this.se_module.is_loaded;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_module.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_module.cost_crew;\n\t\t},\n\n\t\tvalid_types() {\n\t\t\treturn this.$store.getters.se_db.valid_module_types();\n\t\t},\n\t\tvalid_variants() {\n\t\t\treturn this.$store.getters.se_db.find_modules(this.se_module.module_type);\n\t\t},\n\t\tmodule_type: {\n\t\t\tget() {\n\t\t\t\treturn this.se_module.module_type;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_module_type', {\n\t\t\t\t\tse_db: this.$store.getters.se_db,\n\t\t\t\t\tmodule: this.se_module,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t\tmodule_variant: {\n\t\t\tget() {\n\t\t\t\treturn this.se_module.module_variant;\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_module_variant', {\n\t\t\t\t\tmodule: this.se_module,\n\t\t\t\t\tvalue: value,\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tlog_parts() {\n\t\t\tconsole.log('\"' + this.part + '\"');\n\t\t\tconsole.log(this.valid_parts.map((part) => part['Name']));\n\t\t\tconsole.log(this.$store.getters.se_db.find_part(this.part));\n\t\t\tthis.part = this.part;\n\t\t},\n\t},\n};\n</script>\n\n<style>\n  \n</style>\n\n<style scoped>\n.module-tr {\n\tbackground: #ccc;\n\n\twidth: 100%;\n}\n\n.compare-base-value {\n\tbackground: #aa80ff;\n}\n\n.hasloaderror {\n\tbackground: #faa;\n}\n\n.module-pair-span {\n\tdisplay: flex;\n}\n\n.module-pair-type {\n\tflex: 1 1 0;\n}\n\n.module-pair-variant {\n\tflex: 1 1 0;\n}\n\n.part-column-select {\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -1861,7 +1980,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.subsystem-summary[data-v-6beebb70] {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n.name-cell[data-v-6beebb70] {\n\tborder-style: none;\n}\n.part-cell[data-v-6beebb70] {\n\tborder-style: none;\n}\n.part-select[data-v-6beebb70] {\n\twidth: 100%;\n}\n.has-error[data-v-6beebb70] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/subsystem-summary.vue"],"names":[],"mappings":";AAgFA;CACA,iBAAA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-summary.vue","sourcesContent":["<template>\n\n\t<tr class=\"subsystem-summary\">\n\t\t<td class=\"name-column\"\n\t\t\t:class=\"weight_summary_class\"\n\t\t\tcolspan=\"2\">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t\t<td class=\"part-column\"></td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\" :class=\"weight_summary_class\">{{se_subsystem.weight_internal.toFixed(2)}}</td>\n\t\t<td class=\"weight-external-column\">{{se_subsystem.weight_external.toFixed(2)}}</td>\n\n\t\t<td class=\"br-column\">{{se_subsystem.cost_BR.toFixed(2)}}</td>\n\t\t<td class=\"sr-column\">{{se_subsystem.cost_SR.toFixed(2)}}</td>\n\n\t\t<td class=\"power-cost-column\">{{se_subsystem.cost_power.toFixed(2)}}</td>\n\t\t<td class=\"power-gen-column\">{{se_subsystem.power_generation.toFixed(2)}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year}}</td>\n\t</tr>\n\n</template>\n\n\n<script>\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nimport { frac } from '@/lib/ui-functions.js';\n\nexport default {\n\tname: 'SubsystemSummary',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tweight_summary_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error() {\n\t\t\treturn this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;\n\t\t},\n\t\tse_components() {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_subsystem.tech_year_max;\n\t\t},\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style scoped>\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n\n.name-cell {\n\tborder-style: none;\n}\n\n.part-cell {\n\tborder-style: none;\n}\n\n.part-select {\n\twidth: 100%;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.subsystem-summary[data-v-6beebb70] {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n.name-cell[data-v-6beebb70] {\n\tborder-style: none;\n}\n.part-cell[data-v-6beebb70] {\n\tborder-style: none;\n}\n.part-select[data-v-6beebb70] {\n\twidth: 100%;\n}\n.has-error[data-v-6beebb70] {\n\tbackground: #faa;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/subsystem-summary.vue"],"names":[],"mappings":";AAqFA;CACA,iBAAA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,iBAAA;CACA","file":"subsystem-summary.vue","sourcesContent":["<template>\n\n\t<tr class=\"subsystem-summary\">\n\t\t<td class=\"name-column\"\n\t\t\t:class=\"weight_summary_class\"\n\t\t\tcolspan=\"2\">{{se_subsystem.weight_internal.toFixed(2)}}/{{se_subsystem.weight_cap.toFixed(2)}}</td>\n\n\t\t<td class=\"part-column\"></td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"weight-internal-column\" :class=\"weight_summary_class\">{{se_subsystem.weight_internal.toFixed(2)}}</td>\n\t\t<td class=\"weight-external-column\">{{se_subsystem.weight_external.toFixed(2)}}</td>\n\n\t\t<td class=\"br-column\">{{se_subsystem.cost_BR.toFixed(2)}}</td>\n\t\t<td class=\"sr-column\">{{se_subsystem.cost_SR.toFixed(2)}}</td>\n\n\t\t<template v-if=\"se_subsystem.refit_valid\">\n\t\t\t<td class=\"br-column\">{{se_subsystem.refit_cost_BR.toFixed(2)}}</td>\n\t\t\t<td class=\"sr-column\">{{se_subsystem.refit_cost_SR.toFixed(2)}}</td>\n\t\t</template>\n\n\t\t<td class=\"power-cost-column\">{{se_subsystem.cost_power.toFixed(2)}}</td>\n\t\t<td class=\"power-gen-column\">{{se_subsystem.power_generation.toFixed(2)}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year}}</td>\n\t</tr>\n\n</template>\n\n\n<script>\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nimport { frac } from '@/lib/ui-functions.js';\n\nexport default {\n\tname: 'SubsystemSummary',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tprops: {\n\t\tse_subsystem: Object,\n\t},\n\tcomputed: {\n\t\tweight_summary_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_weight_error,\n\t\t\t};\n\t\t},\n\t\thas_weight_error() {\n\t\t\treturn !this.se_subsystem.omit_validation && this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;\n\t\t},\n\t\tse_components() {\n\t\t\treturn this.se_subsystem.components;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_subsystem.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_subsystem.cost_crew;\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_subsystem.build_time, 12);\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_subsystem.tech_year_max;\n\t\t},\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style scoped>\n.subsystem-summary {\n\tbackground: #ccc;\n\tborder-style: none;\n}\n\n.name-cell {\n\tborder-style: none;\n}\n\n.part-cell {\n\tborder-style: none;\n}\n\n.part-select {\n\twidth: 100%;\n}\n\n.has-error {\n\tbackground: #faa;\n}\n</style>\n\n<style>\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -1880,7 +1999,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.design-summary[data-v-f04171c2] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.has-error[data-v-f04171c2] {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n.design-weight-summary[data-v-f04171c2] {\n\tmargin-left: 5px;\n}\n.design-power-summary[data-v-f04171c2] {\n}\n.subsystem-weight-summary[data-v-f04171c2] {\n\tmargin-left: 5px;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/design-summary.vue"],"names":[],"mappings":";AAmFA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA,YAAA;CACA,kBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA;AAEA;CACA,iBAAA;CACA","file":"design-summary.vue","sourcesContent":["<template>\n\t<div class=\"design-summary\">\n\t\t<div>\n\t\t\t<span>{{se_design.name}} | {{se_design.pretty_miscstats}}</span>\n\t\t\t<span> | </span>\n\t\t\t<span\n\t\t\t\t:class=\"{'has-error': has_parts_list_load_error}\"\n\t\t\t\t:title=\"parts_list_load_title\">Parts: {{parts_list_name}}</span>\n\t\t\t<span\n\t\t\t\tv-if=\"has_parts_list_load_error\"\n\t\t\t\t:class=\"{'has-error': has_parts_list_load_error}\"> (WRONG PARTS LIST! EVERYTHING MAY BE INVALID!)</span>\n\t\t</div>\n\n\t\t<div>\n\t\t\t<span>{{se_design.stats_raw.toFixed(2)}}</span>\n\t\t\t<span> | </span>\n\t\t\t<span>[{{se_design.cost_BR_raw.toFixed(2)}}]br</span>\n\t\t\t<span>[{{se_design.cost_SR_raw.toFixed(2)}}]sr</span>\n\t\t\t<span> | </span>\n\t\t\t<span>{{se_design.cost_crew_raw.toFixed(2)}}</span>\n\t\t\t<span> | </span>\n\t\t\t<span>[{{build_time}}]years</span>\n\t\t</div>\n\t\t<div>\n\t\t\t<span\n\t\t\t\tclass=\"design-power-summary\"\n\t\t\t\t:class=\"{'has-error': se_design.cost_power_raw > se_design.power_generation_raw}\"\n\t\t\t\t>Power[{{se_design.cost_power_raw.toFixed(2)}}/{{se_design.power_generation_raw.toFixed(2)}}]</span>\n\t\t\t<span\n\t\t\t\tclass=\"design-weight-summary\"\n\t\t\t\t:class=\"{'has-error': se_design.weight_internal > se_design.frame_max_size_raw}\"\n\t\t\t\t>Internal[{{se_design.weight_internal.toFixed(2)}}/{{se_design.frame_max_size_raw.toFixed(2)}}]</span>\n\t\t\t<span\n\t\t\t\tclass=\"subsystem-weight-summary\"\n\t\t\t\tv-for=\"ss in se_design.subsystems\"\n\t\t\t\t:key=\"ss.name\"\n\t\t\t\t:class=\"{'has-error': ss.weight_internal > ss.weight_cap}\"\n\t\t\t\t>{{ss.name}}[{{ss.weight_internal.toFixed(2)}}/{{ss.weight_cap.toFixed(2)}}] </span>\n\t\t</div>\n\t</div>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport { frac } from '@/lib/ui-functions';\n\nexport default {\n\tname: 'DesignSummary',\n\tcomputed: {\n\t\tparts_list_name() {\n\t\t\treturn this.se_design.parts_list_pretty_name;\n\t\t},\n\t\tparts_list_load_title() {\n\t\t\tif (this.has_parts_list_load_error) {\n\t\t\t\treturn 'Could not find this parts list';\n\t\t\t} else {\n\t\t\t\treturn null;\n\t\t\t}\n\t\t},\n\t\thas_parts_list_load_error() {\n\t\t\treturn !this.se_design.matches_parts_list(this.se_db);\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.$store.getters.se_design.build_time, 12);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t]),\n\t},\n\tmethods: {\n\t\tparts_list_save_name(pl) {\n\t\t\treturn pl.name + ' (' + (new Date(pl.timestamp).toLocaleString()) + ')';\n\t\t},\n\t},\n};\n</script>\n\n\n<style scoped>\n.design-summary {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.has-error {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n\n.design-weight-summary {\n\tmargin-left: 5px;\n}\n\n.design-power-summary {\n}\n\n.subsystem-weight-summary {\n\tmargin-left: 5px;\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.design-summary[data-v-f04171c2] {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.has-error[data-v-f04171c2] {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n.design-weight-summary[data-v-f04171c2] {\n\tmargin-left: 5px;\n}\n.design-power-summary[data-v-f04171c2] {\n}\n.subsystem-weight-summary[data-v-f04171c2] {\n\tmargin-left: 5px;\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/design-summary.vue"],"names":[],"mappings":";AAwFA;CACA,uBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA,YAAA;CACA,kBAAA;CACA;AAEA;CACA,iBAAA;CACA;AAEA;CACA;AAEA;CACA,iBAAA;CACA","file":"design-summary.vue","sourcesContent":["<template>\n\t<div class=\"design-summary\">\n\t\t<div>\n\t\t\t<span>{{se_design.name}} | {{se_design.pretty_miscstats}}</span>\n\t\t\t<span> | </span>\n\t\t\t<span\n\t\t\t\t:class=\"{'has-error': has_parts_list_load_error}\"\n\t\t\t\t:title=\"parts_list_load_title\">Parts: {{parts_list_name}}</span>\n\t\t\t<span\n\t\t\t\tv-if=\"has_parts_list_load_error\"\n\t\t\t\t:class=\"{'has-error': has_parts_list_load_error}\"> (WRONG PARTS LIST! EVERYTHING MAY BE INVALID!)</span>\n\t\t</div>\n\n\t\t<div>\n\t\t\t<span>{{se_design.stats_raw.toFixed(2)}}</span>\n\t\t\t<span> | </span>\n\t\t\t<span>[{{se_design.cost_BR_raw.toFixed(2)}}]br</span>\n\t\t\t<span>[{{se_design.cost_SR_raw.toFixed(2)}}]sr</span>\n\t\t\t<template v-if=\"se_design.refit_valid\">\n\t\t\t\t<span> | Refit </span>\n\t\t\t\t<span>[{{se_design.refit_cost_BR_raw.toFixed(2)}}]br</span>\n\t\t\t\t<span>[{{se_design.refit_cost_SR_raw.toFixed(2)}}]sr</span>\n\t\t\t</template>\n\t\t\t<span> | </span>\n\t\t\t<span>{{se_design.cost_crew_raw.toFixed(2)}}</span>\n\t\t\t<span> | </span>\n\t\t\t<span>[{{build_time}}]years</span>\n\t\t</div>\n\t\t<div>\n\t\t\t<span\n\t\t\t\tclass=\"design-power-summary\"\n\t\t\t\t:class=\"{'has-error': !se_design.omit_validation && se_design.cost_power_raw > se_design.power_generation_raw}\"\n\t\t\t\t>Power[{{se_design.cost_power_raw.toFixed(2)}}/{{se_design.power_generation_raw.toFixed(2)}}]</span>\n\t\t\t<span\n\t\t\t\tclass=\"design-weight-summary\"\n\t\t\t\t:class=\"{'has-error': !se_design.omit_validation && se_design.weight_internal > se_design.frame_max_size_raw}\"\n\t\t\t\t>Internal[{{se_design.weight_internal.toFixed(2)}}/{{se_design.frame_max_size_raw.toFixed(2)}}]</span>\n\t\t\t<span\n\t\t\t\tclass=\"subsystem-weight-summary\"\n\t\t\t\tv-for=\"ss in se_design.subsystems\"\n\t\t\t\t:key=\"ss.name\"\n\t\t\t\t:class=\"{'has-error': !ss.omit_validation && ss.weight_internal > ss.weight_cap}\"\n\t\t\t\t>{{ss.name}}[{{ss.weight_internal.toFixed(2)}}/{{ss.weight_cap.toFixed(2)}}] </span>\n\t\t</div>\n\t</div>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport { frac } from '@/lib/ui-functions';\n\nexport default {\n\tname: 'DesignSummary',\n\tcomputed: {\n\t\tparts_list_name() {\n\t\t\treturn this.se_design.parts_list_pretty_name;\n\t\t},\n\t\tparts_list_load_title() {\n\t\t\tif (this.has_parts_list_load_error) {\n\t\t\t\treturn 'Could not find this parts list';\n\t\t\t} else {\n\t\t\t\treturn null;\n\t\t\t}\n\t\t},\n\t\thas_parts_list_load_error() {\n\t\t\treturn !this.se_design.matches_parts_list(this.se_db);\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.$store.getters.se_design.build_time, 12);\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t\t'se_db',\n\t\t]),\n\t},\n\tmethods: {\n\t\tparts_list_save_name(pl) {\n\t\t\treturn pl.name + ' (' + (new Date(pl.timestamp).toLocaleString()) + ')';\n\t\t},\n\t},\n};\n</script>\n\n\n<style scoped>\n.design-summary {\n\tbackground-color: #999;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.has-error {\n\tcolor: #f11;\n\tfont-weight: bold;\n}\n\n.design-weight-summary {\n\tmargin-left: 5px;\n}\n\n.design-power-summary {\n}\n\n.subsystem-weight-summary {\n\tmargin-left: 5px;\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -1899,7 +2018,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.principal-frame-final[data-v-ff9204c2] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n.name-column-input[data-v-ff9204c2] {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.stat-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.br-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.sr-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.has-error[data-v-ff9204c2] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/principal-frame-final.vue"],"names":[],"mappings":";AAkGA;CACA,iBAAA;CACA,YAAA;;CAEA,kBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,mBAAA;CACA;AAEA;CACA,aAAA;CACA,kBAAA;CACA,kBAAA;CACA,YAAA;CACA,mBAAA;CACA,mBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-final.vue","sourcesContent":["<template>\n\t<tr class=\"principal-frame-final\">\n\t\t<td class=\"name-column\" colspan=\"2\">\n\t\t\t<input v-model=\"ship_name\" placeholder=\"Ship Name\" class=\"name-column-input\">\n\t\t</td>\n\n\t\t<td class=\"part-column\">{{principal_frame}}</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t\t</template>\n\t\t\n\t\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_design.weight_total}}</td>\n\n\t\t<td class=\"br-column\">{{se_design.cost_BR}}</td>\n\t\t<td class=\"sr-column\">{{se_design.cost_SR}}</td>\n\n\t\t<td class=\"power-cost-column\"\n\t\t\t:title=\"power_final_title\"\n\t\t\t:class=\"power_final_class\">{{se_design.cost_power}}</td>\n\t\t<td class=\"power-gen-column\"\n\t\t\t:title=\"power_final_title\"\n\t\t\t:class=\"power_final_class\">{{se_design.power_generation}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year}}</td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nimport { frac } from '@/lib/ui-functions';\n\nexport default {\n\tname: 'PrincipalFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tcomputed: {\n\t\tpower_final_title() {\n\t\t\tif (this.has_power_error) {\n\t\t\t\treturn 'Error: Power cost greater than power generation.';\n\t\t\t} else {\n\t\t\t\treturn '';\n\t\t\t}\n\t\t},\n\t\tpower_final_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_power_error,\n\t\t\t};\n\t\t},\n\t\thas_power_error() {\n\t\t\treturn this.$store.getters.se_design.cost_power_raw > this.$store.getters.se_design.power_generation_raw;\n\t\t},\n\t\tprincipal_frame() {\n\t\t\treturn this.$store.getters.se_design.json['Principal Frame'];\n\t\t},\n\t\tstats() {\n\t\t\treturn this.$store.getters.se_design.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.$store.getters.se_design.cost_crew;\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.$store.getters.se_design.build_time, 12, true);\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.$store.getters.se_design.tech_year_max;\n\t\t},\n\t\tship_name: {\n\t\t\tget() {\n\t\t\t\treturn this.$store.getters.se_design.json['Name'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_design_name', value);\n\t\t\t},\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style scoped>\n.principal-frame-final {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n\n.name-column-input {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.principal-frame-final[data-v-ff9204c2] {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n.name-column-input[data-v-ff9204c2] {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.stat-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.weight-internal-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.weight-external-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.br-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.sr-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.power-gen-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.power-cost-column[data-v-ff9204c2] {\n\ttext-align: center;\n}\n.has-error[data-v-ff9204c2] {\n\tbackground: #d60000;\n}\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/principal-frame-final.vue"],"names":[],"mappings":";AAuGA;CACA,iBAAA;CACA,YAAA;;CAEA,kBAAA;;CAEA,YAAA;CACA,YAAA;;CAEA,mBAAA;CACA;AAEA;CACA,aAAA;CACA,kBAAA;CACA,kBAAA;CACA,YAAA;CACA,mBAAA;CACA,mBAAA;CACA;;AAEA,wCAAA;AACA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,oBAAA;CACA","file":"principal-frame-final.vue","sourcesContent":["<template>\n\t<tr class=\"principal-frame-final\">\n\t\t<td class=\"name-column\" colspan=\"2\">\n\t\t\t<input v-model=\"ship_name\" placeholder=\"Ship Name\" class=\"name-column-input\">\n\t\t</td>\n\n\t\t<td class=\"part-column\">{{principal_frame}}</td>\n\n\t\t<template v-for=\"name in stats.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"stats\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t\t</template>\n\t\t\n\t\t<td class=\"weight-internal-column\" colspan=\"2\">{{se_design.weight_total}}</td>\n\n\t\t<td class=\"br-column\">{{se_design.cost_BR}}</td>\n\t\t<td class=\"sr-column\">{{se_design.cost_SR}}</td>\n\n\t\t<template v-if=\"se_design.refit_valid\">\n\t\t\t<td class=\"br-column\">{{se_design.refit_cost_BR}}</td>\n\t\t\t<td class=\"sr-column\">{{se_design.refit_cost_SR}}</td>\n\t\t</template>\n\n\t\t<td class=\"power-cost-column\"\n\t\t\t:title=\"power_final_title\"\n\t\t\t:class=\"power_final_class\">{{se_design.cost_power}}</td>\n\t\t<td class=\"power-gen-column\"\n\t\t\t:title=\"power_final_title\"\n\t\t\t:class=\"power_final_class\">{{se_design.power_generation}}</td>\n\n\t\t<template v-for=\"name in crew.names\">\n\t\t\t<StatlineCell :key=\"name\" :stats=\"crew\" :name=\"name\" :fixed=\"0\"></StatlineCell>\n\t\t</template>\n\n\t\t<td class=\"build-time-column\">{{build_time}}</td>\n\n\t\t<td class=\"tech-year-column\">{{tech_year}}</td>\n\t</tr>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport StatlineCell from '@/components/shipdesigner/statline-cell.vue';\n\nimport { frac } from '@/lib/ui-functions';\n\nexport default {\n\tname: 'PrincipalFrame',\n\tcomponents: {\n\t\tStatlineCell,\n\t},\n\tcomputed: {\n\t\tpower_final_title() {\n\t\t\tif (this.has_power_error) {\n\t\t\t\treturn 'Error: Power cost greater than power generation.';\n\t\t\t} else {\n\t\t\t\treturn '';\n\t\t\t}\n\t\t},\n\t\tpower_final_class() {\n\t\t\treturn {\n\t\t\t\t'has-error': this.has_power_error,\n\t\t\t};\n\t\t},\n\t\thas_power_error() {\n\t\t\treturn !this.se_design.omit_validation && this.se_design.cost_power_raw > this.se_design.power_generation_raw;\n\t\t},\n\t\tprincipal_frame() {\n\t\t\treturn this.se_design.principal_frame;\n\t\t},\n\t\tstats() {\n\t\t\treturn this.se_design.stats;\n\t\t},\n\t\tcrew() {\n\t\t\treturn this.se_design.cost_crew;\n\t\t},\n\t\tbuild_time() {\n\t\t\treturn frac(this.se_design.build_time, 12, true);\n\t\t},\n\t\ttech_year() {\n\t\t\treturn this.se_design.tech_year_max;\n\t\t},\n\t\tship_name: {\n\t\t\tget() {\n\t\t\t\treturn this.se_design.json['Name'];\n\t\t\t},\n\t\t\tset(value) {\n\t\t\t\tthis.$store.commit('set_design_name', value);\n\t\t\t},\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style scoped>\n.principal-frame-final {\n\tbackground: #111;\n\tcolor: #fff;\n\n\tfont-weight: bold;\n\n\twidth: 100%;\n\tmargin: 0px;\n\n\ttext-align: center;\n}\n\n.name-column-input {\n\tcolor: white;\n\tbackground: black;\n\tfont-weight: bold;\n\twidth: 100%;\n\tborder-style: none;\n\ttext-align: center;\n}\n\n/* override global value for this one */\n.stat-column {\n\ttext-align: center;\n}\n\n.weight-internal-column {\n\ttext-align: center;\n}\n\n.weight-external-column {\n\ttext-align: center;\n}\n\n.br-column {\n\ttext-align: center;\n}\n\n.sr-column {\n\ttext-align: center;\n}\n\n.power-gen-column {\n\ttext-align: center;\n}\n\n.power-cost-column {\n\ttext-align: center;\n}\n\n.has-error {\n\tbackground: #d60000;\n}\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -1918,7 +2037,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"component.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"component.vue","sourceRoot":""}]);
 
 // exports
 
@@ -1937,7 +2056,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n\t/* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.name-column {\n}\n.part-column {\n}\n.part-column-select {\n\twidth: 100%;\n}\n.quantity-column {\n\twidth: 30px;\n}\n.quantity-column-input {\n\twidth: 100%;\n}\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.build-time-column {\n\ttext-align: center;\n}\n.tech-year-column {\n\ttext-align: center;\n}\n.design-table-head {\n}\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/design.vue"],"names":[],"mappings":";AAuFA;CACA,mBAAA;;CAEA,YAAA;CACA,YAAA;CACA,mBAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA;AAEA;CACA,qBAAA;CACA,yBAAA;CACA;AAGA;IACA,qBAAA;IACA,qBAAA;IACA,kBAAA;IACA,mBAAA;CACA","file":"design.vue","sourcesContent":["<template>\n\t<div class=\"design-table\">\n\t\t<table>\n\t\t\t<thead class=\"design-table-head\">\n\t\t\t\t<tr class=\"design-table-head-tr\">\n\t\t\t\t\t<th></th>\t<!-- name -->\n\t\t\t\t\t<th></th>\t<!-- quantity -->\n\t\t\t\t\t<th></th>\t<!-- part -->\n\t\t\t\t\t<th>C</th>\n\t\t\t\t\t<th>S</th>\n\t\t\t\t\t<th>H</th>\n\t\t\t\t\t<th>L</th>\n\t\t\t\t\t<th>P</th>\n\t\t\t\t\t<th>D</th>\n\t\t\t\t\t<th>Wt (Int</th>\n\t\t\t\t\t<th>Ext)</th>\n\t\t\t\t\t<th>BR</th>\n\t\t\t\t\t<th>SR</th>\n\t\t\t\t\t<th>Pwr Cost</th>\n\t\t\t\t\t<th>Pwr Gen</th>\n\t\t\t\t\t<th>O</th>\n\t\t\t\t\t<th>E</th>\n\t\t\t\t\t<th>T</th>\n\t\t\t\t\t<th>Build Time</th>\n\t\t\t\t\t<th>Year Available</th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody class=\"design-table-body\">\n\t\t\t\t<PrincipalFrameFinal></PrincipalFrameFinal>\n\t\t\t\t<PrincipalFrameRaw></PrincipalFrameRaw>\n\t\t\t\t<template v-for=\"se_subsystem in se_subsystems\">\n\t\t\t\t\t<tr :key=\"se_subsystem.name\" class=\"subsystem-spacer-row\"><td colspan=\"100\" height=\"30px\"></td></tr>\t<!-- empty line for spacing -->\n\t\t\t\t\t<SubsystemFrame :key=\"se_subsystem.name + '-frame'\" :se_subsystem=\"se_subsystem\"></SubsystemFrame>\n\t\t\t\t\t<SubsystemSummary :key=\"se_subsystem.name + '-summary'\" :se_subsystem=\"se_subsystem\"></SubsystemSummary>\n\t\t\t\t\t<SubsystemSettings :key=\"se_subsystem.name + '-settings'\" :se_subsystem=\"se_subsystem\"></SubsystemSettings>\n\n\t\t\t\t\t<template v-for=\"se_component in se_subsystem.components\">\n\t\t\t\t\t\t<ComponentTr :key=\"se_component.name\" :se_component=\"se_component\"></ComponentTr>\n\t\t\t\t\t</template>\n\t\t\t\t</template>\n\n\t\t\t\t<tr class=\"subsystem-spacer-row\"><td colspan=\"100\" height=\"30px\"></td></tr>\t<!-- empty line for spacing -->\n\t\t\t\t<ModuleTr :se_module=\"se_design.module\"></ModuleTr>\n\t\t\t</tbody>\n\t\t</table>\n\t</div>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport PrincipalFrameRaw from '@/components/shipdesigner/principal-frame-raw.vue';\nimport PrincipalFrameFinal from '@/components/shipdesigner/principal-frame-final.vue';\nimport SubsystemSummary from '@/components/shipdesigner/subsystem-summary.vue';\nimport SubsystemFrame from '@/components/shipdesigner/subsystem-frame.vue';\nimport SubsystemSettings from '@/components/shipdesigner/subsystem-settings.vue';\nimport ComponentTr from '@/components/shipdesigner/component.vue';\nimport ModuleTr from '@/components/shipdesigner/module.vue';\n\nexport default {\n\tname: 'Design',\n\tcomponents: {\n\t\tPrincipalFrameRaw,\n\t\tPrincipalFrameFinal,\n\t\tSubsystemSummary,\n\t\tSubsystemFrame,\n\t\tSubsystemSettings,\n\t\tComponentTr,\n\t\tModuleTr,\n\t},\n\tcomputed: {\n\t\tse_subsystems() {\n\t\t\treturn this.$store.getters.se_design.subsystems;\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style>\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n\t/* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.name-column {\n}\n\n.part-column {\n}\n\n.part-column-select {\n\twidth: 100%;\n}\n\n.quantity-column {\n\twidth: 30px;\n}\n\n.quantity-column-input {\n\twidth: 100%;\n}\n\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.build-time-column {\n\ttext-align: center;\n}\n\n.tech-year-column {\n\ttext-align: center;\n}\n\n.design-table-head {\n}\n\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n\n\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n</style>\n"],"sourceRoot":""}]);
+exports.push([module.i, "\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n\t/* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n.name-column {\n}\n.part-column {\n}\n.part-column-select {\n\twidth: 100%;\n}\n.quantity-column {\n\twidth: 30px;\n}\n.quantity-column-input {\n\twidth: 100%;\n}\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n.build-time-column {\n\ttext-align: center;\n}\n.tech-year-column {\n\ttext-align: center;\n}\n.design-table-head {\n}\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n", "", {"version":3,"sources":["/home/travis/build/to-boldly-go/tbg-shipdesigner/src/components/shipdesigner/src/components/shipdesigner/design.vue"],"names":[],"mappings":";AA2FA;CACA,mBAAA;;CAEA,YAAA;CACA,YAAA;CACA,mBAAA;;CAEA,UAAA;CACA,SAAA;CACA;AAEA;CACA;AAEA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,YAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,kBAAA;CACA,sCAAA;CACA,gBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA,mBAAA;CACA;AAEA;CACA;AAEA;CACA,qBAAA;CACA,yBAAA;CACA;AAGA;IACA,qBAAA;IACA,qBAAA;IACA,kBAAA;IACA,mBAAA;CACA","file":"design.vue","sourcesContent":["<template>\n\t<div class=\"design-table\">\n\t\t<table>\n\t\t\t<thead class=\"design-table-head\">\n\t\t\t\t<tr class=\"design-table-head-tr\">\n\t\t\t\t\t<th></th>\t<!-- name -->\n\t\t\t\t\t<th></th>\t<!-- quantity -->\n\t\t\t\t\t<th></th>\t<!-- part -->\n\t\t\t\t\t<th>C</th>\n\t\t\t\t\t<th>S</th>\n\t\t\t\t\t<th>H</th>\n\t\t\t\t\t<th>L</th>\n\t\t\t\t\t<th>P</th>\n\t\t\t\t\t<th>D</th>\n\t\t\t\t\t<th>Wt (Int</th>\n\t\t\t\t\t<th>Ext)</th>\n\t\t\t\t\t<th>BR</th>\n\t\t\t\t\t<th>SR</th>\n\t\t\t\t\t<template v-if=\"se_design.refit_valid\">\n\t\t\t\t\t\t<th>Refit BR</th>\n\t\t\t\t\t\t<th>Refit SR</th>\n\t\t\t\t\t</template>\n\t\t\t\t\t<th>Pwr Cost</th>\n\t\t\t\t\t<th>Pwr Gen</th>\n\t\t\t\t\t<th>O</th>\n\t\t\t\t\t<th>E</th>\n\t\t\t\t\t<th>T</th>\n\t\t\t\t\t<th>Build Time</th>\n\t\t\t\t\t<th>Year Available</th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody class=\"design-table-body\">\n\t\t\t\t<PrincipalFrameFinal></PrincipalFrameFinal>\n\t\t\t\t<PrincipalFrameRaw></PrincipalFrameRaw>\n\t\t\t\t<template v-for=\"se_subsystem in se_subsystems\">\n\t\t\t\t\t<tr :key=\"se_subsystem.name\" class=\"subsystem-spacer-row\"><td colspan=\"100\" height=\"30px\"></td></tr>\t<!-- empty line for spacing -->\n\t\t\t\t\t<SubsystemFrame :key=\"se_subsystem.name + '-frame'\" :se_subsystem=\"se_subsystem\"></SubsystemFrame>\n\t\t\t\t\t<SubsystemSummary :key=\"se_subsystem.name + '-summary'\" :se_subsystem=\"se_subsystem\"></SubsystemSummary>\n\t\t\t\t\t<SubsystemSettings :key=\"se_subsystem.name + '-settings'\" :se_subsystem=\"se_subsystem\"></SubsystemSettings>\n\n\t\t\t\t\t<template v-for=\"se_component in se_subsystem.components\">\n\t\t\t\t\t\t<ComponentTr :key=\"se_component.name\" :se_component=\"se_component\"></ComponentTr>\n\t\t\t\t\t</template>\n\t\t\t\t</template>\n\n\t\t\t\t<tr class=\"subsystem-spacer-row\"><td colspan=\"100\" height=\"30px\"></td></tr>\t<!-- empty line for spacing -->\n\t\t\t\t<ModuleTr :se_module=\"se_design.module\"></ModuleTr>\n\t\t\t</tbody>\n\t\t</table>\n\t</div>\n</template>\n\n\n<script>\n\nimport { mapGetters } from 'vuex';\n\nimport PrincipalFrameRaw from '@/components/shipdesigner/principal-frame-raw.vue';\nimport PrincipalFrameFinal from '@/components/shipdesigner/principal-frame-final.vue';\nimport SubsystemSummary from '@/components/shipdesigner/subsystem-summary.vue';\nimport SubsystemFrame from '@/components/shipdesigner/subsystem-frame.vue';\nimport SubsystemSettings from '@/components/shipdesigner/subsystem-settings.vue';\nimport ComponentTr from '@/components/shipdesigner/component.vue';\nimport ModuleTr from '@/components/shipdesigner/module.vue';\n\nexport default {\n\tname: 'Design',\n\tcomponents: {\n\t\tPrincipalFrameRaw,\n\t\tPrincipalFrameFinal,\n\t\tSubsystemSummary,\n\t\tSubsystemFrame,\n\t\tSubsystemSettings,\n\t\tComponentTr,\n\t\tModuleTr,\n\t},\n\tcomputed: {\n\t\tse_subsystems() {\n\t\t\treturn this.$store.getters.se_design.subsystems;\n\t\t},\n\t\t...mapGetters([\n\t\t\t'se_design',\n\t\t]),\n\t},\n\tmethods: {\n\t},\n};\n</script>\n\n\n<style>\n.design-table {\n\tborder-style: none;\n\n\twidth: 100%;\n\tmargin: 0px;\n\t/* height: 100%; */\n\n\tleft: 5px;\n\ttop: 5px;\n}\n\n.name-column {\n}\n\n.part-column {\n}\n\n.part-column-select {\n\twidth: 100%;\n}\n\n.quantity-column {\n\twidth: 30px;\n}\n\n.quantity-column-input {\n\twidth: 100%;\n}\n\n.stat-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-internal-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.weight-external-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.br-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.sr-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-gen-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.power-cost-column {\n\ttext-align: right;\n\tfont-family: 'Roboto Mono', monospace;\n\tfont-size: 13px;\n}\n\n.build-time-column {\n\ttext-align: center;\n}\n\n.tech-year-column {\n\ttext-align: center;\n}\n\n.design-table-head {\n}\n\n.design-table-head-tr {\n\t/* display: block; */\n\t/* position: relative; */\n}\n\n\n.design-table-body {\n    /* display: block; */\n    /* overflow: auto; */\n    /* width: 100%; */\n    /* height: 100%; */\n}\n\n</style>\n"],"sourceRoot":""}]);
 
 // exports
 
@@ -1956,7 +2075,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"module.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"module.vue","sourceRoot":""}]);
 
 // exports
 
@@ -1975,7 +2094,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"principal-frame-raw.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"principal-frame-raw.vue","sourceRoot":""}]);
 
 // exports
 
@@ -1994,7 +2113,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"setting-cell.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"setting-cell.vue","sourceRoot":""}]);
 
 // exports
 
@@ -2051,7 +2170,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-frame.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-frame.vue","sourceRoot":""}]);
 
 // exports
 
@@ -2089,7 +2208,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-summary.vue","sourceRoot":""}]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"subsystem-summary.vue","sourceRoot":""}]);
 
 // exports
 
@@ -19890,51 +20009,83 @@ var render = function() {
         _vm._v("Size: " + _vm._s(_vm.frame_size))
       ]),
       _vm._v(" "),
-      _c("td", { staticClass: "part-column" }, [
-        _c(
-          "select",
-          {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.principal_frame,
-                expression: "principal_frame"
+      !_vm.se_design.refit_valid
+        ? _c(
+            "td",
+            {
+              class: {
+                "part-column": true,
+                "compare-base-value":
+                  _vm.se_design.compare_base &&
+                  _vm.se_design.principal_frame !==
+                    _vm.se_design.compare_base.principal_frame
               }
-            ],
-            staticClass: "part-column-select",
-            on: {
-              change: function($event) {
-                var $$selectedVal = Array.prototype.filter
-                  .call($event.target.options, function(o) {
-                    return o.selected
-                  })
-                  .map(function(o) {
-                    var val = "_value" in o ? o._value : o.value
-                    return val
-                  })
-                _vm.principal_frame = $event.target.multiple
-                  ? $$selectedVal
-                  : $$selectedVal[0]
-              }
-            }
-          },
-          [
-            _vm._l(_vm.se_design.valid_frames, function(princ_frame_value) {
-              return _c("option", { key: princ_frame_value["Name"] }, [
-                _vm._v(_vm._s(princ_frame_value["Name"]))
-              ])
-            }),
-            _vm._v(" "),
-            !_vm.is_valid_frame
-              ? _c("option", { staticClass: "has-error" }, [
-                  _vm._v(_vm._s(_vm.principal_frame))
-                ])
-              : _vm._e()
-          ],
-          2
-        )
-      ]),
+            },
+            [
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.principal_frame,
+                      expression: "principal_frame"
+                    }
+                  ],
+                  staticClass: "part-column-select",
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.principal_frame = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
+                  }
+                },
+                [
+                  _vm._l(_vm.se_design.valid_frames, function(
+                    princ_frame_value
+                  ) {
+                    return _c(
+                      "option",
+                      {
+                        key: princ_frame_value["Name"],
+                        class: {
+                          "compare-base-value":
+                            _vm.se_design.compare_base &&
+                            princ_frame_value["Name"] ===
+                              _vm.se_design.compare_base.principal_frame
+                        }
+                      },
+                      [
+                        _vm._v(
+                          "\n\t\t\t\t" +
+                            _vm._s(princ_frame_value["Name"]) +
+                            "\n\t\t\t"
+                        )
+                      ]
+                    )
+                  }),
+                  _vm._v(" "),
+                  !_vm.is_valid_frame
+                    ? _c("option", { staticClass: "has-error" }, [
+                        _vm._v(_vm._s(_vm.principal_frame))
+                      ])
+                    : _vm._e()
+                ],
+                2
+              )
+            ]
+          )
+        : _c("td", [_vm._v(_vm._s(_vm.principal_frame))]),
       _vm._v(" "),
       _vm._l(_vm.stats_raw.names, function(name) {
         return [
@@ -19965,6 +20116,18 @@ var render = function() {
       _c("td", { staticClass: "sr-column" }, [
         _vm._v(_vm._s(_vm.se_design.cost_SR_raw.toFixed(2)))
       ]),
+      _vm._v(" "),
+      _vm.se_design.refit_valid
+        ? [
+            _c("td", { staticClass: "br-column" }, [
+              _vm._v(_vm._s(_vm.se_design.refit_cost_BR_raw.toFixed(2)))
+            ]),
+            _vm._v(" "),
+            _c("td", { staticClass: "sr-column" }, [
+              _vm._v(_vm._s(_vm.se_design.refit_cost_SR_raw.toFixed(2)))
+            ])
+          ]
+        : _vm._e(),
       _vm._v(" "),
       _c(
         "td",
@@ -20193,8 +20356,8 @@ var render = function() {
                 {
                   name: "model",
                   rawName: "v-model",
-                  value: _vm.selected_design_mode,
-                  expression: "selected_design_mode"
+                  value: _vm.design_mode,
+                  expression: "design_mode"
                 }
               ],
               attrs: {
@@ -20211,7 +20374,7 @@ var render = function() {
                       var val = "_value" in o ? o._value : o.value
                       return val
                     })
-                  _vm.selected_design_mode = $event.target.multiple
+                  _vm.design_mode = $event.target.multiple
                     ? $$selectedVal
                     : $$selectedVal[0]
                 }
@@ -20285,7 +20448,7 @@ var render = function() {
                   expression: "selected_other_design_name"
                 }
               ],
-              attrs: { disabled: _vm.selected_design_mode === "none" },
+              attrs: { disabled: _vm.design_mode === "none" },
               on: {
                 change: function($event) {
                   var $$selectedVal = Array.prototype.filter
@@ -20302,7 +20465,7 @@ var render = function() {
                 }
               }
             },
-            _vm._l(_vm.local_saves, function(blueprint) {
+            _vm._l(_vm.design_mode_local_saves, function(blueprint) {
               return _c("option", { key: blueprint.pretty_name }, [
                 _vm._v(
                   "\n\t\t\t\t\t" + _vm._s(blueprint.pretty_name) + "\n\t\t\t\t"
@@ -20524,8 +20687,14 @@ var render = function() {
       _c(
         "td",
         {
-          staticClass: "quantity-column",
-          class: { "has-error": _vm.has_quantity_error }
+          class: {
+            "quantity-column": true,
+            "has-error": _vm.has_quantity_error,
+            "compare-base-value":
+              _vm.se_component.compare_base &&
+              _vm.se_component.quantity !==
+                _vm.se_component.compare_base.quantity
+          }
         },
         [
           _vm.quantity_configurable
@@ -20565,9 +20734,23 @@ var render = function() {
                     : _vm._e(),
                   _vm._v(" "),
                   _vm._l(_vm.valid_quantities, function(valid_quantity) {
-                    return _c("option", { key: valid_quantity }, [
-                      _vm._v(_vm._s(valid_quantity))
-                    ])
+                    return _c(
+                      "option",
+                      {
+                        key: valid_quantity,
+                        class: {
+                          "compare-base-value":
+                            _vm.se_component.compare_base &&
+                            valid_quantity ===
+                              _vm.se_component.compare_base.quantity
+                        }
+                      },
+                      [
+                        _vm._v(
+                          "\n\t\t\t\t" + _vm._s(valid_quantity) + "\n\t\t\t"
+                        )
+                      ]
+                    )
                   })
                 ],
                 2
@@ -20580,51 +20763,76 @@ var render = function() {
         ]
       ),
       _vm._v(" "),
-      _c("td", { staticClass: "part-column" }, [
-        _c(
-          "select",
-          {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.part,
-                expression: "part"
+      _c(
+        "td",
+        {
+          class: {
+            "part-column": true,
+            "compare-base-value":
+              _vm.se_component.compare_base &&
+              _vm.se_component.part !== _vm.se_component.compare_base.part
+          }
+        },
+        [
+          _c(
+            "select",
+            {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.part,
+                  expression: "part"
+                }
+              ],
+              staticClass: "part-column-select",
+              on: {
+                change: function($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function(o) {
+                      return o.selected
+                    })
+                    .map(function(o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.part = $event.target.multiple
+                    ? $$selectedVal
+                    : $$selectedVal[0]
+                }
               }
+            },
+            [
+              _vm._l(_vm.valid_parts, function(part_value) {
+                return _c(
+                  "option",
+                  {
+                    key: part_value["Name"],
+                    class: {
+                      "compare-base-value":
+                        _vm.se_component.compare_base &&
+                        part_value["Name"] ===
+                          _vm.se_component.compare_base.part
+                    }
+                  },
+                  [
+                    _vm._v(
+                      "\n\t\t\t\t" + _vm._s(part_value["Name"]) + "\n\t\t\t"
+                    )
+                  ]
+                )
+              }),
+              _vm._v(" "),
+              !_vm.is_valid_part
+                ? _c("option", { staticClass: "has-error" }, [
+                    _vm._v(_vm._s(_vm.part))
+                  ])
+                : _vm._e()
             ],
-            staticClass: "part-column-select",
-            on: {
-              change: function($event) {
-                var $$selectedVal = Array.prototype.filter
-                  .call($event.target.options, function(o) {
-                    return o.selected
-                  })
-                  .map(function(o) {
-                    var val = "_value" in o ? o._value : o.value
-                    return val
-                  })
-                _vm.part = $event.target.multiple
-                  ? $$selectedVal
-                  : $$selectedVal[0]
-              }
-            }
-          },
-          [
-            _vm._l(_vm.valid_parts, function(part_value) {
-              return _c("option", { key: part_value["Name"] }, [
-                _vm._v(_vm._s(part_value["Name"]))
-              ])
-            }),
-            _vm._v(" "),
-            !_vm.is_valid_part
-              ? _c("option", { staticClass: "has-error" }, [
-                  _vm._v(_vm._s(_vm.part))
-                ])
-              : _vm._e()
-          ],
-          2
-        )
-      ]),
+            2
+          )
+        ]
+      ),
       _vm._v(" "),
       _vm._l(_vm.stats.names, function(name) {
         return [
@@ -20643,9 +20851,21 @@ var render = function() {
         _vm._v(_vm._s(_vm.weight_external))
       ]),
       _vm._v(" "),
-      _c("td", { staticClass: "br-column" }, [_vm._v(_vm._s(_vm.cost_br))]),
+      _c("td", { staticClass: "br-column" }, [_vm._v(_vm._s(_vm.cost_BR))]),
       _vm._v(" "),
-      _c("td", { staticClass: "sr-column" }, [_vm._v(_vm._s(_vm.cost_sr))]),
+      _c("td", { staticClass: "sr-column" }, [_vm._v(_vm._s(_vm.cost_SR))]),
+      _vm._v(" "),
+      _vm.se_component.refit_valid
+        ? [
+            _c("td", { staticClass: "br-column" }, [
+              _vm._v(_vm._s(_vm.refit_cost_BR))
+            ]),
+            _vm._v(" "),
+            _c("td", { staticClass: "sr-column" }, [
+              _vm._v(_vm._s(_vm.refit_cost_SR))
+            ])
+          ]
+        : _vm._e(),
       _vm._v(" "),
       _c("td", { staticClass: "power-cost-column" }, [
         _vm._v(_vm._s(_vm.power_cost))
@@ -20715,51 +20935,83 @@ var render = function() {
         _vm._v(_vm._s(_vm.se_subsystem.name))
       ]),
       _vm._v(" "),
-      _c("td", { staticClass: "part-column" }, [
-        _c(
-          "select",
-          {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.sub_frame,
-                expression: "sub_frame"
+      !_vm.se_subsystem.refit_valid
+        ? _c(
+            "td",
+            {
+              class: {
+                "part-column": true,
+                "compare-base-value":
+                  _vm.se_subsystem.compare_base &&
+                  _vm.se_subsystem.sub_frame !==
+                    _vm.se_subsystem.compare_base.sub_frame
               }
-            ],
-            staticClass: "part-column-select",
-            on: {
-              change: function($event) {
-                var $$selectedVal = Array.prototype.filter
-                  .call($event.target.options, function(o) {
-                    return o.selected
-                  })
-                  .map(function(o) {
-                    var val = "_value" in o ? o._value : o.value
-                    return val
-                  })
-                _vm.sub_frame = $event.target.multiple
-                  ? $$selectedVal
-                  : $$selectedVal[0]
-              }
-            }
-          },
-          [
-            _vm._l(_vm.se_subsystem.valid_frames, function(sub_frame_value) {
-              return _c("option", { key: sub_frame_value["Name"] }, [
-                _vm._v(_vm._s(sub_frame_value["Name"]))
-              ])
-            }),
-            _vm._v(" "),
-            !_vm.is_valid_frame
-              ? _c("option", { staticClass: "has-error" }, [
-                  _vm._v(_vm._s(_vm.sub_frame))
-                ])
-              : _vm._e()
-          ],
-          2
-        )
-      ]),
+            },
+            [
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.sub_frame,
+                      expression: "sub_frame"
+                    }
+                  ],
+                  staticClass: "part-column-select",
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.sub_frame = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
+                  }
+                },
+                [
+                  _vm._l(_vm.se_subsystem.valid_frames, function(
+                    sub_frame_value
+                  ) {
+                    return _c(
+                      "option",
+                      {
+                        key: sub_frame_value["Name"],
+                        class: {
+                          "compare-base-value":
+                            _vm.se_subsystem.compare_base &&
+                            sub_frame_value["Name"] ===
+                              _vm.se_subsystem.compare_base.sub_frame
+                        }
+                      },
+                      [
+                        _vm._v(
+                          "\n\t\t\t\t" +
+                            _vm._s(sub_frame_value["Name"]) +
+                            "\n\t\t\t"
+                        )
+                      ]
+                    )
+                  }),
+                  _vm._v(" "),
+                  !_vm.is_valid_frame
+                    ? _c("option", { staticClass: "has-error" }, [
+                        _vm._v(_vm._s(_vm.sub_frame))
+                      ])
+                    : _vm._e()
+                ],
+                2
+              )
+            ]
+          )
+        : _c("td", [_vm._v(_vm._s(_vm.sub_frame))]),
       _vm._v(" "),
       _vm._l(_vm.stats.names, function(name) {
         return [
@@ -20782,6 +21034,14 @@ var render = function() {
       _c("td", { staticClass: "sr-column" }, [
         _vm._v(_vm._s(_vm.se_subsystem.cost_SR_mult.toFixed(2)) + "x")
       ]),
+      _vm._v(" "),
+      _vm.se_subsystem.refit_valid
+        ? [
+            _c("td", { staticClass: "br-column" }),
+            _vm._v(" "),
+            _c("td", { staticClass: "sr-column" })
+          ]
+        : _vm._e(),
       _vm._v(" "),
       _c("td", { staticClass: "power-cost-column" }),
       _vm._v(" "),
@@ -20829,15 +21089,70 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("span", { staticClass: "setting-cell" }, [
-    _c("span", { staticClass: "setting-name" }, [
-      _vm._v(_vm._s(_vm.setting_name))
-    ]),
-    _vm._v(" "),
-    typeof _vm.setting_value === "number"
-      ? _c(
-          "select",
-          {
+  return _c(
+    "span",
+    {
+      class: {
+        "setting-cell": true,
+        "compare-base-value":
+          _vm.setting.compare_base &&
+          _vm.setting["Value"] !== _vm.setting.compare_base["Value"]
+      }
+    },
+    [
+      _c("span", { staticClass: "setting-name" }, [
+        _vm._v(_vm._s(_vm.setting_name))
+      ]),
+      _vm._v(" "),
+      typeof _vm.setting_value === "number"
+        ? _c(
+            "select",
+            {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.setting_value,
+                  expression: "setting_value"
+                }
+              ],
+              staticClass: "setting-input-number",
+              attrs: { type: "number" },
+              on: {
+                change: function($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function(o) {
+                      return o.selected
+                    })
+                    .map(function(o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.setting_value = $event.target.multiple
+                    ? $$selectedVal
+                    : $$selectedVal[0]
+                }
+              }
+            },
+            _vm._l(_vm.valid_numbers, function(num) {
+              return _c(
+                "option",
+                {
+                  key: num,
+                  class: {
+                    "compare-base-value":
+                      _vm.setting.compare_base &&
+                      num === _vm.setting.compare_base["Value"]
+                  }
+                },
+                [_vm._v(_vm._s(num))]
+              )
+            })
+          )
+        : _vm._e(),
+      _vm._v(" "),
+      typeof _vm.setting_value === "boolean"
+        ? _c("input", {
             directives: [
               {
                 name: "model",
@@ -20846,71 +21161,38 @@ var render = function() {
                 expression: "setting_value"
               }
             ],
-            staticClass: "setting-input-number",
-            attrs: { type: "number" },
+            staticClass: "setting-input-bool",
+            attrs: { type: "checkbox" },
+            domProps: {
+              checked: Array.isArray(_vm.setting_value)
+                ? _vm._i(_vm.setting_value, null) > -1
+                : _vm.setting_value
+            },
             on: {
               change: function($event) {
-                var $$selectedVal = Array.prototype.filter
-                  .call($event.target.options, function(o) {
-                    return o.selected
-                  })
-                  .map(function(o) {
-                    var val = "_value" in o ? o._value : o.value
-                    return val
-                  })
-                _vm.setting_value = $event.target.multiple
-                  ? $$selectedVal
-                  : $$selectedVal[0]
-              }
-            }
-          },
-          _vm._l(_vm.valid_numbers, function(num) {
-            return _c("option", { key: num }, [_vm._v(_vm._s(num))])
-          })
-        )
-      : _vm._e(),
-    _vm._v(" "),
-    typeof _vm.setting_value === "boolean"
-      ? _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.setting_value,
-              expression: "setting_value"
-            }
-          ],
-          staticClass: "setting-input-bool",
-          attrs: { type: "checkbox" },
-          domProps: {
-            checked: Array.isArray(_vm.setting_value)
-              ? _vm._i(_vm.setting_value, null) > -1
-              : _vm.setting_value
-          },
-          on: {
-            change: function($event) {
-              var $$a = _vm.setting_value,
-                $$el = $event.target,
-                $$c = $$el.checked ? true : false
-              if (Array.isArray($$a)) {
-                var $$v = null,
-                  $$i = _vm._i($$a, $$v)
-                if ($$el.checked) {
-                  $$i < 0 && (_vm.setting_value = $$a.concat([$$v]))
+                var $$a = _vm.setting_value,
+                  $$el = $event.target,
+                  $$c = $$el.checked ? true : false
+                if (Array.isArray($$a)) {
+                  var $$v = null,
+                    $$i = _vm._i($$a, $$v)
+                  if ($$el.checked) {
+                    $$i < 0 && (_vm.setting_value = $$a.concat([$$v]))
+                  } else {
+                    $$i > -1 &&
+                      (_vm.setting_value = $$a
+                        .slice(0, $$i)
+                        .concat($$a.slice($$i + 1)))
+                  }
                 } else {
-                  $$i > -1 &&
-                    (_vm.setting_value = $$a
-                      .slice(0, $$i)
-                      .concat($$a.slice($$i + 1)))
+                  _vm.setting_value = $$c
                 }
-              } else {
-                _vm.setting_value = $$c
               }
             }
-          }
-        })
-      : _vm._e()
-  ])
+          })
+        : _vm._e()
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -20942,83 +21224,127 @@ var render = function() {
         _vm._v("Module")
       ]),
       _vm._v(" "),
-      _c("td", { staticClass: "part-column" }, [
-        _c("span", { staticClass: "module-pair-span" }, [
-          _c("span", { staticClass: "module-pair-type" }, [
-            _c(
-              "select",
-              {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.module_type,
-                    expression: "module_type"
+      _c(
+        "td",
+        {
+          class: {
+            "part-column": true,
+            "compare-base-value":
+              _vm.se_module.compare_base &&
+              (_vm.se_module.module_type !==
+                _vm.se_module.compare_base.module_type ||
+                _vm.se_module.module_variant !==
+                  _vm.se_module.compare_base.module_variant)
+          }
+        },
+        [
+          _c("span", { staticClass: "module-pair-span" }, [
+            _c("span", { staticClass: "module-pair-type" }, [
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.module_type,
+                      expression: "module_type"
+                    }
+                  ],
+                  staticClass: "part-column-select",
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.module_type = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
                   }
-                ],
-                staticClass: "part-column-select",
-                on: {
-                  change: function($event) {
-                    var $$selectedVal = Array.prototype.filter
-                      .call($event.target.options, function(o) {
-                        return o.selected
-                      })
-                      .map(function(o) {
-                        var val = "_value" in o ? o._value : o.value
-                        return val
-                      })
-                    _vm.module_type = $event.target.multiple
-                      ? $$selectedVal
-                      : $$selectedVal[0]
+                },
+                _vm._l(_vm.valid_types, function(module_type_value) {
+                  return _c(
+                    "option",
+                    {
+                      key: module_type_value,
+                      class: {
+                        "compare-base-value":
+                          _vm.se_module.compare_base &&
+                          module_type_value ===
+                            _vm.se_module.compare_base.module_type
+                      }
+                    },
+                    [
+                      _vm._v(
+                        "\n\t\t\t\t" + _vm._s(module_type_value) + "\n\t\t\t"
+                      )
+                    ]
+                  )
+                })
+              )
+            ]),
+            _vm._v(" "),
+            _c("span", { staticClass: "module-pair-variant" }, [
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.module_variant,
+                      expression: "module_variant"
+                    }
+                  ],
+                  staticClass: "part-column-select",
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.module_variant = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
                   }
-                }
-              },
-              _vm._l(_vm.valid_types, function(module_type_value) {
-                return _c("option", { key: module_type_value }, [
-                  _vm._v(_vm._s(module_type_value))
-                ])
-              })
-            )
-          ]),
-          _vm._v(" "),
-          _c("span", { staticClass: "module-pair-variant" }, [
-            _c(
-              "select",
-              {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.module_variant,
-                    expression: "module_variant"
-                  }
-                ],
-                staticClass: "part-column-select",
-                on: {
-                  change: function($event) {
-                    var $$selectedVal = Array.prototype.filter
-                      .call($event.target.options, function(o) {
-                        return o.selected
-                      })
-                      .map(function(o) {
-                        var val = "_value" in o ? o._value : o.value
-                        return val
-                      })
-                    _vm.module_variant = $event.target.multiple
-                      ? $$selectedVal
-                      : $$selectedVal[0]
-                  }
-                }
-              },
-              _vm._l(_vm.valid_variants, function(module_variant_value) {
-                return _c("option", { key: module_variant_value["Variant"] }, [
-                  _vm._v(_vm._s(module_variant_value["Variant"]))
-                ])
-              })
-            )
+                },
+                _vm._l(_vm.valid_variants, function(module_variant_value) {
+                  return _c(
+                    "option",
+                    {
+                      key: module_variant_value["Variant"],
+                      class: {
+                        "compare-base-value":
+                          _vm.se_module.compare_base &&
+                          module_variant_value["Variant"] ===
+                            _vm.se_module.compare_base.module_variant
+                      }
+                    },
+                    [
+                      _vm._v(
+                        "\n\t\t\t\t" +
+                          _vm._s(module_variant_value["Variant"]) +
+                          "\n\t\t\t"
+                      )
+                    ]
+                  )
+                })
+              )
+            ])
           ])
-        ])
-      ]),
+        ]
+      ),
       _vm._v(" "),
       _vm._l(_vm.stats.names, function(name) {
         return [
@@ -21037,9 +21363,21 @@ var render = function() {
         _vm._v(_vm._s(_vm.weight_external))
       ]),
       _vm._v(" "),
-      _c("td", { staticClass: "br-column" }, [_vm._v(_vm._s(_vm.cost_br))]),
+      _c("td", { staticClass: "br-column" }, [_vm._v(_vm._s(_vm.cost_BR))]),
       _vm._v(" "),
-      _c("td", { staticClass: "sr-column" }, [_vm._v(_vm._s(_vm.cost_sr))]),
+      _c("td", { staticClass: "sr-column" }, [_vm._v(_vm._s(_vm.cost_SR))]),
+      _vm._v(" "),
+      _vm.se_module.refit_valid
+        ? [
+            _c("td", { staticClass: "br-column" }, [
+              _vm._v(_vm._s(_vm.refit_cost_BR))
+            ]),
+            _vm._v(" "),
+            _c("td", { staticClass: "sr-column" }, [
+              _vm._v(_vm._s(_vm.refit_cost_SR))
+            ])
+          ]
+        : _vm._e(),
       _vm._v(" "),
       _c("td", { staticClass: "power-cost-column" }, [
         _vm._v(_vm._s(_vm.power_cost))
@@ -21178,6 +21516,18 @@ var render = function() {
         _vm._v(_vm._s(_vm.se_subsystem.cost_SR.toFixed(2)))
       ]),
       _vm._v(" "),
+      _vm.se_subsystem.refit_valid
+        ? [
+            _c("td", { staticClass: "br-column" }, [
+              _vm._v(_vm._s(_vm.se_subsystem.refit_cost_BR.toFixed(2)))
+            ]),
+            _vm._v(" "),
+            _c("td", { staticClass: "sr-column" }, [
+              _vm._v(_vm._s(_vm.se_subsystem.refit_cost_SR.toFixed(2)))
+            ])
+          ]
+        : _vm._e(),
+      _vm._v(" "),
       _c("td", { staticClass: "power-cost-column" }, [
         _vm._v(_vm._s(_vm.se_subsystem.cost_power.toFixed(2)))
       ]),
@@ -21230,7 +21580,62 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "design-table" }, [
     _c("table", [
-      _vm._m(0),
+      _c("thead", { staticClass: "design-table-head" }, [
+        _c(
+          "tr",
+          { staticClass: "design-table-head-tr" },
+          [
+            _c("th"),
+            _vm._v(" "),
+            _c("th"),
+            _vm._v(" "),
+            _c("th"),
+            _vm._v(" "),
+            _c("th", [_vm._v("C")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("S")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("H")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("L")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("P")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("D")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("Wt (Int")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("Ext)")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("BR")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("SR")]),
+            _vm._v(" "),
+            _vm.se_design.refit_valid
+              ? [
+                  _c("th", [_vm._v("Refit BR")]),
+                  _vm._v(" "),
+                  _c("th", [_vm._v("Refit SR")])
+                ]
+              : _vm._e(),
+            _vm._v(" "),
+            _c("th", [_vm._v("Pwr Cost")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("Pwr Gen")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("O")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("E")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("T")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("Build Time")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("Year Available")])
+          ],
+          2
+        )
+      ]),
       _vm._v(" "),
       _c(
         "tbody",
@@ -21274,7 +21679,7 @@ var render = function() {
             ]
           }),
           _vm._v(" "),
-          _vm._m(1),
+          _vm._m(0),
           _vm._v(" "),
           _c("ModuleTr", { attrs: { se_module: _vm.se_design.module } })
         ],
@@ -21284,54 +21689,6 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", { staticClass: "design-table-head" }, [
-      _c("tr", { staticClass: "design-table-head-tr" }, [
-        _c("th"),
-        _vm._v(" "),
-        _c("th"),
-        _vm._v(" "),
-        _c("th"),
-        _vm._v(" "),
-        _c("th", [_vm._v("C")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("S")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("H")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("L")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("P")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("D")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Wt (Int")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Ext)")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("BR")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("SR")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Pwr Cost")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Pwr Gen")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("O")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("E")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("T")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Build Time")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Year Available")])
-      ])
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -21392,27 +21749,53 @@ var render = function() {
         : _vm._e()
     ]),
     _vm._v(" "),
-    _c("div", [
-      _c("span", [_vm._v(_vm._s(_vm.se_design.stats_raw.toFixed(2)))]),
-      _vm._v(" "),
-      _c("span", [_vm._v(" | ")]),
-      _vm._v(" "),
-      _c("span", [
-        _vm._v("[" + _vm._s(_vm.se_design.cost_BR_raw.toFixed(2)) + "]br")
-      ]),
-      _vm._v(" "),
-      _c("span", [
-        _vm._v("[" + _vm._s(_vm.se_design.cost_SR_raw.toFixed(2)) + "]sr")
-      ]),
-      _vm._v(" "),
-      _c("span", [_vm._v(" | ")]),
-      _vm._v(" "),
-      _c("span", [_vm._v(_vm._s(_vm.se_design.cost_crew_raw.toFixed(2)))]),
-      _vm._v(" "),
-      _c("span", [_vm._v(" | ")]),
-      _vm._v(" "),
-      _c("span", [_vm._v("[" + _vm._s(_vm.build_time) + "]years")])
-    ]),
+    _c(
+      "div",
+      [
+        _c("span", [_vm._v(_vm._s(_vm.se_design.stats_raw.toFixed(2)))]),
+        _vm._v(" "),
+        _c("span", [_vm._v(" | ")]),
+        _vm._v(" "),
+        _c("span", [
+          _vm._v("[" + _vm._s(_vm.se_design.cost_BR_raw.toFixed(2)) + "]br")
+        ]),
+        _vm._v(" "),
+        _c("span", [
+          _vm._v("[" + _vm._s(_vm.se_design.cost_SR_raw.toFixed(2)) + "]sr")
+        ]),
+        _vm._v(" "),
+        _vm.se_design.refit_valid
+          ? [
+              _c("span", [_vm._v(" | Refit ")]),
+              _vm._v(" "),
+              _c("span", [
+                _vm._v(
+                  "[" +
+                    _vm._s(_vm.se_design.refit_cost_BR_raw.toFixed(2)) +
+                    "]br"
+                )
+              ]),
+              _vm._v(" "),
+              _c("span", [
+                _vm._v(
+                  "[" +
+                    _vm._s(_vm.se_design.refit_cost_SR_raw.toFixed(2)) +
+                    "]sr"
+                )
+              ])
+            ]
+          : _vm._e(),
+        _vm._v(" "),
+        _c("span", [_vm._v(" | ")]),
+        _vm._v(" "),
+        _c("span", [_vm._v(_vm._s(_vm.se_design.cost_crew_raw.toFixed(2)))]),
+        _vm._v(" "),
+        _c("span", [_vm._v(" | ")]),
+        _vm._v(" "),
+        _c("span", [_vm._v("[" + _vm._s(_vm.build_time) + "]years")])
+      ],
+      2
+    ),
     _vm._v(" "),
     _c(
       "div",
@@ -21423,8 +21806,9 @@ var render = function() {
             staticClass: "design-power-summary",
             class: {
               "has-error":
+                !_vm.se_design.omit_validation &&
                 _vm.se_design.cost_power_raw >
-                _vm.se_design.power_generation_raw
+                  _vm.se_design.power_generation_raw
             }
           },
           [
@@ -21444,6 +21828,7 @@ var render = function() {
             staticClass: "design-weight-summary",
             class: {
               "has-error":
+                !_vm.se_design.omit_validation &&
                 _vm.se_design.weight_internal > _vm.se_design.frame_max_size_raw
             }
           },
@@ -21464,7 +21849,10 @@ var render = function() {
             {
               key: ss.name,
               staticClass: "subsystem-weight-summary",
-              class: { "has-error": ss.weight_internal > ss.weight_cap }
+              class: {
+                "has-error":
+                  !ss.omit_validation && ss.weight_internal > ss.weight_cap
+              }
             },
             [
               _vm._v(
@@ -21559,6 +21947,18 @@ var render = function() {
       _c("td", { staticClass: "sr-column" }, [
         _vm._v(_vm._s(_vm.se_design.cost_SR))
       ]),
+      _vm._v(" "),
+      _vm.se_design.refit_valid
+        ? [
+            _c("td", { staticClass: "br-column" }, [
+              _vm._v(_vm._s(_vm.se_design.refit_cost_BR))
+            ]),
+            _vm._v(" "),
+            _c("td", { staticClass: "sr-column" }, [
+              _vm._v(_vm._s(_vm.se_design.refit_cost_SR))
+            ])
+          ]
+        : _vm._e(),
       _vm._v(" "),
       _c(
         "td",
@@ -32058,6 +32458,46 @@ if (false) {}
 
 /***/ }),
 
+/***/ "./src/lib/lang-utils.js":
+/*!*******************************!*\
+  !*** ./src/lib/lang-utils.js ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.zipByAndWith = undefined;
+
+var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function zipByAndWith(array1, array2, iteratee, combiner) {
+	var keyValMap1 = new Map(array1.map(function (x, index, array) {
+		return [iteratee(x, index, array), x];
+	})); // similar to _.keyBy except iteratee accepts all args passed to .map's callback
+	var keyValMap2 = new Map(array2.map(function (x, index, array) {
+		return [iteratee(x, index, array), x];
+	}));
+	var keys = _lodash2.default.union(array1.map(iteratee), array2.map(iteratee));
+	return _lodash2.default.zipWith(keys.map(function (key) {
+		return keyValMap1.get(key);
+	}), keys.map(function (key) {
+		return keyValMap2.get(key);
+	}), combiner);
+}
+
+exports.zipByAndWith = zipByAndWith;
+
+/***/ }),
+
 /***/ "./src/lib/namedvector.js":
 /*!********************************!*\
   !*** ./src/lib/namedvector.js ***!
@@ -32214,6 +32654,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _uiFunctions = __webpack_require__(/*! @/lib/ui-functions.js */ "./src/lib/ui-functions.js");
 
+var _langUtils = __webpack_require__(/*! @/lib/lang-utils.js */ "./src/lib/lang-utils.js");
+
 var _namedvector = __webpack_require__(/*! @/lib/namedvector.js */ "./src/lib/namedvector.js");
 
 var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
@@ -32255,6 +32697,10 @@ var SR_COST_ROUND_MAP = {
 	'Cruiser': 5,
 	'Explorer': 10
 };
+
+var REFIT_BR_COST_ROUND = 5;
+
+var REFIT_SR_COST_ROUND = 5;
 
 // =IF(DK$18 = 1, "Frigate", IF(DK$18 = 2, "Cruiser", "Explorer"))
 var WEIGHT_CLASS_MAP = {
@@ -33229,6 +33675,102 @@ var DesignComponent = function () {
 				return 1.0;
 			}
 		}
+	}], [{
+		key: 'defaults',
+		value: function defaults(comp1, comp2) {
+			if (!comp1 || !comp2) {
+				var comp = comp1 || comp2;
+				var default_comp = new DesignComponent(comp.db, comp.subsystem, {
+					'Name': comp.name
+				});
+				return [comp1 || default_comp, comp2 || default_comp];
+			} else {
+				return [comp1, comp2];
+			}
+		}
+	}, {
+		key: 'refit',
+		value: function refit(comp, comp_base, refit_valid) {
+			var _DesignComponent$defa = DesignComponent.defaults(comp, comp_base);
+
+			var _DesignComponent$defa2 = _slicedToArray(_DesignComponent$defa, 2);
+
+			comp = _DesignComponent$defa2[0];
+			comp_base = _DesignComponent$defa2[1];
+
+
+			function refit_cost(cost_prop) {
+				var cost = comp[cost_prop];
+				var base_cost = comp_base[cost_prop];
+				if (comp.part === comp_base.part) {
+					if (cost >= base_cost) {
+						return cost - base_cost;
+					} else {
+						return (cost - base_cost) / 2;
+					}
+				} else {
+					return cost - base_cost / 2;
+				}
+			}
+
+			var refit_extensions = {
+				refit_valid: refit_valid,
+				compare_base: comp_base,
+
+				get refit_cost_BR() {
+					return refit_cost('cost_BR');
+				},
+
+				get refit_cost_SR() {
+					return refit_cost('cost_SR');
+				}
+			};
+
+			return new Proxy(refit_extensions, {
+				get: function get(target, prop) {
+					if (prop in target && prop !== 'constructor') {
+						return target[prop];
+					}
+					return comp[prop];
+				},
+				set: function set(target, prop, value) {
+					return Reflect.set(comp, prop, value);
+				}
+			});
+		}
+	}, {
+		key: 'compare',
+		value: function compare(comp, comp_base) {
+			var _DesignComponent$defa3 = DesignComponent.defaults(comp, comp_base);
+
+			var _DesignComponent$defa4 = _slicedToArray(_DesignComponent$defa3, 2);
+
+			comp = _DesignComponent$defa4[0];
+			comp_base = _DesignComponent$defa4[1];
+
+
+			var compare_extensions = {
+				omit_validation: true,
+				compare_base: comp_base,
+
+				// Don't do compare logic on quantity
+				get quantity() {
+					return comp.quantity;
+				}
+			};
+
+			return new Proxy(compare_extensions, {
+				get: function get(target, prop) {
+					if (prop in target && prop !== 'constructor') {
+						return target[prop];
+					}
+					return Design.generic_base_compare(comp[prop], comp_base[prop]);
+				},
+				set: function set(target, prop, value) {
+					return Reflect.set(comp, prop, value);
+				}
+			});
+		}
 	}]);
 
 	return DesignComponent;
@@ -33663,6 +34205,127 @@ var DesignSubsystem = function () {
 			// if frame, then look up "tac mod" field in frames list
 			return this.frame_attribute(SUBSYSTEM_NAME_MAP[this.name]);
 		}
+	}], [{
+		key: 'defaults',
+		value: function defaults(subsystem1, subsystem2) {
+			if (!subsystem1 || !subsystem2) {
+				var subsystem = subsystem1 || subsystem2;
+				var default_subsystem = new DesignSubsystem(subsystem.db, subsystem.design, {
+					'Name': subsystem.name,
+					'Settings': subsystem.settings.map(function (setting) {
+						return { 'Name': setting['Name'] };
+					}),
+					'Components': subsystem.components.map(function (comp) {
+						return DesignComponent.defaults(null, comp)[0];
+					})
+				});
+				return [subsystem1 || default_subsystem, subsystem2 || default_subsystem];
+			} else {
+				return [subsystem1, subsystem2];
+			}
+		}
+	}, {
+		key: 'refit',
+		value: function refit(subsystem, subsystem_base, refit_valid) {
+			// don't assume order or existence of each component
+			var _DesignSubsystem$defa = DesignSubsystem.defaults(subsystem, subsystem_base);
+
+			var _DesignSubsystem$defa2 = _slicedToArray(_DesignSubsystem$defa, 2);
+
+			subsystem = _DesignSubsystem$defa2[0];
+			subsystem_base = _DesignSubsystem$defa2[1];
+			var components = (0, _langUtils.zipByAndWith)(subsystem.components, subsystem_base.components, function (comp) {
+				return comp.name;
+			}, function (comp, comp_base) {
+				return DesignComponent.refit(comp, comp_base, refit_valid);
+			});
+			// also don't assume order or existence of each setting
+			var settings = (0, _langUtils.zipByAndWith)(subsystem.settings, subsystem_base.settings, function (setting) {
+				return setting['Name'];
+			}, function (setting, setting_base) {
+				setting.compare_base = setting_base;
+				return setting;
+			});
+
+			function refit_cost(cost_prop) {
+				return components.filter(function (comp) {
+					return comp.is_loaded;
+				}).map(function (comp) {
+					return comp['refit_' + cost_prop];
+				}).reduce(function (sum, value) {
+					return sum + value;
+				}, 0);
+			}
+
+			var refit_extensions = {
+				refit_valid: refit_valid,
+				compare_base: subsystem_base,
+				components: components,
+				settings: settings,
+
+				get refit_cost_BR() {
+					return refit_cost('cost_BR');
+				},
+
+				get refit_cost_SR() {
+					return refit_cost('cost_SR');
+				}
+			};
+
+			return new Proxy(refit_extensions, {
+				get: function get(target, prop) {
+					if (prop in target && prop !== 'constructor') {
+						return target[prop];
+					}
+					return subsystem[prop];
+				},
+				set: function set(target, prop, value) {
+					return Reflect.set(subsystem, prop, value);
+				}
+			});
+		}
+	}, {
+		key: 'compare',
+		value: function compare(subsystem, subsystem_base) {
+			// don't assume order or existence of each component
+			var _DesignSubsystem$defa3 = DesignSubsystem.defaults(subsystem, subsystem_base);
+
+			var _DesignSubsystem$defa4 = _slicedToArray(_DesignSubsystem$defa3, 2);
+
+			subsystem = _DesignSubsystem$defa4[0];
+			subsystem_base = _DesignSubsystem$defa4[1];
+			var components = (0, _langUtils.zipByAndWith)(subsystem.components, subsystem_base.components, function (comp) {
+				return comp.name;
+			}, function (comp, comp_base) {
+				return DesignComponent.compare(comp, comp_base);
+			});
+			// also don't assume order or existence of each setting
+			var settings = (0, _langUtils.zipByAndWith)(subsystem.settings, subsystem_base.settings, function (setting) {
+				return setting['Name'];
+			}, function (setting, setting_base) {
+				setting.compare_base = setting_base;
+				return setting;
+			});
+
+			var compare_extensions = {
+				omit_validation: true,
+				compare_base: subsystem_base,
+				components: components,
+				settings: settings
+			};
+
+			return new Proxy(compare_extensions, {
+				get: function get(target, prop) {
+					if (prop in target && prop !== 'constructor') {
+						return target[prop];
+					}
+					return Design.generic_base_compare(subsystem[prop], subsystem_base[prop]);
+				},
+				set: function set(target, prop, value) {
+					return Reflect.set(subsystem, prop, value);
+				}
+			});
+		}
 	}]);
 
 	return DesignSubsystem;
@@ -33837,6 +34500,61 @@ var Module = function () {
 			// $CV88 = DL88 = module weight cap? = module weight cap from "Weight Cap" element of module
 			return this.attribute('Weight Cap');
 		}
+	}], [{
+		key: 'refit',
+		value: function refit(module, module_base, refit_valid) {
+			function refit_cost(cost_prop) {
+				if (module.module_type === module_base.module_type && module.module_variant === module_base.module_variant) {
+					return 0;
+				}
+				return module[cost_prop] - module_base[cost_prop] / 2;
+			}
+
+			var refit_extensions = {
+				refit_valid: refit_valid,
+				compare_base: module_base,
+
+				get refit_cost_BR() {
+					return refit_cost('cost_BR');
+				},
+
+				get refit_cost_SR() {
+					return refit_cost('cost_SR');
+				}
+			};
+
+			return new Proxy(refit_extensions, {
+				get: function get(target, prop) {
+					if (prop in target && prop !== 'constructor') {
+						return target[prop];
+					}
+					return module[prop];
+				},
+				set: function set(target, prop, value) {
+					return Reflect.set(module, prop, value);
+				}
+			});
+		}
+	}, {
+		key: 'compare',
+		value: function compare(module, module_base) {
+			var compare_extensions = {
+				omit_validation: true,
+				compare_base: module_base
+			};
+
+			return new Proxy(compare_extensions, {
+				get: function get(target, prop) {
+					if (prop in target && prop !== 'constructor') {
+						return target[prop];
+					}
+					return Design.generic_base_compare(module[prop], module_base[prop]);
+				},
+				set: function set(target, prop, value) {
+					return Reflect.set(module, prop, value);
+				}
+			});
+		}
 	}]);
 
 	return Module;
@@ -33921,6 +34639,13 @@ var Design = function () {
 			}) && this.module.is_loaded;
 		}
 	}, {
+		key: 'frame_name_map',
+		get: function get() {
+			return _lodash2.default.fromPairs([['Principal', this.json['Principal Frame']]].concat(_toConsumableArray(this.json['Subsystems'].map(function (ss_json) {
+				return [ss_json['Name'], ss_json['Sub-Frame']];
+			}))));
+		}
+	}, {
 		key: 'pretty_name',
 		get: function get() {
 			return this.name + ' (' + this.timestamp.toLocaleString() + ')' + ' [' + this.pretty_name_stats + ']';
@@ -33943,6 +34668,14 @@ var Design = function () {
 		key: 'parts_list_pretty_name',
 		get: function get() {
 			return this.parts_list_name + ' (' + this.parts_list_timestamp.toLocaleString() + ')';
+		}
+	}, {
+		key: 'principal_frame',
+		get: function get() {
+			return this.json['Principal Frame'];
+		},
+		set: function set(value) {
+			this.json['Principal Frame'] = value;
 		}
 	}, {
 		key: 'tech_year_frame',
@@ -34490,6 +35223,130 @@ var Design = function () {
 				return design.matches_pretty_name(pretty_name);
 			};
 		}
+	}, {
+		key: 'refit_valid',
+		value: function refit_valid(design, design_base) {
+			return _lodash2.default.isEqual(design.frame_name_map, design_base.frame_name_map);
+		}
+	}, {
+		key: 'refit',
+		value: function refit(design, design_base) {
+			var refit_valid = Design.refit_valid(design, design_base);
+			// don't assume existence of each subsystem
+			var subsystems = (0, _langUtils.zipByAndWith)(design.subsystems, design_base.subsystems, function (ss) {
+				return ss.name;
+			}, function (ss, ss_base) {
+				return DesignSubsystem.refit(ss, ss_base, refit_valid);
+			});
+			var module = Module.refit(design.module, design_base.module, refit_valid);
+
+			function refit_cost(cost_prop) {
+				var ss_cost = subsystems.filter(function (ss) {
+					return ss.is_loaded;
+				}).map(function (ss) {
+					return ss['refit_' + cost_prop];
+				}).reduce(function (sum, value) {
+					return sum + value;
+				}, 0);
+				return ss_cost + module['refit_' + cost_prop];
+			}
+
+			var refit_extensions = {
+				refit_valid: refit_valid,
+				compare_base: design_base,
+				subsystems: subsystems,
+				module: module,
+
+				get refit_cost_BR() {
+					return Math.ceil(this.refit_cost_BR_raw / REFIT_BR_COST_ROUND) * REFIT_BR_COST_ROUND;
+				},
+
+				get refit_cost_BR_raw() {
+					return refit_cost('cost_BR');
+				},
+
+				get refit_cost_SR() {
+					return Math.ceil(this.refit_cost_SR_raw / REFIT_SR_COST_ROUND) * REFIT_SR_COST_ROUND;
+				},
+
+				get refit_cost_SR_raw() {
+					return refit_cost('cost_SR');
+				}
+			};
+
+			return new Proxy(refit_extensions, {
+				get: function get(target, prop) {
+					if (prop in target && prop !== 'constructor') {
+						return target[prop];
+					}
+					return design[prop];
+				},
+				set: function set(target, prop, value) {
+					return Reflect.set(design, prop, value);
+				}
+			});
+		}
+	}, {
+		key: 'compare',
+		value: function compare(design, design_base) {
+			// don't assume existence of each subsystem
+			var subsystems = (0, _langUtils.zipByAndWith)(design.subsystems, design_base.subsystems, function (ss) {
+				return ss.name;
+			}, function (ss, ss_base) {
+				return DesignSubsystem.compare(ss, ss_base);
+			});
+			var module = Module.compare(design.module, design_base.module);
+
+			var compare_extensions = {
+				omit_validation: true,
+				compare_base: design_base,
+				subsystems: subsystems,
+				module: module
+			};
+
+			return new Proxy(compare_extensions, {
+				get: function get(target, prop) {
+					if (prop in target && prop !== 'constructor') {
+						return target[prop];
+					}
+					return Design.generic_base_compare(design[prop], design_base[prop]);
+				},
+				set: function set(target, prop, value) {
+					return Reflect.set(design, prop, value);
+				}
+			});
+		}
+	}, {
+		key: 'generic_base_compare',
+		value: function generic_base_compare(v1, v2) {
+			if (v1 === undefined && v2 === undefined) {
+				return undefined;
+			}
+			if (_lodash2.default.isNil(v1) && _lodash2.default.isNil(v2)) {
+				return null;
+			}
+			if (_lodash2.default.isNil(v1)) {
+				if (_lodash2.default.isNumber(v2)) {
+					return -v2;
+				}
+				if (v2 instanceof _namedvector.NamedVector) {
+					return v2.mult(-1);
+				}
+				return v2;
+			}
+			if (_lodash2.default.isNil(v2)) {
+				return v1;
+			}
+			if (_lodash2.default.isNumber(v1)) {
+				return v1 - v2;
+			}
+			if (v1 instanceof _namedvector.NamedVector) {
+				return v1.op(function (a, b) {
+					return a - b;
+				}, v2);
+			}
+			return v1;
+		}
 	}]);
 
 	return Design;
@@ -34727,8 +35584,14 @@ if (hash) {
 var store = new _vuex2.default.Store({
 	state: {
 		design_json: design_json,
+		other_design_json: null, // TODO: allow url to include a base design for refits?
+
 		parts_list: _canon_parts_list2.default,
 		canon_parts_list: _canon_parts_list2.default,
+
+		design_mode_enabled: false,
+		design_mode: null,
+
 		undo: {
 			current: -1,
 			history: []
@@ -34736,7 +35599,17 @@ var store = new _vuex2.default.Store({
 	},
 	getters: {
 		se_design: function se_design(state, getters) {
-			return new ShipEngine.Design(getters.se_db, state.design_json);
+			var design = new ShipEngine.Design(getters.se_db, state.design_json);
+			if (state.design_mode_enabled && state.other_design_json !== null) {
+				var other_design = new ShipEngine.Design(getters.se_db, state.other_design_json);
+				if (state.design_mode === 'refit') {
+					return ShipEngine.Design.refit(design, other_design);
+				}
+				if (state.design_mode === 'compare') {
+					return ShipEngine.Design.compare(design, other_design);
+				}
+			}
+			return design;
 		},
 		se_db: function se_db(state, getters) {
 			return new ShipEngine.DB(state.parts_list);
@@ -34994,6 +35867,15 @@ var store = new _vuex2.default.Store({
 		},
 		set_design_json_redo: function set_design_json_redo(state, payload) {
 			state.design_json = payload.new_data;
+		},
+		set_other_design_json: function set_other_design_json(state, payload) {
+			state.other_design_json = payload;
+		},
+		set_design_mode_enabled: function set_design_mode_enabled(state, payload) {
+			state.design_mode_enabled = payload;
+		},
+		set_design_mode: function set_design_mode(state, payload) {
+			state.design_mode = payload;
 		}
 	}
 });
