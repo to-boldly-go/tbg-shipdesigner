@@ -1,6 +1,8 @@
 language: node_js
 node_js:
   - "node"
+install:
+  - yarn install --ignore-engines # workaround for indirect dep upath@1.0.4 compat issue with node v10 (https://github.com/anodynos/upath/issues/14)
 script:
   - yarn test
   - yarn run lint
