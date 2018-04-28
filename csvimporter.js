@@ -5832,7 +5832,7 @@ function toComment(sourceMap) {
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.5';
+  var VERSION = '4.17.10';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -6256,6 +6256,14 @@ function toComment(sourceMap) {
   /** Used to access faster Node.js helpers. */
   var nodeUtil = (function() {
     try {
+      // Use `util.types` for Node.js 10+.
+      var types = freeModule && freeModule.require && freeModule.require('util').types;
+
+      if (types) {
+        return types;
+      }
+
+      // Legacy `process.binding('util')` for Node.js < 10.
       return freeProcess && freeProcess.binding && freeProcess.binding('util');
     } catch (e) {}
   }());
@@ -22919,14 +22927,15 @@ function toComment(sourceMap) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*@license
 	Papa Parse
-	v4.3.7
+	v4.4.0
 	https://github.com/mholt/PapaParse
 	License: MIT
 */
 (function(root, factory)
 {
+	/* globals define */
 	if (true)
 	{
 		// AMD. Register as an anonymous module.
@@ -22940,7 +22949,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 {
 	'use strict';
 
-	var global = (function () {
+	var global = (function() {
 		// alternative method, similar to `Function('return this')()`
 		// but without using `eval` (which is disabled when
 		// using Content Security Policy).
@@ -23075,7 +23084,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 				queue.splice(0, 1);
 				parseNextFile();
 			}
-		}
+		};
 	}
 
 
@@ -23095,7 +23104,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 		}
 		else
 		{
-			document.addEventListener('DOMContentLoaded', function () {
+			document.addEventListener('DOMContentLoaded', function() {
 				LOADED_SYNC = true;
 			}, true);
 		}
@@ -23164,9 +23173,6 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 	function JsonToCsv(_input, _config)
 	{
-		var _output = '';
-		var _fields = [];
-
 		// Default configuration
 
 		/** whether to surround every datum with quotes */
@@ -23210,8 +23216,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 				if (!_input.fields)
 					_input.fields =  _input.data[0] instanceof Array
-									? _input.fields
-									: objectKeys(_input.data[0]);
+						? _input.fields
+						: objectKeys(_input.data[0]);
 
 				if (!(_input.data[0] instanceof Array) && typeof _input.data[0] !== 'object')
 					_input.data = [_input.data];	// handles input like [1,2,3] or ['asdf']
@@ -23314,7 +23320,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 			if (typeof str === 'undefined' || str === null)
 				return '';
 
-			str = str.toString().replace(quoteCharRegex, _quoteChar+_quoteChar);
+			str = str.toString().replace(quoteCharRegex, _quoteChar + _quoteChar);
 
 			var needsQuotes = (typeof _quotes === 'boolean' && _quotes)
 							|| (_quotes instanceof Array && _quotes[col])
@@ -23339,8 +23345,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 	function ChunkStreamer(config)
 	{
 		this._handle = null;
-		this._paused = false;
 		this._finished = false;
+		this._completed = false;
 		this._input = null;
 		this._baseIndex = 0;
 		this._partialLine = '';
@@ -23355,7 +23361,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 		};
 		replaceConfig.call(this, config);
 
-		this.parseChunk = function(chunk)
+		this.parseChunk = function(chunk, isFakeChunk)
 		{
 			// First chunk pre-processing
 			if (this.isFirstChunk && isFunction(this._config.beforeFirstChunk))
@@ -23396,10 +23402,10 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 					finished: finishedIncludingPreview
 				});
 			}
-			else if (isFunction(this._config.chunk))
+			else if (isFunction(this._config.chunk) && !isFakeChunk)
 			{
 				this._config.chunk(results, this._handle);
-				if (this._paused)
+				if (this._handle.paused() || this._handle.aborted())
 					return;
 				results = undefined;
 				this._completeResults = undefined;
@@ -23411,8 +23417,10 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 				this._completeResults.meta = results.meta;
 			}
 
-			if (finishedIncludingPreview && isFunction(this._config.complete) && (!results || !results.meta.aborted))
+			if (!this._completed && finishedIncludingPreview && isFunction(this._config.complete) && (!results || !results.meta.aborted)) {
 				this._config.complete(this._completeResults, this._input);
+				this._completed = true;
+			}
 
 			if (!finishedIncludingPreview && (!results || !results.meta.paused))
 				this._nextChunk();
@@ -23515,7 +23523,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 			if (this._config.chunkSize)
 			{
 				var end = this._start + this._config.chunkSize - 1;	// minus one because byte range is inclusive
-				xhr.setRequestHeader('Range', 'bytes='+this._start+'-'+end);
+				xhr.setRequestHeader('Range', 'bytes=' + this._start + '-' + end);
 				xhr.setRequestHeader('If-None-Match', 'webkit-no-cache'); // https://bugs.webkit.org/show_bug.cgi?id=82672
 			}
 
@@ -23530,11 +23538,11 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 				this._chunkError();
 			else
 				this._start += this._config.chunkSize;
-		}
+		};
 
 		this._chunkLoaded = function()
 		{
-			if (xhr.readyState != 4)
+			if (xhr.readyState !== 4)
 				return;
 
 			if (xhr.status < 200 || xhr.status >= 400)
@@ -23545,20 +23553,20 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 			this._finished = !this._config.chunkSize || this._start > getFileSize(xhr);
 			this.parseChunk(xhr.responseText);
-		}
+		};
 
 		this._chunkError = function(errorMessage)
 		{
 			var errorText = xhr.statusText || errorMessage;
-			this._sendError(errorText);
-		}
+			this._sendError(new Error(errorText));
+		};
 
 		function getFileSize(xhr)
 		{
 			var contentRange = xhr.getResponseHeader('Content-Range');
 			if (contentRange === null) { // no content range, then finish!
-					return -1;
-					}
+				return -1;
+			}
 			return parseInt(contentRange.substr(contentRange.lastIndexOf('/') + 1));
 		}
 	}
@@ -23600,7 +23608,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 		{
 			if (!this._finished && (!this._config.preview || this._rowCount < this._config.preview))
 				this._readChunk();
-		}
+		};
 
 		this._readChunk = function()
 		{
@@ -23613,7 +23621,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 			var txt = reader.readAsText(input, this._config.encoding);
 			if (!usingAsyncReader)
 				this._chunkLoaded({ target: { result: txt } });	// mimic the async signature
-		}
+		};
 
 		this._chunkLoaded = function(event)
 		{
@@ -23621,12 +23629,12 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 			this._start += this._config.chunkSize;
 			this._finished = !this._config.chunkSize || this._start >= this._input.size;
 			this.parseChunk(event.target.result);
-		}
+		};
 
 		this._chunkError = function()
 		{
-			this._sendError(reader.error.message);
-		}
+			this._sendError(reader.error);
+		};
 
 	}
 	FileStreamer.prototype = Object.create(ChunkStreamer.prototype);
@@ -23638,14 +23646,12 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 		config = config || {};
 		ChunkStreamer.call(this, config);
 
-		var string;
 		var remaining;
 		this.stream = function(s)
 		{
-			string = s;
 			remaining = s;
 			return this._nextChunk();
-		}
+		};
 		this._nextChunk = function()
 		{
 			if (this._finished) return;
@@ -23654,7 +23660,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 			remaining = size ? remaining.substr(size) : '';
 			this._finished = !remaining;
 			return this.parseChunk(chunk);
-		}
+		};
 	}
 	StringStreamer.prototype = Object.create(StringStreamer.prototype);
 	StringStreamer.prototype.constructor = StringStreamer;
@@ -23668,6 +23674,19 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 		var queue = [];
 		var parseOnData = true;
+		var streamHasEnded = false;
+
+		this.pause = function()
+		{
+			ChunkStreamer.prototype.pause.apply(this, arguments);
+			this._input.pause();
+		};
+
+		this.resume = function()
+		{
+			ChunkStreamer.prototype.resume.apply(this, arguments);
+			this._input.resume();
+		};
 
 		this.stream = function(stream)
 		{
@@ -23676,10 +23695,18 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 			this._input.on('data', this._streamData);
 			this._input.on('end', this._streamEnd);
 			this._input.on('error', this._streamError);
-		}
+		};
+
+		this._checkIsFinished = function()
+		{
+			if (streamHasEnded && queue.length === 1) {
+				this._finished = true;
+			}
+		};
 
 		this._nextChunk = function()
 		{
+			this._checkIsFinished();
 			if (queue.length)
 			{
 				this.parseChunk(queue.shift());
@@ -23688,7 +23715,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 			{
 				parseOnData = true;
 			}
-		}
+		};
 
 		this._streamData = bindFunction(function(chunk)
 		{
@@ -23699,6 +23726,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 				if (parseOnData)
 				{
 					parseOnData = false;
+					this._checkIsFinished();
 					this.parseChunk(queue.shift());
 				}
 			}
@@ -23711,13 +23739,13 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 		this._streamError = bindFunction(function(error)
 		{
 			this._streamCleanUp();
-			this._sendError(error.message);
+			this._sendError(error);
 		}, this);
 
 		this._streamEnd = bindFunction(function()
 		{
 			this._streamCleanUp();
-			this._finished = true;
+			streamHasEnded = true;
 			this._streamData('');
 		}, this);
 
@@ -23833,10 +23861,10 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 		this.resume = function()
 		{
 			_paused = false;
-			self.streamer.parseChunk(_input);
+			self.streamer.parseChunk(_input, true);
 		};
 
-		this.aborted = function ()
+		this.aborted = function()
 		{
 			return _aborted;
 		};
@@ -23855,7 +23883,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 		{
 			if (_results && _delimiterError)
 			{
-				addError('Delimiter', 'UndetectableDelimiter', 'Unable to auto-detect delimiting character; defaulted to \''+Papa.DefaultDelimiter+'\'');
+				addError('Delimiter', 'UndetectableDelimiter', 'Unable to auto-detect delimiting character; defaulted to \'' + Papa.DefaultDelimiter + '\'');
 				_delimiterError = false;
 			}
 
@@ -23883,7 +23911,15 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 				return;
 			for (var i = 0; needsHeaderRow() && i < _results.data.length; i++)
 				for (var j = 0; j < _results.data[i].length; j++)
-					_fields.push(_results.data[i][j]);
+				{
+					var header = _results.data[i][j];
+
+					if (_config.trimHeaders) {
+						header = header.trim();
+					}
+
+					_fields.push(header);
+				}
 			_results.data.splice(0, 1);
 		}
 
@@ -23892,7 +23928,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 			if (_config.dynamicTypingFunction && _config.dynamicTyping[field] === undefined) {
 				_config.dynamicTyping[field] = _config.dynamicTypingFunction(field);
 			}
-			return (_config.dynamicTyping[field] || _config.dynamicTyping) === true
+			return (_config.dynamicTyping[field] || _config.dynamicTyping) === true;
 		}
 
 		function parseDynamic(field, value)
@@ -23903,8 +23939,12 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 					return true;
 				else if (value === 'false' || value === 'FALSE')
 					return false;
-				else
-					return tryParseFloat(value);
+				else if(FLOAT.test(value)) {
+					return parseFloat(value);
+				}
+				else {
+					return (value === '' ? null : value);
+				}
 			}
 			return value;
 		}
@@ -23918,7 +23958,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 			{
 				var row = _config.header ? {} : [];
 
-				for (var j = 0; j < _results.data[i].length; j++)
+				var j;
+				for (j = 0; j < _results.data[i].length; j++)
 				{
 					var field = j;
 					var value = _results.data[i][j];
@@ -23973,8 +24014,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 				for (var j = 0; j < preview.data.length; j++)
 				{
 					if (skipEmptyLines && preview.data[j].length === 1 && preview.data[j][0].length === 0) {
-						emptyLinesCount++
-						continue
+						emptyLinesCount++;
+						continue;
 					}
 					var fieldCount = preview.data[j].length;
 					avgFieldCount += fieldCount;
@@ -24007,12 +24048,12 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 			return {
 				successful: !!bestDelim,
 				bestDelimiter: bestDelim
-			}
+			};
 		}
 
 		function guessLineEndings(input)
 		{
-			input = input.substr(0, 1024*1024);	// max length 1 MB
+			input = input.substr(0, 1024 * 1024);	// max length 1 MB
 
 			var r = input.split('\r');
 
@@ -24031,12 +24072,6 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 			}
 
 			return numWithN >= r.length / 2 ? '\r\n' : '\r';
-		}
-
-		function tryParseFloat(val)
-		{
-			var isNumber = FLOAT.test(val);
-			return isNumber ? parseFloat(val) : val;
 		}
 
 		function addError(type, code, msg, row)
@@ -24065,11 +24100,16 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 		var step = config.step;
 		var preview = config.preview;
 		var fastMode = config.fastMode;
+		var quoteChar;
 		/** Allows for no quoteChar by setting quoteChar to undefined in config */
-		if (config.quoteChar === undefined){
-			var quoteChar = '"';
+		if (config.quoteChar === undefined) {
+			quoteChar = '"';
 		} else {
-			var quoteChar = config.quoteChar;
+			quoteChar = config.quoteChar;
+		}
+		var escapeChar = quoteChar;
+		if (config.escapeChar !== undefined) {
+			escapeChar = config.escapeChar;
 		}
 
 		// Delimiter must be valid
@@ -24087,7 +24127,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 			comments = false;
 
 		// Newline must be valid: \r, \n, or \r\n
-		if (newline != '\n' && newline != '\r' && newline != '\r\n')
+		if (newline !== '\n' && newline !== '\r' && newline !== '\r\n')
 			newline = '\n';
 
 		// We're gonna need these at the Parser scope
@@ -24120,7 +24160,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 				var rows = input.split(newline);
 				for (var i = 0; i < rows.length; i++)
 				{
-					var row = rows[i];
+					row = rows[i];
 					cursor += row.length;
 					if (i !== rows.length - 1)
 						cursor += newline.length;
@@ -24149,7 +24189,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 			var nextDelim = input.indexOf(delim, cursor);
 			var nextNewline = input.indexOf(newline, cursor);
-			var quoteCharRegex = new RegExp(quoteChar+quoteChar, 'g');
+			var quoteCharRegex = new RegExp(escapeChar.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&') + quoteChar, 'g');
+			var quoteSearch;
 
 			// Parser loop
 			for (;;)
@@ -24158,7 +24199,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 				if (input[cursor] === quoteChar)
 				{
 					// Start our search for the closing quote where the cursor is
-					var quoteSearch = cursor;
+					quoteSearch = cursor;
 
 					// Skip the opening quote
 					cursor++;
@@ -24166,7 +24207,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 					for (;;)
 					{
 						// Find closing quote
-						var quoteSearch = input.indexOf(quoteChar, quoteSearch+1);
+						quoteSearch = input.indexOf(quoteChar, quoteSearch + 1);
 
 						//No other quotes are found - no other delimiters
 						if (quoteSearch === -1)
@@ -24185,34 +24226,45 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 						}
 
 						// Closing quote at EOF
-						if (quoteSearch === inputLen-1)
+						if (quoteSearch === inputLen - 1)
 						{
 							var value = input.substring(cursor, quoteSearch).replace(quoteCharRegex, quoteChar);
 							return finish(value);
 						}
 
 						// If this quote is escaped, it's part of the data; skip it
-						if (input[quoteSearch+1] === quoteChar)
+						// If the quote character is the escape character, then check if the next character is the escape character
+						if (quoteChar === escapeChar &&  input[quoteSearch + 1] === escapeChar)
 						{
 							quoteSearch++;
 							continue;
 						}
 
-						// Closing quote followed by delimiter
-						if (input[quoteSearch+1] === delim)
+						// If the quote character is not the escape character, then check if the previous character was the escape character
+						if (quoteChar !== escapeChar && quoteSearch !== 0 && input[quoteSearch - 1] === escapeChar)
+						{
+							continue;
+						}
+
+						var spacesBetweenQuoteAndDelimiter = extraSpaces(nextDelim);
+
+						// Closing quote followed by delimiter or 'unnecessary steps + delimiter'
+						if (input[quoteSearch + 1 + spacesBetweenQuoteAndDelimiter] === delim)
 						{
 							row.push(input.substring(cursor, quoteSearch).replace(quoteCharRegex, quoteChar));
-							cursor = quoteSearch + 1 + delimLen;
+							cursor = quoteSearch + 1 + spacesBetweenQuoteAndDelimiter + delimLen;
 							nextDelim = input.indexOf(delim, cursor);
 							nextNewline = input.indexOf(newline, cursor);
 							break;
 						}
 
-						// Closing quote followed by newline
-						if (input.substr(quoteSearch+1, newlineLen) === newline)
+						var spacesBetweenQuoteAndNewLine = extraSpaces(nextNewline);
+
+						// Closing quote followed by newline or 'unnecessary spaces + newLine'
+						if (input.substr(quoteSearch + 1 + spacesBetweenQuoteAndNewLine, newlineLen) === newline)
 						{
 							row.push(input.substring(cursor, quoteSearch).replace(quoteCharRegex, quoteChar));
-							saveRow(quoteSearch + 1 + newlineLen);
+							saveRow(quoteSearch + 1 + spacesBetweenQuoteAndNewLine + newlineLen);
 							nextDelim = input.indexOf(delim, cursor);	// because we may have skipped the nextDelim in the quoted field
 
 							if (stepIsFunction)
@@ -24299,6 +24351,21 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 			}
 
 			/**
+             * checks if there are extra spaces after closing quote and given index without any text
+             * if Yes, returns the number of spaces
+             */
+			function extraSpaces(index) {
+				var spaceLength = 0;
+				if (index !== -1) {
+					var textBetweenClosingQuoteAndIndex = input.substring(quoteSearch + 1, index);
+					if (textBetweenClosingQuoteAndIndex && textBetweenClosingQuoteAndIndex.trim() === '') {
+						spaceLength = textBetweenClosingQuoteAndIndex.length;
+					}
+				}
+				return spaceLength;
+			}
+
+			/**
 			 * Appends the remaining input from cursor to the end into
 			 * row, saves the row, calls step, and returns the results.
 			 */
@@ -24350,7 +24417,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 			function doStep()
 			{
 				step(returnable());
-				data = [], errors = [];
+				data = [];
+				errors = [];
 			}
 		};
 
@@ -24909,15 +24977,18 @@ process.umask = function() { return 0; };
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {var apply = Function.prototype.apply;
+/* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
+            (typeof self !== "undefined" && self) ||
+            window;
+var apply = Function.prototype.apply;
 
 // DOM APIs, for completeness
 
 exports.setTimeout = function() {
-  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+  return new Timeout(apply.call(setTimeout, scope, arguments), clearTimeout);
 };
 exports.setInterval = function() {
-  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+  return new Timeout(apply.call(setInterval, scope, arguments), clearInterval);
 };
 exports.clearTimeout =
 exports.clearInterval = function(timeout) {
@@ -24932,7 +25003,7 @@ function Timeout(id, clearFn) {
 }
 Timeout.prototype.unref = Timeout.prototype.ref = function() {};
 Timeout.prototype.close = function() {
-  this._clearFn.call(window, this._id);
+  this._clearFn.call(scope, this._id);
 };
 
 // Does not start the time, just sets up the members needed.
@@ -24960,7 +25031,7 @@ exports._unrefActive = exports.active = function(item) {
 
 // setimmediate attaches itself to the global object
 __webpack_require__(/*! setimmediate */ "./node_modules/setimmediate/setImmediate.js");
-// On some exotic environments, it's not clear which object `setimmeidate` was
+// On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
 exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
