@@ -365,6 +365,23 @@ class DesignComponent {
 		return this.json['Part'].match(/No .+/) !== null;
 	}
 
+	get part_with_effective_settings() {
+		switch (this.name) {
+		case 'Primary Phasers':
+		case 'Secondary Phasers':
+			if (this.subsystem.get_setting('Phaser Arrays')) {
+				return [this.name, 'Phaser Arrays'];
+			}
+			break;
+		case 'Torpedo System':
+			if (this.subsystem.get_setting('Burst Launchers')) {
+				return [this.name, 'Burst Launchers'];
+			}
+			break;
+		}
+		return [this.name];
+	}
+
 	// BK column
 	// scalar
 	get quantity() {
@@ -900,7 +917,7 @@ class DesignComponent {
 		function refit_cost(cost_prop) {
 			let cost = comp[cost_prop];
 			let base_cost = comp_base[cost_prop];
-			if (comp.part === comp_base.part) {
+			if (_.isEqual(comp.part_with_effective_settings, comp_base.part_with_effective_settings)) {
 				if (cost >= base_cost) {
 					return cost - base_cost;
 				} else {
@@ -1022,7 +1039,11 @@ class DesignSubsystem {
 	}
 
 	get_setting(key) {
-		return this.settings.find((elem) => elem['Name'] === key)['Value'];
+		let setting = this.settings.find((elem) => elem['Name'] === key);
+		if (setting === undefined) {
+			return null;
+		}
+		return setting['Value'];
 	}
 
 	get sub_frame() {
