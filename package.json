@@ -6,6 +6,7 @@
         "lodash": "^4.17.5",
         "papaparse": "^4.3.7",
         "pretty-data": "^0.40.0",
+        "vuedraggable": "^2.16.0",
         "vuex": "^3.0.1",
         "webpack-node-externals": "^1.7.2"
     },
