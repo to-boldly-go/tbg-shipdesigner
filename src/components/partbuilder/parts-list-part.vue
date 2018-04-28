@@ -9,6 +9,7 @@
 		</PartsListCell>
 		<td class="delete-cell"><input type="button" class="delete-button" value="X" @click="delete_this_part"></td>
 		<td class="copy-cell"><input type="button" class="copy-button" value="+" @click="copy_this_part"></td>
+		<td class="move-cell"><div class="move-handle">↕️</div></td>
 	</tr>
 </template>
 
@@ -71,30 +72,22 @@ export default {
 	background: #faa;
 }
 
-.delete-cell {
+.delete-cell, .copy-cell, .move-cell {
 	width: 30px;
 	border: 1px solid #eee;
 }
 
-.delete-button {
+.delete-button, .copy-button, .move-handle {
 	padding: 0;
 	border-width: 0;
-
 	width: 100%;
-    box-sizing: border-box;
+	box-sizing: border-box;
+	background-color: buttonface;
+	text-align: center;
 }
 
-.copy-cell {
-	width: 30px;
-	border: 1px solid #eee;
-}
-
-.copy-button {
-	padding: 0;
-	border-width: 0;
-
-	width: 100%;
-    box-sizing: border-box;
+.move-handle {
+	cursor: move;
 }
 
 </style>
