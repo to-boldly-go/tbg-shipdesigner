@@ -370,16 +370,16 @@ class DesignComponent {
 		case 'Primary Phasers':
 		case 'Secondary Phasers':
 			if (this.subsystem.get_setting('Phaser Arrays')) {
-				return [this.name, 'Phaser Arrays'];
+				return [this.part, 'Phaser Arrays'];
 			}
 			break;
 		case 'Torpedo System':
 			if (this.subsystem.get_setting('Burst Launchers')) {
-				return [this.name, 'Burst Launchers'];
+				return [this.part, 'Burst Launchers'];
 			}
 			break;
 		}
-		return [this.name];
+		return [this.part];
 	}
 
 	// BK column
