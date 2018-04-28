@@ -40,6 +40,18 @@ const store = new Vuex.Store({
 		selected_schema(state, getters) {
 			return state.parts_list[state.display.selected].schema;
 		},
+		find_part_index(state, getters) {
+			return ({'Type': type, 'Name': name, 'Variant': variant}) => {
+				const selected_parts = state.parts_list[state.display.selected].records;
+				return selected_parts.findIndex(part => (part['Type'] === type) && (part['Name'] === name) && (part['Variant'] === variant));
+			};
+		},
+		has_duplicate_parts(state, getters) {
+			return ({'Type': type, 'Name': name, 'Variant': variant}) => {
+				const selected_parts = state.parts_list[state.display.selected].records;
+				return selected_parts.filter(part => (part['Type'] === type) && (part['Name'] === name) && (part['Variant'] === variant)).length > 1;
+			};
+		},
 	},
 	actions: {
 	},
@@ -70,15 +82,15 @@ const store = new Vuex.Store({
 				[part => part[field]],
 				[state.display.current_sort.ascending ? 'asc' : 'desc']);
 		},
-		delete_part(state, payload) {
-			let selected_parts = state.parts_list[state.display.selected].records;
-			const idx = selected_parts.findIndex(part => (part['Type'] === payload['Type']) && (part['Name'] === payload['Name']) && (part['Variant'] === payload['Variant']));
-			if (idx >= 0) {
-				selected_parts.splice(idx, 1);
+		delete_part(state, {index}) {
+			if (index >= 0) {
+				state.parts_list[state.display.selected].records.splice(index, 1);
 			}
 		},
-		add_part(state, payload) {
-			state.parts_list[state.display.selected].records.push(payload);
+		add_part(state, {index, new_part}) {
+			if (index >= 0) {
+				state.parts_list[state.display.selected].records.splice(index, 0, new_part);
+			}
 		},
 		reset_to_canon(state, payload) {
 			state.parts_list = canon_parts_list;

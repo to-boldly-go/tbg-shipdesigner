@@ -29,35 +29,33 @@ export default {
 		part: Object,
 	},
 	computed: {
-		has_duplicate_name_error() {
-			const f = (part) => _.pick(part, ['Name', 'Variant', 'Type']);
-			const comp = (part) => _.isEqual(f(part), f(this.part));
-			return this.selected_parts.filter(comp).length > 1;
-		},
 		list_class() {
 			return (field) => ({
-				'has-error': (field.id === 'name') && (this.has_duplicate_name_error),
+				'has-error': (field.id === 'name') && (this.has_duplicate_parts(this.part)),
 			});
 		},
 		...mapGetters([
 			'selected_schema',
 			'selected_parts',
+			'find_part_index',
+			'has_duplicate_parts',
 		]),
 	},
 	methods: {
 		delete_this_part() {
 			this.$store.commit('delete_part', {
-				'Type': this.part['Type'],
-				'Name': this.part['Name'],
-				'Variant': this.part['Variant'],
+				index: this.find_part_index(this.part),
 			});
 		},
 		copy_this_part() {
-			const idx = this.selected_parts.findIndex(part => (part['Type'] === this.part['Type']) && (part['Name'] === this.part['Name']) && (part['Variant'] === this.part['Variant']));
-			if (idx >= 0) {
+			const index = this.find_part_index(this.part);
+			if (index >= 0) { // XXX: can this ever be false?
 				let clone = _.cloneDeep(this.part);
 				clone['Name'] += ' copy';
-				this.$store.commit('add_part', clone);
+				this.$store.commit('add_part', {
+					index: index + 1,
+					new_part: clone,
+				});
 			}
 		},
 	},

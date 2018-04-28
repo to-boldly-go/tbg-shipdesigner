@@ -49,6 +49,7 @@ export default {
 		...mapGetters([
 			'selected_schema',
 			'selected_parts',
+			'find_part_index',
 		]),
 	},
 	methods: {
@@ -61,7 +62,10 @@ export default {
 			const last_part = this.displayed_parts[this.displayed_parts.length - 1];
 			new_part['Type'] = last_part['Type'];
 			new_part['Type Sort'] = last_part['Type Sort'];
-			this.$store.commit('add_part', new_part);
+			this.$store.commit('add_part', {
+				index: this.find_part_index(last_part) + 1,
+				new_part,
+			});
 		},
 		sort_list(field) {
 			this.$store.commit('sort_parts_list_by', field);
