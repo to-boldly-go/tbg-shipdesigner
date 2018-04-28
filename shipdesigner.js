@@ -33064,6 +33064,24 @@ var DesignComponent = function () {
 		get: function get() {
 			return this.json['Part'].match(/No .+/) !== null;
 		}
+	}, {
+		key: 'part_with_effective_settings',
+		get: function get() {
+			switch (this.name) {
+				case 'Primary Phasers':
+				case 'Secondary Phasers':
+					if (this.subsystem.get_setting('Phaser Arrays')) {
+						return [this.name, 'Phaser Arrays'];
+					}
+					break;
+				case 'Torpedo System':
+					if (this.subsystem.get_setting('Burst Launchers')) {
+						return [this.name, 'Burst Launchers'];
+					}
+					break;
+			}
+			return [this.name];
+		}
 
 		// BK column
 		// scalar
@@ -33706,7 +33724,7 @@ var DesignComponent = function () {
 			function refit_cost(cost_prop) {
 				var cost = comp[cost_prop];
 				var base_cost = comp_base[cost_prop];
-				if (comp.part === comp_base.part) {
+				if (_lodash2.default.isEqual(comp.part_with_effective_settings, comp_base.part_with_effective_settings)) {
 					if (cost >= base_cost) {
 						return cost - base_cost;
 					} else {
@@ -33815,9 +33833,13 @@ var DesignSubsystem = function () {
 	}, {
 		key: 'get_setting',
 		value: function get_setting(key) {
-			return this.settings.find(function (elem) {
+			var setting = this.settings.find(function (elem) {
 				return elem['Name'] === key;
-			})['Value'];
+			});
+			if (setting === undefined) {
+				return null;
+			}
+			return setting['Value'];
 		}
 	}, {
 		key: 'component',
