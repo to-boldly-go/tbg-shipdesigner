@@ -122,7 +122,7 @@ Promise.all([
 		// 	  .flatMap(se_design.subsystems, (ss) => ss.components)
 		// 	  .filter((comp) => comp.is_quantity_configurable);
 		// const res = Opt.backtracking_search_quantities(se_design, obj_target, comps, {count: 0});
-		const res = Opt.stochastic_annealing_quantities(se_design, obj_target, 10000, .9999);
+		const res = Opt.stochastic_annealing_quantities(se_design, obj_target, 1000, .9999);
 		console.log();
 		console.log(res);
 		console.log(se_design.pretty_summary);
