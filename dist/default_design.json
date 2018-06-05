@@ -1,220 +1,218 @@
-[
-  {
-    "Name":"Centaur-B",
-    "Blueprint Date":"2018-06-05T07:10:20.000Z",
-    "Parts List":{
-      "name":"Official Speculative Parts 2323",
-      "timestamp":"2018-06-04T21:15:32.000Z"
+{
+  "Name":"Centaur-B",
+  "Blueprint Date":"2018-06-05T07:10:20.000Z",
+  "Parts List":{
+    "name":"Official Speculative Parts 2323",
+    "timestamp":"2018-06-04T21:15:32.000Z"
+  },
+  "Principal Frame":"[T0] 800kt Frigate Frame",
+  "Module":{
+    "Variant":"Science",
+    "Type":"Miranda Rollbar"
+  },
+  "Subsystems":[
+    {
+      "Name":"Warp Core",
+      "Sub-Frame":"[T0][C+SR-] Sm Frigate Warp Core Suite",
+      "Settings":[
+        {
+          "Value":1,
+          "Name":"Safety/Performance"
+        }
+      ],
+      "Components":[
+        {
+          "Name":"Warp Core Type",
+          "Quantity":2,
+          "Part":"[T3][L][R-C-SR+] ONA-IV-L Standard"
+        },
+        {
+          "Name":"M/AM Injectors",
+          "Quantity":2,
+          "Part":"[T2][L][R-C-] Luna-VI High-Efficiency M/AM System"
+        },
+        {
+          "Name":"Coolant Systems",
+          "Quantity":2,
+          "Part":"[T2][H][SR-] SBD-VIII Efficient Coolant System"
+        },
+        {
+          "Name":"EPS Manifold System",
+          "Quantity":3,
+          "Part":"[T3][L][SR-] 40EA-II Industrial Injection Manifold"
+        },
+        {
+          "Name":"Eject System",
+          "Quantity":1,
+          "Part":"[T3] EngOS 3.1 Monitoring - YYD-Emergency VI EM Rails"
+        }
+      ]
     },
-    "Principal Frame":"[T0] 800kt Frigate Frame",
-    "Module":{
-      "Variant":"Science",
-      "Type":"Miranda Rollbar"
+    {
+      "Name":"Engineering",
+      "Sub-Frame":"[T0][T--] Sm Frigate Engineering Suite",
+      "Settings":[
+
+      ],
+      "Components":[
+        {
+          "Name":"Structural Integrity Fields",
+          "Quantity":2,
+          "Part":"[T0][H] Type-IV-H SIF"
+        },
+        {
+          "Name":"Navigational Deflector",
+          "Quantity":3,
+          "Part":"[T2][L] Graviton Wavefront Deflector Saucer-Only"
+        },
+        {
+          "Name":"Nacelle System",
+          "Quantity":1,
+          "Part":"[T1][L] 2 X Centaur-A Pattern Nacelle"
+        },
+        {
+          "Name":"Replication Package",
+          "Quantity":3,
+          "Part":"[T3][H] S-Medical Mk VII High-Endurance Protein Synth"
+        },
+        {
+          "Name":"Fuel & Matter Stores",
+          "Quantity":3,
+          "Part":"[T2][L] 2310-Light Pattern Deuterium Tanks"
+        }
+      ]
     },
-    "Subsystems":[
-      {
-        "Name":"Warp Core",
-        "Sub-Frame":"[T0][C+SR-] Sm Frigate Warp Core Suite",
-        "Settings":[
-          {
-            "Value":1,
-            "Name":"Safety/Performance"
-          }
-        ],
-        "Components":[
-          {
-            "Name":"Warp Core Type",
-            "Quantity":2,
-            "Part":"[T3][L][R-C-SR+] ONA-IV-L Standard"
-          },
-          {
-            "Name":"M/AM Injectors",
-            "Quantity":2,
-            "Part":"[T2][L][R-C-] Luna-VI High-Efficiency M/AM System"
-          },
-          {
-            "Name":"Coolant Systems",
-            "Quantity":2,
-            "Part":"[T2][H][SR-] SBD-VIII Efficient Coolant System"
-          },
-          {
-            "Name":"EPS Manifold System",
-            "Quantity":3,
-            "Part":"[T3][L][SR-] 40EA-II Industrial Injection Manifold"
-          },
-          {
-            "Name":"Eject System",
-            "Quantity":1,
-            "Part":"[T3] EngOS 3.1 Monitoring - YYD-Emergency VI EM Rails"
-          }
-        ]
-      },
-      {
-        "Name":"Engineering",
-        "Sub-Frame":"[T0][T--] Sm Frigate Engineering Suite",
-        "Settings":[
+    {
+      "Name":"Hull",
+      "Sub-Frame":"[T0] Sm Frigate Hull Suite",
+      "Settings":[
 
-        ],
-        "Components":[
-          {
-            "Name":"Structural Integrity Fields",
-            "Quantity":2,
-            "Part":"[T0][H] Type-IV-H SIF"
-          },
-          {
-            "Name":"Navigational Deflector",
-            "Quantity":3,
-            "Part":"[T2][L] Graviton Wavefront Deflector Saucer-Only"
-          },
-          {
-            "Name":"Nacelle System",
-            "Quantity":1,
-            "Part":"[T1][L] 2 X Centaur-A Pattern Nacelle"
-          },
-          {
-            "Name":"Replication Package",
-            "Quantity":3,
-            "Part":"[T3][H] S-Medical Mk VII High-Endurance Protein Synth"
-          },
-          {
-            "Name":"Fuel & Matter Stores",
-            "Quantity":3,
-            "Part":"[T2][L] 2310-Light Pattern Deuterium Tanks"
-          }
-        ]
-      },
-      {
-        "Name":"Hull",
-        "Sub-Frame":"[T0] Sm Frigate Hull Suite",
-        "Settings":[
-
-        ],
-        "Components":[
-          {
-            "Name":"Hull System",
-            "Quantity":1,
-            "Part":"[T0][L] Lt. Alloy-1 Duranium Hull"
-          }
-        ]
-      },
-      {
-        "Name":"Operations",
-        "Sub-Frame":"[T0][OE--] Lg Frigate Operations Suite",
-        "Settings":[
-          {
-            "Value":false,
-            "Name":"Isolinear?"
-          }
-        ],
-        "Components":[
-          {
-            "Name":"Long-Range Sensors",
-            "Quantity":0,
-            "Part":"No Sensor"
-          },
-          {
-            "Name":"Navigational Sensors",
-            "Quantity":1,
-            "Part":"[T0][M] Mark-V Nav Sensors"
-          },
-          {
-            "Name":"Survey Sensors",
-            "Quantity":0,
-            "Part":"No Survey Sensors"
-          },
-          {
-            "Name":"Science Labs",
-            "Quantity":1,
-            "Part":"[T1][L] Pattern-K2 Compact Lab"
-          },
-          {
-            "Name":"Computer Core",
-            "Quantity":3,
-            "Part":"[T1][L] Type-III-A Duotronic Core"
-          },
-          {
-            "Name":"Operating System",
-            "Quantity":3,
-            "Part":"[T0] Majel 2.1 OS"
-          },
-          {
-            "Name":"Secondary Core",
-            "Quantity":0,
-            "Part":"No Core"
-          },
-          {
-            "Name":"Diplomatic Package",
-            "Quantity":2,
-            "Part":"[T-1][M] Cruiser Diplomatic Package '61"
-          },
-          {
-            "Name":"Recreation Package",
-            "Quantity":1,
-            "Part":"[T1][L] 2300s Compact Rec Space"
-          },
-          {
-            "Name":"Sickbay",
-            "Quantity":3,
-            "Part":"[T3][L] T'Koren-B Pattern Small Sickbay"
-          }
-        ]
-      },
-      {
-        "Name":"Tactical",
-        "Sub-Frame":"[T0][O-] Md Frigate Tactical Suite",
-        "Settings":[
-          {
-            "Value":false,
-            "Name":"Burst Launchers"
-          },
-          {
-            "Value":false,
-            "Name":"Phaser Arrays"
-          }
-        ],
-        "Components":[
-          {
-            "Name":"Primary Phasers",
-            "Quantity":1,
-            "Part":"[T0][L] Model 83 Phaser Bank"
-          },
-          {
-            "Name":"Secondary Phasers",
-            "Quantity":0,
-            "Part":"No Phasers"
-          },
-          {
-            "Name":"Torpedo System",
-            "Quantity":3,
-            "Part":"[T2][L] Mk-IV LW Burst Launcher"
-          },
-          {
-            "Name":"Short-Range Sensors",
-            "Quantity":2,
-            "Part":"[T3][H] Mark-VII-Heavy SR Lateral Sensor Array"
-          },
-          {
-            "Name":"Targeting Computer",
-            "Quantity":1,
-            "Part":"No TCU"
-          },
-          {
-            "Name":"Deflector Shields",
-            "Quantity":5,
-            "Part":"[T2][L] Mk-V-E Shield Gens"
-          },
-          {
-            "Name":"Backup Deflectors",
-            "Quantity":4,
-            "Part":"[T2][L] Mk-V-E Shield Gens"
-          },
-          {
-            "Name":"Impulse Engine Pwr",
-            "Quantity":1,
-            "Part":"[T2][M] SDB-09 High-Power Impulse Drive Sys"
-          }
-        ]
-      }
-    ]
-  }
-]
+      ],
+      "Components":[
+        {
+          "Name":"Hull System",
+          "Quantity":1,
+          "Part":"[T0][L] Lt. Alloy-1 Duranium Hull"
+        }
+      ]
+    },
+    {
+      "Name":"Operations",
+      "Sub-Frame":"[T0][OE--] Lg Frigate Operations Suite",
+      "Settings":[
+        {
+          "Value":false,
+          "Name":"Isolinear?"
+        }
+      ],
+      "Components":[
+        {
+          "Name":"Long-Range Sensors",
+          "Quantity":0,
+          "Part":"No Sensor"
+        },
+        {
+          "Name":"Navigational Sensors",
+          "Quantity":1,
+          "Part":"[T0][M] Mark-V Nav Sensors"
+        },
+        {
+          "Name":"Survey Sensors",
+          "Quantity":0,
+          "Part":"No Survey Sensors"
+        },
+        {
+          "Name":"Science Labs",
+          "Quantity":1,
+          "Part":"[T1][L] Pattern-K2 Compact Lab"
+        },
+        {
+          "Name":"Computer Core",
+          "Quantity":3,
+          "Part":"[T1][L] Type-III-A Duotronic Core"
+        },
+        {
+          "Name":"Operating System",
+          "Quantity":3,
+          "Part":"[T0] Majel 2.1 OS"
+        },
+        {
+          "Name":"Secondary Core",
+          "Quantity":0,
+          "Part":"No Core"
+        },
+        {
+          "Name":"Diplomatic Package",
+          "Quantity":2,
+          "Part":"[T-1][M] Cruiser Diplomatic Package '61"
+        },
+        {
+          "Name":"Recreation Package",
+          "Quantity":1,
+          "Part":"[T1][L] 2300s Compact Rec Space"
+        },
+        {
+          "Name":"Sickbay",
+          "Quantity":3,
+          "Part":"[T3][L] T'Koren-B Pattern Small Sickbay"
+        }
+      ]
+    },
+    {
+      "Name":"Tactical",
+      "Sub-Frame":"[T0][O-] Md Frigate Tactical Suite",
+      "Settings":[
+        {
+          "Value":false,
+          "Name":"Burst Launchers"
+        },
+        {
+          "Value":false,
+          "Name":"Phaser Arrays"
+        }
+      ],
+      "Components":[
+        {
+          "Name":"Primary Phasers",
+          "Quantity":1,
+          "Part":"[T0][L] Model 83 Phaser Bank"
+        },
+        {
+          "Name":"Secondary Phasers",
+          "Quantity":0,
+          "Part":"No Phasers"
+        },
+        {
+          "Name":"Torpedo System",
+          "Quantity":3,
+          "Part":"[T2][L] Mk-IV LW Burst Launcher"
+        },
+        {
+          "Name":"Short-Range Sensors",
+          "Quantity":2,
+          "Part":"[T3][H] Mark-VII-Heavy SR Lateral Sensor Array"
+        },
+        {
+          "Name":"Targeting Computer",
+          "Quantity":1,
+          "Part":"No TCU"
+        },
+        {
+          "Name":"Deflector Shields",
+          "Quantity":5,
+          "Part":"[T2][L] Mk-V-E Shield Gens"
+        },
+        {
+          "Name":"Backup Deflectors",
+          "Quantity":4,
+          "Part":"[T2][L] Mk-V-E Shield Gens"
+        },
+        {
+          "Name":"Impulse Engine Pwr",
+          "Quantity":1,
+          "Part":"[T2][M] SDB-09 High-Power Impulse Drive Sys"
+        }
+      ]
+    }
+  ]
+}
