@@ -9,7 +9,7 @@ import ShipDesigner from '@/components/shipdesigner/shipdesigner.vue';
 
 import * as ShipEngine from '@/lib/shipengine.js';
 
-import design_json_init from '#/swb_kepler_recreation.json';
+import design_json_init from '#/default_design.json';
 import canon_parts_list from '#/canon_parts_list.json';
 
 let design_json;
