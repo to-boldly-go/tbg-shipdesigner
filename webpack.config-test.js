@@ -1,3 +1,5 @@
+/* eslint-env node */
+
 const common = require('./webpack.config-base.js');
 const nodeExternals = require('webpack-node-externals');
 

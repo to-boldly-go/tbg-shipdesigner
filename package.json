@@ -1,47 +1,59 @@
 {
-    "dependencies": {
-        "argparse": "^1.0.10",
-        "babel-cli": "^6.26.0",
-        "bluebird": "^3.5.1",
-        "lodash": "^4.17.5",
-        "papaparse": "^4.3.7",
-        "pretty-data": "^0.40.0",
-        "vuedraggable": "^2.16.0",
-        "vuex": "^3.0.1",
-        "webpack-node-externals": "^1.7.2"
-    },
-    "scripts": {
-        "import-parts": "node bin/import-parts.js",
-        "webpack": "webpack",
-        "watch": "webpack --progress --watch",
-        "start": "webpack-dev-server",
-        "deploy-gh-pages": "git subtree push --prefix dist origin gh-pages",
-        "lint": "eslint src/** lib/** test/** scripts/**",
-        "test": "mocha-webpack --webpack-config ./webpack.config-test.js 'test/**/*.spec.js'"
-    },
-    "license": "MIT",
-    "version": "1.0.0",
-    "name": "tbg-shipbuilder",
-    "devDependencies": {
-        "babel-core": "^6.26.0",
-        "babel-loader": "^7.1.4",
-        "babel-plugin-syntax-object-rest-spread": "^6.13.0",
-        "babel-plugin-transform-es2015-destructuring": "^6.23.0",
-        "babel-plugin-transform-object-rest-spread": "^6.26.0",
-        "babel-preset-env": "^1.6.1",
-        "css-loader": "^0.28.11",
-        "csv-loader": "^2.1.1",
-        "eslint": "^4.19.1",
-        "eslint-config-google": "^0.9.1",
-        "eslint-plugin-vue": "^4.4.0",
-        "mocha": "^5.0.5",
-        "mocha-webpack": "^2.0.0-beta.0",
-        "raw-loader": "^0.5.1",
-        "vue": "^2.5.16",
-        "vue-loader": "^14.2.2",
-        "vue-template-compiler": "^2.5.16",
-        "webpack": "^4.5.0",
-        "webpack-cli": "^2.0.14",
-        "webpack-dev-server": "^3.1.1"
+  "license": "MIT",
+  "version": "1.0.0",
+  "name": "tbg-shipbuilder",
+  "scripts": {
+    "build": "vue-cli-service build",
+    "deploy-gh-pages": "git subtree push --prefix dist origin gh-pages",
+    "import-parts": "node bin/import-parts.js",
+    "lint": "vue-cli-service lint",
+    "lint:legacy": "eslint src/** lib/** test/** scripts/**",
+    "serve": "vue-cli-service serve",
+    "test": "mocha-webpack --webpack-config ./webpack.config-test.js 'tests/**/*.spec.js'",
+    "test:unit": "vue-cli-service test:unit",
+    "watch": "webpack --progress --watch",
+    "webpack": "webpack"
+  },
+  "dependencies": {
+    "argparse": "^1.0.10",
+    "babel-cli": "^6.26.0",
+    "bluebird": "^3.5.1",
+    "lodash": "^4.17.5",
+    "papaparse": "^4.3.7",
+    "pretty-data": "^0.40.0",
+    "register-service-worker": "^1.0.0",
+    "vue": "^2.5.17",
+    "vuedraggable": "^2.16.0",
+    "vuex": "^3.0.1",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.1.1",
+    "@vue/cli-plugin-eslint": "^3.1.1",
+    "@vue/cli-plugin-pwa": "^3.1.1",
+    "@vue/cli-plugin-unit-mocha": "^3.1.1",
+    "@vue/cli-service": "^3.1.1",
+    "@vue/eslint-config-prettier": "^4.0.0",
+    "@vue/test-utils": "^1.0.0-beta.20",
+    "csv-loader": "^2.1.1",
+    "eslint": "^5.8.0",
+    "eslint-config-google": "^0.9.1",
+    "eslint-plugin-vue": "^5.0.0-0",
+    "raw-loader": "^0.5.1",
+    "vue-template-compiler": "^2.5.17"
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
     }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ],
+  "prettier": {
+	  "singleQuote": true,
+	  "useTabs": true
+  }
 }

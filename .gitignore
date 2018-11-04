@@ -1,4 +1,17 @@
-# Logs
+# Artifacts
+dist/*.js
+dist/*.js.map
+bin/*.js
+bin/*.js.map
+
+# node_modules
+node_modules
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
 logs
 *.log
 npm-debug.log*
@@ -57,10 +70,12 @@ typings/
 # dotenv environment variables file
 .env
 
-# VS Code workspace folder
+# Editor directories and files
+.idea
 .vscode
 
-dist/*.js.map
-dist/*.js
-bin/*.js
-bin/*.js.map
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*

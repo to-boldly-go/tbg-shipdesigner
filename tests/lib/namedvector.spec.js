@@ -6,9 +6,9 @@ describe('NamedVector', () => {
 	class SpecificNamedVector extends NamedVector {
 		static get shortnames() {
 			return {
-				'dim_a': 'a',
-				'dim_b': 'b',
-				'dim_c': 'c',
+				dim_a: 'a',
+				dim_b: 'b',
+				dim_c: 'c'
 			};
 		}
 		constructor(val) {
@@ -25,14 +25,18 @@ describe('NamedVector', () => {
 		});
 
 		it('can be created with an object', () => {
-			const namedVector = new SpecificNamedVector({dim_a: 1.0, dim_b: 2.0, dim_c: 3.0});
+			const namedVector = new SpecificNamedVector({
+				dim_a: 1.0,
+				dim_b: 2.0,
+				dim_c: 3.0
+			});
 			assert.equal(namedVector['dim_a'], 1.0);
 			assert.equal(namedVector['dim_b'], 2.0);
 			assert.equal(namedVector['dim_c'], 3.0);
 		});
 
 		it('fills in missing values when creating from object', () => {
-			const namedVector = new SpecificNamedVector({dim_a: 1.0});
+			const namedVector = new SpecificNamedVector({ dim_a: 1.0 });
 			assert.equal(namedVector['dim_a'], 1.0);
 			assert.equal(namedVector['dim_b'], 0.0);
 			assert.equal(namedVector['dim_c'], 0.0);
