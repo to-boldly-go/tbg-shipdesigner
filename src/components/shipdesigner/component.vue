@@ -75,20 +75,17 @@
 
 
 <script>
-
-import {
-	pretty,
-} from '@/lib/ui-functions';
+import { pretty } from '@/lib/ui-functions';
 
 import StatlineCell from '@/components/shipdesigner/statline-cell.vue';
 
 export default {
 	name: 'ComponentTr',
 	components: {
-		StatlineCell,
+		StatlineCell
 	},
 	props: {
-		se_component: Object,
+		se_component: Object
 	},
 	computed: {
 		tech_year_tooltip() {
@@ -99,18 +96,22 @@ export default {
 			}
 		},
 		is_limiting_tech_year() {
-			return this.se_component.tech_year === this.se_component.subsystem.design.tech_year;
+			return (
+				this.se_component.tech_year ===
+				this.se_component.subsystem.design.tech_year
+			);
 		},
 		tech_year() {
 			return this.se_component.tech_year;
 		},
 		is_valid_part() {
-			return this.valid_parts
-				.map((part) => part['Name'])
-				.includes(this.part);
+			return this.valid_parts.map(part => part['Name']).includes(this.part);
 		},
 		has_quantity_error() {
-			return this.quantity_configurable && !(this.valid_quantities.includes(this.quantity));
+			return (
+				this.quantity_configurable &&
+				!this.valid_quantities.includes(this.quantity)
+			);
 		},
 		power_gen() {
 			return pretty(this.se_component.power_generation);
@@ -159,9 +160,9 @@ export default {
 			set(value) {
 				this.$store.commit('set_component_quantity', {
 					component: this.se_component,
-					value,
+					value
 				});
-			},
+			}
 		},
 		valid_quantities() {
 			return this.se_component.valid_quantities;
@@ -179,16 +180,16 @@ export default {
 			set(value) {
 				this.$store.commit('set_component_part', {
 					component: this.se_component,
-					value,
+					value
 				});
-			},
+			}
 		},
 		is_quantity_valid() {
-			return (hypothesis) => this
-				.valid_quantities
-				.map((elem) => (elem === hypothesis))
-				.reduce((acc, elem) => acc || elem);
-		},
+			return hypothesis =>
+				this.valid_quantities
+					.map(elem => elem === hypothesis)
+					.reduce((acc, elem) => acc || elem);
+		}
 	},
 	methods: {
 		increment_quantity() {
@@ -213,13 +214,12 @@ export default {
 				ev.preventDefault();
 			}
 			ev.returnValue = false;
-		},
-	},
+		}
+	}
 };
 </script>
 
 <style>
-  
 </style>
 
 <style scoped>

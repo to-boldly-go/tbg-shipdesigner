@@ -101,7 +101,6 @@
 
 
 <script>
-
 import _ from 'lodash';
 import * as ShipEngine from '@/lib/shipengine';
 
@@ -112,8 +111,7 @@ const LOCAL_SAVES_KEY = 'local_saves';
 
 export default {
 	name: 'DesignImportExport',
-	components: {
-	},
+	components: {},
 	data() {
 		return {
 			// local_saves is a straight array of blueprint objects (ShipEngine.Design objects).
@@ -132,7 +130,7 @@ export default {
 
 			selected_parts_list: null,
 
-			design_filter: [],
+			design_filter: []
 		};
 	},
 	computed: {
@@ -157,7 +155,7 @@ export default {
 				this.selected_parts_list = this.all_parts_lists.find(
 					ShipEngine.DB.find_by_pretty_name(value)
 				);
-			},
+			}
 		},
 		all_parts_lists() {
 			return [...this.local_parts_lists, this.canon_se_db];
@@ -174,7 +172,7 @@ export default {
 				this.selected_save = this.local_saves.find(
 					ShipEngine.Design.find_by_pretty_name(value)
 				);
-			},
+			}
 		},
 		selected_other_design_name: {
 			get() {
@@ -192,7 +190,7 @@ export default {
 					this.selected_other_save = other_save;
 					this.$store.commit('set_other_design_json', other_save.json);
 				}
-			},
+			}
 		},
 		design_mode_enabled: {
 			get() {
@@ -200,7 +198,7 @@ export default {
 			},
 			set(value) {
 				this.$store.commit('set_design_mode_enabled', value);
-			},
+			}
 		},
 		design_mode: {
 			get() {
@@ -208,13 +206,15 @@ export default {
 			},
 			set(value) {
 				this.$store.commit('set_design_mode', value);
-			},
+			}
 		},
 		design_mode_local_saves() {
 			if (this.design_mode !== 'refit') {
 				return this.local_saves;
 			}
-			return this.local_saves.filter(save => ShipEngine.Design.refit_valid(this.se_design, save));
+			return this.local_saves.filter(save =>
+				ShipEngine.Design.refit_valid(this.se_design, save)
+			);
 		},
 		design_json_string() {
 			return JSON.stringify(this.$store.state.design_json);
@@ -222,28 +222,30 @@ export default {
 		design_json_url_encoded_string() {
 			return encodeURI(this.design_json_string);
 		},
-		...mapGetters([
-			'canon_se_db',
-			'se_design',
-			'se_db',
-		]),
+		...mapGetters(['canon_se_db', 'se_design', 'se_db'])
 	},
 	mounted() {
 		this.parts_lists_load_from_local_storage();
-		window.addEventListener('storage', function(ev) {
-			if (ev.key === LOCAL_PARTS_LISTS_KEY) {
-				this.parts_lists_load_from_local_storage();
-			}
-		}.bind(this));
+		window.addEventListener(
+			'storage',
+			function(ev) {
+				if (ev.key === LOCAL_PARTS_LISTS_KEY) {
+					this.parts_lists_load_from_local_storage();
+				}
+			}.bind(this)
+		);
 
 		this.select_parts_list_from_design(this.$store.state.design_json);
 
 		this.local_saves_load_from_local_storage();
-		window.addEventListener('storage', function(ev) {
-			if (ev.key === LOCAL_SAVES_KEY) {
-				this.local_saves_load_from_local_storage();
-			}
-		}.bind(this));
+		window.addEventListener(
+			'storage',
+			function(ev) {
+				if (ev.key === LOCAL_SAVES_KEY) {
+					this.local_saves_load_from_local_storage();
+				}
+			}.bind(this)
+		);
 	},
 	methods: {
 		dispatch_undo() {
@@ -265,12 +267,17 @@ export default {
 			}
 		},
 		parts_lists_load_selected() {
-			this.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list.json));
+			this.$store.commit(
+				'set_parts_list',
+				_.cloneDeep(this.selected_parts_list.json)
+			);
 			this.$store.commit('set_design_parts_list');
 			this.display_status_message('Parts list loaded');
 		},
 		select_parts_list_from_design(design_json) {
-			const db = this.all_parts_lists.find(ShipEngine.DB.find_by_design_json(design_json));
+			const db = this.all_parts_lists.find(
+				ShipEngine.DB.find_by_design_json(design_json)
+			);
 			if (db) {
 				this.$store.commit('set_parts_list', _.cloneDeep(db.json));
 				this.selected_parts_list = db;
@@ -279,15 +286,18 @@ export default {
 
 		local_saves_delete_selected() {
 			// remove the selected item
-			this.local_saves = _.chain(this.local_saves).reject(
-				(elem) => elem === this.selected_save
-			).value();
+			this.local_saves = _.chain(this.local_saves)
+				.reject(elem => elem === this.selected_save)
+				.value();
 			this.local_saves_save_to_local_storage();
 			this.display_status_message('Blueprint deleted');
 		},
 		local_saves_load_selected() {
 			this.select_parts_list_from_design(this.selected_save.json);
-			this.$store.commit('set_design_json', _.cloneDeep(this.selected_save.json));
+			this.$store.commit(
+				'set_design_json',
+				_.cloneDeep(this.selected_save.json)
+			);
 			this.display_status_message('Blueprint loaded');
 		},
 		local_saves_save_design() {
@@ -300,7 +310,10 @@ export default {
 			}
 			this.$store.commit('set_design_parts_list');
 			this.$store.commit('timestamp_design');
-			const new_save = new ShipEngine.Design(this.se_db, _.cloneDeep(this.$store.state.design_json));
+			const new_save = new ShipEngine.Design(
+				this.se_db,
+				_.cloneDeep(this.$store.state.design_json)
+			);
 			this.local_saves.push(new_save);
 			this.local_saves_save_to_local_storage();
 			this.selected_save = new_save;
@@ -313,7 +326,7 @@ export default {
 				this.local_saves = [];
 				this.display_status_message('No Blueprints to load');
 			} else {
-				this.local_saves = JSON.parse(loaded).map((design_json) => {
+				this.local_saves = JSON.parse(loaded).map(design_json => {
 					let db;
 					let wrong_db;
 					if (design_json['Parts List']) {
@@ -331,27 +344,33 @@ export default {
 			}
 		},
 		local_saves_save_to_local_storage() {
-			localStorage.setItem(LOCAL_SAVES_KEY, JSON.stringify(
-				_.chain(this.local_saves)
-					.map((design) => design.json)
-					.value()
-			));
+			localStorage.setItem(
+				LOCAL_SAVES_KEY,
+				JSON.stringify(
+					_.chain(this.local_saves)
+						.map(design => design.json)
+						.value()
+				)
+			);
 		},
 
 		display_status_message(status) {
 			this.status_message = status;
 			this.$refs.status_message.className = 'design-bar-cell';
-			window.requestAnimationFrame(function(time) {
-				window.requestAnimationFrame(function(time) {
-					this.$refs.status_message.className = 'design-bar-cell fade';
-				}.bind(this));
-			}.bind(this));
+			window.requestAnimationFrame(
+				function(time) {
+					window.requestAnimationFrame(
+						function(time) {
+							this.$refs.status_message.className = 'design-bar-cell fade';
+						}.bind(this)
+					);
+				}.bind(this)
+			);
 		},
 		clear_status_message() {
 			this.status_message = null;
-		},
-		
-	},
+		}
+	}
 };
 </script>
 
@@ -382,7 +401,8 @@ export default {
 	flex: auto;
 }
 
-.design-bar-column, .design-bar-flex-column {
+.design-bar-column,
+.design-bar-flex-column {
 	display: flex;
 	flex-flow: column;
 	justify-content: space-around;
@@ -404,7 +424,7 @@ export default {
 	margin: 0 0.2em;
 }
 
-.design-bar-cell > input[type=checkbox] {
+.design-bar-cell > input[type='checkbox'] {
 	vertical-align: text-bottom;
 }
 
@@ -436,5 +456,4 @@ export default {
 		color: transparent;
 	}
 }
-
 </style>

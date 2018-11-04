@@ -1,12 +1,12 @@
 class NamedVector {
 	constructor(val, shortnames) {
 		this.shortnames = shortnames;
-		if ((typeof val) === 'number') {
-			this.names.forEach((name) => {
+		if (typeof val === 'number') {
+			this.names.forEach(name => {
 				this[name] = val;
 			});
 		} else {
-			this.names.forEach((name) => {
+			this.names.forEach(name => {
 				this[name] = val[name] || 0;
 			});
 		}
@@ -17,11 +17,21 @@ class NamedVector {
 	}
 
 	toFixed(n) {
-		return this.names.map(name => this.shortnames[name].toUpperCase() + '[' + this[name].toFixed(n) + ']').join(' ');
+		return this.names
+			.map(
+				name =>
+					this.shortnames[name].toUpperCase() +
+					'[' +
+					this[name].toFixed(n) +
+					']'
+			)
+			.join(' ');
 	}
 
 	toString() {
-		return this.names.map(name => this.shortnames[name].toUpperCase() + this[name].toString()).join(' ');
+		return this.names
+			.map(name => this.shortnames[name].toUpperCase() + this[name].toString())
+			.join(' ');
 	}
 	static op_add(a, b) {
 		return a + b;
@@ -59,7 +69,7 @@ class NamedVector {
 	}
 
 	op(fun, other) {
-		if ((typeof other) === 'number') {
+		if (typeof other === 'number') {
 			return new this.constructor(
 				this.names.reduce((acc, name) => {
 					acc[name] = fun(this[name], other);
@@ -77,6 +87,4 @@ class NamedVector {
 	}
 }
 
-export {
-	NamedVector,
-};
+export { NamedVector };

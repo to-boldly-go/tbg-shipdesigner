@@ -48,7 +48,6 @@
 
 
 <script>
-
 import { mapGetters } from 'vuex';
 
 import StatlineCell from '@/components/shipdesigner/statline-cell.vue';
@@ -58,7 +57,7 @@ import { frac } from '@/lib/ui-functions.js';
 export default {
 	name: 'PrincipalFrameRaw',
 	components: {
-		StatlineCell,
+		StatlineCell
 	},
 	computed: {
 		is_valid_frame() {
@@ -73,19 +72,25 @@ export default {
 		},
 		power_final_class() {
 			return {
-				'has-error': this.has_power_error,
+				'has-error': this.has_power_error
 			};
 		},
 		has_power_error() {
-			return !this.se_design.omit_validation && this.se_design.cost_power_raw > this.se_design.power_generation_raw;
+			return (
+				!this.se_design.omit_validation &&
+				this.se_design.cost_power_raw > this.se_design.power_generation_raw
+			);
 		},
 		weight_summary_class() {
 			return {
-				'has-error': this.has_weight_error,
+				'has-error': this.has_weight_error
 			};
 		},
 		has_weight_error() {
-			return !this.se_design.omit_validation && this.se_design.weight_internal > this.se_design.frame_max_size_raw;
+			return (
+				!this.se_design.omit_validation &&
+				this.se_design.weight_internal > this.se_design.frame_max_size_raw
+			);
 		},
 		principal_frame: {
 			get() {
@@ -93,7 +98,7 @@ export default {
 			},
 			set(value) {
 				this.se_design.principal_frame = value;
-			},
+			}
 		},
 		stats_raw() {
 			return this.se_design.stats_raw;
@@ -110,12 +115,9 @@ export default {
 		frame_size() {
 			return this.se_design.frame_size.toFixed(2);
 		},
-		...mapGetters([
-			'se_design',
-		]),
+		...mapGetters(['se_design'])
 	},
-	methods: {
-	},
+	methods: {}
 };
 </script>
 

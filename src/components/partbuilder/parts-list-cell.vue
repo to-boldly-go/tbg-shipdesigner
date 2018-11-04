@@ -23,42 +23,43 @@
 </template>
 
 <script>
-
 export default {
 	name: 'PartsListCell',
-	components: {
-	},
+	components: {},
 	directives: {
 		focus: {
 			inserted(el) {
 				el.focus();
-			},
-		},
+			}
+		}
 	},
 	props: {
 		part: {
-			type: Object,
+			type: Object
 		},
 		field: {
-			type: Object,
-		},
+			type: Object
+		}
 	},
 	data() {
 		return {
 			is_editing: false,
-			temp_value: null,
+			temp_value: null
 		};
 	},
 	computed: {
 		computed_style() {
-			return Object.assign({
-				'width': this.field.width.toString() + 'px',
-				'text-align': this.field.align,
-			}, this.computed_font);
+			return Object.assign(
+				{
+					width: this.field.width.toString() + 'px',
+					'text-align': this.field.align
+				},
+				this.computed_font
+			);
 		},
 		computed_input_style() {
 			return {
-				'text-align': this.field.align,
+				'text-align': this.field.align
 			};
 		},
 		computed_font() {
@@ -67,31 +68,36 @@ export default {
 				style = 'fixed';
 			}
 			switch (style) {
-			case 'fixed':
-				return {
-					['font-family']: "'Roboto Mono', monospace",
-					['font-size']: '12px',
-				};
-			case 'variable':
-			default:
-				return {};
+				case 'fixed':
+					return {
+						['font-family']: "'Roboto Mono', monospace",
+						['font-size']: '12px'
+					};
+				case 'variable':
+				default:
+					return {};
 			}
 		},
 		display_value() {
 			const v = this.part[this.field.name];
 			switch (this.field.edit_type) {
-			case 'number': {
-				if (v === undefined || v === null || Number.isNaN(v)) {
-					return '';
-				} else if (typeof(v.valueOf()) === 'number') {
-					const f = v.toFixed(this.field.fixed);
-					return f.replace(/(\..*?)(0+)$/, (match, p1, p2) => p1 + ' '.repeat(p2.length)).replace(/\. ( *)/, '.0$1');
-				} else {
-					return v;
+				case 'number': {
+					if (v === undefined || v === null || Number.isNaN(v)) {
+						return '';
+					} else if (typeof v.valueOf() === 'number') {
+						const f = v.toFixed(this.field.fixed);
+						return f
+							.replace(
+								/(\..*?)(0+)$/,
+								(match, p1, p2) => p1 + ' '.repeat(p2.length)
+							)
+							.replace(/\. ( *)/, '.0$1');
+					} else {
+						return v;
+					}
 				}
-			}
-			case 'string':
-				return v;
+				case 'string':
+					return v;
 			}
 		},
 		value: {
@@ -118,7 +124,7 @@ export default {
 						this.$store.commit('edit_part', {
 							part: this.part,
 							field: this.field.name,
-							value: new_value,
+							value: new_value
 						});
 					}
 				} else {
@@ -126,23 +132,23 @@ export default {
 						this.$store.commit('edit_part', {
 							part: this.part,
 							field: this.field.name,
-							value: value,
+							value: value
 						});
 					}
 				}
-			},
-		},
+			}
+		}
 	},
 	methods: {
 		on_keydown(ev) {
 			switch (ev.key) {
-			case 'Enter':
-				// leave focus and let the app save changes
-				this.commit_edit();
-				break;
-			case 'Escape':
-				this.abort_edit();
-				break;
+				case 'Enter':
+					// leave focus and let the app save changes
+					this.commit_edit();
+					break;
+				case 'Escape':
+					this.abort_edit();
+					break;
 			}
 		},
 		abort_edit() {
@@ -156,19 +162,18 @@ export default {
 		commit_edit(ev) {
 			this.is_editing = false;
 			this.value = this.temp_value;
-		},
-	},
+		}
+	}
 };
 </script>
 
 <style scoped>
-
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
 	-webkit-appearance: none;
 	margin: 0;
 }
-input[type="number"] {
+input[type='number'] {
 	-moz-appearance: textfield;
 }
 
@@ -188,10 +193,7 @@ input[type="number"] {
 	width: 100%;
 	box-sizing: border-box;
 }
-
-
 </style>
 
 <style>
-
 </style>

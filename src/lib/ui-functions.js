@@ -47,8 +47,4 @@ function pretty(val, n) {
 	}
 }
 
-export {
-	pretty,
-	frac,
-	from_frac,
-};
+export { pretty, frac, from_frac };

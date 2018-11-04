@@ -47,7 +47,6 @@
 
 
 <script>
-
 import { mapGetters } from 'vuex';
 
 import { frac } from '@/lib/ui-functions';
@@ -71,16 +70,13 @@ export default {
 		build_time() {
 			return frac(this.$store.getters.se_design.build_time, 12);
 		},
-		...mapGetters([
-			'se_design',
-			'se_db',
-		]),
+		...mapGetters(['se_design', 'se_db'])
 	},
 	methods: {
 		parts_list_save_name(pl) {
-			return pl.name + ' (' + (new Date(pl.timestamp).toLocaleString()) + ')';
-		},
-	},
+			return pl.name + ' (' + new Date(pl.timestamp).toLocaleString() + ')';
+		}
+	}
 };
 </script>
 
@@ -111,5 +107,4 @@ export default {
 .subsystem-weight-summary {
 	margin-left: 5px;
 }
-
 </style>

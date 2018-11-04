@@ -39,7 +39,6 @@
 
 
 <script>
-
 import { mapGetters } from 'vuex';
 
 import StatlineCell from '@/components/shipdesigner/statline-cell.vue';
@@ -49,7 +48,7 @@ import { frac } from '@/lib/ui-functions';
 export default {
 	name: 'PrincipalFrame',
 	components: {
-		StatlineCell,
+		StatlineCell
 	},
 	computed: {
 		power_final_title() {
@@ -61,11 +60,14 @@ export default {
 		},
 		power_final_class() {
 			return {
-				'has-error': this.has_power_error,
+				'has-error': this.has_power_error
 			};
 		},
 		has_power_error() {
-			return !this.se_design.omit_validation && this.se_design.cost_power_raw > this.se_design.power_generation_raw;
+			return (
+				!this.se_design.omit_validation &&
+				this.se_design.cost_power_raw > this.se_design.power_generation_raw
+			);
 		},
 		principal_frame() {
 			return this.se_design.principal_frame;
@@ -88,14 +90,11 @@ export default {
 			},
 			set(value) {
 				this.$store.commit('set_design_name', value);
-			},
+			}
 		},
-		...mapGetters([
-			'se_design',
-		]),
+		...mapGetters(['se_design'])
 	},
-	methods: {
-	},
+	methods: {}
 };
 </script>
 

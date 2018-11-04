@@ -52,7 +52,6 @@
 
 
 <script>
-
 import { mapGetters } from 'vuex';
 
 import PrincipalFrameRaw from '@/components/shipdesigner/principal-frame-raw.vue';
@@ -72,18 +71,15 @@ export default {
 		SubsystemFrame,
 		SubsystemSettings,
 		ComponentTr,
-		ModuleTr,
+		ModuleTr
 	},
 	computed: {
 		se_subsystems() {
 			return this.$store.getters.se_design.subsystems;
 		},
-		...mapGetters([
-			'se_design',
-		]),
+		...mapGetters(['se_design'])
 	},
-	methods: {
-	},
+	methods: {}
 };
 </script>
 
@@ -176,12 +172,10 @@ export default {
 	/* position: relative; */
 }
 
-
 .design-table-body {
-    /* display: block; */
-    /* overflow: auto; */
-    /* width: 100%; */
-    /* height: 100%; */
+	/* display: block; */
+	/* overflow: auto; */
+	/* width: 100%; */
+	/* height: 100%; */
 }
-
 </style>

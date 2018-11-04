@@ -49,7 +49,6 @@
 
 
 <script>
-
 import StatlineCell from '@/components/shipdesigner/statline-cell.vue';
 
 import { frac } from '@/lib/ui-functions';
@@ -57,10 +56,10 @@ import { frac } from '@/lib/ui-functions';
 export default {
 	name: 'SubsystemFrame',
 	components: {
-		StatlineCell,
+		StatlineCell
 	},
 	props: {
-		se_subsystem: Object,
+		se_subsystem: Object
 	},
 	computed: {
 		is_valid_frame() {
@@ -82,7 +81,9 @@ export default {
 			return this.se_subsystem.cost_crew;
 		},
 		crew_mult_pretty() {
-			return this.se_subsystem.cost_crew_frame_mult.apply((val) => val.toFixed(2) + 'x');
+			return this.se_subsystem.cost_crew_frame_mult.apply(
+				val => val.toFixed(2) + 'x'
+			);
 		},
 		build_time() {
 			return frac(this.se_subsystem.build_time, 12);
@@ -97,19 +98,17 @@ export default {
 			set(value) {
 				this.$store.commit('set_subsystem_frame', {
 					value: value,
-					subsystem: this.se_subsystem,
+					subsystem: this.se_subsystem
 				});
-			},
-		},
+			}
+		}
 	},
-	methods: {
-	},
+	methods: {}
 };
 </script>
 
 
 <style>
-
 </style>
 
 

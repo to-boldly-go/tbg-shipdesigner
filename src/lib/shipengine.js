@@ -10,23 +10,23 @@ const SIZE_TO_WEIGHT_CAP_MULTIPLIER = 300;
 const BR_TO_WEIGHT_MULTIPLIER = 10;
 
 const SUBSYSTEM_SORT_ORDER = {
-	'Tactical': 1,
-	'Operations': 2,
-	'Hull': 3,
-	'Engineering': 4,
-	'Warp Core': 5,
+	Tactical: 1,
+	Operations: 2,
+	Hull: 3,
+	Engineering: 4,
+	'Warp Core': 5
 };
 
 const BR_COST_ROUND_MAP = {
-	'Frigate': 5,
-	'Cruiser': 10,
-	'Explorer': 10,
+	Frigate: 5,
+	Cruiser: 10,
+	Explorer: 10
 };
 
 const SR_COST_ROUND_MAP = {
-	'Frigate': 5,
-	'Cruiser': 5,
-	'Explorer': 10,
+	Frigate: 5,
+	Cruiser: 5,
+	Explorer: 10
 };
 
 const REFIT_BR_COST_ROUND = 5;
@@ -37,213 +37,213 @@ const REFIT_SR_COST_ROUND = 5;
 const WEIGHT_CLASS_MAP = {
 	1: 'Frigate',
 	2: 'Cruiser',
-	3: 'Explorer',
+	3: 'Explorer'
 };
 
 const SUBSYSTEM_NAME_MAP = {
-	'Tactical': 'Tac Mod',
-	'Engineering': 'Eng. Mod',
-	'Hull': 'Hull Mod',
-	'Operations': 'Ops Mod',
-	'Warp Core': 'Core Mod',
+	Tactical: 'Tac Mod',
+	Engineering: 'Eng. Mod',
+	Hull: 'Hull Mod',
+	Operations: 'Ops Mod',
+	'Warp Core': 'Core Mod'
 };
 
 // REFACTOR: change the names of these to be less abbreviated
 // (effectiveness instead of effect, for example)
-let COMPONENT_MODIFIERS = {
+const COMPONENT_MODIFIERS = {
 	'Primary Phasers': {
 		'Effect Qty?': true,
-		'combat': 1,
+		combat: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Secondary Phasers': {
 		'Effect Qty?': true,
-		'combat': 1/4,
-		'Cost Mod': 1/4,
-		'Crew Mod': 1/4,
+		combat: 1 / 4,
+		'Cost Mod': 1 / 4,
+		'Crew Mod': 1 / 4
 	},
 	'Torpedo System': {
 		'Effect Qty?': true,
-		'combat': 1,
+		combat: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Short-Range Sensors': {
 		'Effect Qty?': true,
-		'combat': 1/2,
-		'science': 1/2,
+		combat: 1 / 2,
+		science: 1 / 2,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Targeting Computer': {
 		'Effect Qty?': true,
-		'combat': 1,
+		combat: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Deflector Shields': {
 		'Effect Qty?': true,
-		'shields': 1,
+		shields: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Backup Deflectors': {
 		'Effect Qty?': true,
-		'shields': 1/5,
-		'Cost Mod': 1/5,
-		'Crew Mod': 1/5,
+		shields: 1 / 5,
+		'Cost Mod': 1 / 5,
+		'Crew Mod': 1 / 5
 	},
 	'Impulse Engine Pwr': {
 		'Effect Qty?': true,
-		'combat': 1/4,
-		'defense': 4/5,
+		combat: 1 / 4,
+		defense: 4 / 5,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 
 	'Long-Range Sensors': {
 		'Effect Qty?': true,
-		'science': 1,
+		science: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Navigational Sensors': {
 		'Effect Qty?': true,
-		'science': 1,
-		'defense': 1/6,
+		science: 1,
+		defense: 1 / 6,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Survey Sensors': {
 		'Effect Qty?': true,
-		'science': 1,
+		science: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Science Labs': {
 		'Effect Qty?': true,
-		'science': 1,
+		science: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Computer Core': {
 		'Effect Qty?': true,
-		'combat': 1/4,
-		'science': 1/4,
-		'hull': 1/10,
-		'shields': 1/7,
-		'presence': 1/6,
-		'defense': 1/8,
+		combat: 1 / 4,
+		science: 1 / 4,
+		hull: 1 / 10,
+		shields: 1 / 7,
+		presence: 1 / 6,
+		defense: 1 / 8,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Operating System': {
 		'Effect Qty?': true,
-		'combat': 1/8,
-		'science': 1/8,
-		'shields': 1/14,
-		'defense': 1/10,
+		combat: 1 / 8,
+		science: 1 / 8,
+		shields: 1 / 14,
+		defense: 1 / 10,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Secondary Core': {
 		'Effect Qty?': true,
-		'combat': 1/16,
-		'science': 1/16,
-		'shields': 1/28,
-		'defense': 1/40,
-		'Cost Mod': 1/2,
-		'Crew Mod': 1/4,
+		combat: 1 / 16,
+		science: 1 / 16,
+		shields: 1 / 28,
+		defense: 1 / 40,
+		'Cost Mod': 1 / 2,
+		'Crew Mod': 1 / 4
 	},
 	'Diplomatic Package': {
 		'Effect Qty?': true,
-		'presence': 1,
+		presence: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Recreation Package': {
 		'Effect Qty?': true,
-		'presence': 1,
+		presence: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
-	'Sickbay': {
+	Sickbay: {
 		'Effect Qty?': true,
-		'science': 1/2,
-		'presence': 1,
+		science: 1 / 2,
+		presence: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
-	
+
 	'Hull System': {
 		'Effect Qty?': true,
-		'hull': 1,
+		hull: 1,
 		'Cost Mod': 1,
 		'Scale Wt?': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
-	
+
 	'Structural Integrity Fields': {
 		'Effect Qty?': true,
-		'hull': 1,
+		hull: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Navigational Deflector': {
 		'Effect Qty?': false,
-		'science': 1/3,
-		'shields': 1/7,
-		'defense': 1,
+		science: 1 / 3,
+		shields: 1 / 7,
+		defense: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Nacelle System': {
 		'Effect Qty?': true,
-		'defense': 1,
+		defense: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Replication Package': {
 		'Effect Qty?': true,
-		'science': 1/10,
-		'presence': 1/4,
-		'defense': 1,
+		science: 1 / 10,
+		presence: 1 / 4,
+		defense: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Fuel & Matter Stores': {
 		'Effect Qty?': false,
-		'defense': 1,
+		defense: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
-	
+
 	'Warp Core Type': {
 		'Effect Qty?': true,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'M/AM Injectors': {
 		'Effect Qty?': true,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Coolant Systems': {
 		'Effect Qty?': true,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'EPS Manifold System': {
 		'Effect Qty?': false,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
+		'Crew Mod': 1
 	},
 	'Eject System': {
 		'Effect Qty?': false,
 		'Cost Mod': 1,
-		'Crew Mod': 1,
-	},
+		'Crew Mod': 1
+	}
 };
 
 // AI, AJ, AK block
@@ -266,7 +266,7 @@ const COMPONENT_PART_CLASSIFICATIONS = {
 	'Secondary Core': 'Computer Cores',
 	'Diplomatic Package': 'Diplomatic Packages',
 	'Recreation Package': 'Recreation Packages',
-	'Sickbay': 'Sickbays',
+	Sickbay: 'Sickbays',
 	'Hull System': 'Hull System',
 	'Structural Integrity Fields': 'Structural Integrity Fields',
 	'Navigational Deflector': 'Navigational Deflectors',
@@ -277,15 +277,15 @@ const COMPONENT_PART_CLASSIFICATIONS = {
 	'M/AM Injectors': 'Matter/Anti-Matter Injectors',
 	'Coolant Systems': 'Coolant Systems',
 	'EPS Manifold System': 'EPS Manifold System',
-	'Eject System': 'Eject System',
+	'Eject System': 'Eject System'
 };
 
 class Crewline extends NamedVector {
 	static get shortnames() {
 		return {
-			'officer': 'O',
-			'enlisted': 'E',
-			'technician': 'T',
+			officer: 'O',
+			enlisted: 'E',
+			technician: 'T'
 		};
 	}
 	constructor(val) {
@@ -296,12 +296,12 @@ class Crewline extends NamedVector {
 class Statline extends NamedVector {
 	static get shortnames() {
 		return {
-			'combat': 'C',
-			'science': 'S',
-			'hull': 'H',
-			'shields': 'L',
-			'presence': 'P',
-			'defense': 'D',
+			combat: 'C',
+			science: 'S',
+			hull: 'H',
+			shields: 'L',
+			presence: 'P',
+			defense: 'D'
 		};
 	}
 	constructor(val) {
@@ -327,7 +327,13 @@ class DesignComponent {
 		// statline
 		this.part_def = this.db.find_part(this.json['Part']);
 		if (!this.part_def) {
-			console.log("WARNING: Could not find '" + this.name + "' part named '" + this.json['Part'] + "'");
+			console.log(
+				"WARNING: Could not find '" +
+					this.name +
+					"' part named '" +
+					this.json['Part'] +
+					"'"
+			);
 		}
 	}
 
@@ -367,17 +373,17 @@ class DesignComponent {
 
 	get part_with_effective_settings() {
 		switch (this.name) {
-		case 'Primary Phasers':
-		case 'Secondary Phasers':
-			if (this.subsystem.get_setting('Phaser Arrays')) {
-				return [this.part, 'Phaser Arrays'];
-			}
-			break;
-		case 'Torpedo System':
-			if (this.subsystem.get_setting('Burst Launchers')) {
-				return [this.part, 'Burst Launchers'];
-			}
-			break;
+			case 'Primary Phasers':
+			case 'Secondary Phasers':
+				if (this.subsystem.get_setting('Phaser Arrays')) {
+					return [this.part, 'Phaser Arrays'];
+				}
+				break;
+			case 'Torpedo System':
+				if (this.subsystem.get_setting('Burst Launchers')) {
+					return [this.part, 'Burst Launchers'];
+				}
+				break;
 		}
 		return [this.part];
 	}
@@ -392,7 +398,9 @@ class DesignComponent {
 		if (this.is_quantity_configurable) {
 			this.quantity_calcs.set(parseInt(value));
 			if (value === 0) {
-				const no_part = this.valid_parts.find((part) => part['Name'].match(/No .+/) !== null);
+				const no_part = this.valid_parts.find(
+					part => part['Name'].match(/No .+/) !== null
+				);
 				if (no_part) {
 					this.json['Part'] = no_part['Name'];
 				}
@@ -414,68 +422,71 @@ class DesignComponent {
 
 	get quantity_calcs() {
 		switch (this.name) {
-		case 'Computer Core':
-		case 'Operating System':
-		case 'Navigational Deflector':
-		case 'Fuel & Matter Stores':
-		case 'EPS Manifold System':
-			return {
-				is_configurable: () => false,
-				get: () => {
-					return this.subsystem.design.size_round;
-				},
-			};
-		case 'M/AM Injectors':
-		case 'Coolant Systems':
-			return {
-				is_configurable: () => false,
-				get: () => {
-					let warp_core_type = this.subsystem.component('Warp Core Type');
-					if (!warp_core_type || !warp_core_type.is_loaded) {
-						return 0;
+			case 'Computer Core':
+			case 'Operating System':
+			case 'Navigational Deflector':
+			case 'Fuel & Matter Stores':
+			case 'EPS Manifold System':
+				return {
+					is_configurable: () => false,
+					get: () => {
+						return this.subsystem.design.size_round;
 					}
-					return warp_core_type.quantity;
-				},
-			};
-		case 'Targeting Computer':
-		case 'Nacelle System':
-		case 'Eject System':
-			return {
-				is_configurable: () => false,
-				get: () => {
-					if (this.is_no_part) {
-						return 0;
-					} else {
-						return 1;
+				};
+			case 'M/AM Injectors':
+			case 'Coolant Systems':
+				return {
+					is_configurable: () => false,
+					get: () => {
+						const warp_core_type = this.subsystem.component('Warp Core Type');
+						if (!warp_core_type || !warp_core_type.is_loaded) {
+							return 0;
+						}
+						return warp_core_type.quantity;
 					}
-				},
-			};
-		default:
-			return {
-				is_configurable: () => true,
-				get: () => {
-					return this.json['Quantity'];
-				},
-				set: (value) => {
-					this.json['Quantity'] = value;
-				},
-				options: () => {
-					switch (this.name) {
-					case 'Replication Package':
-						return [...Array(this.subsystem.design.size_round + 1).keys()];
-					case 'Secondary Core':
-						return [0, 1, 2];
-					case 'Structural Integrity Fields': {
-						let hull_count = this.subsystem.design.subsystem('Hull').component('Hull System').quantity;
-						let hull_grade_civilian = this.part.match(/Civilian Grade$/);
-						let sif_max_count = hull_count * (hull_grade_civilian ? 1 : 2);
-						return [...Array(sif_max_count + 1).keys()];
+				};
+			case 'Targeting Computer':
+			case 'Nacelle System':
+			case 'Eject System':
+				return {
+					is_configurable: () => false,
+					get: () => {
+						if (this.is_no_part) {
+							return 0;
+						} else {
+							return 1;
+						}
 					}
-					default:
-						return [...Array(26).keys()];
+				};
+			default:
+				return {
+					is_configurable: () => true,
+					get: () => {
+						return this.json['Quantity'];
+					},
+					set: value => {
+						this.json['Quantity'] = value;
+					},
+					options: () => {
+						switch (this.name) {
+							case 'Replication Package':
+								return [...Array(this.subsystem.design.size_round + 1).keys()];
+							case 'Secondary Core':
+								return [0, 1, 2];
+							case 'Structural Integrity Fields': {
+								const hull_count = this.subsystem.design
+									.subsystem('Hull')
+									.component('Hull System').quantity;
+								const hull_grade_civilian = this.part.match(/Civilian Grade$/);
+								const sif_max_count =
+									hull_count * (hull_grade_civilian ? 1 : 2);
+								return [...Array(sif_max_count + 1).keys()];
+							}
+							default:
+								return [...Array(26).keys()];
+						}
 					}
-				},
-			};
+				};
 		}
 	}
 
@@ -484,40 +495,53 @@ class DesignComponent {
 	// * Large or Medium Cruiser Engineering Subframe
 	// * All Explorer
 	get requires_heavy_navigational_deflector() {
-		return (this.subsystem.design.weight_class === 'Explorer')
-			|| (this.subsystem.design.weight_class === 'Cruiser'
-				&& this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Lg | Md /))
-			|| (this.subsystem.design.weight_class === 'Frigate'
-				&& this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Lg /));
+		return (
+			this.subsystem.design.weight_class === 'Explorer' ||
+			(this.subsystem.design.weight_class === 'Cruiser' &&
+				this.subsystem.design
+					.subsystem('Engineering')
+					.sub_frame.match(/ Lg | Md /)) ||
+			(this.subsystem.design.weight_class === 'Frigate' &&
+				this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Lg /))
+		);
 	}
 
 	// Requires L navigational deflector:
 	// * Small or Medium Frigate Engineering Subframe
 	// * Small Cruiser Engineering Subframe
 	get requires_light_navigational_deflector() {
-		return (this.subsystem.design.weight_class === 'Cruiser'
-				&& this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Sm /))
-			|| (this.subsystem.design.weight_class === 'Frigate'
-				&& this.subsystem.design.subsystem('Engineering').sub_frame.match(/ Md | Sm /));
+		return (
+			(this.subsystem.design.weight_class === 'Cruiser' &&
+				this.subsystem.design
+					.subsystem('Engineering')
+					.sub_frame.match(/ Sm /)) ||
+			(this.subsystem.design.weight_class === 'Frigate' &&
+				this.subsystem.design
+					.subsystem('Engineering')
+					.sub_frame.match(/ Md | Sm /))
+		);
 	}
 
 	get valid_parts() {
-		let parts_of_type = this
-			.db
+		let parts_of_type = this.db
 			.find_parts(COMPONENT_PART_CLASSIFICATIONS[this.name])
-			.filter((part) => !part['Name'].match(/^x/));
+			.filter(part => !part['Name'].match(/^x/));
 
 		switch (this.name) {
-		case 'Navigational Deflector':
-			if (this.requires_heavy_navigational_deflector) {
-				parts_of_type = parts_of_type.filter((part) => part['Name'].match(/\[H\]/));
-			}
-			if (this.requires_light_navigational_deflector) {
-				parts_of_type = parts_of_type.filter((part) => part['Name'].match(/\[L\]/));
-			}
-			break;
-		default:
-			break;
+			case 'Navigational Deflector':
+				if (this.requires_heavy_navigational_deflector) {
+					parts_of_type = parts_of_type.filter(part =>
+						part['Name'].match(/\[H\]/)
+					);
+				}
+				if (this.requires_light_navigational_deflector) {
+					parts_of_type = parts_of_type.filter(part =>
+						part['Name'].match(/\[L\]/)
+					);
+				}
+				break;
+			default:
+				break;
 		}
 		return parts_of_type;
 	}
@@ -530,7 +554,7 @@ class DesignComponent {
 			// out and some junk to convert it to a probability
 			//
 			const evasion_effect = this.effect * this.subsystem.stats_multiplier;
-			return 1 + (evasion_effect / 10);
+			return 1 + evasion_effect / 10;
 		} else {
 			return false;
 		}
@@ -562,7 +586,7 @@ class DesignComponent {
 			this.crew_mod,
 
 			this.cost_crew_quantity_mod,
-			this.subsystem.design.cost_crew_size_mod,
+			this.subsystem.design.cost_crew_size_mod
 		].reduce((sum, value) => sum.mult(value), new Crewline(1));
 	}
 
@@ -572,19 +596,18 @@ class DesignComponent {
 	// crewline
 	get cost_crew_quantity_mod() {
 		if (this.quantity) {
-			return 1 + (2 * Math.log(this.quantity) / Math.log(10));
+			return 1 + (2 * Math.log(this.quantity)) / Math.log(10);
 		} else {
 			return 1;
 		}
 	}
 
 	get cost_crew_raw() {
-		const map = [
-			['officer', 'O'],
-			['enlisted', 'E'],
-			['technician', 'T'],
-		];
-		let crew_block = map.reduce((res, [longname, shortname]) => { res[longname] = this.attribute(shortname); return res; }, {});
+		const map = [['officer', 'O'], ['enlisted', 'E'], ['technician', 'T']];
+		const crew_block = map.reduce((res, [longname, shortname]) => {
+			res[longname] = this.attribute(shortname);
+			return res;
+		}, {});
 		return new Crewline(crew_block);
 	}
 
@@ -598,24 +621,24 @@ class DesignComponent {
 			// CD is effect
 			return this.effect;
 		}
-		let warp_core_type = this.subsystem.component('Warp Core Type');
+		const warp_core_type = this.subsystem.component('Warp Core Type');
 		if (!warp_core_type || !warp_core_type.is_loaded) {
 			return 0;
 		}
 		switch (this.name) {
-		case 'M/AM Injectors':
-			// =1 + (CD81 / 100 * CO$79)
-			// CD is effect
-			// CD$79 is the effect for the "Warp Core Type" component
-			return 1 + (this.effect * warp_core_type.effect / 100.0);
-		case 'Coolant Systems':
-			// =1 + (CD82 / 100 * CO$79)
-			return 1 + (this.effect * warp_core_type.effect / 100.0);
-		case 'EPS Manifold System':
-			// =1 + (CD83 / 100 * CO$79)
-			return 1 + (this.effect * warp_core_type.effect / 100.0);
-		default:
-			return 0;
+			case 'M/AM Injectors':
+				// =1 + (CD81 / 100 * CO$79)
+				// CD is effect
+				// CD$79 is the effect for the "Warp Core Type" component
+				return 1 + (this.effect * warp_core_type.effect) / 100.0;
+			case 'Coolant Systems':
+				// =1 + (CD82 / 100 * CO$79)
+				return 1 + (this.effect * warp_core_type.effect) / 100.0;
+			case 'EPS Manifold System':
+				// =1 + (CD83 / 100 * CO$79)
+				return 1 + (this.effect * warp_core_type.effect) / 100.0;
+			default:
+				return 0;
 		}
 	}
 
@@ -638,9 +661,12 @@ class DesignComponent {
 		// these sum together to the same as the normal case, so need
 		// not be special-cased!
 
-		return (this.cost_power_overhead
-				+ this.cost_power_scale * this.subsystem.design.size
-				+ this.cost_power_unit * this.quantity) * this.cost_mod;
+		return (
+			(this.cost_power_overhead +
+				this.cost_power_scale * this.subsystem.design.size +
+				this.cost_power_unit * this.quantity) *
+			this.cost_mod
+		);
 	}
 
 	// DP column
@@ -664,7 +690,11 @@ class DesignComponent {
 		// CM29 is subsystem frame 'SR Cost x'
 		// CK31 is weight
 		// DO31 is SR Cost x off the part list
-		return (this.weight_internal + this.weight_external) * this.cost_SR_mult * this.subsystem.cost_SR_mult;
+		return (
+			(this.weight_internal + this.weight_external) *
+			this.cost_SR_mult *
+			this.subsystem.cost_SR_mult
+		);
 	}
 
 	// DO31
@@ -676,7 +706,9 @@ class DesignComponent {
 	// CL column
 	get cost_BR() {
 		// total weight divided by br to weight mult
-		return (this.weight_internal + this.weight_external) / BR_TO_WEIGHT_MULTIPLIER;
+		return (
+			(this.weight_internal + this.weight_external) / BR_TO_WEIGHT_MULTIPLIER
+		);
 	}
 
 	// CK column
@@ -692,11 +724,11 @@ class DesignComponent {
 		// DE31 is "Wt Custom" component configuration
 		// DG31 is "Cost Mod" component configuration
 		switch (this.name) {
-		case 'Nacelle System':
-			// "Nacelle Distribution" line in spreadsheet
-			return this.weight_overhead_raw * this.weight_custom * this.cost_mod;
-		default:
-			return this.weight_raw * this.weight_custom * this.cost_mod;
+			case 'Nacelle System':
+				// "Nacelle Distribution" line in spreadsheet
+				return this.weight_overhead_raw * this.weight_custom * this.cost_mod;
+			default:
+				return this.weight_raw * this.weight_custom * this.cost_mod;
 		}
 	}
 
@@ -713,12 +745,17 @@ class DesignComponent {
 		// DE31 is "Wt Custom" component configuration
 		// DG31 is "Cost Mod" component configuration
 		switch (this.name) {
-		case 'Nacelle System':
-			// "Nacelle System" line in spreadsheet
-			// DN70 * BK70 * DE70 * DG70
-			return this.weight_unit_raw * this.quantity * this.weight_custom * this.cost_mod;
-		default:
-			return 0;
+			case 'Nacelle System':
+				// "Nacelle System" line in spreadsheet
+				// DN70 * BK70 * DE70 * DG70
+				return (
+					this.weight_unit_raw *
+					this.quantity *
+					this.weight_custom *
+					this.cost_mod
+				);
+			default:
+				return 0;
 		}
 	}
 
@@ -728,7 +765,7 @@ class DesignComponent {
 	// the weight of the component before component and size modifiers
 	// are applied
 	get weight_raw() {
-		return this.weight_overhead_raw + (this.weight_per_unit * this.quantity);
+		return this.weight_overhead_raw + this.weight_per_unit * this.quantity;
 	}
 
 	get cost_mod() {
@@ -774,23 +811,30 @@ class DesignComponent {
 		//
 		// effect for this part * frame effect multiplier * the
 		// component's statline modifier
-		return new Statline(this.component_modifier).mult(this.effect * this.subsystem.stats_multiplier);
+		return new Statline(this.component_modifier).mult(
+			this.effect * this.subsystem.stats_multiplier
+		);
 	}
 
 	// CD column
 	// scalar
 	get effect() {
 		switch (this.subsystem.name) {
-		case 'Warp Core':
-			// =DK79 * IF(CX79,1+3.5*log10(0.7*BK79+0.3),1) * CW79 * CD$77
-			//
-			// raw effect * quantity mult * custom effect * frame effect modifier
-			return this.raw_effect * this.effect_custom * this.qty_mult * this.subsystem.stats_multiplier;
-		default:
-			// =DK31 * IF(CX31,1+3.5*log10(0.7*BK31+0.3),1) * CW31
-			//
-			// raw effect from parts list * quantity multiplier * custom effect
-			return this.raw_effect * this.effect_custom * this.qty_mult;
+			case 'Warp Core':
+				// =DK79 * IF(CX79,1+3.5*log10(0.7*BK79+0.3),1) * CW79 * CD$77
+				//
+				// raw effect * quantity mult * custom effect * frame effect modifier
+				return (
+					this.raw_effect *
+					this.effect_custom *
+					this.qty_mult *
+					this.subsystem.stats_multiplier
+				);
+			default:
+				// =DK31 * IF(CX31,1+3.5*log10(0.7*BK31+0.3),1) * CW31
+				//
+				// raw effect from parts list * quantity multiplier * custom effect
+				return this.raw_effect * this.effect_custom * this.qty_mult;
 		}
 	}
 
@@ -801,7 +845,7 @@ class DesignComponent {
 	// scalar
 	get qty_mult() {
 		if (this.uses_effect_qty) {
-			return 1 + (3.5 * Math.log((0.7 * this.quantity) + 0.3) / Math.log(10));
+			return 1 + (3.5 * Math.log(0.7 * this.quantity + 0.3)) / Math.log(10);
 		} else {
 			return 1;
 		}
@@ -849,10 +893,14 @@ class DesignComponent {
 
 			// return (0.97 / 2) * ;
 
-			return this.phaser_size_mult * this.setting_phaser_array_combat_multiplier;
+			return (
+				this.phaser_size_mult * this.setting_phaser_array_combat_multiplier
+			);
 		}
 		if (this.name === 'Secondary Phasers') {
-			return this.phaser_size_mult * this.setting_phaser_array_combat_multiplier;
+			return (
+				this.phaser_size_mult * this.setting_phaser_array_combat_multiplier
+			);
 		}
 		if (this.name === 'Torpedo System') {
 			// =IF($D$35, 1.5, 1)
@@ -864,7 +912,7 @@ class DesignComponent {
 	}
 
 	get phaser_size_mult() {
-		return 1 - (this.subsystem.design.size / 100.0);
+		return 1 - this.subsystem.design.size / 100.0;
 	}
 
 	get setting_phaser_array_weight_multiplier() {
@@ -903,7 +951,7 @@ class DesignComponent {
 		if (!comp1 || !comp2) {
 			let comp = comp1 || comp2;
 			let default_comp = new DesignComponent(comp.db, comp.subsystem, {
-				'Name': comp.name,
+				Name: comp.name
 			});
 			return [comp1 || default_comp, comp2 || default_comp];
 		} else {
@@ -917,7 +965,12 @@ class DesignComponent {
 		function refit_cost(cost_prop) {
 			let cost = comp[cost_prop];
 			let base_cost = comp_base[cost_prop];
-			if (_.isEqual(comp.part_with_effective_settings, comp_base.part_with_effective_settings)) {
+			if (
+				_.isEqual(
+					comp.part_with_effective_settings,
+					comp_base.part_with_effective_settings
+				)
+			) {
 				if (cost >= base_cost) {
 					return cost - base_cost;
 				} else {
@@ -938,7 +991,7 @@ class DesignComponent {
 
 			get refit_cost_SR() {
 				return refit_cost('cost_SR');
-			},
+			}
 		};
 
 		return new Proxy(refit_extensions, {
@@ -951,7 +1004,7 @@ class DesignComponent {
 
 			set(target, prop, value) {
 				return Reflect.set(comp, prop, value);
-			},
+			}
 		});
 	}
 
@@ -965,7 +1018,7 @@ class DesignComponent {
 			// Don't do compare logic on quantity
 			get quantity() {
 				return comp.quantity;
-			},
+			}
 		};
 
 		return new Proxy(compare_extensions, {
@@ -978,7 +1031,7 @@ class DesignComponent {
 
 			set(target, prop, value) {
 				return Reflect.set(comp, prop, value);
-			},
+			}
 		});
 	}
 }
@@ -992,10 +1045,16 @@ class DesignSubsystem {
 		this.settings = this.json['Settings'];
 		this.sub_frame_def = this.db.find_frame(this.json['Sub-Frame']);
 		if (!this.sub_frame_def) {
-			console.log("WARNING: Could not find '" + this.name + "' subframe named '" + this.json['Sub-Frame'] + "'");
+			console.log(
+				"WARNING: Could not find '" +
+					this.name +
+					"' subframe named '" +
+					this.json['Sub-Frame'] +
+					"'"
+			);
 		}
 		this.components = this.json['Components'].map(
-			(comp_json) => new DesignComponent(this.db, this, comp_json)
+			comp_json => new DesignComponent(this.db, this, comp_json)
 		);
 	}
 
@@ -1025,8 +1084,8 @@ class DesignSubsystem {
 	get tech_year_max() {
 		const years = _.chain(this.components)
 			.filter(comp => comp.is_loaded)
-			.map((comp) => Number(comp.tech_year))
-			.filter((n) => n)
+			.map(comp => Number(comp.tech_year))
+			.filter(n => n)
 			.value();
 		let max = _.max(years);
 		if (!max) {
@@ -1039,7 +1098,7 @@ class DesignSubsystem {
 	}
 
 	get_setting(key) {
-		let setting = this.settings.find((elem) => elem['Name'] === key);
+		const setting = this.settings.find(elem => elem['Name'] === key);
 		if (setting === undefined) {
 			return null;
 		}
@@ -1057,8 +1116,8 @@ class DesignSubsystem {
 	get valid_frames() {
 		return this.db
 			.find_frames(this.name)
-			.filter((frame) => frame['Weight Class'] === this.design.weight_class_raw)
-			.filter((frame) => !frame['Name'].match(/^x/));
+			.filter(frame => frame['Weight Class'] === this.design.weight_class_raw)
+			.filter(frame => !frame['Name'].match(/^x/));
 	}
 
 	// CV20, CV41
@@ -1076,7 +1135,7 @@ class DesignSubsystem {
 	// CV29
 	get weight_cap_frame() {
 		// =(DL29/100) * CV$18
-		return this.max_size_frame * this.design.frame_max_size_raw / 100;
+		return (this.max_size_frame * this.design.frame_max_size_raw) / 100;
 	}
 
 	get max_size_frame() {
@@ -1087,9 +1146,9 @@ class DesignSubsystem {
 	get warp_core_breach() {
 		return this.components
 			.filter(comp => comp.is_loaded)
-			.map((comp) => comp.warp_core_breach)
-			.filter((val) => (val !== false))
-			.reduce((sum, value) => 1 - ((1 - sum) * (1 - value)), 0);
+			.map(comp => comp.warp_core_breach)
+			.filter(val => val !== false)
+			.reduce((sum, value) => 1 - (1 - sum) * (1 - value), 0);
 	}
 
 	get evasion() {
@@ -1097,9 +1156,9 @@ class DesignSubsystem {
 		// DD40 D mod for Impulse Engine Pwr
 		return this.components
 			.filter(comp => comp.is_loaded)
-			.map((comp) => comp.evasion)
-			.filter((val) => (val !== false))
-			.reduce((sum, value) => 1 - ((1 - sum) * (1 - value)), 0);
+			.map(comp => comp.evasion)
+			.filter(val => val !== false)
+			.reduce((sum, value) => 1 - (1 - sum) * (1 - value), 0);
 	}
 
 	// CT column, subsystems
@@ -1130,9 +1189,12 @@ class DesignSubsystem {
 		const map = [
 			['officer', 'O-Mod'],
 			['enlisted', 'E-Mod'],
-			['technician', 'T-Mod'],
+			['technician', 'T-Mod']
 		];
-		let crew_block = map.reduce((res, [longname, shortname]) => { res[longname] = this.frame_attribute(shortname); return res; }, {});
+		const crew_block = map.reduce((res, [longname, shortname]) => {
+			res[longname] = this.frame_attribute(shortname);
+			return res;
+		}, {});
 		return new Crewline(crew_block);
 	}
 
@@ -1142,7 +1204,7 @@ class DesignSubsystem {
 		// straight sum of components
 		return this.components
 			.filter(comp => comp.is_loaded)
-			.map((comp) => comp.cost_crew)
+			.map(comp => comp.cost_crew)
 			.reduce((sum, value) => sum.add(value), new Crewline({}));
 	}
 
@@ -1150,17 +1212,19 @@ class DesignSubsystem {
 	// scalar
 	get power_generation() {
 		switch (this.name) {
-		case 'Warp Core':
-			return this.power_generation_components + this.setting_safety_performance;
-		default:
-			return this.power_generation_components;
+			case 'Warp Core':
+				return (
+					this.power_generation_components + this.setting_safety_performance
+				);
+			default:
+				return this.power_generation_components;
 		}
 	}
 
 	get power_generation_components() {
 		return this.components
 			.filter(comp => comp.is_loaded)
-			.map((comp) => comp.power_generation)
+			.map(comp => comp.power_generation)
 			.reduce((sum, value) => sum + value, 0);
 	}
 
@@ -1172,14 +1236,16 @@ class DesignSubsystem {
 		if (!warp_core_type || !warp_core_type.is_loaded) {
 			return 0;
 		}
-		return -this.get_setting('Safety/Performance')
-			* warp_core_type.effect
-			* (2.0 ** Math.abs(this.get_setting('Safety/Performance')) / 2.0)
-			/ 100.0;
+		return (
+			(-this.get_setting('Safety/Performance') *
+				warp_core_type.effect *
+				(2.0 ** Math.abs(this.get_setting('Safety/Performance')) / 2.0)) /
+			100.0
+		);
 	}
 
 	component(component_name) {
-		return this.components.find((comp) => (comp.name === component_name));
+		return this.components.find(comp => comp.name === component_name);
 	}
 
 	// CN column, 29 etc
@@ -1190,7 +1256,7 @@ class DesignSubsystem {
 	get cost_power_components() {
 		return this.components
 			.filter(comp => comp.is_loaded)
-			.map((comp) => comp.cost_power)
+			.map(comp => comp.cost_power)
 			.reduce((sum, value) => sum + value, 0);
 	}
 
@@ -1211,7 +1277,7 @@ class DesignSubsystem {
 		// straight sum of component costs
 		return this.components
 			.filter(comp => comp.is_loaded)
-			.map((comp) => comp.cost_SR)
+			.map(comp => comp.cost_SR)
 			.reduce((sum, value) => sum + value, 0);
 	}
 
@@ -1229,7 +1295,7 @@ class DesignSubsystem {
 	get cost_BR_components() {
 		return this.components
 			.filter(comp => comp.is_loaded)
-			.map((comp) => comp.cost_BR)
+			.map(comp => comp.cost_BR)
 			.reduce((sum, value) => sum + value, 0);
 	}
 
@@ -1258,7 +1324,7 @@ class DesignSubsystem {
 	get weight_components_external() {
 		return this.components
 			.filter(comp => comp.is_loaded)
-			.map((comp) => comp.weight_external)
+			.map(comp => comp.weight_external)
 			.reduce((sum, value) => sum + value, 0);
 	}
 
@@ -1267,19 +1333,19 @@ class DesignSubsystem {
 	get weight_components_internal() {
 		return this.components
 			.filter(comp => comp.is_loaded)
-			.map((comp) => comp.weight_internal)
+			.map(comp => comp.weight_internal)
 			.reduce((sum, value) => sum + value, 0);
 	}
 
 	// get weight_multiplier() {
 	// 	return this.frame_attribute('') || 0;
 	// };
-	
+
 	// [CE41 row;CE57 row;CE63 row] block
 	get stats() {
 		return this.components
 			.filter(comp => comp.is_loaded)
-			.map((comp) => comp.stats)
+			.map(comp => comp.stats)
 			.reduce((sum, value) => sum.add(value), new Statline({}));
 	}
 
@@ -1295,11 +1361,19 @@ class DesignSubsystem {
 	static defaults(subsystem1, subsystem2) {
 		if (!subsystem1 || !subsystem2) {
 			let subsystem = subsystem1 || subsystem2;
-			let default_subsystem = new DesignSubsystem(subsystem.db, subsystem.design, {
-				'Name': subsystem.name,
-				'Settings': subsystem.settings.map(setting => ({'Name': setting['Name']})),
-				'Components': subsystem.components.map(comp => DesignComponent.defaults(null, comp)[0]),
-			});
+			let default_subsystem = new DesignSubsystem(
+				subsystem.db,
+				subsystem.design,
+				{
+					Name: subsystem.name,
+					Settings: subsystem.settings.map(setting => ({
+						Name: setting['Name']
+					})),
+					Components: subsystem.components.map(
+						comp => DesignComponent.defaults(null, comp)[0]
+					)
+				}
+			);
 			return [subsystem1 || default_subsystem, subsystem2 || default_subsystem];
 		} else {
 			return [subsystem1, subsystem2];
@@ -1307,13 +1381,25 @@ class DesignSubsystem {
 	}
 
 	static refit(subsystem, subsystem_base, refit_valid) {
-		[subsystem, subsystem_base] = DesignSubsystem.defaults(subsystem, subsystem_base);
+		[subsystem, subsystem_base] = DesignSubsystem.defaults(
+			subsystem,
+			subsystem_base
+		);
 		// don't assume order or existence of each component
-		let components = zipByAndWith(subsystem.components, subsystem_base.components, comp => comp.name,
-			(comp, comp_base) => DesignComponent.refit(comp, comp_base, refit_valid));
+		let components = zipByAndWith(
+			subsystem.components,
+			subsystem_base.components,
+			comp => comp.name,
+			(comp, comp_base) => DesignComponent.refit(comp, comp_base, refit_valid)
+		);
 		// also don't assume order or existence of each setting
-		let settings = zipByAndWith(subsystem.settings, subsystem_base.settings, setting => setting['Name'],
-			(setting, setting_base) => DesignSubsystem.setting_refit(setting, setting_base, refit_valid));
+		let settings = zipByAndWith(
+			subsystem.settings,
+			subsystem_base.settings,
+			setting => setting['Name'],
+			(setting, setting_base) =>
+				DesignSubsystem.setting_refit(setting, setting_base, refit_valid)
+		);
 
 		function refit_cost(cost_prop) {
 			return components
@@ -1334,7 +1420,7 @@ class DesignSubsystem {
 
 			get refit_cost_SR() {
 				return refit_cost('cost_SR');
-			},
+			}
 		};
 
 		return new Proxy(refit_extensions, {
@@ -1347,24 +1433,36 @@ class DesignSubsystem {
 
 			set(target, prop, value) {
 				return Reflect.set(subsystem, prop, value);
-			},
+			}
 		});
 	}
 
 	static compare(subsystem, subsystem_base) {
-		[subsystem, subsystem_base] = DesignSubsystem.defaults(subsystem, subsystem_base);
+		[subsystem, subsystem_base] = DesignSubsystem.defaults(
+			subsystem,
+			subsystem_base
+		);
 		// don't assume order or existence of each component
-		let components = zipByAndWith(subsystem.components, subsystem_base.components, comp => comp.name,
-			(comp, comp_base) => DesignComponent.compare(comp, comp_base));
+		let components = zipByAndWith(
+			subsystem.components,
+			subsystem_base.components,
+			comp => comp.name,
+			(comp, comp_base) => DesignComponent.compare(comp, comp_base)
+		);
 		// also don't assume order or existence of each setting
-		let settings = zipByAndWith(subsystem.settings, subsystem_base.settings, setting => setting['Name'],
-			(setting, setting_base) => DesignSubsystem.setting_compare(setting, setting_base));
+		let settings = zipByAndWith(
+			subsystem.settings,
+			subsystem_base.settings,
+			setting => setting['Name'],
+			(setting, setting_base) =>
+				DesignSubsystem.setting_compare(setting, setting_base)
+		);
 
 		let compare_extensions = {
 			omit_validation: true,
 			compare_base: subsystem_base,
 			components,
-			settings,
+			settings
 		};
 
 		return new Proxy(compare_extensions, {
@@ -1372,19 +1470,22 @@ class DesignSubsystem {
 				if (prop in target && prop !== 'constructor') {
 					return target[prop];
 				}
-				return Design.generic_base_compare(subsystem[prop], subsystem_base[prop]);
+				return Design.generic_base_compare(
+					subsystem[prop],
+					subsystem_base[prop]
+				);
 			},
 
 			set(target, prop, value) {
 				return Reflect.set(subsystem, prop, value);
-			},
+			}
 		});
 	}
 
 	static setting_refit(setting, setting_base, refit_valid) {
 		let refit_extensions = {
 			refit_valid,
-			compare_base: setting_base,
+			compare_base: setting_base
 		};
 
 		// Proxy is mostly for adding compare_base without polluting original setting object
@@ -1398,14 +1499,14 @@ class DesignSubsystem {
 
 			set(target, prop, value) {
 				return Reflect.set(setting, prop, value);
-			},
+			}
 		});
 	}
 
 	static setting_compare(setting, setting_base) {
-		let compare_extensions = {
+		const compare_extensions = {
 			omit_validation: true,
-			compare_base: setting_base,
+			compare_base: setting_base
 		};
 
 		// Proxy is mostly for adding compare_base without polluting original setting object
@@ -1420,7 +1521,7 @@ class DesignSubsystem {
 
 			set(target, prop, value) {
 				return Reflect.set(setting, prop, value);
-			},
+			}
 		});
 	}
 }
@@ -1430,9 +1531,18 @@ class Module {
 		this.json = design_module_json;
 		this.db = db;
 		this.design = design;
-		this.module_def = this.db.find_module(this.json['Type'], this.json['Variant']);
+		this.module_def = this.db.find_module(
+			this.json['Type'],
+			this.json['Variant']
+		);
 		if (!this.module_def) {
-			console.log("WARNING: Could not find module of type '" + this.json['Type'] + "' and variant '" + this.json['Variant'] + "'");
+			console.log(
+				"WARNING: Could not find module of type '" +
+					this.json['Type'] +
+					"' and variant '" +
+					this.json['Variant'] +
+					"'"
+			);
 		}
 	}
 
@@ -1481,12 +1591,11 @@ class Module {
 	// crewline
 	get cost_crew() {
 		// straight off parts list
-		const map = [
-			['officer', 'O'],
-			['enlisted', 'E'],
-			['technician', 'T'],
-		];
-		let stat_block = map.reduce((res, [longname, shortname]) => { res[longname] = this.attribute(shortname); return res; }, {});
+		const map = [['officer', 'O'], ['enlisted', 'E'], ['technician', 'T']];
+		let stat_block = map.reduce((res, [longname, shortname]) => {
+			res[longname] = this.attribute(shortname);
+			return res;
+		}, {});
 		return new Crewline(stat_block);
 	}
 
@@ -1519,9 +1628,12 @@ class Module {
 			['hull', 'H'],
 			['shields', 'L'],
 			['presence', 'P'],
-			['defense', 'D'],
+			['defense', 'D']
 		];
-		let stat_block = map.reduce((res, [longname, shortname]) => { res[longname] = this.attribute(shortname); return res; }, {});
+		let stat_block = map.reduce((res, [longname, shortname]) => {
+			res[longname] = this.attribute(shortname);
+			return res;
+		}, {});
 		return new Statline(stat_block);
 	}
 
@@ -1557,7 +1669,10 @@ class Module {
 
 	static refit(module, module_base, refit_valid) {
 		function refit_cost(cost_prop) {
-			if (module.module_type === module_base.module_type && module.module_variant === module_base.module_variant) {
+			if (
+				module.module_type === module_base.module_type &&
+				module.module_variant === module_base.module_variant
+			) {
 				return 0;
 			}
 			return module[cost_prop] - module_base[cost_prop] / 2;
@@ -1573,7 +1688,7 @@ class Module {
 
 			get refit_cost_SR() {
 				return refit_cost('cost_SR');
-			},
+			}
 		};
 
 		return new Proxy(refit_extensions, {
@@ -1586,14 +1701,14 @@ class Module {
 
 			set(target, prop, value) {
 				return Reflect.set(module, prop, value);
-			},
+			}
 		});
 	}
 
 	static compare(module, module_base) {
 		let compare_extensions = {
 			omit_validation: true,
-			compare_base: module_base,
+			compare_base: module_base
 		};
 
 		return new Proxy(compare_extensions, {
@@ -1606,11 +1721,10 @@ class Module {
 
 			set(target, prop, value) {
 				return Reflect.set(module, prop, value);
-			},
+			}
 		});
 	}
 }
-
 
 class Design {
 	constructor(db, design_json, wrong_db = false) {
@@ -1628,11 +1742,18 @@ class Design {
 		}
 		this.princ_frame_def = this.db.find_frame(this.json['Principal Frame']);
 		if (!this.princ_frame_def) {
-			console.log("WARNING: Could not find principal frame named '" + this.json['Principal Frame'] + "'");
+			console.log(
+				"WARNING: Could not find principal frame named '" +
+					this.json['Principal Frame'] +
+					"'"
+			);
 		}
-		this.subsystems = this.json['Subsystems'].map(
-			(ss_json) => new DesignSubsystem(this.db, this, ss_json)
-		).sort((ssa, ssb) => SUBSYSTEM_SORT_ORDER[ssa.name] > SUBSYSTEM_SORT_ORDER[ssb.name]);
+		this.subsystems = this.json['Subsystems']
+			.map(ss_json => new DesignSubsystem(this.db, this, ss_json))
+			.sort(
+				(ssa, ssb) =>
+					SUBSYSTEM_SORT_ORDER[ssa.name] > SUBSYSTEM_SORT_ORDER[ssb.name]
+			);
 		this.module = new Module(db, this, this.json['Module']);
 	}
 
@@ -1643,17 +1764,18 @@ class Design {
 	}
 
 	matches_pretty_name(value) {
-		return (this.pretty_name === value);
+		return this.pretty_name === value;
 	}
 
 	matches_design(other) {
-		return (this.name === other.name
-				&& this.timestamp === other.timestamp);
+		return this.name === other.name && this.timestamp === other.timestamp;
 	}
 
 	matches_parts_list(parts_db) {
-		return (this.parts_list_name === parts_db.name
-				&& this.parts_list_timestamp.getTime() === parts_db.timestamp.getTime());
+		return (
+			this.parts_list_name === parts_db.name &&
+			this.parts_list_timestamp.getTime() === parts_db.timestamp.getTime()
+		);
 	}
 
 	frame_attribute(name) {
@@ -1672,17 +1794,33 @@ class Design {
 	}
 
 	get is_loaded() {
-		return this.is_valid_frame && this.subsystems.every(ss => ss.is_loaded) && this.module.is_loaded;
+		return (
+			this.is_valid_frame &&
+			this.subsystems.every(ss => ss.is_loaded) &&
+			this.module.is_loaded
+		);
 	}
 
 	get frame_name_map() {
-		return _.fromPairs([['Principal', this.json['Principal Frame']], ...this.json['Subsystems'].map(ss_json => [ss_json['Name'], ss_json['Sub-Frame']])]);
+		return _.fromPairs([
+			['Principal', this.json['Principal Frame']],
+			...this.json['Subsystems'].map(ss_json => [
+				ss_json['Name'],
+				ss_json['Sub-Frame']
+			])
+		]);
 	}
 
 	get pretty_name() {
-		return this.name
-			+ ' (' + this.timestamp.toLocaleString() + ')'
-			+ ' [' + this.pretty_name_stats + ']';
+		return (
+			this.name +
+			' (' +
+			this.timestamp.toLocaleString() +
+			')' +
+			' [' +
+			this.pretty_name_stats +
+			']'
+		);
 	}
 
 	get pretty_name_stats() {
@@ -1698,7 +1836,12 @@ class Design {
 	}
 
 	get parts_list_pretty_name() {
-		return this.parts_list_name + ' (' + this.parts_list_timestamp.toLocaleString() + ')';
+		return (
+			this.parts_list_name +
+			' (' +
+			this.parts_list_timestamp.toLocaleString() +
+			')'
+		);
 	}
 
 	get principal_frame() {
@@ -1716,8 +1859,8 @@ class Design {
 	get tech_year_max() {
 		const years = _.chain(this.subsystems)
 			.filter(ss => ss.is_loaded)
-			.map((ss) => Number(ss.tech_year_max))
-			.filter((n) => n)
+			.map(ss => Number(ss.tech_year_max))
+			.filter(n => n)
 			.value();
 		let max = _.max(years);
 		if (!max) {
@@ -1730,7 +1873,7 @@ class Design {
 	}
 
 	subsystem(subsystem_name) {
-		return this.subsystems.find((ss) => (ss.name === subsystem_name));
+		return this.subsystems.find(ss => ss.name === subsystem_name);
 	}
 
 	get valid_frames() {
@@ -1745,7 +1888,11 @@ class Design {
 	// CT26
 	get build_time_raw() {
 		// =SUM(CT20:CT25)+CT$18
-		return this.build_time_frame + this.build_time_subsystems + this.module.build_time;
+		return (
+			this.build_time_frame +
+			this.build_time_subsystems +
+			this.module.build_time
+		);
 	}
 
 	// CT18, DN18
@@ -1758,7 +1905,7 @@ class Design {
 	get build_time_subsystems() {
 		return this.subsystems
 			.filter(ss => ss.is_loaded)
-			.map((ss) => ss.build_time)
+			.map(ss => ss.build_time)
 			.reduce((sum, value) => sum + value, 0);
 	}
 
@@ -1778,15 +1925,15 @@ class Design {
 	get evasion_size_mult() {
 		// =(MAX(0, 30 - (BK$26*3)) / 100)
 		// for ease of programming: probability of all failing
-		return Math.max(0, 30 - (this.size * 3)) / 100;
+		return Math.max(0, 30 - this.size * 3) / 100;
 	}
 
 	get evasion_subsystems() {
 		return this.subsystems
 			.filter(ss => ss.is_loaded)
-			.map((ss) => ss.evasion)
-			.filter((wcb) => wcb)
-			.reduce((sum, value) => 1 - ((1 - sum) * (1 - value)), 0);
+			.map(ss => ss.evasion)
+			.filter(wcb => wcb)
+			.reduce((sum, value) => 1 - (1 - sum) * (1 - value), 0);
 	}
 
 	// CD13, DV84
@@ -1798,16 +1945,16 @@ class Design {
 		// for ease of programming: probability of all failing
 		return this.subsystems
 			.filter(ss => ss.is_loaded)
-			.map((ss) => ss.warp_core_breach)
-			.filter((wcb) => wcb)
-			.reduce((sum, value) => 1 - ((1 - sum) * (1 - value)), 0);
+			.map(ss => ss.warp_core_breach)
+			.filter(wcb => wcb)
+			.reduce((sum, value) => 1 - (1 - sum) * (1 - value), 0);
 	}
 
 	// ($BK$26^0.7 / 2)
 	// crewline
 	get cost_crew_size_mod() {
 		// BK26 is design size
-		return (this.size ** 0.7) / 2;
+		return this.size ** 0.7 / 2;
 		// return 1/2;
 	}
 
@@ -1817,9 +1964,12 @@ class Design {
 		const map = [
 			['officer', 'O-Mod'],
 			['enlisted', 'E-Mod'],
-			['technician', 'T-Mod'],
+			['technician', 'T-Mod']
 		];
-		let crew_block = map.reduce((res, [longname, shortname]) => { res[longname] = this.frame_attribute(shortname); return res; }, {});
+		let crew_block = map.reduce((res, [longname, shortname]) => {
+			res[longname] = this.frame_attribute(shortname);
+			return res;
+		}, {});
 		return new Crewline(crew_block);
 	}
 
@@ -1841,7 +1991,7 @@ class Design {
 	get cost_crew_subsystems() {
 		return this.subsystems
 			.filter(ss => ss.is_loaded)
-			.map((ss) => ss.cost_crew)
+			.map(ss => ss.cost_crew)
 			.reduce((sum, value) => sum.add(value), new Crewline({}));
 	}
 
@@ -1852,10 +2002,10 @@ class Design {
 	get power_generation_raw() {
 		return this.subsystems
 			.filter(ss => ss.is_loaded)
-			.map((ss) => ss.power_generation)
+			.map(ss => ss.power_generation)
 			.reduce((sum, value) => sum + value, 0);
 	}
-	
+
 	// CE27 row
 	get stats() {
 		return this.stats_raw.floor;
@@ -1869,7 +2019,7 @@ class Design {
 	get stats_subsystems() {
 		return this.subsystems
 			.filter(ss => ss.is_loaded)
-			.map((ss) => ss.stats)
+			.map(ss => ss.stats)
 			.reduce((sum, value) => sum.add(value), new Statline({}));
 	}
 
@@ -1894,7 +2044,11 @@ class Design {
 	// scalar
 	get weight_internal() {
 		// =SUM(CK20:CK25)+CK$18
-		return this.weight_frame + this.weight_subsystems_internal + this.module.weight_internal;
+		return (
+			this.weight_frame +
+			this.weight_subsystems_internal +
+			this.module.weight_internal
+		);
 	}
 
 	// O2, CK26
@@ -1911,7 +2065,7 @@ class Design {
 		// CK25 is module weight
 		return this.subsystems
 			.filter(ss => ss.is_loaded)
-			.map((ss) => ss.weight_internal)
+			.map(ss => ss.weight_internal)
 			.reduce((sum, value) => sum + value, 0);
 	}
 
@@ -1922,7 +2076,7 @@ class Design {
 		// CK25 is module weight
 		return this.subsystems
 			.filter(ss => ss.is_loaded)
-			.map((ss) => ss.weight_external)
+			.map(ss => ss.weight_external)
 			.reduce((sum, value) => sum + value, 0);
 	}
 
@@ -1937,7 +2091,9 @@ class Design {
 		// =CEILING(CL26,INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0)))
 		// ceiling(CL16, cost_BR_round)
 		// round raw BR cost to next integer multiple of the rounding interval
-		return Math.ceil(this.cost_BR_raw / this.cost_BR_round) * this.cost_BR_round;
+		return (
+			Math.ceil(this.cost_BR_raw / this.cost_BR_round) * this.cost_BR_round
+		);
 	}
 
 	get cost_BR_round() {
@@ -1973,7 +2129,7 @@ class Design {
 	get cost_BR_components() {
 		return this.subsystems
 			.filter(ss => ss.is_loaded)
-			.map((ss) => ss.cost_BR)
+			.map(ss => ss.cost_BR)
 			.reduce((sum, value) => sum + value, 0);
 	}
 
@@ -1996,7 +2152,9 @@ class Design {
 		// =CEILING(CL26,INDEX($AL$6:$AL$16,MATCH("BR Cost Round - "&$CD$9,$AJ$6:$AJ$16,0)))
 		// ceiling(CL16, cost_BR_round)
 		// round raw BR cost to next integer multiple of the rounding interval
-		return Math.ceil(this.cost_SR_raw / this.cost_SR_round) * this.cost_SR_round;
+		return (
+			Math.ceil(this.cost_SR_raw / this.cost_SR_round) * this.cost_SR_round
+		);
 	}
 
 	// Q3, CM26
@@ -2008,7 +2166,7 @@ class Design {
 	get cost_SR_subsystems() {
 		return this.subsystems
 			.filter(ss => ss.is_loaded)
-			.map((ss) => ss.cost_SR)
+			.map(ss => ss.cost_SR)
 			.reduce((sum, value) => sum + value, 0);
 	}
 
@@ -2030,7 +2188,7 @@ class Design {
 	get cost_power_subsystems() {
 		return this.subsystems
 			.filter(ss => ss.is_loaded)
-			.map((ss) => ss.cost_power)
+			.map(ss => ss.cost_power)
 			.reduce((sum, value) => sum + value, 0);
 	}
 
@@ -2060,15 +2218,33 @@ class Design {
 	}
 
 	get pretty_statline() {
-		return this.stats.toString() + ' - '
-			+ this.cost_BR.toString() + 'br ' + this.cost_SR.toString() + 'sr ' + ' - '
-			+ this.weight_total.toString() + 'kt ' + '[' + this.build_time.toFixed(2) + ']yr' + ' - '
-			+ this.cost_crew.toString();
+		return (
+			this.stats.toString() +
+			' - ' +
+			this.cost_BR.toString() +
+			'br ' +
+			this.cost_SR.toString() +
+			'sr ' +
+			' - ' +
+			this.weight_total.toString() +
+			'kt ' +
+			'[' +
+			this.build_time.toFixed(2) +
+			']yr' +
+			' - ' +
+			this.cost_crew.toString()
+		);
 	}
 
 	get pretty_miscstats() {
-		return 'Evasion Chance: ' + (this.evasion * 100).toFixed(2) + '%\t'
-			+ 'Warp Core Breach Chance: ' + (this.warp_core_breach * 100).toFixed(2) + '%';
+		return (
+			'Evasion Chance: ' +
+			(this.evasion * 100).toFixed(2) +
+			'%\t' +
+			'Warp Core Breach Chance: ' +
+			(this.warp_core_breach * 100).toFixed(2) +
+			'%'
+		);
 	}
 
 	get pretty_summary() {
@@ -2077,24 +2253,57 @@ class Design {
 	}
 
 	get pretty_statline_raw() {
-		return this.stats_raw.toFixed(2) + ' - '
-			+ '[' + this.cost_BR_raw.toFixed(2) + ']br [' + this.cost_SR_raw.toFixed(2) + ']sr ' + ' - '
-			+ '[' + this.weight_total_raw.toFixed(2) + ']kt ' + '[' + this.build_time.toFixed(2) + ']yr' + ' - '
-			+ this.cost_crew_raw.toFixed(2);
+		return (
+			this.stats_raw.toFixed(2) +
+			' - ' +
+			'[' +
+			this.cost_BR_raw.toFixed(2) +
+			']br [' +
+			this.cost_SR_raw.toFixed(2) +
+			']sr ' +
+			' - ' +
+			'[' +
+			this.weight_total_raw.toFixed(2) +
+			']kt ' +
+			'[' +
+			this.build_time.toFixed(2) +
+			']yr' +
+			' - ' +
+			this.cost_crew_raw.toFixed(2)
+		);
 	}
 
 	get pretty_buildinfo() {
-		return 'Power[' + this.cost_power_raw.toFixed(2) + '/' + this.power_generation_raw.toFixed(2) + '] - '
-			+ 'Internal[' + this.weight_internal.toFixed(1) + '/' + this.frame_max_size_raw + '] '
-			+ this.subsystems.map((ss) => ss.name + '[' + ss.weight_internal.toFixed(1) + '/' + ss.weight_cap.toFixed(0) + ']').join(' ');
+		return (
+			'Power[' +
+			this.cost_power_raw.toFixed(2) +
+			'/' +
+			this.power_generation_raw.toFixed(2) +
+			'] - ' +
+			'Internal[' +
+			this.weight_internal.toFixed(1) +
+			'/' +
+			this.frame_max_size_raw +
+			'] ' +
+			this.subsystems
+				.map(
+					ss =>
+						ss.name +
+						'[' +
+						ss.weight_internal.toFixed(1) +
+						'/' +
+						ss.weight_cap.toFixed(0) +
+						']'
+				)
+				.join(' ')
+		);
 	}
 
 	get pretty_sdb_info() {
 		return [this.pretty_statline_raw, this.pretty_buildinfo].join('\n');
 	}
 
-	get pretty_dump() {
-	}
+	get pretty_dump() {}
 
 	static refit_valid(design, design_base) {
 		return _.isEqual(design.frame_name_map, design_base.frame_name_map);
@@ -2103,8 +2312,12 @@ class Design {
 	static refit(design, design_base) {
 		let refit_valid = Design.refit_valid(design, design_base);
 		// don't assume existence of each subsystem
-		let subsystems = zipByAndWith(design.subsystems, design_base.subsystems, ss => ss.name,
-			(ss, ss_base) => DesignSubsystem.refit(ss, ss_base, refit_valid));
+		let subsystems = zipByAndWith(
+			design.subsystems,
+			design_base.subsystems,
+			ss => ss.name,
+			(ss, ss_base) => DesignSubsystem.refit(ss, ss_base, refit_valid)
+		);
 		let module = Module.refit(design.module, design_base.module, refit_valid);
 
 		function refit_cost(cost_prop) {
@@ -2122,7 +2335,10 @@ class Design {
 			module,
 
 			get refit_cost_BR() {
-				return Math.ceil(this.refit_cost_BR_raw / REFIT_BR_COST_ROUND) * REFIT_BR_COST_ROUND;
+				return (
+					Math.ceil(this.refit_cost_BR_raw / REFIT_BR_COST_ROUND) *
+					REFIT_BR_COST_ROUND
+				);
 			},
 
 			get refit_cost_BR_raw() {
@@ -2130,12 +2346,15 @@ class Design {
 			},
 
 			get refit_cost_SR() {
-				return Math.ceil(this.refit_cost_SR_raw / REFIT_SR_COST_ROUND) * REFIT_SR_COST_ROUND;
+				return (
+					Math.ceil(this.refit_cost_SR_raw / REFIT_SR_COST_ROUND) *
+					REFIT_SR_COST_ROUND
+				);
 			},
 
 			get refit_cost_SR_raw() {
 				return refit_cost('cost_SR');
-			},
+			}
 		};
 
 		return new Proxy(refit_extensions, {
@@ -2148,21 +2367,25 @@ class Design {
 
 			set(target, prop, value) {
 				return Reflect.set(design, prop, value);
-			},
+			}
 		});
 	}
 
 	static compare(design, design_base) {
 		// don't assume existence of each subsystem
-		let subsystems = zipByAndWith(design.subsystems, design_base.subsystems, ss => ss.name,
-			(ss, ss_base) => DesignSubsystem.compare(ss, ss_base));
+		let subsystems = zipByAndWith(
+			design.subsystems,
+			design_base.subsystems,
+			ss => ss.name,
+			(ss, ss_base) => DesignSubsystem.compare(ss, ss_base)
+		);
 		let module = Module.compare(design.module, design_base.module);
 
 		let compare_extensions = {
 			omit_validation: true,
 			compare_base: design_base,
 			subsystems,
-			module,
+			module
 		};
 
 		return new Proxy(compare_extensions, {
@@ -2175,7 +2398,7 @@ class Design {
 
 			set(target, prop, value) {
 				return Reflect.set(design, prop, value);
-			},
+			}
 		});
 	}
 
@@ -2216,19 +2439,28 @@ class DB {
 		this.parts = this.json.parts.records;
 		this.frames = this.json.frames.records;
 		this.modules = this.json.modules.records;
-		this.part_schema = new Map(this.json.parts.schema.map(schema => [schema.name, schema]));
-		this.frame_schema = new Map(this.json.frames.schema.map(schema => [schema.name, schema]));
-		this.module_schema = new Map(this.json.modules.schema.map(schema => [schema.name, schema]));
+		this.part_schema = new Map(
+			this.json.parts.schema.map(schema => [schema.name, schema])
+		);
+		this.frame_schema = new Map(
+			this.json.frames.schema.map(schema => [schema.name, schema])
+		);
+		this.module_schema = new Map(
+			this.json.modules.schema.map(schema => [schema.name, schema])
+		);
 	}
 
 	matches(other) {
-		return (this.name === other.name) && (this.timestamp === other.timestamp);
+		return this.name === other.name && this.timestamp === other.timestamp;
 	}
 
 	static find_by_design_json(design_json) {
 		return function(db) {
-			return db.name === design_json['Parts List'].name
-				&& db.timestamp.getTime() === (new Date(design_json['Parts List'].timestamp)).getTime();
+			return (
+				db.name === design_json['Parts List'].name &&
+				db.timestamp.getTime() ===
+					new Date(design_json['Parts List'].timestamp).getTime()
+			);
 		};
 	}
 
@@ -2248,39 +2480,33 @@ class DB {
 
 	find_module(type, variant) {
 		return this.modules.find(
-			(elem) => (
-				(elem['Type'] === type) && (elem['Variant'] === variant))
+			elem => elem['Type'] === type && elem['Variant'] === variant
 		);
 	}
 
 	find_part(name) {
-		return this.parts.find((elem) => elem['Name'] === name);
+		return this.parts.find(elem => elem['Name'] === name);
 	}
 
 	find_frame(name) {
-		return this.frames.find((elem) => elem['Name'] === name);
+		return this.frames.find(elem => elem['Name'] === name);
 	}
 
 	find_frames(type) {
-		return this.frames.filter((elem) => elem['Type'] === type);
+		return this.frames.filter(elem => elem['Type'] === type);
 	}
 
 	find_parts(type) {
-		return this.parts.filter((elem) => elem['Type'] === type);
+		return this.parts.filter(elem => elem['Type'] === type);
 	}
 
 	find_modules(type) {
-		return this.modules.filter((elem) => elem['Type'] === type);
+		return this.modules.filter(elem => elem['Type'] === type);
 	}
 
 	valid_module_types() {
-		return [...new Set(this.modules.map((elem) => elem['Type']))];
+		return [...new Set(this.modules.map(elem => elem['Type']))];
 	}
 }
 
-export {
-	Design,
-	DB,
-	Statline,
-	Crewline,
-};
+export { Design, DB, Statline, Crewline };

@@ -38,7 +38,6 @@
 
 
 <script>
-
 import StatlineCell from '@/components/shipdesigner/statline-cell.vue';
 
 import { frac } from '@/lib/ui-functions.js';
@@ -46,19 +45,22 @@ import { frac } from '@/lib/ui-functions.js';
 export default {
 	name: 'SubsystemSummary',
 	components: {
-		StatlineCell,
+		StatlineCell
 	},
 	props: {
-		se_subsystem: Object,
+		se_subsystem: Object
 	},
 	computed: {
 		weight_summary_class() {
 			return {
-				'has-error': this.has_weight_error,
+				'has-error': this.has_weight_error
 			};
 		},
 		has_weight_error() {
-			return !this.se_subsystem.omit_validation && this.se_subsystem.weight_internal > this.se_subsystem.weight_cap;
+			return (
+				!this.se_subsystem.omit_validation &&
+				this.se_subsystem.weight_internal > this.se_subsystem.weight_cap
+			);
 		},
 		se_components() {
 			return this.se_subsystem.components;
@@ -74,10 +76,9 @@ export default {
 		},
 		tech_year() {
 			return this.se_subsystem.tech_year_max;
-		},
+		}
 	},
-	methods: {
-	},
+	methods: {}
 };
 </script>
 
@@ -106,5 +107,4 @@ export default {
 </style>
 
 <style>
-
 </style>

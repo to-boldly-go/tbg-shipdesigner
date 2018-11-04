@@ -25,13 +25,11 @@
 </template>
 
 <script>
-
 export default {
 	name: 'SettingCell',
-	components: {
-	},
+	components: {},
 	props: {
-		setting: Object,
+		setting: Object
 	},
 	computed: {
 		valid_numbers() {
@@ -47,21 +45,18 @@ export default {
 			set(value) {
 				this.$store.commit('set_setting', {
 					setting: this.setting,
-					value: value,
+					value: value
 				});
-			},
-		},
-	},
+			}
+		}
+	}
 };
-
 </script>
 
 <style>
-  
 </style>
 
 <style scoped>
-
 .setting-cell {
 	flex: 1 1 0;
 	margin-right: 13px;
@@ -80,5 +75,4 @@ export default {
 .compare-base-value {
 	background: #aa80ff;
 }
-
 </style>

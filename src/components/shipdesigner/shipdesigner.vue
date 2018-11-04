@@ -14,7 +14,6 @@
 
 
 <script>
-
 import DesignSummary from '@/components/shipdesigner/design-summary.vue';
 import Design from '@/components/shipdesigner/design.vue';
 import DesignImportExport from '@/components/shipdesigner/design-import-export.vue';
@@ -24,17 +23,14 @@ export default {
 	components: {
 		DesignSummary,
 		Design,
-		DesignImportExport,
+		DesignImportExport
 	},
-	computed: {
-	},
+	computed: {}
 };
-
 </script>
 
 
 <style>
-
 .root {
 	width: 100%;
 	height: 100%;
@@ -52,7 +48,7 @@ export default {
 
 .design {
 	flex: 1 1 auto;
-	position: relative;/* need this to position inner content */
+	position: relative; /* need this to position inner content */
 	overflow-y: auto;
 }
 
@@ -60,5 +56,4 @@ export default {
 	flex: 0 0 auto;
 	border-top: 2px solid;
 }
-
 </style>

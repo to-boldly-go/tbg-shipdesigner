@@ -33,7 +33,6 @@
 </template>
 
 <script>
-
 import _ from 'lodash';
 
 export default {
@@ -41,36 +40,44 @@ export default {
 	computed: {
 		types() {
 			let type_sort_map = _.chain(this.$store.getters.selected_parts)
-				.map((part) => { return { [part['Type']]: part['Type Sort'] }; })
+				.map(part => {
+					return { [part['Type']]: part['Type Sort'] };
+				})
 				.reduce(_.assign, {})
 				.value();
-			
+
 			return _.chain(type_sort_map)
-				.map((tsort, type) => { return { 'Type': type, 'Type Sort': tsort }; })
-				.sortBy((elem) => elem['Type Sort'])
-				.map((elem) => elem['Type'])
+				.map((tsort, type) => {
+					return { Type: type, 'Type Sort': tsort };
+				})
+				.sortBy(elem => elem['Type Sort'])
+				.map(elem => elem['Type'])
 				.value();
 		},
 		tab_class_type() {
-			return (type) => ({
-				'type-tab-selected': this.$store.state.display.filter.types.includes(type),
+			return type => ({
+				'type-tab-selected': this.$store.state.display.filter.types.includes(
+					type
+				)
 			});
 		},
 		tab_class_select() {
-			return (select) => ({
-				'select-tab-selected': this.$store.state.display.selected === select,
+			return select => ({
+				'select-tab-selected': this.$store.state.display.selected === select
 			});
 		},
 		lamp_class_type() {
-			return (type) => ({
-				'indicator-lamp-selected': this.$store.state.display.filter.types.includes(type),
+			return type => ({
+				'indicator-lamp-selected': this.$store.state.display.filter.types.includes(
+					type
+				)
 			});
 		},
 		lamp_class_select() {
-			return (select) => ({
-				'indicator-lamp-selected': this.$store.state.display.selected === select,
+			return select => ({
+				'indicator-lamp-selected': this.$store.state.display.selected === select
 			});
-		},
+		}
 	},
 	methods: {
 		set_selection(select) {
@@ -78,13 +85,12 @@ export default {
 		},
 		set_filter(type) {
 			this.$store.commit('toggle_filter', type);
-		},
-	},
+		}
+	}
 };
 </script>
 
 <style scoped>
-
 .header {
 	display: flex;
 	flex-direction: row;
@@ -182,7 +188,7 @@ export default {
 	margin-top: 0px;
 	margin-bottom: 0px;
 	margin-right: 0px;
-	
+
 	width: 10px;
 }
 
@@ -199,9 +205,7 @@ export default {
 .indicator-lamp-selected {
 	background: #2f2;
 }
-
 </style>
 
 <style>
-
 </style>

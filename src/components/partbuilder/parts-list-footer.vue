@@ -38,7 +38,6 @@
 </template>
 
 <script>
-
 import _ from 'lodash';
 
 import { mapState } from 'vuex';
@@ -52,8 +51,12 @@ function applyAnyMissingSchema(parts, canon_parts) {
 		let schema_list = parts[part_type].schema;
 		if (schema_list) {
 			let canon_schema_list = canon_parts[part_type].schema;
-			let schema_map = new Map(schema_list.map(schema => [schema.name, schema]));
-			let canon_schema_map = new Map(canon_schema_list.map(schema => [schema.name, schema]));
+			let schema_map = new Map(
+				schema_list.map(schema => [schema.name, schema])
+			);
+			let canon_schema_map = new Map(
+				canon_schema_list.map(schema => [schema.name, schema])
+			);
 			for (let [schema_name, canon_schema] of canon_schema_map) {
 				let schema = schema_map.get(schema_name);
 				if (schema) {
@@ -72,15 +75,14 @@ function applyAnyMissingSchema(parts, canon_parts) {
 
 export default {
 	name: 'PartsListFooter',
-	components: {
-	},
+	components: {},
 	data() {
 		return {
 			status_message: '',
 			status_message_timeout_id: null,
 
 			local_parts_lists: [],
-			selected_parts_list: null,
+			selected_parts_list: null
 		};
 	},
 	computed: {
@@ -90,7 +92,7 @@ export default {
 			},
 			set(value) {
 				this.$store.commit('set_parts_list_name', value);
-			},
+			}
 		},
 		selected_parts_list_name: {
 			get() {
@@ -101,26 +103,26 @@ export default {
 				}
 			},
 			set(value) {
-				this.selected_parts_list = _
-					.chain(this.all_parts_lists)
+				this.selected_parts_list = _.chain(this.all_parts_lists)
 					.find(list => this.parts_list_save_name(list) === value)
 					.value();
-			},
+			}
 		},
 		all_parts_lists() {
 			return [...this.local_parts_lists, this.canon_parts_list];
 		},
-		...mapState([
-			'canon_parts_list',
-		]),
+		...mapState(['canon_parts_list'])
 	},
 	mounted() {
 		this.parts_lists_load_from_local_storage();
-		window.addEventListener('storage', function(ev) {
-			if (ev.key === LOCAL_PARTS_LISTS_KEY) {
-				this.parts_lists_load_from_local_storage();
-			}
-		}.bind(this));
+		window.addEventListener(
+			'storage',
+			function(ev) {
+				if (ev.key === LOCAL_PARTS_LISTS_KEY) {
+					this.parts_lists_load_from_local_storage();
+				}
+			}.bind(this)
+		);
 	},
 	methods: {
 		reset_to_canon() {
@@ -128,7 +130,7 @@ export default {
 		},
 		parts_list_save_name(pl) {
 			// console.log(Object.keys(pl));
-			return pl.name + ' (' + (new Date(pl.timestamp).toLocaleString()) + ')';
+			return pl.name + ' (' + new Date(pl.timestamp).toLocaleString() + ')';
 		},
 		parts_lists_load_from_local_storage() {
 			const loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);
@@ -137,20 +139,30 @@ export default {
 				this.display_status_message('No parts lists to load');
 			} else {
 				let local_parts_lists = JSON.parse(loaded);
-				local_parts_lists.forEach(local_parts => applyAnyMissingSchema(local_parts, this.canon_parts_list));
+				local_parts_lists.forEach(local_parts =>
+					applyAnyMissingSchema(local_parts, this.canon_parts_list)
+				);
 				this.local_parts_lists = local_parts_lists;
 				this.display_status_message('Parts lists loaded');
 			}
 		},
 		parts_lists_load_selected() {
-			this.$store.commit('set_parts_list', _.cloneDeep(this.selected_parts_list));
+			this.$store.commit(
+				'set_parts_list',
+				_.cloneDeep(this.selected_parts_list)
+			);
 			this.display_status_message('Parts list loaded');
 		},
 		parts_lists_delete_selected() {
 			// remove the selected item
-			this.local_parts_lists = _.chain(this.local_parts_lists).reject(pl => {
-				return _.isEqual(pl_comparison_slice(pl), pl_comparison_slice(this.selected_parts_list));
-			}).value();
+			this.local_parts_lists = _.chain(this.local_parts_lists)
+				.reject(pl => {
+					return _.isEqual(
+						pl_comparison_slice(pl),
+						pl_comparison_slice(this.selected_parts_list)
+					);
+				})
+				.value();
 			this.parts_lists_save_to_local_storage();
 			this.display_status_message('Parts list deleted');
 		},
@@ -161,13 +173,22 @@ export default {
 			this.display_status_message('Parts list saved');
 		},
 		parts_lists_save_to_local_storage() {
-			localStorage.setItem(LOCAL_PARTS_LISTS_KEY, JSON.stringify(this.local_parts_lists));
+			localStorage.setItem(
+				LOCAL_PARTS_LISTS_KEY,
+				JSON.stringify(this.local_parts_lists)
+			);
 		},
 
 		parts_lists_save_file() {
 			this.$store.commit('timestamp_parts_list');
-			const data = encodeURIComponent(JSON.stringify(this.$store.state.parts_list));
-			const filename = this.$store.state.parts_list.name + ' ' + this.$store.state.parts_list.timestamp + '.json';
+			const data = encodeURIComponent(
+				JSON.stringify(this.$store.state.parts_list)
+			);
+			const filename =
+				this.$store.state.parts_list.name +
+				' ' +
+				this.$store.state.parts_list.timestamp +
+				'.json';
 			let element = this.$refs.save_file_a;
 			element.setAttribute('href', 'data:text/plain;charset=utf-8,' + data);
 			element.setAttribute('download', filename);
@@ -193,16 +214,21 @@ export default {
 		display_status_message(status) {
 			this.status_message = status;
 			this.$refs.status_message.className = 'parts-list-footer-status-message';
-			window.requestAnimationFrame(function(time) {
-				window.requestAnimationFrame(function(time) {
-					this.$refs.status_message.className = 'parts-list-footer-status-message fade';
-				}.bind(this));
-			}.bind(this));
+			window.requestAnimationFrame(
+				function(time) {
+					window.requestAnimationFrame(
+						function(time) {
+							this.$refs.status_message.className =
+								'parts-list-footer-status-message fade';
+						}.bind(this)
+					);
+				}.bind(this)
+			);
 		},
 		clear_status_message() {
 			this.status_message = null;
-		},
-	},
+		}
+	}
 };
 </script>
 
@@ -228,9 +254,7 @@ export default {
 		color: transparent;
 	}
 }
-
 </style>
 
 <style>
-
 </style>

@@ -89,7 +89,6 @@
 </template>
 
 <script>
-
 import canon_parts_list from '#/canon_parts_list.json';
 
 import _ from 'lodash';
@@ -100,22 +99,20 @@ const LOCAL_PARTS_LISTS_KEY = 'parts_lists';
 
 const csv_parse_config = {
 	header: true,
-	dynamicTyping: true,
+	dynamicTyping: true
 };
 
 export default {
 	name: 'CsvImporter',
-	components: {
-	},
-	props: {
-	},
+	components: {},
+	props: {},
 	data() {
 		return {
 			modules_result: {},
 			parts_result: {},
 			frames_result: {},
 			name: '',
-			success: null,
+			success: null
 		};
 	},
 	computed: {
@@ -126,11 +123,11 @@ export default {
 			set(value) {
 				this.success = false;
 				this.name = value;
-			},
+			}
 		},
 		modules_error_messages() {
 			if (this.has_modules_errors) {
-				return this.modules_result.errors.map((er) => {
+				return this.modules_result.errors.map(er => {
 					if (er.row) {
 						return 'Row ' + er.row.toString() + ': ' + er.message;
 					} else {
@@ -143,7 +140,7 @@ export default {
 		},
 		frames_error_messages() {
 			if (this.has_frames_errors) {
-				return this.frames_result.errors.map((er) => {
+				return this.frames_result.errors.map(er => {
 					if (er.row) {
 						return 'Row ' + er.row.toString() + ': ' + er.message;
 					} else {
@@ -157,7 +154,7 @@ export default {
 		parts_error_messages() {
 			if (this.has_parts_errors) {
 				console.log(this.parts_result.errors);
-				return this.parts_result.errors.map((er) => {
+				return this.parts_result.errors.map(er => {
 					if (er.row) {
 						return 'Row ' + er.row.toString() + ': ' + er.message;
 					} else {
@@ -174,30 +171,34 @@ export default {
 			}
 		},
 		can_import() {
-			return (!this.has_errors
-					&& this.name.length
-					&& (this.parts_result.data && this.parts_result.data.length)
-					&& (this.frames_result.data && this.frames_result.data.length)
-					&& (this.modules_result.data && this.modules_result.data.length));
+			return (
+				!this.has_errors &&
+				this.name.length &&
+				(this.parts_result.data && this.parts_result.data.length) &&
+				(this.frames_result.data && this.frames_result.data.length) &&
+				(this.modules_result.data && this.modules_result.data.length)
+			);
 		},
 		has_errors() {
-			return this.has_name_errors
-				|| this.has_parts_errors
-				|| this.has_frames_errors
-				|| this.has_modules_errors;
+			return (
+				this.has_name_errors ||
+				this.has_parts_errors ||
+				this.has_frames_errors ||
+				this.has_modules_errors
+			);
 		},
 		has_name_errors() {
 			return !this.name.length;
 		},
 		has_parts_errors() {
-			return (this.parts_result.errors && this.parts_result.errors.length);
+			return this.parts_result.errors && this.parts_result.errors.length;
 		},
 		has_frames_errors() {
-			return (this.frames_result.errors && this.frames_result.errors.length);
+			return this.frames_result.errors && this.frames_result.errors.length;
 		},
 		has_modules_errors() {
-			return (this.modules_result.errors && this.modules_result.errors.length);
-		},
+			return this.modules_result.errors && this.modules_result.errors.length;
+		}
 	},
 	methods: {
 		load_file_parts() {
@@ -242,17 +243,17 @@ export default {
 				name: this.name,
 				timestamp: new Date().toISOString(),
 				parts: {
-					records: this.parts_result.data.filter((row) => _.size(row) > 2),
-					schema: canon_parts_list.parts.schema,
+					records: this.parts_result.data.filter(row => _.size(row) > 2),
+					schema: canon_parts_list.parts.schema
 				},
 				modules: {
-					records: this.modules_result.data.filter((row) => _.size(row) > 2),
-					schema: canon_parts_list.modules.schema,
+					records: this.modules_result.data.filter(row => _.size(row) > 2),
+					schema: canon_parts_list.modules.schema
 				},
 				frames: {
-					records: this.frames_result.data.filter((row) => _.size(row) > 2),
-					schema: canon_parts_list.frames.schema,
-				},
+					records: this.frames_result.data.filter(row => _.size(row) > 2),
+					schema: canon_parts_list.frames.schema
+				}
 			});
 
 			const loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);
@@ -263,18 +264,18 @@ export default {
 				local_parts_lists = JSON.parse(loaded);
 			}
 			local_parts_lists.push(_.cloneDeep(this.$store.state.parts_list));
-			localStorage.setItem(LOCAL_PARTS_LISTS_KEY, JSON.stringify(local_parts_lists));
+			localStorage.setItem(
+				LOCAL_PARTS_LISTS_KEY,
+				JSON.stringify(local_parts_lists)
+			);
 			this.success = 'Successfully saved parts list!';
-		},
-	},
+		}
+	}
 };
-
 </script>
 
 <style scoped>
-
 </style>
 
 <style>
-
 </style>

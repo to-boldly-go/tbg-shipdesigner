@@ -4,22 +4,24 @@
 
 
 <script>
-
 export default {
 	name: 'StatlineCell',
-	components: {
-	},
+	components: {},
 	props: {
 		stats: Object,
 		name: String,
 		fixed: {
 			type: Number,
-			default() { return 2; },
+			default() {
+				return 2;
+			}
 		},
 		ispretty: {
 			type: Boolean,
-			default() { return true; },
-		},
+			default() {
+				return true;
+			}
+		}
 	},
 	computed: {
 		pretty() {
@@ -36,15 +38,13 @@ export default {
 		},
 		raw() {
 			return this.stats[this.name];
-		},
-	},
+		}
+	}
 };
 </script>
 
 <style>
-
 </style>
 
 <style scoped>
-
 </style>

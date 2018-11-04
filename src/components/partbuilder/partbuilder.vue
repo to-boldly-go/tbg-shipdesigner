@@ -14,7 +14,6 @@
 
 
 <script>
-
 import PartsListHeader from '@/components/partbuilder/parts-list-header.vue';
 import PartsListFooter from '@/components/partbuilder/parts-list-footer.vue';
 import PartsListEditor from '@/components/partbuilder/parts-list-editor.vue';
@@ -26,11 +25,10 @@ export default {
 	components: {
 		PartsListHeader,
 		PartsListFooter,
-		PartsListEditor,
+		PartsListEditor
 	},
 	data() {
-		return {
-		};
+		return {};
 	},
 	mounted() {
 		this.load_parts_from_storage();
@@ -51,10 +49,9 @@ export default {
 			if (this.data) {
 				localStorage.setItem(PARTS_KEY, JSON.stringify(this.data));
 			}
-		},
-	},
+		}
+	}
 };
-
 </script>
 
 <style scoped>
@@ -83,7 +80,7 @@ export default {
 
 .editor {
 	flex: 1 1 auto;
-	position: relative;/* need this to position inner content */
+	position: relative; /* need this to position inner content */
 	overflow-y: auto;
 }
 
@@ -91,14 +88,14 @@ export default {
 	flex: 0 0 auto;
 	border-top: 2px solid;
 }
-
 </style>
 
 <style>
-
-button, input, select, textarea {
-	font-family : inherit;
-	font-size   : 100%;
+button,
+input,
+select,
+textarea {
+	font-family: inherit;
+	font-size: 100%;
 }
-
 </style>

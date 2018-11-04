@@ -20,7 +20,6 @@
 </template>
 
 <script>
-
 import _ from 'lodash';
 
 import { mapGetters } from 'vuex';
@@ -33,47 +32,47 @@ export default {
 	name: 'PartsListEditor',
 	components: {
 		PartsListPart,
-		draggable,
+		draggable
 	},
 	data() {
-		return {
-		};
+		return {};
 	},
 	computed: {
 		displayed_parts() {
 			return _(this.selected_parts)
-				.filter((part) => this.$store.state.display.filter.types.includes(part['Type'])).value();
+				.filter(part =>
+					this.$store.state.display.filter.types.includes(part['Type'])
+				)
+				.value();
 		},
 		header_style() {
 			return function(field) {
 				return {
-					width: field.width.toString() + 'px',
+					width: field.width.toString() + 'px'
 				};
 			};
 		},
-		...mapGetters([
-			'selected_schema',
-			'selected_parts',
-			'find_part_index',
-		]),
+		...mapGetters(['selected_schema', 'selected_parts', 'find_part_index'])
 	},
 	methods: {
 		part_drag_drop_end(event) {
 			// Note: display_parts/find_part_index will change after each commit here, so fetch needed data from it before the commits.
 			const part = this.displayed_parts[event.oldIndex];
 			const src_part_index = this.find_part_index(part);
-			const dest_part_index = this.find_part_index(this.displayed_parts[event.newIndex]);
+			const dest_part_index = this.find_part_index(
+				this.displayed_parts[event.newIndex]
+			);
 			this.$store.commit('delete_part', {
-				index: src_part_index,
+				index: src_part_index
 			});
 			this.$store.commit('add_part', {
 				index: dest_part_index,
-				new_part: part,
+				new_part: part
 			});
 		},
 		add_new_part() {
 			let new_part = _.chain(this.fields)
-				.map((field) => [field.name, null])
+				.map(field => [field.name, null])
 				.fromPairs()
 				.value();
 
@@ -82,18 +81,17 @@ export default {
 			new_part['Type Sort'] = last_part['Type Sort'];
 			this.$store.commit('add_part', {
 				index: this.find_part_index(last_part) + 1,
-				new_part,
+				new_part
 			});
 		},
 		sort_list(field) {
 			this.$store.commit('sort_parts_list_by', field);
-		},
-	},
+		}
+	}
 };
 </script>
 
 <style scoped>
-
 .editor {
 	/* width: 1500px; */
 	table-layout: fixed;
@@ -105,16 +103,16 @@ export default {
 	border: 1px solid #eee;
 }
 
-.delete-column, .copy-column, .move-column {
+.delete-column,
+.copy-column,
+.move-column {
 	width: 30px;
 }
 
 .new-part-button {
 	margin: 5px;
 }
-
 </style>
 
 <style>
-
 </style>
