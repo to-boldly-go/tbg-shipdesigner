@@ -14,14 +14,14 @@ export default {
 			type: Number,
 			default() {
 				return 2;
-			}
+			},
 		},
 		ispretty: {
 			type: Boolean,
 			default() {
 				return true;
-			}
-		}
+			},
+		},
 	},
 	computed: {
 		pretty() {
@@ -38,8 +38,8 @@ export default {
 		},
 		raw() {
 			return this.stats[this.name];
-		}
-	}
+		},
+	},
 };
 </script>
 

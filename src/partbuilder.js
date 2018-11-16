@@ -29,15 +29,15 @@ const store = new Vuex.Store({
 					],
 					_(canon_parts_list.frames.records).minBy(part => part['Type Sort'])[
 						'Type'
-					]
-				]
+					],
+				],
 			},
 			current_sort: {
 				field: null,
-				ascending: true
+				ascending: true,
 			},
-			selected: 'parts'
-		}
+			selected: 'parts',
+		},
 	},
 	getters: {
 		selected_parts(state, getters) {
@@ -69,7 +69,7 @@ const store = new Vuex.Store({
 					).length > 1
 				);
 			};
-		}
+		},
 	},
 	actions: {},
 	mutations: {
@@ -131,13 +131,13 @@ const store = new Vuex.Store({
 			} else {
 				state.display.filter.types.push(payload);
 			}
-		}
-	}
+		},
+	},
 });
 
 // create a root instance
 new Vue({
 	el: '#app',
 	store,
-	render: h => h(PartBuilder)
+	render: h => h(PartBuilder),
 });

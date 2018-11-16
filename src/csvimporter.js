@@ -13,7 +13,7 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
 	state: {
 		parts_list: {},
-		design_json: {}
+		design_json: {},
 	},
 	getters: {},
 	actions: {},
@@ -23,13 +23,13 @@ const store = new Vuex.Store({
 		},
 		set_design_json(state, payload) {
 			state.design_json = payload;
-		}
-	}
+		},
+	},
 });
 
 // create a root instance
 new Vue({
 	el: '#app',
 	render: h => h(CsvImporter),
-	store
+	store,
 });

@@ -5,7 +5,7 @@ const nodeExternals = require('webpack-node-externals');
 
 const config = {
 	target: 'node',
-	externals: [nodeExternals()]
+	externals: [nodeExternals()],
 };
 
 module.exports = Object.assign({}, common, config);

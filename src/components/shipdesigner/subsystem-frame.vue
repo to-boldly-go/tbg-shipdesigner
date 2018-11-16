@@ -56,10 +56,10 @@ import { frac } from '@/lib/ui-functions';
 export default {
 	name: 'SubsystemFrame',
 	components: {
-		StatlineCell
+		StatlineCell,
 	},
 	props: {
-		se_subsystem: Object
+		se_subsystem: Object,
 	},
 	computed: {
 		is_valid_frame() {
@@ -98,12 +98,12 @@ export default {
 			set(value) {
 				this.$store.commit('set_subsystem_frame', {
 					value: value,
-					subsystem: this.se_subsystem
+					subsystem: this.se_subsystem,
 				});
-			}
-		}
+			},
+		},
 	},
-	methods: {}
+	methods: {},
 };
 </script>
 

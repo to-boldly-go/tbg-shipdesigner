@@ -82,7 +82,7 @@ export default {
 			status_message_timeout_id: null,
 
 			local_parts_lists: [],
-			selected_parts_list: null
+			selected_parts_list: null,
 		};
 	},
 	computed: {
@@ -92,7 +92,7 @@ export default {
 			},
 			set(value) {
 				this.$store.commit('set_parts_list_name', value);
-			}
+			},
 		},
 		selected_parts_list_name: {
 			get() {
@@ -106,12 +106,12 @@ export default {
 				this.selected_parts_list = _.chain(this.all_parts_lists)
 					.find(list => this.parts_list_save_name(list) === value)
 					.value();
-			}
+			},
 		},
 		all_parts_lists() {
 			return [...this.local_parts_lists, this.canon_parts_list];
 		},
-		...mapState(['canon_parts_list'])
+		...mapState(['canon_parts_list']),
 	},
 	mounted() {
 		this.parts_lists_load_from_local_storage();
@@ -227,8 +227,8 @@ export default {
 		},
 		clear_status_message() {
 			this.status_message = null;
-		}
-	}
+		},
+	},
 };
 </script>
 

@@ -25,7 +25,7 @@ export default {
 	components: {
 		PartsListHeader,
 		PartsListFooter,
-		PartsListEditor
+		PartsListEditor,
 	},
 	data() {
 		return {};
@@ -49,8 +49,8 @@ export default {
 			if (this.data) {
 				localStorage.setItem(PARTS_KEY, JSON.stringify(this.data));
 			}
-		}
-	}
+		},
+	},
 };
 </script>
 

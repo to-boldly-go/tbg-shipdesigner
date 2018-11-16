@@ -32,7 +32,7 @@ export default {
 	name: 'PartsListEditor',
 	components: {
 		PartsListPart,
-		draggable
+		draggable,
 	},
 	data() {
 		return {};
@@ -48,11 +48,11 @@ export default {
 		header_style() {
 			return function(field) {
 				return {
-					width: field.width.toString() + 'px'
+					width: field.width.toString() + 'px',
 				};
 			};
 		},
-		...mapGetters(['selected_schema', 'selected_parts', 'find_part_index'])
+		...mapGetters(['selected_schema', 'selected_parts', 'find_part_index']),
 	},
 	methods: {
 		part_drag_drop_end(event) {
@@ -63,11 +63,11 @@ export default {
 				this.displayed_parts[event.newIndex]
 			);
 			this.$store.commit('delete_part', {
-				index: src_part_index
+				index: src_part_index,
 			});
 			this.$store.commit('add_part', {
 				index: dest_part_index,
-				new_part: part
+				new_part: part,
 			});
 		},
 		add_new_part() {
@@ -81,13 +81,13 @@ export default {
 			new_part['Type Sort'] = last_part['Type Sort'];
 			this.$store.commit('add_part', {
 				index: this.find_part_index(last_part) + 1,
-				new_part
+				new_part,
 			});
 		},
 		sort_list(field) {
 			this.$store.commit('sort_parts_list_by', field);
-		}
-	}
+		},
+	},
 };
 </script>
 

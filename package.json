@@ -53,7 +53,8 @@
     "not ie <= 8"
   ],
   "prettier": {
-	  "singleQuote": true,
-	  "useTabs": true
+    "singleQuote": true,
+    "useTabs": true,
+    "trailingComma": "es5"
   }
 }

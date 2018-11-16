@@ -9,9 +9,9 @@ const COMPONENT_MAPPING = [
 			{ name: 'M/AM Injectors', row: 80 },
 			{ name: 'Coolant Systems', row: 81 },
 			{ name: 'EPS Manifold System', row: 82 },
-			{ name: 'Eject System', row: 83 }
+			{ name: 'Eject System', row: 83 },
 		],
-		settings: [{ name: 'Safety/Performance', row: 79 }]
+		settings: [{ name: 'Safety/Performance', row: 79 }],
 	},
 	{
 		name: 'Engineering',
@@ -21,15 +21,15 @@ const COMPONENT_MAPPING = [
 			{ name: 'Navigational Deflector', row: 68 },
 			{ name: 'Nacelle System', row: 69 },
 			{ name: 'Replication Package', row: 71 },
-			{ name: 'Fuel & Matter Stores', row: 72 }
+			{ name: 'Fuel & Matter Stores', row: 72 },
 		],
-		settings: []
+		settings: [],
 	},
 	{
 		name: 'Hull',
 		frame_row: 59,
 		components: [{ name: 'Hull System', row: 61 }],
-		settings: []
+		settings: [],
 	},
 	{
 		name: 'Operations',
@@ -44,9 +44,9 @@ const COMPONENT_MAPPING = [
 			{ name: 'Secondary Core', row: 51 },
 			{ name: 'Diplomatic Package', row: 53 },
 			{ name: 'Recreation Package', row: 54 },
-			{ name: 'Sickbay', row: 55 }
+			{ name: 'Sickbay', row: 55 },
 		],
-		settings: [{ name: 'Isolinear?', row: 52 }]
+		settings: [{ name: 'Isolinear?', row: 52 }],
 	},
 	{
 		name: 'Tactical',
@@ -59,13 +59,13 @@ const COMPONENT_MAPPING = [
 			{ name: 'Targeting Computer', row: 36 },
 			{ name: 'Deflector Shields', row: 37 },
 			{ name: 'Backup Deflectors', row: 38 },
-			{ name: 'Impulse Engine Pwr', row: 39 }
+			{ name: 'Impulse Engine Pwr', row: 39 },
 		],
 		settings: [
 			{ name: 'Phaser Arrays', row: 32 },
-			{ name: 'Burst Launchers', row: 34 }
-		]
-	}
+			{ name: 'Burst Launchers', row: 34 },
+		],
+	},
 ];
 
 function import_design(design_csv) {
@@ -75,7 +75,7 @@ function import_design(design_csv) {
 		'Principal Frame': result.data[17][4],
 		Module: {
 			Variant: result.data[87][4],
-			Type: result.data[87][2]
+			Type: result.data[87][2],
 		},
 		Subsystems: COMPONENT_MAPPING.map(function(subsystem) {
 			return {
@@ -89,11 +89,11 @@ function import_design(design_csv) {
 					return {
 						Name: row.name,
 						Quantity: result.data[row.row][3],
-						Part: result.data[row.row][4]
+						Part: result.data[row.row][4],
 					};
-				})
+				}),
 			};
-		})
+		}),
 	};
 }
 

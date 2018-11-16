@@ -23,28 +23,28 @@ import PartsListCell from '@/components/partbuilder/parts-list-cell.vue';
 export default {
 	name: 'PartsListPart',
 	components: {
-		PartsListCell
+		PartsListCell,
 	},
 	props: {
-		part: Object
+		part: Object,
 	},
 	computed: {
 		list_class() {
 			return field => ({
-				'has-error': field.id === 'name' && this.has_duplicate_parts(this.part)
+				'has-error': field.id === 'name' && this.has_duplicate_parts(this.part),
 			});
 		},
 		...mapGetters([
 			'selected_schema',
 			'selected_parts',
 			'find_part_index',
-			'has_duplicate_parts'
-		])
+			'has_duplicate_parts',
+		]),
 	},
 	methods: {
 		delete_this_part() {
 			this.$store.commit('delete_part', {
-				index: this.find_part_index(this.part)
+				index: this.find_part_index(this.part),
 			});
 		},
 		copy_this_part() {
@@ -55,11 +55,11 @@ export default {
 				clone['Name'] += ' copy';
 				this.$store.commit('add_part', {
 					index: index + 1,
-					new_part: clone
+					new_part: clone,
 				});
 			}
-		}
-	}
+		},
+	},
 };
 </script>
 

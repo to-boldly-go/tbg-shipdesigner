@@ -58,26 +58,27 @@ export default {
 			return type => ({
 				'type-tab-selected': this.$store.state.display.filter.types.includes(
 					type
-				)
+				),
 			});
 		},
 		tab_class_select() {
 			return select => ({
-				'select-tab-selected': this.$store.state.display.selected === select
+				'select-tab-selected': this.$store.state.display.selected === select,
 			});
 		},
 		lamp_class_type() {
 			return type => ({
 				'indicator-lamp-selected': this.$store.state.display.filter.types.includes(
 					type
-				)
+				),
 			});
 		},
 		lamp_class_select() {
 			return select => ({
-				'indicator-lamp-selected': this.$store.state.display.selected === select
+				'indicator-lamp-selected':
+					this.$store.state.display.selected === select,
 			});
-		}
+		},
 	},
 	methods: {
 		set_selection(select) {
@@ -85,8 +86,8 @@ export default {
 		},
 		set_filter(type) {
 			this.$store.commit('toggle_filter', type);
-		}
-	}
+		},
+	},
 };
 </script>
 

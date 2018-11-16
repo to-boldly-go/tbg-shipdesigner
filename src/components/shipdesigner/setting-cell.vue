@@ -29,7 +29,7 @@ export default {
 	name: 'SettingCell',
 	components: {},
 	props: {
-		setting: Object
+		setting: Object,
 	},
 	computed: {
 		valid_numbers() {
@@ -45,11 +45,11 @@ export default {
 			set(value) {
 				this.$store.commit('set_setting', {
 					setting: this.setting,
-					value: value
+					value: value,
 				});
-			}
-		}
-	}
+			},
+		},
+	},
 };
 </script>
 

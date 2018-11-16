@@ -71,15 +71,15 @@ export default {
 		SubsystemFrame,
 		SubsystemSettings,
 		ComponentTr,
-		ModuleTr
+		ModuleTr,
 	},
 	computed: {
 		se_subsystems() {
 			return this.$store.getters.se_design.subsystems;
 		},
-		...mapGetters(['se_design'])
+		...mapGetters(['se_design']),
 	},
-	methods: {}
+	methods: {},
 };
 </script>
 

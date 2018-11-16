@@ -12,10 +12,10 @@ import SettingCell from '@/components/shipdesigner/setting-cell.vue';
 export default {
 	name: 'SubsystemSettings',
 	components: {
-		SettingCell
+		SettingCell,
 	},
 	props: {
-		se_subsystem: Object
+		se_subsystem: Object,
 	},
 	computed: {
 		has_settings() {
@@ -23,8 +23,8 @@ export default {
 		},
 		settings() {
 			return this.se_subsystem.settings;
-		}
-	}
+		},
+	},
 };
 </script>
 

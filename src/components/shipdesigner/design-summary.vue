@@ -70,13 +70,13 @@ export default {
 		build_time() {
 			return frac(this.$store.getters.se_design.build_time, 12);
 		},
-		...mapGetters(['se_design', 'se_db'])
+		...mapGetters(['se_design', 'se_db']),
 	},
 	methods: {
 		parts_list_save_name(pl) {
 			return pl.name + ' (' + new Date(pl.timestamp).toLocaleString() + ')';
-		}
-	}
+		},
+	},
 };
 </script>
 

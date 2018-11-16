@@ -82,10 +82,10 @@ import StatlineCell from '@/components/shipdesigner/statline-cell.vue';
 export default {
 	name: 'ComponentTr',
 	components: {
-		StatlineCell
+		StatlineCell,
 	},
 	props: {
-		se_component: Object
+		se_component: Object,
 	},
 	computed: {
 		tech_year_tooltip() {
@@ -160,9 +160,9 @@ export default {
 			set(value) {
 				this.$store.commit('set_component_quantity', {
 					component: this.se_component,
-					value
+					value,
 				});
-			}
+			},
 		},
 		valid_quantities() {
 			return this.se_component.valid_quantities;
@@ -180,16 +180,16 @@ export default {
 			set(value) {
 				this.$store.commit('set_component_part', {
 					component: this.se_component,
-					value
+					value,
 				});
-			}
+			},
 		},
 		is_quantity_valid() {
 			return hypothesis =>
 				this.valid_quantities
 					.map(elem => elem === hypothesis)
 					.reduce((acc, elem) => acc || elem);
-		}
+		},
 	},
 	methods: {
 		increment_quantity() {
@@ -214,8 +214,8 @@ export default {
 				ev.preventDefault();
 			}
 			ev.returnValue = false;
-		}
-	}
+		},
+	},
 };
 </script>
 

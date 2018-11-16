@@ -30,21 +30,21 @@ export default {
 		focus: {
 			inserted(el) {
 				el.focus();
-			}
-		}
+			},
+		},
 	},
 	props: {
 		part: {
-			type: Object
+			type: Object,
 		},
 		field: {
-			type: Object
-		}
+			type: Object,
+		},
 	},
 	data() {
 		return {
 			is_editing: false,
-			temp_value: null
+			temp_value: null,
 		};
 	},
 	computed: {
@@ -52,14 +52,14 @@ export default {
 			return Object.assign(
 				{
 					width: this.field.width.toString() + 'px',
-					'text-align': this.field.align
+					'text-align': this.field.align,
 				},
 				this.computed_font
 			);
 		},
 		computed_input_style() {
 			return {
-				'text-align': this.field.align
+				'text-align': this.field.align,
 			};
 		},
 		computed_font() {
@@ -71,7 +71,7 @@ export default {
 				case 'fixed':
 					return {
 						['font-family']: "'Roboto Mono', monospace",
-						['font-size']: '12px'
+						['font-size']: '12px',
 					};
 				case 'variable':
 				default:
@@ -124,7 +124,7 @@ export default {
 						this.$store.commit('edit_part', {
 							part: this.part,
 							field: this.field.name,
-							value: new_value
+							value: new_value,
 						});
 					}
 				} else {
@@ -132,12 +132,12 @@ export default {
 						this.$store.commit('edit_part', {
 							part: this.part,
 							field: this.field.name,
-							value: value
+							value: value,
 						});
 					}
 				}
-			}
-		}
+			},
+		},
 	},
 	methods: {
 		on_keydown(ev) {
@@ -162,8 +162,8 @@ export default {
 		commit_edit(ev) {
 			this.is_editing = false;
 			this.value = this.temp_value;
-		}
-	}
+		},
+	},
 };
 </script>
 

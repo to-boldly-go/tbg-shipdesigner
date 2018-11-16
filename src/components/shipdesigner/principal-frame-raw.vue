@@ -57,7 +57,7 @@ import { frac } from '@/lib/ui-functions.js';
 export default {
 	name: 'PrincipalFrameRaw',
 	components: {
-		StatlineCell
+		StatlineCell,
 	},
 	computed: {
 		is_valid_frame() {
@@ -72,7 +72,7 @@ export default {
 		},
 		power_final_class() {
 			return {
-				'has-error': this.has_power_error
+				'has-error': this.has_power_error,
 			};
 		},
 		has_power_error() {
@@ -83,7 +83,7 @@ export default {
 		},
 		weight_summary_class() {
 			return {
-				'has-error': this.has_weight_error
+				'has-error': this.has_weight_error,
 			};
 		},
 		has_weight_error() {
@@ -98,7 +98,7 @@ export default {
 			},
 			set(value) {
 				this.se_design.principal_frame = value;
-			}
+			},
 		},
 		stats_raw() {
 			return this.se_design.stats_raw;
@@ -115,9 +115,9 @@ export default {
 		frame_size() {
 			return this.se_design.frame_size.toFixed(2);
 		},
-		...mapGetters(['se_design'])
+		...mapGetters(['se_design']),
 	},
-	methods: {}
+	methods: {},
 };
 </script>
 

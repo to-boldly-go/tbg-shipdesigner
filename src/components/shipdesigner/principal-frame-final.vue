@@ -48,7 +48,7 @@ import { frac } from '@/lib/ui-functions';
 export default {
 	name: 'PrincipalFrame',
 	components: {
-		StatlineCell
+		StatlineCell,
 	},
 	computed: {
 		power_final_title() {
@@ -60,7 +60,7 @@ export default {
 		},
 		power_final_class() {
 			return {
-				'has-error': this.has_power_error
+				'has-error': this.has_power_error,
 			};
 		},
 		has_power_error() {
@@ -90,11 +90,11 @@ export default {
 			},
 			set(value) {
 				this.$store.commit('set_design_name', value);
-			}
+			},
 		},
-		...mapGetters(['se_design'])
+		...mapGetters(['se_design']),
 	},
-	methods: {}
+	methods: {},
 };
 </script>
 

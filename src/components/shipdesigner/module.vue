@@ -64,10 +64,10 @@ import StatlineCell from '@/components/shipdesigner/statline-cell.vue';
 export default {
 	name: 'ModuleTr',
 	components: {
-		StatlineCell
+		StatlineCell,
 	},
 	props: {
-		se_module: Object
+		se_module: Object,
 	},
 	computed: {
 		build_time() {
@@ -121,9 +121,9 @@ export default {
 				this.$store.commit('set_module_type', {
 					se_db: this.$store.getters.se_db,
 					module: this.se_module,
-					value: value
+					value: value,
 				});
-			}
+			},
 		},
 		module_variant: {
 			get() {
@@ -132,10 +132,10 @@ export default {
 			set(value) {
 				this.$store.commit('set_module_variant', {
 					module: this.se_module,
-					value: value
+					value: value,
 				});
-			}
-		}
+			},
+		},
 	},
 	methods: {
 		log_parts() {
@@ -143,8 +143,8 @@ export default {
 			console.log(this.valid_parts.map(part => part['Name']));
 			console.log(this.$store.getters.se_db.find_part(this.part));
 			this.part = this.part;
-		}
-	}
+		},
+	},
 };
 </script>
 

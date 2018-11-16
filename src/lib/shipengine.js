@@ -14,19 +14,19 @@ const SUBSYSTEM_SORT_ORDER = {
 	Operations: 2,
 	Hull: 3,
 	Engineering: 4,
-	'Warp Core': 5
+	'Warp Core': 5,
 };
 
 const BR_COST_ROUND_MAP = {
 	Frigate: 5,
 	Cruiser: 10,
-	Explorer: 10
+	Explorer: 10,
 };
 
 const SR_COST_ROUND_MAP = {
 	Frigate: 5,
 	Cruiser: 5,
-	Explorer: 10
+	Explorer: 10,
 };
 
 const REFIT_BR_COST_ROUND = 5;
@@ -37,7 +37,7 @@ const REFIT_SR_COST_ROUND = 5;
 const WEIGHT_CLASS_MAP = {
 	1: 'Frigate',
 	2: 'Cruiser',
-	3: 'Explorer'
+	3: 'Explorer',
 };
 
 const SUBSYSTEM_NAME_MAP = {
@@ -45,7 +45,7 @@ const SUBSYSTEM_NAME_MAP = {
 	Engineering: 'Eng. Mod',
 	Hull: 'Hull Mod',
 	Operations: 'Ops Mod',
-	'Warp Core': 'Core Mod'
+	'Warp Core': 'Core Mod',
 };
 
 // REFACTOR: change the names of these to be less abbreviated
@@ -55,77 +55,77 @@ const COMPONENT_MODIFIERS = {
 		'Effect Qty?': true,
 		combat: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Secondary Phasers': {
 		'Effect Qty?': true,
 		combat: 1 / 4,
 		'Cost Mod': 1 / 4,
-		'Crew Mod': 1 / 4
+		'Crew Mod': 1 / 4,
 	},
 	'Torpedo System': {
 		'Effect Qty?': true,
 		combat: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Short-Range Sensors': {
 		'Effect Qty?': true,
 		combat: 1 / 2,
 		science: 1 / 2,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Targeting Computer': {
 		'Effect Qty?': true,
 		combat: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Deflector Shields': {
 		'Effect Qty?': true,
 		shields: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Backup Deflectors': {
 		'Effect Qty?': true,
 		shields: 1 / 5,
 		'Cost Mod': 1 / 5,
-		'Crew Mod': 1 / 5
+		'Crew Mod': 1 / 5,
 	},
 	'Impulse Engine Pwr': {
 		'Effect Qty?': true,
 		combat: 1 / 4,
 		defense: 4 / 5,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 
 	'Long-Range Sensors': {
 		'Effect Qty?': true,
 		science: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Navigational Sensors': {
 		'Effect Qty?': true,
 		science: 1,
 		defense: 1 / 6,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Survey Sensors': {
 		'Effect Qty?': true,
 		science: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Science Labs': {
 		'Effect Qty?': true,
 		science: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Computer Core': {
 		'Effect Qty?': true,
@@ -136,7 +136,7 @@ const COMPONENT_MODIFIERS = {
 		presence: 1 / 6,
 		defense: 1 / 8,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Operating System': {
 		'Effect Qty?': true,
@@ -145,7 +145,7 @@ const COMPONENT_MODIFIERS = {
 		shields: 1 / 14,
 		defense: 1 / 10,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Secondary Core': {
 		'Effect Qty?': true,
@@ -154,26 +154,26 @@ const COMPONENT_MODIFIERS = {
 		shields: 1 / 28,
 		defense: 1 / 40,
 		'Cost Mod': 1 / 2,
-		'Crew Mod': 1 / 4
+		'Crew Mod': 1 / 4,
 	},
 	'Diplomatic Package': {
 		'Effect Qty?': true,
 		presence: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Recreation Package': {
 		'Effect Qty?': true,
 		presence: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	Sickbay: {
 		'Effect Qty?': true,
 		science: 1 / 2,
 		presence: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 
 	'Hull System': {
@@ -181,14 +181,14 @@ const COMPONENT_MODIFIERS = {
 		hull: 1,
 		'Cost Mod': 1,
 		'Scale Wt?': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 
 	'Structural Integrity Fields': {
 		'Effect Qty?': true,
 		hull: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Navigational Deflector': {
 		'Effect Qty?': false,
@@ -196,13 +196,13 @@ const COMPONENT_MODIFIERS = {
 		shields: 1 / 7,
 		defense: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Nacelle System': {
 		'Effect Qty?': true,
 		defense: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Replication Package': {
 		'Effect Qty?': true,
@@ -210,40 +210,40 @@ const COMPONENT_MODIFIERS = {
 		presence: 1 / 4,
 		defense: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Fuel & Matter Stores': {
 		'Effect Qty?': false,
 		defense: 1,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 
 	'Warp Core Type': {
 		'Effect Qty?': true,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'M/AM Injectors': {
 		'Effect Qty?': true,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Coolant Systems': {
 		'Effect Qty?': true,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'EPS Manifold System': {
 		'Effect Qty?': false,
 		'Cost Mod': 1,
-		'Crew Mod': 1
+		'Crew Mod': 1,
 	},
 	'Eject System': {
 		'Effect Qty?': false,
 		'Cost Mod': 1,
-		'Crew Mod': 1
-	}
+		'Crew Mod': 1,
+	},
 };
 
 // AI, AJ, AK block
@@ -277,7 +277,7 @@ const COMPONENT_PART_CLASSIFICATIONS = {
 	'M/AM Injectors': 'Matter/Anti-Matter Injectors',
 	'Coolant Systems': 'Coolant Systems',
 	'EPS Manifold System': 'EPS Manifold System',
-	'Eject System': 'Eject System'
+	'Eject System': 'Eject System',
 };
 
 class Crewline extends NamedVector {
@@ -285,7 +285,7 @@ class Crewline extends NamedVector {
 		return {
 			officer: 'O',
 			enlisted: 'E',
-			technician: 'T'
+			technician: 'T',
 		};
 	}
 	constructor(val) {
@@ -301,7 +301,7 @@ class Statline extends NamedVector {
 			hull: 'H',
 			shields: 'L',
 			presence: 'P',
-			defense: 'D'
+			defense: 'D',
 		};
 	}
 	constructor(val) {
@@ -431,7 +431,7 @@ class DesignComponent {
 					is_configurable: () => false,
 					get: () => {
 						return this.subsystem.design.size_round;
-					}
+					},
 				};
 			case 'M/AM Injectors':
 			case 'Coolant Systems':
@@ -443,7 +443,7 @@ class DesignComponent {
 							return 0;
 						}
 						return warp_core_type.quantity;
-					}
+					},
 				};
 			case 'Targeting Computer':
 			case 'Nacelle System':
@@ -456,7 +456,7 @@ class DesignComponent {
 						} else {
 							return 1;
 						}
-					}
+					},
 				};
 			default:
 				return {
@@ -485,7 +485,7 @@ class DesignComponent {
 							default:
 								return [...Array(26).keys()];
 						}
-					}
+					},
 				};
 		}
 	}
@@ -586,7 +586,7 @@ class DesignComponent {
 			this.crew_mod,
 
 			this.cost_crew_quantity_mod,
-			this.subsystem.design.cost_crew_size_mod
+			this.subsystem.design.cost_crew_size_mod,
 		].reduce((sum, value) => sum.mult(value), new Crewline(1));
 	}
 
@@ -951,7 +951,7 @@ class DesignComponent {
 		if (!comp1 || !comp2) {
 			let comp = comp1 || comp2;
 			let default_comp = new DesignComponent(comp.db, comp.subsystem, {
-				Name: comp.name
+				Name: comp.name,
 			});
 			return [comp1 || default_comp, comp2 || default_comp];
 		} else {
@@ -991,7 +991,7 @@ class DesignComponent {
 
 			get refit_cost_SR() {
 				return refit_cost('cost_SR');
-			}
+			},
 		};
 
 		return new Proxy(refit_extensions, {
@@ -1004,7 +1004,7 @@ class DesignComponent {
 
 			set(target, prop, value) {
 				return Reflect.set(comp, prop, value);
-			}
+			},
 		});
 	}
 
@@ -1018,7 +1018,7 @@ class DesignComponent {
 			// Don't do compare logic on quantity
 			get quantity() {
 				return comp.quantity;
-			}
+			},
 		};
 
 		return new Proxy(compare_extensions, {
@@ -1031,7 +1031,7 @@ class DesignComponent {
 
 			set(target, prop, value) {
 				return Reflect.set(comp, prop, value);
-			}
+			},
 		});
 	}
 }
@@ -1189,7 +1189,7 @@ class DesignSubsystem {
 		const map = [
 			['officer', 'O-Mod'],
 			['enlisted', 'E-Mod'],
-			['technician', 'T-Mod']
+			['technician', 'T-Mod'],
 		];
 		const crew_block = map.reduce((res, [longname, shortname]) => {
 			res[longname] = this.frame_attribute(shortname);
@@ -1367,11 +1367,11 @@ class DesignSubsystem {
 				{
 					Name: subsystem.name,
 					Settings: subsystem.settings.map(setting => ({
-						Name: setting['Name']
+						Name: setting['Name'],
 					})),
 					Components: subsystem.components.map(
 						comp => DesignComponent.defaults(null, comp)[0]
-					)
+					),
 				}
 			);
 			return [subsystem1 || default_subsystem, subsystem2 || default_subsystem];
@@ -1420,7 +1420,7 @@ class DesignSubsystem {
 
 			get refit_cost_SR() {
 				return refit_cost('cost_SR');
-			}
+			},
 		};
 
 		return new Proxy(refit_extensions, {
@@ -1433,7 +1433,7 @@ class DesignSubsystem {
 
 			set(target, prop, value) {
 				return Reflect.set(subsystem, prop, value);
-			}
+			},
 		});
 	}
 
@@ -1462,7 +1462,7 @@ class DesignSubsystem {
 			omit_validation: true,
 			compare_base: subsystem_base,
 			components,
-			settings
+			settings,
 		};
 
 		return new Proxy(compare_extensions, {
@@ -1478,14 +1478,14 @@ class DesignSubsystem {
 
 			set(target, prop, value) {
 				return Reflect.set(subsystem, prop, value);
-			}
+			},
 		});
 	}
 
 	static setting_refit(setting, setting_base, refit_valid) {
 		let refit_extensions = {
 			refit_valid,
-			compare_base: setting_base
+			compare_base: setting_base,
 		};
 
 		// Proxy is mostly for adding compare_base without polluting original setting object
@@ -1499,14 +1499,14 @@ class DesignSubsystem {
 
 			set(target, prop, value) {
 				return Reflect.set(setting, prop, value);
-			}
+			},
 		});
 	}
 
 	static setting_compare(setting, setting_base) {
 		const compare_extensions = {
 			omit_validation: true,
-			compare_base: setting_base
+			compare_base: setting_base,
 		};
 
 		// Proxy is mostly for adding compare_base without polluting original setting object
@@ -1521,7 +1521,7 @@ class DesignSubsystem {
 
 			set(target, prop, value) {
 				return Reflect.set(setting, prop, value);
-			}
+			},
 		});
 	}
 }
@@ -1628,7 +1628,7 @@ class Module {
 			['hull', 'H'],
 			['shields', 'L'],
 			['presence', 'P'],
-			['defense', 'D']
+			['defense', 'D'],
 		];
 		let stat_block = map.reduce((res, [longname, shortname]) => {
 			res[longname] = this.attribute(shortname);
@@ -1688,7 +1688,7 @@ class Module {
 
 			get refit_cost_SR() {
 				return refit_cost('cost_SR');
-			}
+			},
 		};
 
 		return new Proxy(refit_extensions, {
@@ -1701,14 +1701,14 @@ class Module {
 
 			set(target, prop, value) {
 				return Reflect.set(module, prop, value);
-			}
+			},
 		});
 	}
 
 	static compare(module, module_base) {
 		let compare_extensions = {
 			omit_validation: true,
-			compare_base: module_base
+			compare_base: module_base,
 		};
 
 		return new Proxy(compare_extensions, {
@@ -1721,7 +1721,7 @@ class Module {
 
 			set(target, prop, value) {
 				return Reflect.set(module, prop, value);
-			}
+			},
 		});
 	}
 }
@@ -1806,8 +1806,8 @@ class Design {
 			['Principal', this.json['Principal Frame']],
 			...this.json['Subsystems'].map(ss_json => [
 				ss_json['Name'],
-				ss_json['Sub-Frame']
-			])
+				ss_json['Sub-Frame'],
+			]),
 		]);
 	}
 
@@ -1964,7 +1964,7 @@ class Design {
 		const map = [
 			['officer', 'O-Mod'],
 			['enlisted', 'E-Mod'],
-			['technician', 'T-Mod']
+			['technician', 'T-Mod'],
 		];
 		let crew_block = map.reduce((res, [longname, shortname]) => {
 			res[longname] = this.frame_attribute(shortname);
@@ -2354,7 +2354,7 @@ class Design {
 
 			get refit_cost_SR_raw() {
 				return refit_cost('cost_SR');
-			}
+			},
 		};
 
 		return new Proxy(refit_extensions, {
@@ -2367,7 +2367,7 @@ class Design {
 
 			set(target, prop, value) {
 				return Reflect.set(design, prop, value);
-			}
+			},
 		});
 	}
 
@@ -2385,7 +2385,7 @@ class Design {
 			omit_validation: true,
 			compare_base: design_base,
 			subsystems,
-			module
+			module,
 		};
 
 		return new Proxy(compare_extensions, {
@@ -2398,7 +2398,7 @@ class Design {
 
 			set(target, prop, value) {
 				return Reflect.set(design, prop, value);
-			}
+			},
 		});
 	}
 

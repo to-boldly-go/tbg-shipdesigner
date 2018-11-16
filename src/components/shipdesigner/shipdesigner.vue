@@ -23,9 +23,9 @@ export default {
 	components: {
 		DesignSummary,
 		Design,
-		DesignImportExport
+		DesignImportExport,
 	},
-	computed: {}
+	computed: {},
 };
 </script>
 

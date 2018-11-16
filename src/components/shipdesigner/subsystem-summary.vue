@@ -45,15 +45,15 @@ import { frac } from '@/lib/ui-functions.js';
 export default {
 	name: 'SubsystemSummary',
 	components: {
-		StatlineCell
+		StatlineCell,
 	},
 	props: {
-		se_subsystem: Object
+		se_subsystem: Object,
 	},
 	computed: {
 		weight_summary_class() {
 			return {
-				'has-error': this.has_weight_error
+				'has-error': this.has_weight_error,
 			};
 		},
 		has_weight_error() {
@@ -76,9 +76,9 @@ export default {
 		},
 		tech_year() {
 			return this.se_subsystem.tech_year_max;
-		}
+		},
 	},
-	methods: {}
+	methods: {},
 };
 </script>
 

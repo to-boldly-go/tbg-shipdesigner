@@ -9,23 +9,23 @@ Promise.longStackTraces();
 let parser = new ArgumentParser({
 	version: '0.0.1',
 	addHelp: true,
-	description: 'Read CSV parts list into a json parts list'
+	description: 'Read CSV parts list into a json parts list',
 });
 
 parser.addArgument(['-p', '--parts'], {
-	help: 'The CSV for the parts list'
+	help: 'The CSV for the parts list',
 });
 
 parser.addArgument(['-f', '--frames'], {
-	help: 'The CSV for the frames list'
+	help: 'The CSV for the frames list',
 });
 
 parser.addArgument(['-m', '--modules'], {
-	help: 'The CSV for the modules list'
+	help: 'The CSV for the modules list',
 });
 
 parser.addArgument('name', {
-	help: 'The name of the json parts lists to create.'
+	help: 'The name of the json parts lists to create.',
 });
 
 let args = parser.parseArgs();
@@ -37,14 +37,14 @@ const DEFAULT_PARTS_SCHEMA = [
 		edit_type: 'number',
 		fixed: 0,
 		width: 30,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Type',
 		id: 'type',
 		edit_type: 'string',
 		width: 162,
-		align: 'left'
+		align: 'left',
 	},
 	{
 		name: 'Tier',
@@ -52,7 +52,7 @@ const DEFAULT_PARTS_SCHEMA = [
 		edit_type: 'number',
 		fixed: 0,
 		width: 26,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Size Sort',
@@ -60,21 +60,21 @@ const DEFAULT_PARTS_SCHEMA = [
 		edit_type: 'number',
 		fixed: 0,
 		width: 30,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Size Class',
 		id: 'size-class',
 		edit_type: 'string',
 		width: 68,
-		align: 'left'
+		align: 'left',
 	},
 	{
 		name: 'Name',
 		id: 'name',
 		edit_type: 'string',
 		width: 345,
-		align: 'left'
+		align: 'left',
 	},
 	{
 		name: 'Effect',
@@ -83,7 +83,7 @@ const DEFAULT_PARTS_SCHEMA = [
 		fixed: 3,
 		width: 56,
 		align: 'right',
-		style: 'fixed'
+		style: 'fixed',
 	},
 	{
 		name: 'Weight O/H',
@@ -92,7 +92,7 @@ const DEFAULT_PARTS_SCHEMA = [
 		width: 40,
 		fixed: 0,
 		align: 'right',
-		style: 'fixed'
+		style: 'fixed',
 	},
 	{
 		name: 'Scale Weight',
@@ -100,7 +100,7 @@ const DEFAULT_PARTS_SCHEMA = [
 		edit_type: 'number',
 		width: 40,
 		align: 'right',
-		style: 'fixed'
+		style: 'fixed',
 	},
 	{
 		name: 'Unit Weight',
@@ -109,7 +109,7 @@ const DEFAULT_PARTS_SCHEMA = [
 		fixed: 2,
 		width: 40,
 		align: 'right',
-		style: 'fixed'
+		style: 'fixed',
 	},
 	{
 		name: 'SR Cost x',
@@ -118,7 +118,7 @@ const DEFAULT_PARTS_SCHEMA = [
 		fixed: 5,
 		width: 65,
 		align: 'right',
-		style: 'fixed'
+		style: 'fixed',
 	},
 	{
 		name: 'Pwr O/H',
@@ -127,7 +127,7 @@ const DEFAULT_PARTS_SCHEMA = [
 		fixed: 3,
 		width: 54,
 		align: 'right',
-		style: 'fixed'
+		style: 'fixed',
 	},
 	{
 		name: 'Scale Pwr',
@@ -136,7 +136,7 @@ const DEFAULT_PARTS_SCHEMA = [
 		fixed: 3,
 		width: 40,
 		align: 'right',
-		style: 'fixed'
+		style: 'fixed',
 	},
 	{
 		name: 'Unit Power',
@@ -145,7 +145,7 @@ const DEFAULT_PARTS_SCHEMA = [
 		fixed: 2,
 		width: 40,
 		align: 'right',
-		style: 'fixed'
+		style: 'fixed',
 	},
 	{
 		name: 'O',
@@ -154,7 +154,7 @@ const DEFAULT_PARTS_SCHEMA = [
 		fixed: 3,
 		width: 51,
 		align: 'right',
-		style: 'fixed'
+		style: 'fixed',
 	},
 	{
 		name: 'E',
@@ -163,7 +163,7 @@ const DEFAULT_PARTS_SCHEMA = [
 		fixed: 3,
 		width: 51,
 		align: 'right',
-		style: 'fixed'
+		style: 'fixed',
 	},
 	{
 		name: 'T',
@@ -172,7 +172,7 @@ const DEFAULT_PARTS_SCHEMA = [
 		fixed: 3,
 		width: 44,
 		align: 'right',
-		style: 'fixed'
+		style: 'fixed',
 	},
 	{
 		name: 'Reliability',
@@ -181,15 +181,15 @@ const DEFAULT_PARTS_SCHEMA = [
 		fixed: 7,
 		width: 66,
 		align: 'right',
-		style: 'fixed'
+		style: 'fixed',
 	},
 	{
 		name: 'Year Available (SF)',
 		id: 'year',
 		edit_type: 'string',
 		width: 123,
-		align: 'right'
-	}
+		align: 'right',
+	},
 ];
 
 const DEFAULT_MODULES_SCHEMA = [
@@ -198,7 +198,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		id: 'type',
 		edit_type: 'string',
 		width: 151,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Weight Cap',
@@ -206,14 +206,14 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 0,
 		width: 72,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Variant',
 		id: 'variant',
 		edit_type: 'string',
 		width: 70,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Tier',
@@ -221,7 +221,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 0,
 		width: 24,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Build Time',
@@ -229,7 +229,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 2,
 		width: 70,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'C',
@@ -237,7 +237,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 1,
 		width: 19,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'S',
@@ -245,7 +245,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 1,
 		width: 19,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'H',
@@ -253,7 +253,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 1,
 		width: 19,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'L',
@@ -261,7 +261,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 1,
 		width: 19,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'P',
@@ -269,7 +269,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 1,
 		width: 19,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'D',
@@ -277,7 +277,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 1,
 		width: 19,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Weight',
@@ -285,7 +285,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 0,
 		width: 47,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'SR Cost',
@@ -293,7 +293,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 0,
 		width: 54,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Power Cost',
@@ -301,7 +301,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 0,
 		width: 75,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'O',
@@ -309,7 +309,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 2,
 		width: 30,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'E',
@@ -317,7 +317,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 2,
 		width: 30,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'T',
@@ -325,7 +325,7 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 2,
 		width: 30,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Reliability',
@@ -333,8 +333,8 @@ const DEFAULT_MODULES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 7,
 		width: 62,
-		align: 'right'
-	}
+		align: 'right',
+	},
 ];
 
 const DEFAULT_FRAMES_SCHEMA = [
@@ -344,63 +344,63 @@ const DEFAULT_FRAMES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 0,
 		width: 59,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Type',
 		id: 'type',
 		edit_type: 'string',
 		width: 73,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Tier',
 		id: 'tier',
 		edit_type: 'number',
 		width: 27,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Weight Class',
 		id: 'weightclass',
 		edit_type: 'number',
 		width: 85,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Size Class',
 		id: 'sizeclass',
 		edit_type: 'number',
 		width: 68,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Name',
 		id: 'name',
 		edit_type: 'string',
 		width: 261,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'MaxSz',
 		id: 'maxsz',
 		edit_type: 'number',
 		width: 44,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Wt',
 		id: 'wt',
 		edit_type: 'number',
 		width: 25,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Build Time',
 		id: 'buildtime',
 		edit_type: 'string',
 		width: 70,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Tac Mod',
@@ -408,7 +408,7 @@ const DEFAULT_FRAMES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 3,
 		width: 55,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Ops Mod',
@@ -416,7 +416,7 @@ const DEFAULT_FRAMES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 3,
 		width: 59,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Hull Mod',
@@ -424,7 +424,7 @@ const DEFAULT_FRAMES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 3,
 		width: 58,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Eng. Mod',
@@ -432,7 +432,7 @@ const DEFAULT_FRAMES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 3,
 		width: 62,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Core Mod',
@@ -440,7 +440,7 @@ const DEFAULT_FRAMES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 3,
 		width: 63,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'O-Mod',
@@ -448,7 +448,7 @@ const DEFAULT_FRAMES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 3,
 		width: 45,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'E-Mod',
@@ -456,7 +456,7 @@ const DEFAULT_FRAMES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 3,
 		width: 45,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'T-Mod',
@@ -464,7 +464,7 @@ const DEFAULT_FRAMES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 3,
 		width: 42,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'SR-Mod',
@@ -472,15 +472,15 @@ const DEFAULT_FRAMES_SCHEMA = [
 		edit_type: 'number',
 		fixed: 3,
 		width: 53,
-		align: 'right'
+		align: 'right',
 	},
 	{
 		name: 'Year Available (SF)',
 		id: 'year',
 		edit_type: 'string',
 		width: 120,
-		align: 'right'
-	}
+		align: 'right',
+	},
 ];
 
 Papa.parsePromise = function(file) {
@@ -489,7 +489,7 @@ Papa.parsePromise = function(file) {
 			header: true,
 			dynamicTyping: true,
 			complete,
-			error
+			error,
 		});
 	});
 };
@@ -509,7 +509,7 @@ function readFile(filename, enc) {
 Promise.all([
 	readFile(args.parts, 'utf8').then(Papa.parsePromise),
 	readFile(args.frames, 'utf8').then(Papa.parsePromise),
-	readFile(args.modules, 'utf8').then(Papa.parsePromise)
+	readFile(args.modules, 'utf8').then(Papa.parsePromise),
 ]).then(([parts, frames, modules]) => {
 	console.log(
 		JSON.stringify({
@@ -517,16 +517,16 @@ Promise.all([
 			timestamp: new Date().toISOString(),
 			parts: {
 				records: parts.data.filter(row => _.size(row) > 2),
-				schema: DEFAULT_PARTS_SCHEMA
+				schema: DEFAULT_PARTS_SCHEMA,
 			},
 			modules: {
 				records: modules.data.filter(row => _.size(row) > 2),
-				schema: DEFAULT_MODULES_SCHEMA
+				schema: DEFAULT_MODULES_SCHEMA,
 			},
 			frames: {
 				records: frames.data.filter(row => _.size(row) > 2),
-				schema: DEFAULT_FRAMES_SCHEMA
-			}
+				schema: DEFAULT_FRAMES_SCHEMA,
+			},
 		})
 	);
 });

@@ -99,7 +99,7 @@ const LOCAL_PARTS_LISTS_KEY = 'parts_lists';
 
 const csv_parse_config = {
 	header: true,
-	dynamicTyping: true
+	dynamicTyping: true,
 };
 
 export default {
@@ -112,7 +112,7 @@ export default {
 			parts_result: {},
 			frames_result: {},
 			name: '',
-			success: null
+			success: null,
 		};
 	},
 	computed: {
@@ -123,7 +123,7 @@ export default {
 			set(value) {
 				this.success = false;
 				this.name = value;
-			}
+			},
 		},
 		modules_error_messages() {
 			if (this.has_modules_errors) {
@@ -198,7 +198,7 @@ export default {
 		},
 		has_modules_errors() {
 			return this.modules_result.errors && this.modules_result.errors.length;
-		}
+		},
 	},
 	methods: {
 		load_file_parts() {
@@ -244,16 +244,16 @@ export default {
 				timestamp: new Date().toISOString(),
 				parts: {
 					records: this.parts_result.data.filter(row => _.size(row) > 2),
-					schema: canon_parts_list.parts.schema
+					schema: canon_parts_list.parts.schema,
 				},
 				modules: {
 					records: this.modules_result.data.filter(row => _.size(row) > 2),
-					schema: canon_parts_list.modules.schema
+					schema: canon_parts_list.modules.schema,
 				},
 				frames: {
 					records: this.frames_result.data.filter(row => _.size(row) > 2),
-					schema: canon_parts_list.frames.schema
-				}
+					schema: canon_parts_list.frames.schema,
+				},
 			});
 
 			const loaded = localStorage.getItem(LOCAL_PARTS_LISTS_KEY);
@@ -269,8 +269,8 @@ export default {
 				JSON.stringify(local_parts_lists)
 			);
 			this.success = 'Successfully saved parts list!';
-		}
-	}
+		},
+	},
 };
 </script>
 

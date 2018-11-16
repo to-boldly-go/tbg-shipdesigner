@@ -8,8 +8,8 @@ module.exports = {
 		modules: [path.resolve('./src'), path.resolve('./node_modules')],
 		alias: {
 			'@': path.resolve('src'),
-			'#': path.resolve('dist')
-		}
+			'#': path.resolve('dist'),
+		},
 	},
 	module: {
 		rules: [
@@ -17,16 +17,16 @@ module.exports = {
 				test: /\.js$/,
 				exclude: /(node_modules|bower_components)/,
 				use: {
-					loader: 'babel-loader'
-				}
+					loader: 'babel-loader',
+				},
 			},
 			{
 				test: /\.vue$/,
-				use: ['vue-loader']
+				use: ['vue-loader'],
 			},
 			{
 				test: /\.raw\./,
-				use: ['raw-loader']
+				use: ['raw-loader'],
 			},
 			{
 				test: /\.csv$/,
@@ -35,10 +35,10 @@ module.exports = {
 				options: {
 					dynamicTyping: true,
 					header: true,
-					skipEmptyLines: true
-				}
-			}
-		]
+					skipEmptyLines: true,
+				},
+			},
+		],
 	},
-	mode: 'development'
+	mode: 'development',
 };

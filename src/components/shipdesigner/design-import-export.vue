@@ -130,7 +130,7 @@ export default {
 
 			selected_parts_list: null,
 
-			design_filter: []
+			design_filter: [],
 		};
 	},
 	computed: {
@@ -155,7 +155,7 @@ export default {
 				this.selected_parts_list = this.all_parts_lists.find(
 					ShipEngine.DB.find_by_pretty_name(value)
 				);
-			}
+			},
 		},
 		all_parts_lists() {
 			return [...this.local_parts_lists, this.canon_se_db];
@@ -172,7 +172,7 @@ export default {
 				this.selected_save = this.local_saves.find(
 					ShipEngine.Design.find_by_pretty_name(value)
 				);
-			}
+			},
 		},
 		selected_other_design_name: {
 			get() {
@@ -190,7 +190,7 @@ export default {
 					this.selected_other_save = other_save;
 					this.$store.commit('set_other_design_json', other_save.json);
 				}
-			}
+			},
 		},
 		design_mode_enabled: {
 			get() {
@@ -198,7 +198,7 @@ export default {
 			},
 			set(value) {
 				this.$store.commit('set_design_mode_enabled', value);
-			}
+			},
 		},
 		design_mode: {
 			get() {
@@ -206,7 +206,7 @@ export default {
 			},
 			set(value) {
 				this.$store.commit('set_design_mode', value);
-			}
+			},
 		},
 		design_mode_local_saves() {
 			if (this.design_mode !== 'refit') {
@@ -222,7 +222,7 @@ export default {
 		design_json_url_encoded_string() {
 			return encodeURI(this.design_json_string);
 		},
-		...mapGetters(['canon_se_db', 'se_design', 'se_db'])
+		...mapGetters(['canon_se_db', 'se_design', 'se_db']),
 	},
 	mounted() {
 		this.parts_lists_load_from_local_storage();
@@ -369,8 +369,8 @@ export default {
 		},
 		clear_status_message() {
 			this.status_message = null;
-		}
-	}
+		},
+	},
 };
 </script>
 

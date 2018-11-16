@@ -33,8 +33,8 @@ const store = new Vuex.Store({
 
 		undo: {
 			current: -1,
-			history: []
-		}
+			history: [],
+		},
 	},
 	getters: {
 		se_design(state, getters) {
@@ -58,7 +58,7 @@ const store = new Vuex.Store({
 		},
 		canon_se_db(state, getters) {
 			return new ShipEngine.DB(state.canon_parts_list);
-		}
+		},
 	},
 	actions: {
 		redo(context) {
@@ -76,7 +76,7 @@ const store = new Vuex.Store({
 				);
 				context.commit('history_backward');
 			}
-		}
+		},
 	},
 	mutations: {
 		history_forward(state, payload) {
@@ -96,7 +96,7 @@ const store = new Vuex.Store({
 		set_design_parts_list(state, payload) {
 			state.design_json['Parts List'] = {
 				name: state.parts_list.name,
-				timestamp: state.parts_list.timestamp
+				timestamp: state.parts_list.timestamp,
 			};
 		},
 
@@ -108,12 +108,12 @@ const store = new Vuex.Store({
 			state.undo.history[state.undo.current] = {
 				undo: {
 					type: 'set_design_name_undo',
-					old_name
+					old_name,
 				},
 				redo: {
 					type: 'set_design_name_redo',
-					new_name: payload
-				}
+					new_name: payload,
+				},
 			};
 		},
 		set_design_name_undo(state, payload) {
@@ -132,13 +132,13 @@ const store = new Vuex.Store({
 				undo: {
 					type: 'set_subsystem_frame_undo',
 					subsystem: payload.subsystem,
-					old_frame
+					old_frame,
 				},
 				redo: {
 					type: 'set_subsystem_frame_redo',
 					subsystem: payload.subsystem,
-					new_frame: payload.subsystem.sub_frame
-				}
+					new_frame: payload.subsystem.sub_frame,
+				},
 			};
 		},
 		set_subsystem_frame_undo(state, payload) {
@@ -159,14 +159,14 @@ const store = new Vuex.Store({
 					type: 'set_component_quantity_undo',
 					component: payload.component,
 					old_quantity,
-					old_part
+					old_part,
 				},
 				redo: {
 					type: 'set_component_quantity_redo',
 					component: payload.component,
 					new_quantity: payload.component.quantity,
-					new_part: payload.component.part
-				}
+					new_part: payload.component.part,
+				},
 			};
 		},
 		set_component_quantity_undo(state, payload) {
@@ -192,14 +192,14 @@ const store = new Vuex.Store({
 					type: 'set_component_part_undo',
 					component: payload.component,
 					old_quantity,
-					old_part
+					old_part,
 				},
 				redo: {
 					type: 'set_component_part_redo',
 					component: payload.component,
 					new_quantity: payload.component.quantity,
-					new_part: payload.component.part
-				}
+					new_part: payload.component.part,
+				},
 			};
 		},
 		set_component_part_undo(state, payload) {
@@ -227,13 +227,13 @@ const store = new Vuex.Store({
 				undo: {
 					type: 'set_setting_undo',
 					setting: payload.setting,
-					old_value
+					old_value,
 				},
 				redo: {
 					type: 'set_setting_redo',
 					setting: payload.setting,
-					new_value: payload.setting['Value']
-				}
+					new_value: payload.setting['Value'],
+				},
 			};
 		},
 		set_setting_undo(state, payload) {
@@ -256,14 +256,14 @@ const store = new Vuex.Store({
 					type: 'set_module_type_undo',
 					module: payload.module,
 					old_type,
-					old_variant
+					old_variant,
 				},
 				redo: {
 					type: 'set_module_type_redo',
 					module: payload.module,
 					new_type: payload.module.module_type,
-					new_variant: payload.module.module_variant
-				}
+					new_variant: payload.module.module_variant,
+				},
 			};
 		},
 		set_module_type_undo(state, payload) {
@@ -284,13 +284,13 @@ const store = new Vuex.Store({
 				undo: {
 					type: 'set_module_variant_undo',
 					module: payload.module,
-					old_variant
+					old_variant,
 				},
 				redo: {
 					type: 'set_module_variant_redo',
 					module: payload.module,
-					new_variant: payload.module.module_variant
-				}
+					new_variant: payload.module.module_variant,
+				},
 			};
 		},
 		set_module_variant_undo(state, payload) {
@@ -308,12 +308,12 @@ const store = new Vuex.Store({
 			state.undo.history[state.undo.current] = {
 				undo: {
 					type: 'set_design_json_undo',
-					old_data
+					old_data,
 				},
 				redo: {
 					type: 'set_design_json_redo',
-					new_data: state.design_json
-				}
+					new_data: state.design_json,
+				},
 			};
 		},
 		set_design_json_undo(state, payload) {
@@ -332,8 +332,8 @@ const store = new Vuex.Store({
 		},
 		set_design_mode(state, payload) {
 			state.design_mode = payload;
-		}
-	}
+		},
+	},
 });
 
 window.addEventListener('keydown', function(ev) {
@@ -351,5 +351,5 @@ window.addEventListener('keydown', function(ev) {
 new Vue({
 	el: '#app',
 	render: h => h(ShipDesigner),
-	store
+	store,
 });
